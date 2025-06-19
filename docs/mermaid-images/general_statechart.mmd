@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> Resting
+    Resting --> Awakening : StartUp
+    Awakening --> Attentive : ReadyForInput
+    Attentive --> Active : BeginWork
+    Attentive --> Alert : EnterAlertMode
+    Attentive --> Delegating : DelegateTask
+    Active --> Reflecting : StartReflection
+    Active --> Delegating : DelegateWhileActive
+    Reflecting --> Learning : StartLearning
+    Learning --> Active : FinishLearning
+    Delegating --> Attentive : DelegationComplete
+    Overloaded --> Recovering : StartRecovery
+    Recovering --> Attentive : RecoveryComplete
+    ShuttingDown --> Resting : ShutdownComplete
+    Interrupting --> Overloaded : EscalateToOverload
+    Interrupting --> Alert : EscalateToAlert
+    Interrupting --> ShuttingDown : EscalateToShutdown
+    Interrupting --> prevState : ReturnAfterInterrupt

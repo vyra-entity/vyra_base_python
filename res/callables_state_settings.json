@@ -1,0 +1,145 @@
+[
+    {
+        "function_name": "activate",
+        "displayname": "Activate",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "User",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Id",
+                "description": "",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Activate the module. This will unlock functions due to the access-level",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "deactivate",
+        "displayname": "Deactivate",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "User",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Id",
+                "description": "",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Deactivate the module. This will lock most functions for access",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "reset",
+        "displayname": "Reset",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Resetting a module if it is in Error-State",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "stop",
+        "displayname": "Stop",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Stopping an running Module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "pause",
+        "displayname": "Pause",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Pausing an running Module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "restart",
+        "displayname": "Restart",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Used to restart the module if this module is in Pause-State",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "configure",
+        "displayname": "Configure",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Used to restart the module if this module is in Pause-State",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    }
+]

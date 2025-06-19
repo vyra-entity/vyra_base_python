@@ -1,0 +1,138 @@
+[
+    {
+        "tags": ["module"],
+        "type": "callable",
+        "functionname": "get_module_variables",
+        "displayname": "Get module variables",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "User",
+                "description": "",
+                "optional": true
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": true
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Read the customizable and only-readable parameters of this module",
+        "visible": false,
+        "published": false
+    },
+    {
+        "tags": ["module"],
+        "type": "callable",
+        "functionname": "get_function_list",
+        "displayname": "Get function list",
+        "params": [
+            {
+                "datatype": "bool",
+                "displayname": "Verbose",
+                "description": "With verbose set active, the list will be sent with all paremters",
+                "optional": true
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Read the list of available functions of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "tags": ["module"],
+        "type": "callable",
+        "functionname": "get_module_state_history",
+        "name": "Modulestate History",
+        "displayname": "Get module state history",
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Feedback the state history of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "tags": ["module"],
+        "type": "speaker",
+        "functionname": "module_name",
+        "displayname": "Module name",
+        "description": "Read the Module-Name",
+        "visible": true,
+        "published": false
+    },
+    {
+        "tags": ["module"],
+        "type": "speaker",
+        "functionname": "module_id",
+        "displayname": "Module id",
+        "description": "Read the Module-ID",
+        "visible": true,
+        "published": false
+    },
+    {
+        "tags": ["module"],
+        "type": "speaker",
+        "functionname": "module_state",
+        "displayname": "Module state",
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Feedback the current state of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "tags": ["module"],
+        "type": "speaker",
+        "functionname": "config_links",
+        "displayname": "Config links",
+        "description": "Read the IP-Address of the Configuration-Software",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["module"],
+        "type": "speaker",
+        "functionname": "is_continuous_running",
+        "displayname": "Is continuous running",
+        "description": "Read if the module permanently runs.",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["module"],
+        "type": "speaker",
+        "functionname": "module_address",
+        "displayname": "Module address",
+        "description": "Read the IP-Address and Port of the Shaker-Module",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]

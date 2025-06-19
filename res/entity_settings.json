@@ -1,0 +1,419 @@
+[
+    {
+        "function_name": "get_module_id",
+        "name": "Module ID",
+        "displayname": "Module ID",
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read the Module-ID",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "get_module_name",
+        "name": "Module Name",
+        "displayname": {
+            "en": "Module Name",
+            "de": "Modulname"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read the Module-Name",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "get_module_variables",
+        "name": "Module Variables",
+        "displayname": {
+            "en": "Module Variables",
+            "de": "Modulvariablen"
+        },
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "User",
+                    "de": "Benutzer"
+                },
+                "description": "",
+                "optional": true
+            },
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Password",
+                    "de": "Passwort"
+                },
+                "description": "",
+                "optional": true
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read the customizable and only-readable parameters of this module",
+        "visible": false,
+        "published": false
+    },
+    {
+        "function_name": "get_function_list",
+        "name": "Function List",
+        "displayname": {
+            "en": "Read Function List",
+            "de": "Lese Funktionsliste"
+        },
+        "params": [
+            {
+                "datatype": "bool",
+                "displayname": {
+                    "en": "Verbose",
+                    "de": "Umfangreich"
+                },
+                "description": "With verbose set active, the list will be sent with all paremters",
+                "optional": true
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read the list of available functions of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "get_module_state",
+        "name": "Status",
+        "displayname": {
+            "en": "Get State",
+            "de": "Get State"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Feedback the current state of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "get_module_state_history",
+        "name": "Modulestate History",
+        "displayname": {
+            "en": "Read Statehistory",
+            "de": "Lese Zustandsübersicht"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Feedback the state history of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "get_params",
+        "name": "Lese Parameter",
+        "displayname": {
+            "en": "Read Parameter",
+            "de": "Lese Parameter"
+        },
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Name",
+                    "de": "Name"
+                },
+                "description": "Parametername",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Username",
+                    "de": "Username"
+                },
+                "description": "Username to be needed at reading hidden parameter",
+                "optional": true
+            },
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Password",
+                    "de": "Passwort"
+                },
+                "description": "Password to be needed at reading hidden parameter",
+                "optional": true
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": "Parametervalue"
+        },
+        "description": "Pull a parameter of the module-specific or module-general parameters",
+        "visible": true,
+        "published": false,
+        "presets": [
+            [
+                "Modules"
+            ]
+        ]
+    },
+    {
+        "function_name": "set_params",
+        "name": "Schreibe Parameter",
+        "displayname": {
+            "en": "Write Parameter",
+            "de": "Schreibe Parameter"
+        },
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Name",
+                    "de": "Name"
+                },
+                "description": "Parametername",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Value",
+                    "de": "Wert"
+                },
+                "description": "Parametervalue",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Username",
+                    "de": "Username"
+                },
+                "description": "Username to be needed at reading hidden parameter",
+                "optional": true
+            },
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Password",
+                    "de": "Passwort"
+                },
+                "description": "Password to be needed at reading hidden parameter",
+                "optional": true
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Push a parameter to the module-specific or module-general parameters",
+        "visible": true,
+        "published": false,
+        "presets": [
+            [],
+            [
+                ""
+            ]
+        ]
+    },
+    {
+        "function_name": "ack_pull_request",
+        "name": "Acknowledge Pull Request",
+        "displayname": {
+            "en": "Acknowledge Pull Request",
+            "de": "Bestätige Pull Request"
+        },
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "Payload",
+                    "de": "Payload"
+                },
+                "description": "Containing the date, decision-value, User and pullRequest-uuid",
+                "optional": false
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": "Returnvalue"
+        },
+        "description": "Used to acknowledge a pull request from the operater by this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "init_io_list",
+        "name": "Initialize IO-List",
+        "displayname": {
+            "en": "Initialize IO-List",
+            "de": "Initialisiere IO-Liste"
+        },
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": {
+                    "en": "IO-List",
+                    "de": "IO-Liste"
+                },
+                "description": "Liste der IO-Signale",
+                "optional": false
+            }
+        ],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Initializes the IO-List of this module",
+        "visible": false,
+        "published": false
+    },
+    {
+        "function_name": "get_module_address",
+        "name": "Lese Addresse",
+        "displayname": {
+            "en": "Read Address",
+            "de": "Lese Addresse"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read the IP-Address and Port of the Shaker-Module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "read_io_list",
+        "name": "Read IO-List",
+        "displayname": {
+            "en": "Read IO-List",
+            "de": "Lese IO-Liste"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Reading the IO-List of this module",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "is_continuous_running",
+        "name": "Continuous Running",
+        "displayname": {
+            "en": "Continuous Running",
+            "de": "Läuft Dauerhaft"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read if the module permanently runs.",
+        "visible": true,
+        "published": false
+    },
+    {
+        "function_name": "get_config_links",
+        "name": "Lese Konfigurationsaddressen",
+        "displayname": {
+            "en": "Read Configuration Links",
+            "de": "Lese Konfigurationsaddressen"
+        },
+        "params": [],
+        "return": {
+            "name": "returnvalue",
+            "datatype": "str",
+            "displayname": {
+                "en": "Returnvalue",
+                "de": "Rückgabewert"
+            },
+            "description": ""
+        },
+        "description": "Read the IP-Address of the Configuration-Software",
+        "visible": true,
+        "published": false
+    }
+]
+

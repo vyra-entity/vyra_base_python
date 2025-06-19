@@ -1,0 +1,32 @@
+# InitialteUpdate.action
+
+# Goal
+string module_name  
+string update_url  # URL to the update package (will be uploaded by the webserver)
+string target_version  # version to update to, can be a specific version or "latest"
+bool force  # whether to force the update even if the version is not newer
+string expected_hash  # optional SHA256-Hash
+
+---
+# Result
+bool success
+string report  # Report on the update process, e.g., "Update successful", "Update failed", etc.
+
+---
+# Feedback
+string status_message
+float32 progress_percentage  # 0.0 - 100.0
+
+# This action is used to initiate an update of a specific module in the vos system.
+# The goal is to provide the necessary parameters for the update process.
+# The result will indicate whether the update was successful and provide a report.
+# The feedback will provide real-time updates on the status of the update process.
+# Example usage:
+# - Goal: "module_name": "vos_base", "update_url": "http://example.com/update.zip", "target_version": "latest", "force": false, "expected_hash": "abc123"
+# - Result: "success": true, "report": "Update successful"
+# - Feedback: "status_message": "Downloading update...", "progress_percentage": 50.0
+# Note: The update process may involve downloading the update package, verifying the hash, and applying the update.
+# The action is designed to be used in a ROS2 environment, where the action server will handle the update process.
+# The action server will listen for requests to initiate an update and will provide feedback during the process.
+# The action server will also handle any errors that may occur during the update process.
+# The action is defined in the .action file format, which is used in ROS2 to define actions.
