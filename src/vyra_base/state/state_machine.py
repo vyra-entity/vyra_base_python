@@ -19,7 +19,7 @@ from vyra_base.com.feeder.state_feeder import StateFeeder
 from vyra_base.defaults.entries import StateEntry
 from vyra_base.helper.logger import Logger
 
-from .state_config import VOS_STATES
+from .state_config import Vyra_STATES
 from .state_config import state_config
 
 
@@ -46,8 +46,8 @@ class StateMachine:
         self._machine: Machine = Machine(**state_config)  # **modelConfig unpacks arguments as kwargs
 
         self._state: StateEntry = StateEntry(
-            VOS_STATES.Resting,  # type: ignore
-            VOS_STATES.Resting,  # type: ignore
+            Vyra_STATES.Resting,  # type: ignore
+            Vyra_STATES.Resting,  # type: ignore
             self.module_config.uuid,
             self.module_config.name,
             datetime.now(),

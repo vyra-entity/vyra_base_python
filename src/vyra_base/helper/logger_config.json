@@ -19,7 +19,7 @@
         "class": "logging.handlers.RotatingFileHandler",
         "level": "DEBUG",
         "formatter": "debug",
-        "filename": "log/vos/logfile.log",
+        "filename": "log/vyra/logfile.log",
         "mode": "a",
         "maxBytes": 5242880,
         "backupCount": 40,

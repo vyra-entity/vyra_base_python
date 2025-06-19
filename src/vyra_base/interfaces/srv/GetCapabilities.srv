@@ -1,7 +1,7 @@
 # GetCapabilities.srv
 ---
 string[] capabilities
-# This service is used to retrieve the capabilities of the vos system.
+# This service is used to retrieve the capabilities of the vyra system.
 # The capabilities field contains a list of strings representing the capabilities.
 # Example usage:
 # - Request: (empty)

@@ -120,9 +120,9 @@ class FunctionConfigEntry:
             returns (list[FunctionConfigBaseReturn]): Return values of the function.
             qosprofile (Union[int, QoSProfile]) [default=10]: Quality of Service profile 
                 for the function.
-            callback (Callable, optional): Only !vos-callable!. Function to be called 
+            callback (Callable, optional): Only !vyra-callable!. Function to be called 
                 when the function is invoked.
-            periodic (FunctionConfigPeriodicSpeaker, optional): Only !vos-speaker!. 
+            periodic (FunctionConfigPeriodicSpeaker, optional): Only !vyra-speaker!. 
                 Function to be called periodically.
     """
     tags: list[str]

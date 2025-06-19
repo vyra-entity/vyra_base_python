@@ -35,7 +35,7 @@ def extract_ros_interfaces(target_package_path):
         init_file.touch()
         with open(source_path / 'config' / 'types.py', 'r') as source_file:
             type_content = source_file.read()
-            type_content = type_content.replace('vos_base', target_path.name)
+            type_content = type_content.replace('vyra_base', target_path.name)
             with open(init_file, 'a') as target_file:
                 target_file.write(type_content)
                 print(f"Created {init_file} with type imports.")

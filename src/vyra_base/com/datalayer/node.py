@@ -4,7 +4,7 @@ from rclpy.node import Node
 
 @dataclass
 class NodeSettings:
-    name: str = 'VOS_node'
+    name: str = 'Vyra_node'
     parameters: dict = field(default_factory=dict)
 
 

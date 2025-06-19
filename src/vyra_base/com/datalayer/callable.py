@@ -10,10 +10,10 @@ from vyra_base.com.datalayer.service_server import VyraServiceServer
 @dataclass
 class VyraCallable:
     """
-    A class that represents and stores all information about a VOS callable.
+    A class that represents and stores all information about a Vyra callable.
     A callable is a function that can be invoked with arguments and returns a result
     within a specified time limit. It is used to define quick responses
-    to requests in the VOS.
+    to requests in the Vyra.
     :param name: Name of the callable.
     :param type: Type of the callable, typically a ROS2 service type.
     :param 

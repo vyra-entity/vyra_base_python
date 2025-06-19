@@ -4,7 +4,7 @@ from typing import List, Union, NamedTuple
 import json
 import os
 
-class VOS_STATES:
+class Vyra_STATES:
     Resting: str = "Resting"
     Awakening: str = "Awakening"
     Attentive: str = "Attentive"
@@ -18,7 +18,7 @@ class VOS_STATES:
     ShuttingDown: str = "ShuttingDown"
     Interrupting: str = "Interrupting"
 
-class VOS_TRANSITIONS:
+class Vyra_TRANSITIONS:
     Resting: str = "Resting"
     Awakening: str = "Awakening"
     Attentive: str = "Attentive"
@@ -38,7 +38,7 @@ class Transition:
     source: Union[str, List[str]]
     dest: str
 
-VOS_TRANSITIONS_LIST: List[Transition] = [
+Vyra_TRANSITIONS_LIST: List[Transition] = [
     Transition(trigger="StartUp", source="Resting", dest="Awakening"),
     Transition(trigger="ReadyForInput", source="Awakening", dest="Attentive"),
     Transition(trigger="BeginWork", source="Attentive", dest="Active"),
@@ -83,15 +83,15 @@ VOS_TRANSITIONS_LIST: List[Transition] = [
 ]
 
 state_config: dict = {
-    "name": "vos_base.state_machine",
-    "states": [state for state in VOS_STATES.__dict__.values() if isinstance(state, str)],
+    "name": "vyra_base.state_machine",
+    "states": [state for state in Vyra_STATES.__dict__.values() if isinstance(state, str)],
     "transitions": [
         {
             "trigger": t.trigger,
             "source": t.source,
             "dest": t.dest
         }
-        for t in VOS_TRANSITIONS_LIST
+        for t in Vyra_TRANSITIONS_LIST
     ],
-    "initial": VOS_STATES.Resting
+    "initial": Vyra_STATES.Resting
 }

@@ -17,12 +17,12 @@ string report  # Report on the update process, e.g., "Update successful", "Updat
 string status_message
 float32 progress_percentage  # 0.0 - 100.0
 
-# This action is used to initiate an update of a specific module in the vos system.
+# This action is used to initiate an update of a specific module in the vyra system.
 # The goal is to provide the necessary parameters for the update process.
 # The result will indicate whether the update was successful and provide a report.
 # The feedback will provide real-time updates on the status of the update process.
 # Example usage:
-# - Goal: "module_name": "vos_base", "update_url": "http://example.com/update.zip", "target_version": "latest", "force": false, "expected_hash": "abc123"
+# - Goal: "module_name": "vyra_base", "update_url": "http://example.com/update.zip", "target_version": "latest", "force": false, "expected_hash": "abc123"
 # - Result: "success": true, "report": "Update successful"
 # - Feedback: "status_message": "Downloading update...", "progress_percentage": 50.0
 # Note: The update process may involve downloading the update package, verifying the hash, and applying the update.
