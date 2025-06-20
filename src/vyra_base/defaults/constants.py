@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 
 class RequiredVersion(Enum):
-    """ Constants used in the vOS universe.
+    """ Constants used in the V.Y.R.A. universe.
         According to "Pyright" Annotations like 'Final[str]' are not allowed.
     """
     PYTHON_MIN = (3, 9, 0)

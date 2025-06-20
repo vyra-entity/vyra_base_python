@@ -102,14 +102,14 @@ class Logger:
             None: If logging is not active, the message will be printed to stdout.
             Otherwise, the message will be logged according to its mode.
         """
+        if isinstance(entry, str):
+            entry = LogEntry(message=entry, mode=LogMode.INFO)
 
         if not Logger._LOG_ACTIVE:
             print(entry.message)
             return None
 
-        if isinstance(entry, str):
-            entry = LogEntry(message=entry, mode=LogMode.INFO)
-
+        
         match entry.mode:
             case LogMode.DEBUG:
                 Logger.logger.debug(entry.message)

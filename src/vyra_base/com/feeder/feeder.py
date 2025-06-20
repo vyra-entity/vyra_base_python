@@ -26,16 +26,17 @@ class BaseFeeder:
     
     def feed(self, msg: Any) -> None:
         """ """
+        Logger.log("Log to ROS2 Handler")
         self._logger.log(self._level, msg)
 
-    def add_logger(self):
+    def create_feeder(self):
         """ Set the logger for the feeder. """
         feed_logger_name: str = f"{self._feedBaseName}.{self._feederName}"
         self._logger = logging.getLogger(feed_logger_name)
         self._logger.setLevel(self._level)
         self._logger.propagate = False
 
-        if self._loggingOn:        
+        if self._loggingOn:
             Logger.add_external(feed_logger_name)
 
     def add_handler(self, handler: CommunicationHandler) -> bool:
@@ -48,6 +49,7 @@ class BaseFeeder:
         if handler in self._handler:
             return False
         
+        self._logger.addHandler(handler)
         self._handler.append(handler)
 
         return True

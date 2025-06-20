@@ -4,6 +4,7 @@ from typing import Any
 
 from vyra_base.com.communication_handler import CommunicationHandler
 from vyra_base.com.datalayer.publisher import VyraPublisher
+from vyra_base.helper.logger import Logger
 
 class ROS2Handler(CommunicationHandler):
     """ Abstract class for all DDS communication handlers.
@@ -16,12 +17,14 @@ class ROS2Handler(CommunicationHandler):
 
 
     def __init__(self, publisher: VyraPublisher, type: Any):
+        Logger.log("INIT ROS2HANDLER")
         self._publisher: VyraPublisher = publisher
         self._type: Any = type
         super().__init__()
 
     def emit(self, record: Any):
         try:
+            Logger.log("DEBUG")
             log_msg: Any = self.format(record)
             ros_msg: Any = self._type()
             ros_msg.data = log_msg

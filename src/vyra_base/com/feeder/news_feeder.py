@@ -48,7 +48,7 @@ class NewsFeeder(BaseFeeder):
             type=speaker.publisher_server.publisher_info.type
         )
 
-        self.add_logger()
+        self.create_feeder()
         
         self.add_handler(ros2_handler)
 
