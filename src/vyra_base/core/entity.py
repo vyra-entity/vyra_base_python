@@ -43,7 +43,12 @@ class VyraEntity:
             self, 
             state_entry: StateEntry,
             module_config: ModuleEntry) -> None:
-        
+
+        log_config_path = Path(__file__).resolve().parent.parent
+        log_config_path: Path = log_config_path / "helper" / "logger_config.json"
+
+        Logger.initialize(log_config_path=log_config_path)
+
         self.register_remote_callables()
 
         if VyraEntity._check_node_availability(module_config.name):
@@ -73,10 +78,6 @@ class VyraEntity:
 
         self.state_machine.initialize()
 
-        log_config_path = Path(__file__).resolve().parent.parent
-        log_config_path: Path = log_config_path / "helper" / "logger_config.json"
-
-        Logger.initialize(log_config_path=log_config_path)
 
     def register_remote_callables(self):
         for attr_name in dir(self):
@@ -182,6 +183,8 @@ class VyraEntity:
                 f"in current state {self.state_machine.current_state}."
             )
             return
+
+        getattr(self.state_machine.model, f"enter_{request.transition_name}")()
 
         response.success = True
         response.message = f"Transition {request.transition_name} triggered successfully."

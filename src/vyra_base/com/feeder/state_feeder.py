@@ -15,6 +15,7 @@ from vyra_base.com.datalayer.speaker import VyraSpeaker
 
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.helper.logger import Logger
 
 class StateFeeder(BaseFeeder):
     """ Collection of the tranisiton state. """
@@ -52,6 +53,7 @@ class StateFeeder(BaseFeeder):
         self.add_handler(ros2_handler)
 
     async def feed(self, stateElement: StateEntry) -> None:
+        Logger.log(f"Feeding {stateElement}")
         """Adds value to the logger and the remote handler"""
         if isinstance(stateElement, StateEntry):
             super().feed(stateElement)

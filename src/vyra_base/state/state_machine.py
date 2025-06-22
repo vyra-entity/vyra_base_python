@@ -86,60 +86,73 @@ class StateModel:
             state_feed: StateFeeder, 
             module_config: ModuleEntry):
         
+        Logger.log(f'Initialize state model with state {state.current}.')
+
         self.state: StateEntry = state
         self.state_feed: StateFeeder = state_feed
         self.module_config: ModuleEntry = module_config
 
     # Enter methods for all states
 
-    async def enter_resting(self):
-        await self._enter_state('resting')
-
-    async def enter_awakening(self):
-        await self._enter_state('awakening')
-
-    async def enter_attentive(self):
-        await self._enter_state('attentive')
-
-    async def enter_active(self):
-        await self._enter_state('active')
-
-    async def enter_reflecting(self):
-        await self._enter_state('reflecting')
-
-    async def enter_learning(self):
-        await self._enter_state('learning')
-
-    async def enter_alert(self):
-        await self._enter_state('alert')
-
-    async def enter_delegating(self):
-        await self._enter_state('delegating')
-
-    async def enter_recovering(self):
-        await self._enter_state('recovering')
-
-    async def enter_overloaded(self):
-        await self._enter_state('overloaded')
-
-    async def enter_shuttingdown(self):
-        await self._enter_state('shuttingdown')
-
-    async def enter_interrupting(self):
-        await self._enter_state('interrupting')
-
-    async def _enter_state(self, state_name: str):
-        """Hilfsmethode für alle enter_<state>-Funktionen."""
+    async def enter_state(self, state_name: str):
+        """Generic method to enter a state."""
         Logger.log(
             LogEntry(f'Enter {state_name} state.', LogMode.INFO)
         )
+        Logger.log("" + str(self.state))
         self.state.previous = self.state.current
         self.state.current = state_name
-        await self.state_feed.feed(
-            self.state
-        )
+        await self.state_feed.feed(self.state)
 
-    # Exit methods for all states
+    # async def enter_resting(self):
+    #     await self._enter_state('resting')
+
+    # async def enter_awakening(self):
+    #     await self._enter_state('awakening')
+
+    # async def enter_attentive(self):
+    #     await self._enter_state('attentive')
+
+    # async def enter_active(self):
+    #     await self._enter_state('active')
+
+    # async def enter_reflecting(self):
+    #     await self._enter_state('reflecting')
+
+    # async def enter_learning(self):
+    #     await self._enter_state('learning')
+
+    # async def enter_alert(self):
+    #     await self._enter_state('alert')
+
+    # async def enter_delegating(self):
+    #     await self._enter_state('delegating')
+
+    # async def enter_recovering(self):
+    #     await self._enter_state('recovering')
+
+    # async def enter_overloaded(self):
+    #     await self._enter_state('overloaded')
+
+    # async def enter_shuttingdown(self):
+    #     await self._enter_state('shuttingdown')
+
+    # async def enter_interrupting(self):
+    #     await self._enter_state('interrupting')
+
+    # async def _enter_state(self, state_name: str):
+    #     """Hilfsmethode für alle enter_<state>-Funktionen."""
+    #     Logger.log(
+    #         LogEntry(f'Enter {state_name} state.', LogMode.INFO)
+    #     )
+    #     Logger.log("" + str(self.state))
+    #     self.state.previous = self.state.current
+    #     self.state.current = state_name
+    #     await self.state_feed.feed(
+    #         self.state
+    #     )
+
+    # # Exit methods for all states
 
     async def exit_resting(self):
         await self._exit_state('resting')
