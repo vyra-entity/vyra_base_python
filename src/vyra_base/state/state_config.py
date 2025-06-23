@@ -82,9 +82,11 @@ Vyra_TRANSITIONS_LIST: List[Transition] = [
     Transition(trigger="ReturnAfterInterrupt", source="Interrupting", dest="prevState"),
 ]
 
-state_config: dict = {
+config_collection: dict = {
     "name": "vyra_base.state_machine",
-    "states": [state for state in Vyra_STATES.__dict__.values() if isinstance(state, str)],
+    "states": [
+        v for k, v in Vyra_STATES.__dict__.items() 
+        if not k.startswith('__')],
     "transitions": [
         {
             "trigger": t.trigger,

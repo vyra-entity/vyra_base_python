@@ -20,7 +20,7 @@ from vyra_base.defaults.entries import StateEntry
 from vyra_base.helper.logger import Logger
 
 from .state_config import Vyra_STATES
-from .state_config import state_config
+from .state_config import config_collection
 
 
 class StateMachine:
@@ -43,7 +43,7 @@ class StateMachine:
         self.module_config: ModuleEntry = module_config
 
     def initialize(self):
-        self._machine: Machine = Machine(**state_config)  # **modelConfig unpacks arguments as kwargs
+        self._machine: Machine = Machine(**config_collection)  # **modelConfig unpacks arguments as kwargs
 
         self._state: StateEntry = StateEntry(
             Vyra_STATES.Resting,  # type: ignore
@@ -60,7 +60,11 @@ class StateMachine:
             self.module_config
         )
 
-        state_config['model'] = self.model  # adding a model to the configuration
+        self.generate_state_methods(
+            config_collection['states']
+        )
+
+        config_collection['model'] = self.model  # adding a model to the configuration
 
     @property
     def current_state(self) -> str:
@@ -69,6 +73,29 @@ class StateMachine:
 
     def is_transition_possible(self, trigger_name):
         return trigger_name in self._machine.get_triggers(self._state.current)
+
+    def generate_state_methods(self, states: list[str]):
+        """Generates methods for entering states dynamically."""
+        for state in states:
+            async def on_enter(self, state=state):
+                pass
+                # print(f"{self.name}: entering state '{state}'")
+                # Logger.log(
+                #     LogEntry(f'Enter {self.name} state.', LogMode.INFO)
+                # )
+                # Logger.log("" + str(self._state))
+                # self._state.previous = self._state.current
+                # self._state.current = self.name
+                # await self.state_feed.feed(self.state)
+
+            setattr(
+                self.model, 
+                f'on_enter_{state}', 
+                on_enter.__get__(
+                    self, 
+                    StateMachine
+                )
+            )
 
 class StateModel:
     """ State class for all states.
@@ -92,8 +119,11 @@ class StateModel:
         self.state_feed: StateFeeder = state_feed
         self.module_config: ModuleEntry = module_config
 
-    # Enter methods for all states
 
+    def aa(self):
+        pass
+
+    # Enter methods for all states
     async def enter_state(self, state_name: str):
         """Generic method to enter a state."""
         Logger.log(
