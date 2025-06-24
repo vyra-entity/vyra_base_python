@@ -94,20 +94,77 @@ class StateModel:
         self._state: StateEntry = state
         self._state_feed: StateFeeder = state_feed
         self._module_config: ModuleEntry = module_config
-
-    def create_on_enter_function(self, state_name) -> Callable:
-        def on_enter(self=self):
-            Logger.debug(f"Entered state: {state_name}")
-        return on_enter
     
-    def create_on_exit_function(self, state_name) -> Callable:
-        def on_exit(self=self):
-            Logger.debug(f"Exit state: {state_name}")
-        return on_exit
-    
-    # def on_enter_Awakening(self):
-    #     """On enter function for the StartUp state."""
-    #     Logger.debug("Entering StartUp state.")
+    def on_enter(self):
+        """On enter function for the Resting state."""
+        Logger.debug(f"Entering {self.state} state.")
+        self._state.previous = self._state.current
+        self._state.current = self.state
+        self._state.timestamp = datetime.now()
         
+        self._state_feed.add_entry(
+            self._state
+        )
+    
+    def on_enter_Resting(self):
+        """On enter function for the Resting state."""
+        Logger.debug("Entering Resting state.")
+        self.on_enter()
+    
+    def on_enter_Awakening(self):
+        """On enter function for the Awakening state."""
+        Logger.debug("Entering Awakening state.")
+        self.on_enter()
+
+    def on_enter_Attentive(self):
+        """On enter function for the Attentive state."""
+        Logger.debug("Entering Attentive state.")
+        self.on_enter()
+
+    def on_enter_Active(self):
+        """On enter function for the Active state."""
+        Logger.debug("Entering Active state.")
+        self.on_enter()
+
+    def on_enter_Reflecting(self):
+        """On enter function for the Reflecting state."""
+        Logger.debug("Entering Reflecting state.")
+        self.on_enter()
+
+    def on_enter_Learning(self):
+        """On enter function for the Learning state."""
+        Logger.debug("Entering Learning state.")
+        self.on_enter()
+
+    def on_enter_Alert(self):
+        """On enter function for the Alert state."""
+        Logger.debug("Entering Alert state.")
+        self.on_enter()
+
+    def on_enter_Delegating(self):
+        """On enter function for the Delegating state."""
+        Logger.debug("Entering Delegating state.")
+        self.on_enter()
+
+    def on_enter_Recovering(self):
+        """On enter function for the Recovering state."""
+        Logger.debug("Entering Recovering state.")
+        self.on_enter()
+
+    def on_enter_Overloaded(self):
+        """On enter function for the Overloaded state."""
+        Logger.debug("Entering Overloaded state.")
+        self.on_enter()
+
+    def on_enter_ShuttingDown(self):
+        """On enter function for the ShuttingDown state."""
+        Logger.debug("Entering ShuttingDown state.")
+        self.on_enter()
+
+    def on_enter_Interrupting(self):
+        """On enter function for the Interrupting state."""
+        Logger.debug("Entering Interrupting state.")
+        self.on_enter()
+
       
 # EOF: state_machine.py
