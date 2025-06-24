@@ -3,7 +3,7 @@
     "disable_existing_loggers": 0,
         
     "root": {
-      "level": "INFO",
+      "level": "DEBUG",
       "handlers": ["debug_file_handler"]
     },
     

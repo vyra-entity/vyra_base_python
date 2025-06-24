@@ -12,7 +12,10 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
-from typing import Union
+from typing import (
+    Union,
+    Any
+)
 
 
 class LogMode(Enum):
@@ -91,7 +94,7 @@ class Logger:
         Logger.debug('Started new Logger')
 
     @classmethod
-    def log(cls, entry: LogEntry) -> None:
+    def log(cls, entry: Union[LogEntry, str, Any]) -> None:
         """Logging a message in different modis.
 
         Args:
@@ -104,6 +107,13 @@ class Logger:
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.INFO)
+        elif isinstance(entry, LogEntry):
+            pass
+        else:
+            entry = LogEntry(
+                message=f"{entry}",
+                mode=LogMode.INFO
+            )
 
         if not Logger._LOG_ACTIVE:
             print(entry.message)

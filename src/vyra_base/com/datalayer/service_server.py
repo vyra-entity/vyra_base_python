@@ -1,5 +1,4 @@
 
-import asyncio
 import rclpy
 from dataclasses import dataclass
 
@@ -83,7 +82,6 @@ class VyraServiceServer:
             print(f">>>>>>{response}")
            
         finally:
-            Logger.log("TEST")
             if ErrorTraceback.check_error_exist():
                 self._node.get_logger().error(
                     f"Error in service callback for {self.service_info.name}")

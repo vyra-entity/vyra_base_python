@@ -184,7 +184,7 @@ class VyraEntity:
             )
             return
 
-        getattr(self.state_machine.model, f"enter_{request.transition_name}")()
+        getattr(self.state_machine.model, f"{request.transition_name}")()
 
         response.success = True
         response.message = f"Transition {request.transition_name} triggered successfully."

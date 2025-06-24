@@ -18,25 +18,13 @@ class Vyra_STATES:
     ShuttingDown: str = "ShuttingDown"
     Interrupting: str = "Interrupting"
 
-class Vyra_TRANSITIONS:
-    Resting: str = "Resting"
-    Awakening: str = "Awakening"
-    Attentive: str = "Attentive"
-    Active: str = "Active"
-    Reflecting: str = "Reflecting"
-    Learning: str = "Learning"
-    Alert: str = "Alert"
-    Delegating: str = "Delegating"
-    Recovering: str = "Recovering"
-    Overloaded: str = "Overloaded"
-    ShuttingDown: str = "ShuttingDown"
-    Interrupting: str = "Interrupting"
 
 @dataclass
 class Transition:
     trigger: str
     source: Union[str, List[str]]
     dest: str
+
 
 Vyra_TRANSITIONS_LIST: List[Transition] = [
     Transition(trigger="StartUp", source="Resting", dest="Awakening"),
