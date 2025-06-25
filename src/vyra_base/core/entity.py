@@ -1,37 +1,40 @@
-
 from __future__ import annotations
 
-
 import asyncio
-
+import datetime
+from pathlib import Path
 from typing import Any
 from typing import Union
 
-from pathlib import Path
-
 from rclpy.qos import QoSProfile
 
-from vyra_base.com.datalayer.interface_factory import remote_callable
-from vyra_base.com.datalayer.interface_factory import create_vyra_callable
-from vyra_base.com.datalayer.interface_factory import create_vyra_job
-from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
-
-from vyra_base.defaults.entries import FunctionConfigEntry
-from vyra_base.defaults.entries import FunctionConfigBaseTypes
-
-from vyra_base.state.state_machine import StateMachine
-
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.node import NodeSettings
-from vyra_base.com.datalayer.node import CheckerNode
-from vyra_base.com.feeder.state_feeder import StateFeeder
-from vyra_base.defaults.entries import StateEntry
-from vyra_base.defaults.entries import ModuleEntry
-from vyra_base.state import state_machine
-from vyra_base.helper.logger import Logger
 from vyra_base.com.datalayer.callable import VyraCallable
-from vyra_base.com.datalayer.interface_factory import DataSpace
+from vyra_base.com.datalayer.interface_factory import (
+    DataSpace,
+    create_vyra_callable,
+    create_vyra_job,
+    create_vyra_speaker,
+    remote_callable,
+)
+from vyra_base.com.datalayer.node import CheckerNode
+from vyra_base.com.datalayer.node import NodeSettings
+from vyra_base.com.datalayer.node import VyraNode
 
+from vyra_base.com.feeder.news_feeder import NewsFeeder
+from vyra_base.com.feeder.state_feeder import StateFeeder
+from vyra_base.com.feeder.error_feeder import ErrorFeeder
+
+from vyra_base.defaults.entries import ErrorEntry
+from vyra_base.defaults.entries import FunctionConfigBaseTypes
+from vyra_base.defaults.entries import FunctionConfigEntry
+from vyra_base.defaults.entries import ModuleEntry
+from vyra_base.defaults.entries import NewsEntry
+from vyra_base.defaults.entries import StateEntry
+
+from vyra_base.helper.logger import Logger
+
+from vyra_base.state import state_machine
+from vyra_base.state.state_machine import StateMachine
 
 class VyraEntity:
 
@@ -42,6 +45,8 @@ class VyraEntity:
     def __init__(
             self, 
             state_entry: StateEntry,
+            news_entry: NewsEntry,
+            error_entry: ErrorEntry,
             module_config: ModuleEntry) -> None:
 
         log_config_path = Path(__file__).resolve().parent.parent
@@ -66,14 +71,40 @@ class VyraEntity:
         self.ros2_node = VyraNode(node_settings)
 
         self.state_feeder = StateFeeder(
-            type=state_entry.type,
-            node=self.ros2_node
+            type=state_entry.type, 
+            node=self.ros2_node, 
+            module_config=self.module_config
+        )
+
+        self.news_feeder = NewsFeeder(
+            type=news_entry.type, 
+            node=self.ros2_node,
+            module_config=self.module_config
+        )
+        
+        self.error_feeder = ErrorFeeder(
+            type=error_entry.type, node=self.ros2_node,
+            module_config=self.module_config
         )
 
         self.state_machine = StateMachine(
             self.state_feeder,
             state_entry.type,
             module_config=self.module_config
+        )
+
+        self.error_feeder.feed(
+            ErrorEntry(
+                module_id=self.module_config.uuid,
+                module_name=self.module_config.name,
+                timestamp=datetime.datetime.now(),
+                type=error_entry.type,
+                level=ErrorEntry.ERROR_LEVEL.MINOR_FAULT,
+                code=0x00000001,
+                description="The entity has been initialized successfully.",
+                solution="No action required.",
+                miscellaneous="Initialization complete."
+            )
         )
 
         self.state_machine.initialize()

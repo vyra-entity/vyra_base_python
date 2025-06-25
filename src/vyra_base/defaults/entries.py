@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import uuid
+
 from typing import Any
 from typing import Callable
 from typing import Union
 from datetime import datetime
 from dataclasses import dataclass, field
 from uuid import UUID
+
 
 from rclpy.qos import QoSProfile
 
@@ -15,21 +18,6 @@ from re import DEBUG
 
 class AvailableModuleEntry:
     pass
-
-
-@dataclass(slots=True)
-class ErrorEntry:
-    """ Contains the database responses.
-
-        Primitive Python object that stores the object values.
-    """
-    error_code: str
-    module_id: str
-    date: datetime
-    type: Any
-    description: str=''
-    solution: str=''
-    miscellaneous: str=''
 
 
 class FunctionConfigParamTypes(Enum):
@@ -140,54 +128,78 @@ class FunctionConfigEntry:
     periodic: Union[FunctionConfigPeriodicSpeaker, None] = None
 
 
-class NewsFeedEntry(dict):
+@dataclass(slots=True)
+class ErrorEntry:
+    """ Contains the database responses.
+
+        Primitive Python object that stores the object values.
+    """
+    type: Any
+    level: Union[ERROR_LEVEL, str] = ''
+    code: int= 0x00000000
+    module_name: str= 'N/A'
+    module_id: Union[UUID, str]= 'N/A'
+    uuid: UUID= field(default_factory=uuid.uuid4)
+    timestamp: Any= ''
+    description: str=''
+    solution: str=''
+    miscellaneous: str=''
+
+    class ERROR_LEVEL(Enum):
+        """ Enum for the error level. """
+
+        MINOR_FAULT = 'minor_fault'
+        MAJOR_FAULT = 'major_fault'
+        CRITICAL_FAULT = 'critical_fault'
+        EMERGENCY_FAULT = 'emergency_fault'
+    
+
+
+class NewsEntry(dict):
     """ News feed entry object. 
        
         Object that writes informational data to the graphical user interface.
         Makes use of the memory saving __slots__. 
     """
     __slots__ = (
-        'level', 
-        'message', 
-        'timestamp', 
-        'uuid', 
-        'module_name', 
-        'module_template'
+        'level',
+        'message',
+        'timestamp',
+        'uuid',
+        'module_name',
+        'module_id',
+        'module_template',
         'type'
     )
     def __init__(
             self, 
-            level: NewsFeedEntry.MESSAGE_TYPE, 
-            message: str, 
-            timestamp: datetime, 
-            uuid: UUID, 
-            module_name: str,
-            module_template: str,
-            type: Any
+            type: Any,
+            level: Union[NewsEntry.MESSAGE_LEVEL, str]= 'info', 
+            message: str= '', 
+            timestamp: Any= datetime.now(), 
+            uuid: UUID= uuid.uuid4(), 
+            module_name: str = 'N/A',
+            module_id: str = 'N/A',
+            module_template: str = 'N/A'
         ) -> None:
 
-        self.message: NewsFeedEntry.Body = self.Body(level, message)
+        self.message: str = message
+        self.level: Union[NewsEntry.MESSAGE_LEVEL, str] = level
         self.timestamp: datetime = timestamp
         self.uuid: UUID = uuid
         self.module_name: str = module_name
+        self.module_id: str = module_id
         self.module_template: str = module_template
         self.type: Any = type
 
 
-    class MESSAGE_TYPE(Enum):
+    class MESSAGE_LEVEL(Enum):
         """ Enum for the message type. """
         ACTION = 'action'
         INFO = 'info'
         DEBUG = 'debug'
         WARNING = 'warning'
         HINT = 'hint'
-    
-    class Body:
-        """ Message body object. """
-        __slots__ = ('level', 'message')
-        def __init__(self, level: NewsFeedEntry.MESSAGE_TYPE, message: str) -> None:
-            self.level: NewsFeedEntry.MESSAGE_TYPE = level
-            self.message: str = message
 
 
 @dataclass(slots=True)
@@ -196,6 +208,7 @@ class PullRequestEntry:
 
         Primitive Python object that stores the object values.
     """
+    type: Any
     uuid: str
     ack_by_user: str
     ack_on_date: str 
@@ -207,7 +220,6 @@ class PullRequestEntry:
     request_action_args: list 
     module_id: str
     color:int
-    type: Any
 
 
 @dataclass(repr=True, slots=True)
@@ -217,13 +229,12 @@ class StateEntry:
         Primitive Python object that stores the object values.
         Makes use of the memory saving __slots__.
     """
-    previous: str
     current: str 
-    module_uuid: UUID
+    module_id: UUID
     module_name: str
     timestamp: Any
     type: Any
-
+    previous: str = 'N/A'
 
 @dataclass(slots=True)
 class ModuleEntry:

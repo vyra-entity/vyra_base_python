@@ -9,7 +9,7 @@ from .constants import TimeoutConstants
 
 from .entries import AvailableModuleEntry
 from .entries import ErrorEntry
-from .entries import NewsFeedEntry
+from .entries import NewsEntry
 from .entries import PullRequestEntry
 from .entries import StateEntry
 

@@ -13,7 +13,7 @@ class CommunicationHandler(logging.Handler):
     # loading time if feed list is not empty.
     FILL_AT_LOADING: bool = True
 
-    def __init__(self):
+    def __init__(self, publisher=None, type=None):
         super().__init__()
 
     def emit(self, record):

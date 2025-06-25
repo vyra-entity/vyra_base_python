@@ -1,67 +1,57 @@
-from collections import deque
-
 import logging
 
 from typing import Any
 
-from builtin_interfaces.msg import Time as BuiltinTime
-
-from vyra_base.com import ros2_handler
-
 from .feeder import BaseFeeder
-from vyra_base.defaults.constants import FeederConstants
+from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
+from vyra_base.defaults.entries import ModuleEntry
 from vyra_base.defaults.entries import StateEntry
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.com.ros2_handler import ROS2Handler
-from vyra_base.com.datalayer.speaker import VyraSpeaker
-
-from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
-
 from vyra_base.helper.logger import Logger
 
 class StateFeeder(BaseFeeder):
-    """ Collection of the tranisiton state. """
+    """ Resposible for loading a ROS2 Handler and feeding StateEntry elements to
+    this handler. """
 
     def __init__(
             self, 
             type: Any,
             node: VyraNode,
-            loggingOn: bool = False
+            module_config: ModuleEntry,
+            loggingOn: bool = False,
             ):
+        
+        """
+        Initializes a StateFeeder instance for sending changes in state of a module.
+        Parameters:
+            type (Any): The ros2-msg type for the feeder.
+            node (VyraNode): The VyraNode instance associated with this feeder (ROS2 Node).
+            loggingOn (bool, optional): Flag to enable or disable logging next to feeding. Defaults to False.
+            module_name (str, optional): Name of the module using this feeder. Defaults to 'N/A'.
+            module_template (str, optional): Template identifier for the module. Defaults to 'N/A'.
+        Raises:
+            FeederException: If the VyraSpeaker cannot be created with the given type.
+        """
         
         self._feederName: str = 'StateFeeder'
         self._doc: str = 'Collect states from this module.'
         self._level: int = logging.INFO
-        self._loggingOn: bool = loggingOn
+        self._type: Any = type
+        self._node: VyraNode = node
+        self._module_config: str = module_config
 
-        speaker: VyraSpeaker = create_vyra_speaker(
-            name=self._feederName,
-            node=node,
-            type=type,
-            description=self._doc
-        )
-        if speaker.publisher_server is None:
-            raise FeederException(
-                f"Could not create speaker for {self._feederName} with type {type}."
-            )        
+        self._handler.append(ROS2Handler)
 
-        ros2_handler = ROS2Handler(
-            speaker.publisher_server,
-            type=speaker.publisher_server.publisher_info.type
-        )
-
-        self.create_feeder()
-        
-        self.add_handler(ros2_handler)
+        super().__init__(loggingOn=loggingOn)
 
     def feed(self, stateElement: StateEntry) -> None:
         """Adds value to the logger and the remote handler"""
 
         if isinstance(stateElement, StateEntry):
             
-            stateElement.timestamp = Ros2TypeConverter.time_to_ros2_buildin_time(
+            stateElement.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
                 stateElement.timestamp)
 
             super().feed(stateElement)

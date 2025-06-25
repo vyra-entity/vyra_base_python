@@ -38,18 +38,18 @@ class StateMachine:
 
     def initialize(self):
         self._state_entry: StateEntry = StateEntry(
-            Vyra_STATES.Resting,  # type: ignore
-            Vyra_STATES.Resting,  # type: ignore
-            self.module_config.uuid,
-            self.module_config.name,
-            datetime.now(),
+            previous='',  # type: ignore
+            current=Vyra_STATES.Resting,  # type: ignore
+            module_id=self.module_config.uuid,
+            module_name=self.module_config.name,
+            timestamp=datetime.now(),
             type=self.state_type
         )
 
         self.model: StateModel = StateModel(
-            self._state_entry, 
-            self.state_feed,
-            self.module_config
+            state_entry=self._state_entry, 
+            state_feed=self.state_feed,
+            module_config=self.module_config
         )
 
         config_collection['model'] = self.model  # adding a model to the configuration
