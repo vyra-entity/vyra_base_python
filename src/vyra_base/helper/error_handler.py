@@ -20,10 +20,10 @@ class ErrorTraceback:
             if exc_type == asyncio.exceptions.CancelledError:
                 pass
             else:
-                error_details.append(traceback.print_exc())
+                error_details.append(traceback.format_exc())
 
                 Logger.log(LogEntry(
-                    f'{traceback.print_exc()}').error())
+                    f'{exc_type}|{exc_obj}|').error())
                 tb_lines: list = []
 
                 for line in traceback.format_tb(exc_tb):

@@ -4,6 +4,8 @@ import logging
 
 from typing import Any
 
+from builtin_interfaces.msg import Time as BuiltinTime
+
 from vyra_base.com import ros2_handler
 
 from .feeder import BaseFeeder
@@ -15,6 +17,8 @@ from vyra_base.com.datalayer.speaker import VyraSpeaker
 
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
+
 from vyra_base.helper.logger import Logger
 
 class StateFeeder(BaseFeeder):
@@ -52,10 +56,14 @@ class StateFeeder(BaseFeeder):
         
         self.add_handler(ros2_handler)
 
-    async def feed(self, stateElement: StateEntry) -> None:
-        Logger.log(f"Feeding {stateElement}")
+    def feed(self, stateElement: StateEntry) -> None:
         """Adds value to the logger and the remote handler"""
+
         if isinstance(stateElement, StateEntry):
+            
+            stateElement.timestamp = Ros2TypeConverter.time_to_ros2_buildin_time(
+                stateElement.timestamp)
+
             super().feed(stateElement)
         else:
             raise FeederException(f"Wrong Type. Expect: StateEntry, got {type(stateElement)}")

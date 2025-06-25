@@ -113,7 +113,7 @@ class VyraEntity:
         for setting in settings:
             
             if setting.type == FunctionConfigBaseTypes.callable.value:
-                print(f"Creating callable: {setting.functionname}")
+                Logger.info(f"Creating callable: {setting.functionname}")
                 create_vyra_callable(
                     name=setting.functionname,
                     type=setting.ros2type,
@@ -122,14 +122,14 @@ class VyraEntity:
                     async_loop=async_loop
                 )
             elif setting.type == FunctionConfigBaseTypes.job.value:
-                print(f"Creating job: {setting.functionname}")
+                Logger.info(f"Creating job: {setting.functionname}")
                 create_vyra_job(
                     name=setting.functionname,
                     type=setting.ros2type,
                     async_loop=async_loop
                 )
             elif setting.type == FunctionConfigBaseTypes.speaker.value:
-                print(f"Creating speaker: {setting.functionname}")
+                Logger.info(f"Creating speaker: {setting.functionname}")
                 periodic: bool = False
                 periodic_caller: Any = None
                 periodic_interval: Union[float, None] = None
@@ -176,18 +176,33 @@ class VyraEntity:
         Raises:
             NotImplementedError: If the method is not implemented in the subclass.
         """
-        if not self.state_machine.is_transition_possible(request.transition_name):
-            response.success = False
-            response.message = (
-                f"Transition {request.transition_name} not possible "
-                f"in current state {self.state_machine.current_state}."
+        trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]
+        if request.trigger_name not in trigger_list:
+            fail_msg = (
+                f"Transition {request.trigger_name} not found in "
+                f"available transitions: {trigger_list}."
             )
-            return
-
-        getattr(self.state_machine.model, f"{request.transition_name}")()
+            
+            response.success = False
+            response.message = fail_msg
+            Logger.warning(fail_msg)
+            return None
+        
+        if not self.state_machine.is_transition_possible(request.trigger_name):
+            fail_msg = (
+                f"Transition {request.trigger_name} not possible in "
+                f"current state {self.state_machine.model.state}."
+            )
+            
+            response.success = False
+            response.message = fail_msg
+            Logger.warning(fail_msg)
+            return None
+        
+        getattr(self.state_machine.model, f"{request.trigger_name}")()
 
         response.success = True
-        response.message = f"Transition {request.transition_name} triggered successfully."
+        response.message = f"Transition {request.trigger_name} triggered successfully."
 
     
     @remote_callable

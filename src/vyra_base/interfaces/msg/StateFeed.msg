@@ -1,8 +1,9 @@
 # StateFeeder.msg
 
-string prev_state
-string current_state
+string previous
+string current
 builtin_interfaces/Time timestamp
+
 
 # The previous state of the system
 # The current state of the system

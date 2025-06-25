@@ -18,23 +18,23 @@ class BaseFeeder:
     _feedBaseName: str = 'vyraFeeder'
     _feederName: str = 'AbstractFeeder'
     _doc: str = 'Abstract class for all feeder classes.'
-    _level: int = logging.INFO
+    _level: int = logging.DEBUG
 
     _handler: list[CommunicationHandler] = []
-    _logger: logging.Logger
+    _feeder: logging.Logger
     _loggingOn: bool  # If true, the feeder will log messages in the base logger
     
     def feed(self, msg: Any) -> None:
         """ """
         Logger.log("Log to ROS2 Handler")
-        self._logger.log(self._level, msg)
+        self._feeder.log(self._level, msg)
 
     def create_feeder(self):
         """ Set the logger for the feeder. """
         feed_logger_name: str = f"{self._feedBaseName}.{self._feederName}"
-        self._logger = logging.getLogger(feed_logger_name)
-        self._logger.setLevel(self._level)
-        self._logger.propagate = False
+        self._feeder = logging.getLogger(feed_logger_name)
+        self._feeder.setLevel(self._level)
+        # self._feeder.propagate = False
 
         if self._loggingOn:
             Logger.add_external(feed_logger_name)
@@ -49,7 +49,7 @@ class BaseFeeder:
         if handler in self._handler:
             return False
         
-        self._logger.addHandler(handler)
+        self._feeder.addHandler(handler)
         self._handler.append(handler)
 
         return True

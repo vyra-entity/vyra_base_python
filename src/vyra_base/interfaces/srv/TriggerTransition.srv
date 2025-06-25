@@ -1,7 +1,7 @@
 # SetState.srv
 
 # Request
-string transition_name  # Name of the transition to set to change the current state
+string trigger_name  # Name of the transition to set to change the current state
 ---
 # Response
 bool success  # Indicates whether the operation was successful thus the state was set

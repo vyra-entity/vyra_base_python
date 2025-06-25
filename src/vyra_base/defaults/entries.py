@@ -9,6 +9,7 @@ from uuid import UUID
 
 from rclpy.qos import QoSProfile
 
+
 from enum import Enum
 from re import DEBUG
 
@@ -220,7 +221,7 @@ class StateEntry:
     current: str 
     module_uuid: UUID
     module_name: str
-    timestamp: datetime
+    timestamp: Any
     type: Any
 
 
