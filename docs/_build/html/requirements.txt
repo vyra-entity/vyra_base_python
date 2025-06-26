@@ -1,8 +1,0 @@
-aiopath==0.7.7
-application==1.0
-asyncua==1.1.5
-PyMySQL==1.1.1
-rclpy==9.1.0
-setuptools==68.1.2
-SQLAlchemy==2.0.41
-transitions==0.9.2

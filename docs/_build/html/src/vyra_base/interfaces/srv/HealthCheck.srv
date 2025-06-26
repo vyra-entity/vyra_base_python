@@ -1,6 +1,0 @@
-# HealthCheck.srv
----
-bool alive  # Indicates if the system is alive/online and ready to process requests
-string state  # Current state of the system, e.g., "active", ...
-string health_status  # Detailed health status of the system, e.g., "all systems operational", "minor issues detected", "major issues detected"
-string[] issues  # List of issues detected, if any, e.g., ["disk space low", "network latency high"]
