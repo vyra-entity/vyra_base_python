@@ -81,7 +81,7 @@ class DbAccess:
         else:
             return sessionmaker(self.db_engine, expire_on_commit=False)
 
-    async def create_all(self) -> str:
+    async def create_all_tables(self) -> str:
         """Create all database tables that are childen of the SQLAlchemy Base class.
         This method will create all tables that are defined in the SQLAlchemy Base class.
         It will also create the tables if they do not exist.
@@ -102,7 +102,7 @@ class DbAccess:
             if ErrorTraceback.check_error_exist():
                 return DBSTATUS.ERROR
 
-    async def create_selective(self, table_structs: list[Base]) -> str:
+    async def create_selected_table(self, table_structs: list[Base]) -> str:
         """Create new database table.
 
         Args:
@@ -147,7 +147,7 @@ class DbAccess:
             if ErrorTraceback.check_error_exist():
                 return DBSTATUS.ERROR
 
-    async def drop(self, table: Base) -> str:
+    async def drop_table(self, table: Base) -> str:
         """Delete table from database.
 
         Args:

@@ -34,18 +34,19 @@ class StateFeeder(BaseFeeder):
         Raises:
             FeederException: If the VyraSpeaker cannot be created with the given type.
         """
-        
+        super().__init__()
+
         self._feederName: str = 'StateFeeder'
         self._doc: str = 'Collect states from this module.'
         self._level: int = logging.INFO
         self._type: Any = type
         self._node: VyraNode = node
-        self._module_config: str = module_config
+        self._module_config: ModuleEntry = module_config
 
         self._handler.append(ROS2Handler)
 
-        super().__init__(loggingOn=loggingOn)
-
+        self.create(loggingOn=loggingOn)
+        
     def feed(self, stateElement: StateEntry) -> None:
         """Adds value to the logger and the remote handler"""
 
@@ -53,6 +54,9 @@ class StateFeeder(BaseFeeder):
             
             stateElement.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
                 stateElement.timestamp)
+            
+            stateElement.module_id = Ros2TypeConverter.uuid_to_ros2uuid(
+                self._module_config.uuid)
 
             super().feed(stateElement)
         else:

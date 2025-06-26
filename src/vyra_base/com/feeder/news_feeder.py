@@ -2,17 +2,15 @@ import logging
 import re
 import uuid
 from datetime import datetime
-from typing import Any
-from typing import Union
+from typing import Any, Union
+
+from builtin_interfaces.msg import Time as BuiltinTime
 
 from .feeder import BaseFeeder
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
-from builtin_interfaces.msg import Time as BuiltinTime
 from vyra_base.com.ros2_handler import ROS2Handler
-
-from vyra_base.defaults.entries import NewsEntry
-from vyra_base.defaults.entries import ModuleEntry
+from vyra_base.defaults.entries import ModuleEntry, NewsEntry
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.helper.logger import Logger
 
@@ -38,7 +36,7 @@ class NewsFeeder(BaseFeeder):
         Raises:
             FeederException: If the VyraSpeaker cannot be created with the given type.
         """
-        
+        super().__init__()
 
         self._feederName: str = f'NewsFeeder'
         self._doc: str = 'Collect news messages of this module.'
@@ -49,11 +47,19 @@ class NewsFeeder(BaseFeeder):
 
         self._handler.append(ROS2Handler)
 
-        super().__init__(loggingOn=loggingOn)
+        self.create(loggingOn=loggingOn)
 
     def feed(self, newsElement: Union[NewsEntry, str, list]) -> None:
         """Feed a news entry to the feeder. The content can either be a string which
-        will be processed into a NewsEntry, or a NewsEntry object itself."""
+        will be processed into a NewsEntry, or a NewsEntry object itself. Use the
+        method `build_newsfeed` to create a NewsEntry from a string or list.
+        Args:
+            newsElement (Union[NewsEntry, str, list]): The news entry to be fed.
+                Can be a string or list of strings to be processed into a NewsEntry,
+                or a NewsEntry object.
+        Raises:
+            FeederException: If the type of newsElement is not supported.
+        """
 
         if isinstance(newsElement, str) or isinstance(newsElement, list):
             # If a string is passed, we assume it is a message to be logged
@@ -72,10 +78,23 @@ class NewsFeeder(BaseFeeder):
             newsfeed_entry.uuid if newsfeed_entry.uuid else uuid.uuid4()
         )
 
+        newsfeed_entry.module_id = Ros2TypeConverter.uuid_to_ros2uuid(
+            self._module_config.uuid
+        )
+
         super().feed(newsfeed_entry)
 
     def build_newsfeed(self, *args: Any) -> NewsEntry:
-        """Building a well structured newsfeed entry from plain text and module information"""
+        """Building a well structured newsfeed entry from plain text and module information
+        Args:
+            *args (Any): The arguments to be processed into a news entry.
+                Can be a string or list of strings.
+        Returns:
+            NewsEntry: A structured news entry containing the message, level, timestamp,
+            UUID, module name, module ID, module template, and type.
+        Raises:
+            FeederException: If the type of the message level is not valid.
+        """
        
         message: str = (''.join(map(str, args))).split('|')[-1]
         ansi_escape = re.compile(
@@ -96,20 +115,26 @@ class NewsFeeder(BaseFeeder):
             )
 
         newsfeed_entry: NewsEntry = NewsEntry(
-            level= message_level,
+            level= message_level.value,
             message= message,
             timestamp= datetime.now(),
             uuid= uuid.uuid4(),
             module_name= self._module_config.name,
             module_id= self._module_config.uuid,
-            module_template= self._module_config.template,
-            type= self._type
+            _type= self._type
 
         )
         return newsfeed_entry
 
 
-def extract_level_from_msg(message: str) -> NewsEntry.MESSAGE_LEVEL | None:
+def extract_level_from_msg(message: str) -> Union[NewsEntry.MESSAGE_LEVEL, None]:
+    """Extracts the message level from a given message string.
+    Args:
+        message (str): The message string from which to extract the level.
+    Returns:
+        Union[NewsEntry.MESSAGE_LEVEL, None]: The extracted message level if found,
+        otherwise None.
+    """
     match = re.search(r"<([^<>]+)>", message)
     if match:
         value = match.group(1)

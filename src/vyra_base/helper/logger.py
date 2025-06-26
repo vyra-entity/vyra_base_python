@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 import logging.config
+import logging.handlers
 import time
 import os
 
@@ -59,7 +60,7 @@ class Logger:
        therefore it is initialized only once. Like the OOP
        Singleton design pattern.
     """
-    _LOGGER_NAME = 'varioboticos_base'
+    _LOGGER_NAME: str = 'vyra_base'
     _LOG_PATH: str = ''
     _LOG_ACTIVE: bool = False
 
@@ -76,7 +77,7 @@ class Logger:
             log_config = json.load(content)
 
             # Pfad zum Logfile extrahieren
-            logfile = log_config["handlers"]["debug_file_handler"]["filename"]
+            logfile = log_config["handlers"]["file_handler"]["filename"]
             logdir = os.path.dirname(logfile)
 
             # Verzeichnis erstellen, falls nötig
@@ -84,14 +85,16 @@ class Logger:
 
             logging.config.dictConfig(log_config)
 
-        print(f"Logger initialized with config: {log_config}")
-
         Logger._LOG_ACTIVE = log_active
-
         Logger.logger = logging.getLogger(Logger._LOGGER_NAME)
 
-        Logger.debug('-'*50)
-        Logger.debug('Started new Logger')
+        for handler in Logger.logger.handlers:
+            
+            if isinstance(handler, logging.handlers.RotatingFileHandler):
+                # Trenner direkt in den Stream schreiben
+                handler.stream.write('\n' + '─' * 91 + '\n')
+                handler.flush()
+                break
 
     @classmethod
     def log(cls, entry: Union[LogEntry, str, Any]) -> None:

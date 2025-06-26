@@ -18,16 +18,19 @@ class ROS2Handler(CommunicationHandler):
     __handlerName__: str = 'ROS2Handler'
     __doc__: str = 'ROS2 communication handler'
 
-    def __init__(self, publisher: VyraPublisher, type: Any):
+    def __init__(self, initiator, publisher: VyraPublisher, type: Any):
+        self._initiator = initiator
         self._publisher: VyraPublisher = publisher
         self._type: Any = type
         super().__init__()
 
     def emit(self, record: LogRecord):
         try:
-            Logger.log("Emitting log record to ROS2 Handler")
-            Logger.log(type(record.msg))
-            record_msg = record.msg
+            Logger.debug(
+                f"{self._initiator} instruct {ROS2Handler.__handlerName__}"
+                f" publish -> {record.msg}")
+
+            record_msg: Any = record.msg
             ros_msg: Any = self._type()
 
             record_fields = [f.lstrip('_') for f in record_msg.__slots__]

@@ -1,11 +1,14 @@
 # ErrorFeed.msg
 
-uint32 error_code
-string module_id
+uint8 level
+uint32 code
+unique_identifier_msgs/UUID uuid
+builtin_interfaces/Time timestamp
 string description
 string solution
 string miscellaneous
-builtin_interfaces/Time timestamp
+string module_name
+unique_identifier_msgs/UUID module_id
 
 # The error code representing the specific error
 # A description of the error

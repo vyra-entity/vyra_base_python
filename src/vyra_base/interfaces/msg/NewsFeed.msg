@@ -1,9 +1,8 @@
 # NewsFeed.msg
 
-string type 
+uint8 level
 string message
-string level
-unique_identifier_msgs/UUID uuid
 builtin_interfaces/Time timestamp
-string module_id
+unique_identifier_msgs/UUID uuid
 string module_name
+unique_identifier_msgs/UUID module_id

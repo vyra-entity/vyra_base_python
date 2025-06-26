@@ -3,8 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 from pathlib import Path
-from typing import Any
-from typing import Union
+from typing import Any, Union
 
 from rclpy.qos import QoSProfile
 
@@ -16,25 +15,22 @@ from vyra_base.com.datalayer.interface_factory import (
     create_vyra_speaker,
     remote_callable,
 )
-from vyra_base.com.datalayer.node import CheckerNode
-from vyra_base.com.datalayer.node import NodeSettings
-from vyra_base.com.datalayer.node import VyraNode
-
+from vyra_base.com.datalayer.node import CheckerNode, NodeSettings, VyraNode
+from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
-from vyra_base.com.feeder.error_feeder import ErrorFeeder
-
-from vyra_base.defaults.entries import ErrorEntry
-from vyra_base.defaults.entries import FunctionConfigBaseTypes
-from vyra_base.defaults.entries import FunctionConfigEntry
-from vyra_base.defaults.entries import ModuleEntry
-from vyra_base.defaults.entries import NewsEntry
-from vyra_base.defaults.entries import StateEntry
-
+from vyra_base.defaults.entries import (
+    ErrorEntry,
+    FunctionConfigBaseTypes,
+    FunctionConfigEntry,
+    ModuleEntry,
+    NewsEntry,
+    StateEntry,
+)
 from vyra_base.helper.logger import Logger
-
 from vyra_base.state import state_machine
 from vyra_base.state.state_machine import StateMachine
+
 
 class VyraEntity:
 
@@ -71,40 +67,36 @@ class VyraEntity:
         self.ros2_node = VyraNode(node_settings)
 
         self.state_feeder = StateFeeder(
-            type=state_entry.type, 
+            type=state_entry._type, 
             node=self.ros2_node, 
             module_config=self.module_config
         )
 
         self.news_feeder = NewsFeeder(
-            type=news_entry.type, 
+            type=news_entry._type, 
             node=self.ros2_node,
             module_config=self.module_config
         )
         
         self.error_feeder = ErrorFeeder(
-            type=error_entry.type, node=self.ros2_node,
+            type=error_entry._type, 
+            node=self.ros2_node,
             module_config=self.module_config
         )
 
         self.state_machine = StateMachine(
             self.state_feeder,
-            state_entry.type,
+            state_entry._type,
             module_config=self.module_config
         )
 
+        Logger.info("Initializing V.Y.R.A. entity...")
         self.error_feeder.feed(
-            ErrorEntry(
-                module_id=self.module_config.uuid,
-                module_name=self.module_config.name,
-                timestamp=datetime.datetime.now(),
-                type=error_entry.type,
-                level=ErrorEntry.ERROR_LEVEL.MINOR_FAULT,
-                code=0x00000001,
-                description="The entity has been initialized successfully.",
-                solution="No action required.",
-                miscellaneous="Initialization complete."
-            )
+            {
+                "description": "Initialization of the entity.",
+                "solution": "No action required.",
+                "miscellaneous": "Initialization complete."
+            }
         )
 
         self.state_machine.initialize()
@@ -219,10 +211,14 @@ class VyraEntity:
             Logger.warning(fail_msg)
             return None
         
-        if not self.state_machine.is_transition_possible(request.trigger_name):
+        can_trigger, possible_trigger = self.state_machine.is_transition_possible(
+            request.trigger_name)
+
+        if not can_trigger:
             fail_msg = (
                 f"Transition {request.trigger_name} not possible in "
                 f"current state {self.state_machine.model.state}."
+                f" Possible transitions are: {possible_trigger}."
             )
             
             response.success = False
@@ -235,6 +231,9 @@ class VyraEntity:
         response.success = True
         response.message = f"Transition {request.trigger_name} triggered successfully."
 
+        self.news_feeder.feed(
+            f"Transition {request.trigger_name} triggered successfully."
+        )
     
     @remote_callable
     async def get_capabilities(self) -> Any:

@@ -1,22 +1,18 @@
-from collections import deque
-
 import logging
-
+from collections import deque
 from datetime import datetime
-from typing import Any
-from typing import Union
-
+from typing import Any, Union
 import uuid
 
 from vyra_base.com import ros2_handler
-
-from .feeder import BaseFeeder
-from vyra_base.defaults.entries import ErrorEntry
-from vyra_base.defaults.entries import ModuleEntry
-from vyra_base.defaults.exceptions import FeederException
+from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
 from vyra_base.com.ros2_handler import ROS2Handler
-from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.defaults.entries import ErrorEntry, ModuleEntry
+from vyra_base.defaults.exceptions import FeederException
+from vyra_base.helper.logger import Logger
+
+from .feeder import BaseFeeder
 
 class ErrorFeeder(BaseFeeder):
     """ Collection of the error messages """
@@ -38,7 +34,7 @@ class ErrorFeeder(BaseFeeder):
         Raises:
             FeederException: If the VyraSpeaker cannot be created with the given type.
         """
-        
+        super().__init__()
 
         self._feederName: str = f'ErrorFeeder'
         self._doc: str = 'Collect error messages of this module.'
@@ -49,11 +45,18 @@ class ErrorFeeder(BaseFeeder):
 
         self._handler.append(ROS2Handler)
 
-        super().__init__(loggingOn=loggingOn)
+        self.create(loggingOn=loggingOn)
 
     def feed(self, errorElement: Union[ErrorEntry, dict]) -> None:
         """Feed a news entry to the feeder. The content can either be a string which
-        will be processed into a NewsEntry, or a NewsEntry object itself."""
+        will be processed into an ErrorEntry if a dict is given, or a ErrorEntry object 
+        itself. Use the method `build_errorfeed` to create an ErrorEntry from a dict. 
+        Args:
+            errorElement (Union[ErrorEntry, dict]): The error entry to be fed.
+                Can be a dictionary with error details or an ErrorEntry object.
+        Raises:
+            FeederException: If the type of errorElement is neither a dict nor an ErrorEntry.
+        """
 
         if isinstance(errorElement, dict):
             # If a string is passed, we assume it is a message to be logged
@@ -72,14 +75,30 @@ class ErrorFeeder(BaseFeeder):
             errorfeed_entry.uuid if errorfeed_entry.uuid else uuid.uuid4()
         )
 
+        errorfeed_entry.module_id = Ros2TypeConverter.uuid_to_ros2uuid(
+            self._module_config.uuid
+        )
+
         super().feed(errorfeed_entry)
 
-
-
     def build_errorfeed(self, errorDict: dict) -> ErrorEntry:
-        """Builds a error entry from the given keyword arguments."""
+        """Builds a error entry from the given keyword arguments.
+        Args:
+            errorDict (dict): A dictionary containing error details.
+                Keywords are:
+                - 'code': int16 - Error code (default: 0x00000000)
+                - 'uuid': UUID - Unique identifier for the error (default: a new UUID)
+                - 'description': str - Description of the error (default: '')
+                - 'solution': str - Suggested solution for the error (default: '')
+                - 'miscellaneous': str - Additional information (default: '')
+                - 'level': ErrorEntry.ERROR_LEVEL - Level of the error 
+                           (default: ErrorEntry.ERROR_LEVEL.MINOR_FAULT)
+        Returns:
+            ErrorEntry: An instance of ErrorEntry populated with the provided details.
+        """
+
         errorfeed_entry = ErrorEntry(
-            type=self._type,
+            _type=self._type,
             code=errorDict.get('error_code', 0x00000000),
             module_id=self._module_config.uuid,
             module_name=self._module_config.name,
@@ -88,6 +107,6 @@ class ErrorFeeder(BaseFeeder):
             description=errorDict.get('description', ''),
             solution=errorDict.get('solution', ''),
             miscellaneous=errorDict.get('miscellaneous', ''),
-            level=errorDict.get('level', ErrorEntry.ERROR_LEVEL.MINOR_FAULT)
+            level=errorDict.get('level', ErrorEntry.ERROR_LEVEL.MINOR_FAULT).value
         )
         return errorfeed_entry

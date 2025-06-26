@@ -1,11 +1,14 @@
 
+# Standard library imports
 import datetime
-import rclpy
 from typing import Union
-
-from builtin_interfaces.msg import Time as BuiltinTime
 from uuid import UUID
+
+# Third party imports
+import rclpy
+from builtin_interfaces.msg import Time as BuiltinTime
 from unique_identifier_msgs.msg import UUID as Ros2UUID
+
 
 class Ros2TypeConverter:
     """
@@ -29,13 +32,13 @@ class Ros2TypeConverter:
         )
     
     @staticmethod
-    def uuid_to_ros2uuid(uuid: UUID) -> str:
+    def uuid_to_ros2uuid(uuid: UUID) -> Ros2UUID:
         """
         Converts a UUID string to a ROS 2 compatible UUID string.
         """
 
         uuid_msg = Ros2UUID()
-        uuid_msg.uuid = list(uuid.bytes) 
+        uuid_msg.uuid = list(uuid.bytes)
         return uuid_msg
     
     @staticmethod
