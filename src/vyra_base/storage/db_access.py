@@ -2,6 +2,7 @@ import configparser
 import os
 
 from enum import Enum
+from pathlib import Path
 from typing import Union
 
 from sqlalchemy import inspect
@@ -15,6 +16,7 @@ from sqlalchemy.orm import sessionmaker
 from vyra_base.helper.logger import Logger
 from vyra_base.helper.logger import LogEntry
 from vyra_base.helper.logger import LogMode
+from vyra_base.storage.storage import Storage
 from vyra_base.storage.tb_base import Base
 from vyra_base.helper.error_handler import ErrorTraceback
 
@@ -32,35 +34,57 @@ class DBSTATUS(str, Enum):
 class DBMESSAGE:
     DEFAULT_ERROR = 'Something went wrong while processing the query. See the details.'
 
-class DbAccess:
+class DbAccess(Storage):
     """Baseclass for database access."""
 
-    def __init__(self, module_id: str, db_config_path: str):
+    def __init__(self, module_name: str, db_config_path: str= None, db_config: dict = None):
         """Initialize database object.
 
         Args:
             module_id (str): The id of the varioboticOS module.
             config_path (str, optional): Path to the ini file of your sqlalchemy config. 
                                          Defaults to WORKING_PATH+PATH_DB_CONFIG.
-        """        
+        """
         try:
-            self.module_id = module_id
+            self.module_name = module_name
 
-            self._config = configparser.ConfigParser()
-            self._config.read(db_config_path)
+            if db_config_path is not None and db_config is None:
+                self._config = configparser.ConfigParser()
+                self._config.read(db_config_path)
+            elif db_config is not None:
+                db_config = db_config[0] if isinstance(db_config, list) else db_config
 
+                if not isinstance(db_config, dict):
+                    raise ValueError("db_config must be a dictionary.")
+                
+                if 'sqlite' not in db_config:
+                    Logger.error(f"Currently only 'sqlite' is implemented: {db_config}")
+                    raise ValueError(
+                        "Currently only 'sqlite' is implemented."
+                        "Please use sqlite in your db_config.")
+
+                self._config = db_config
+            else:
+                raise ValueError("Either db_config_path or db_config must be provided.")
+            
             self._user: str|None = os.environ.get("USER")
             self._path = self._config['sqlite']['path']
             self._path = self._path.replace("${user}", str(self._user))
 
             self._database = self._config['sqlite']['database']
-            self._database = self._database.replace("${module_id}", self.module_id)
+            self._database = self._database.replace("${module_name}", self.module_name)
+
+            if not self._path.endswith('/'):
+                self._path += '/'
+
+            Path(self._path).mkdir(parents=True, exist_ok=True)
 
             self.db_engine: AsyncEngine = create_async_engine(
                 f"sqlite+aiosqlite:///{self._path}{self._database}",
                 echo=True,
             )
 
+            Logger.debug(f"Database config: {self._config}")
             Logger.add_external('sqlalchemy.engine')
 
         finally:

@@ -30,13 +30,29 @@ from vyra_base.defaults.entries import (
 from vyra_base.helper.logger import Logger
 from vyra_base.state import state_machine
 from vyra_base.state.state_machine import StateMachine
-
+from vyra_base.storage.storage import Storage
 
 class VyraEntity:
 
     """
     Base class for all V.Y.R.A. entities.
+    This class initializes the entity with a ROS2 node, state, news, and error feeders.
+    It also provides methods to register remote callables and manage interfaces.
+    It is designed to be extended by specific entities that require additional functionality.
+    Attributes:
+        ros2_node (VyraNode): The ROS2 node for the entity.
+        state_feeder (StateFeeder): Feeder for state updates.
+        news_feeder (NewsFeeder): Feeder for news updates.
+        error_feeder (ErrorFeeder): Feeder for error updates.
+        state_machine (StateMachine): State machine for managing entity states.
+    Methods:
+        register_remote_callables(): Registers all remote callables defined in the entity.
+        add_interface(settings: list[FunctionConfigEntry]): Adds a communication interface to the entity.
+        trigger_transition(request: Any, response: Any): Triggers a state transition for the entity.
+        get_capabilities(request: Any, response: Any): Retrieves the capabilities of the entity.
     """
+    _interface_list: list[FunctionConfigEntry] = []
+    _storage_list: list[Storage] = []
 
     def __init__(
             self, 
@@ -129,7 +145,7 @@ class VyraEntity:
         Returns:
             dict: A dictionary containing the built module functions.
         """
-        self._module_function_list = settings
+        self._interface_list = settings
 
         async_loop = asyncio.get_event_loop()
 
@@ -173,6 +189,19 @@ class VyraEntity:
                     qos_profile=setting.qosprofile,
                     async_loop=async_loop
                 )
+
+    def register_storage(self, storage: Storage) -> None:
+        """
+        Register a storage object to the entity.
+        
+        Args:
+            storage (Storage): The storage object to register.
+        """
+        if not isinstance(storage, Storage):
+            raise TypeError("storage must be an instance of Storage.")
+        
+        self._storage_list.append(storage)
+        Logger.info(f"Storage {storage} registered successfully.")
 
     @classmethod
     def _check_node_availability(cls, node_name: str) -> bool:
@@ -236,5 +265,5 @@ class VyraEntity:
         )
     
     @remote_callable
-    async def get_capabilities(self) -> Any:
+    async def get_capabilities(self, request: Any, response: Any) -> Any:
         pass

@@ -19,7 +19,7 @@ def extract_ros_interfaces(target_package_path):
     
     # Copy interface files from source to target
     print(f"Extracting ROS2 interfaces from {source_path} to {target_path}")
-    for interface_type in ['msg', 'srv', 'action', 'config']:
+    for interface_type in ['msg', 'srv', 'action', 'json']:
         source_dir: Path = source_path / interface_type
         target_dir: Path = target_path / interface_type
         
