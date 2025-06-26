@@ -1,0 +1,171 @@
+[
+    {
+        "function_name": "kill",
+        "displayname": "Kill",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "User",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Id",
+                "description": "",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Kill the module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "debug",
+        "displayname": "Debug",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "1",
+                "description": "Please contact developer",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "2",
+                "description": "Please contact developer",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "3",
+                "description": "Please contact developer",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Exclusively to use by Variobotic development team!!",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "download_logging_file",
+        "displayname": "Download Log",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Download Logging file from module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "download_license_file",
+        "displayname": "Download Licenses",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Download License file from module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "upload_update",
+        "displayname": "Upload Update",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "Username",
+                "description": "",
+                "optional": true
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": true
+            },
+            {
+                "datatype": "bytestr",
+                "displayname": "file",
+                "description": "Updatefile. Must contain a .zip-file",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Uploading update file to this module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "get_all_installed_versions",
+        "displayname": "Get all installed versions",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": "List of all installed versions"
+        },
+        "description": "Read and return all installed versions of this module",
+        "display_style": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "function_name": "change_running_module_version",
+        "displayname": "Change running versions",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "Version",
+                "description": "The module will be switched to this version if available",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": "[True|False, <Message>]"
+        },
+        "description": "Change the running version of this module",
+        "display_style": {
+            "visible": false,
+            "published": false
+        }
+    }
+]

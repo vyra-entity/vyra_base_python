@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "vyra_base"
+version = "0.1.5"
+description = "Base library for V.Y.R.A. modules written in Python"
+authors = ["Variobotic GmbH"]
+license = "LICENSE"
+readme = "README.md"
+homepage = "https://variobotic.de"  # Replace with actual URL
+repository = "https://github.com/Variobotic-GmbH/varioboticos-base-python.git"  # Replace with actual URL
+keywords = ["V.Y.R.A.", "python", "library"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+include = [
+    "vyra_base/helper/logger_config.json"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10, <4"
+aiopath = "^0.6.0"
+asyncua = "^1.1.5"
+SQLAlchemy = "^2.0.41"
+transitions = "^0.9.2"
+python-dotenv = ">=1.0.0"
+tomli = "^2.0.1"
+
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^6.0"
+flake8 = "^3.9"
+rclpy = "^9.1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

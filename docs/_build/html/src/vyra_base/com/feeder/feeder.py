@@ -1,0 +1,105 @@
+from __future__ import annotations
+
+import logging
+from typing import Any, Type
+
+from rclpy.qos import (
+    QoSProfile,
+    QoSHistoryPolicy,
+    QoSReliabilityPolicy,
+    QoSDurabilityPolicy,
+)
+
+from vyra_base.com.communication_handler import CommunicationHandler
+from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
+from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.com.datalayer.speaker import VyraSpeaker
+from vyra_base.defaults.exceptions import FeederException
+from vyra_base.helper.logger import Logger
+
+class BaseFeeder:
+    """ Abstract class 
+
+        Abstraction that provides the required interface for deuque method all
+        inheriting deque objects require to work.
+    """
+
+    def __init__(self, loggingOn: bool = False) -> None:
+        self._qos = QoSProfile(
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=10,
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
+        )
+
+        self._feedBaseName: str = 'vyraFeeder'
+        self._feederName: str = 'AbstractFeeder'
+        self._doc: str = 'Abstract class for all feeder classes.'
+        self._level: int = logging.DEBUG
+
+        self._handler: list[Type[CommunicationHandler]] = []
+        self._feeder: logging.Logger
+        self._loggingOn: bool  # If true, the feeder will log messages in the base logger
+        self._node: VyraNode
+        self._type: Any
+
+    def create(self, loggingOn: bool = False) -> None:
+        speaker: VyraSpeaker = create_vyra_speaker(
+            name=self._feederName,
+            node=self._node,
+            type=self._type,
+            description=self._doc,
+            qos_profile=self._qos
+        )
+        self._loggingOn: bool = loggingOn
+
+        if speaker.publisher_server is None:
+            raise FeederException(
+                f"Could not create speaker for {self._feederName} with type {type}."
+            )        
+
+        self.create_feeder()
+
+        for handler_class in self._handler:
+            if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
+                raise TypeError("Handler class must be a subclass of CommunicationHandler")
+
+            handler = handler_class(
+                initiator=self._feederName,
+                publisher=speaker.publisher_server,
+                type=speaker.publisher_server.publisher_info.type
+            )
+            self.add_handler(handler)
+
+    def feed(self, msg: Any) -> None:
+        self._feeder.log(self._level, msg)
+
+        if self._loggingOn:
+            Logger.log(
+                f"Feeder {self._feederName} fed with message: {msg}",
+                level=self._level
+            )
+
+    def create_feeder(self):
+        """ Set the logger for the feeder. """
+        feed_logger_name: str = f"{self._feedBaseName}.{self._feederName}"
+        self._feeder = logging.getLogger(feed_logger_name)
+        self._feeder.setLevel(self._level)
+        # self._feeder.propagate = False
+
+        if self._loggingOn:
+            Logger.add_external(feed_logger_name)
+
+    def add_handler(self, handler: CommunicationHandler) -> bool:
+        """ Add a communication handler to the feeder. """
+        if not isinstance(handler, CommunicationHandler):
+            raise TypeError(
+                f"Expected a CommunicationHandler, got {type(handler)}"
+            )
+        
+        if handler in self._handler:
+            return False
+        
+        self._feeder.addHandler(handler)
+
+        return True

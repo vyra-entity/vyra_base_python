@@ -1,0 +1,158 @@
+[
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "activate",
+        "displayname": "Activate",
+        "params": [
+            {
+                "displayname": "User",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Id",
+                "description": "",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Activate the module. This will unlock functions due to the access-level",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "deactivate",
+        "displayname": "Deactivate",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "User",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": false
+            },
+            {
+                "datatype": "str",
+                "displayname": "Id",
+                "description": "",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Deactivate the module. This will lock most functions for access",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "reset",
+        "displayname": "Reset",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Resetting a module if it is in Error-State or Stop-State",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "stop",
+        "displayname": "Stop",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Stopping a module if it is in Run-State",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "pause",
+        "displayname": "Pause",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Pausing a module if it is in Run-State",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "restart",
+        "displayname": "Restart",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Restarting a module if it is in Pause-State",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["statemachine"],
+        "type": "service",
+        "functionname": "configure",
+        "displayname": "Configure",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Initializing a module to change state from Idle-State to Run-State",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]

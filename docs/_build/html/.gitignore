@@ -1,0 +1,11 @@
+build/*
+logs/*
+install/*
+temp/*
+
+*.log
+*.tmp
+*.bak
+
+*.env
+*.pyc

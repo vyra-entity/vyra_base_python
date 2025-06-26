@@ -1,0 +1,79 @@
+[
+    {
+        "tags": ["updater"],
+        "type": "callable",
+        "functionname": "change_running_module_version",
+        "displayname": "Change running versions",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "Version",
+                "description": "The module will be switched to this version if available",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": "[True|False, <Message>]"
+        },
+        "description": "Change the running version of this module",
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": ["updater"],
+        "type": "callable",
+        "functionname": "upload_update",
+        "displayname": "Upload Update",
+        "params": [
+            {
+                "datatype": "str",
+                "displayname": "Username",
+                "description": "",
+                "optional": true
+            },
+            {
+                "datatype": "str",
+                "displayname": "Password",
+                "description": "",
+                "optional": true
+            },
+            {
+                "datatype": "bytestr",
+                "displayname": "file",
+                "description": "Updatefile. Must contain a .zip-file",
+                "optional": false
+            }
+        ],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": ""
+        },
+        "description": "Uploading update file to this module",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["updater"],
+        "type": "callable",
+        "functionname": "get_all_installed_versions",
+        "displayname": "Get all installed versions",
+        "params": [],
+        "return": {
+            "datatype": "str",
+            "displayname": "Returnvalue",
+            "description": "List of all installed versions"
+        },
+        "description": "Read and return all installed versions of this module",
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]
