@@ -1,1715 +1,1425 @@
-<!doctype html>
-<html class="no-js" lang="en" data-content_root="./">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
-
-    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 --><title>Index - vyra_base documentation</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
-    
-    
-
-
-<style>
-  body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
-  
-  }
-  @media not print {
-    body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-    }
-    @media (prefers-color-scheme: dark) {
-      body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-      }
-    }
-  }
-</style></head>
-  <body>
-    
-    <script>
-      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
-    </script>
-    
-
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="svg-toc" viewBox="0 0 24 24">
-    <title>Contents</title>
-    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
-      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-menu" viewBox="0 0 24 24">
-    <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
-    <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  </symbol>
-  <symbol id="svg-sun" viewBox="0 0 24 24">
-    <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
-      <circle cx="12" cy="12" r="5"></circle>
-      <line x1="12" y1="1" x2="12" y2="3"></line>
-      <line x1="12" y1="21" x2="12" y2="23"></line>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-      <line x1="1" y1="12" x2="3" y2="12"></line>
-      <line x1="21" y1="12" x2="23" y2="12"></line>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon" viewBox="0 0 24 24">
-    <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
-    </svg>
-  </symbol>
-  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
-    <title>Auto light/dark, in light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
-      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
-      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
-      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
-      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
-      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
-      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
-      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
-      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
-      <circle cx="14.5" cy="9.55" r="3.6"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
-    <title>Auto light/dark, in dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
-      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
-      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
-      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
-      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
-      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
-      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
-      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
-      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
-      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
-    </svg>
-  </symbol>
-  <symbol id="svg-pencil" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
-      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-      <path d="M13.5 6.5l4 4" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-  <symbol id="svg-eye" viewBox="0 0 24 24">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-      <path
-        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
-      <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" />
-    </svg>
-  </symbol>
-</svg>
-
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
-
-<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
-
-
-
-<div class="page">
-  <header class="mobile-header">
-    <div class="header-left">
-      <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
-      </label>
-    </div>
-    <div class="header-center">
-      <a href="index.html"><div class="brand">vyra_base  documentation</div></a>
-    </div>
-    <div class="header-right">
-      <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
-          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
-          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
-          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
-        </button>
-      </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
-      </label>
-    </div>
-  </header>
-  <aside class="sidebar-drawer">
-    <div class="sidebar-container">
-      
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
-  
-  <span class="sidebar-brand-text">vyra_base  documentation</span>
-  
-</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
-  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
-  <input type="hidden" name="check_keywords" value="yes">
-  <input type="hidden" name="area" value="default">
-</form>
-<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  
-</div>
-</div>
-
-      </div>
-      
-    </div>
-  </aside>
-  <div class="main">
-    <div class="content">
-      <div class="article-container">
-        <a href="#" class="back-to-top muted-link">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
-          </svg>
-          <span>Back to top</span>
-        </a>
-        <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
-              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
-              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
-              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
-              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
-            </button>
-          </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
-          </label>
-        </div>
-        <article role="main" id="furo-main-content">
-          
-<section class="genindex-section">
-  <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#J"><strong>J</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
-</section>
-<section id="_" class="genindex-section">
-  <h2>_</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry._type">_type (vyra_base.defaults.entries.ErrorEntry attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry._type">(vyra_base.defaults.entries.NewsEntry attribute)</a>
-</li>
-          <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry._type">(vyra_base.defaults.entries.PullRequestEntry attribute)</a>
-</li>
-          <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry._type">(vyra_base.defaults.entries.StateEntry attribute)</a>
-</li>
-        </ul></li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="A" class="genindex-section">
-  <h2>A</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id41">ack_by_user (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.ack_by_user">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id42">ack_on_date (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.ack_on_date">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action">Action (class in vyra_base.com.datalayer.action_server)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL.ACTION">ACTION (vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo">ActionInfo (class in vyra_base.com.datalayer.action_client)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Active">Active (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.add">add() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.add_callable">add_callable() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.add_external">add_external() (vyra_base.helper.logger.Logger class method)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.add_handler">add_handler() (vyra_base.com.feeder.feeder.BaseFeeder method)</a>
-</li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.add_interface">add_interface() (vyra_base.core.entity.VyraEntity method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.add_job">add_job() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.add_speaker">add_speaker() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Alert">Alert (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.all_transitions">all_transitions (vyra_base.state.state_machine.StateMachine property)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.ANY">ANY (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.ARRAY">ARRAY (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Attentive">Attentive (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo">AuthorInfo (class in vyra_base.defaults.info)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author">AuthorInfo.Author (class in vyra_base.defaults.info)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange">AuthorInfo.FileChange (class in vyra_base.defaults.info)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version">AuthorInfo.Version (class in vyra_base.defaults.info)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.AvailableModuleEntry">AvailableModuleEntry (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Awakening">Awakening (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="B" class="genindex-section">
-  <h2>B</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.Base">Base (class in vyra_base.storage.tb_base)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.base_enter">base_enter() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder">BaseFeeder (class in vyra_base.com.feeder.feeder)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.BOOL">BOOL (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed">build_errorfeed() (vyra_base.com.feeder.error_feeder.ErrorFeeder method)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.NewsFeeder.build_newsfeed">build_newsfeed() (vyra_base.com.feeder.news_feeder.NewsFeeder method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.bulk_add">bulk_add() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.bulk_delete">bulk_delete() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.BYTE">BYTE (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="C" class="genindex-section">
-  <h2>C</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id13">callable (vyra_base.defaults.entries.FunctionConfigBaseTypes attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.callable">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.callables">callables (vyra_base.com.datalayer.interface_factory.DataSpace attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id16">callback (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.callback">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.callback">callback() (vyra_base.com.datalayer.action_server.Action method)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.callback">(vyra_base.com.datalayer.service_client.ServiceInfo method)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient.callback">(vyra_base.com.datalayer.service_client.VyraServiceClient method)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.callback">(vyra_base.com.datalayer.service_server.ServiceInfo method)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.VyraServiceServer.callback">(vyra_base.com.datalayer.service_server.VyraServiceServer method)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.callback">(vyra_base.com.datalayer.subscriber.SubscriptionInfo method)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.VyraSubscription.callback">(vyra_base.com.datalayer.subscriber.VyraSubscription method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller.caller">caller (vyra_base.com.datalayer.publisher.PeriodicCaller attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id28">(vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.caller">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.CHAR">CHAR (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback.check_error_exist">check_error_exist() (vyra_base.helper.error_handler.ErrorTraceback static method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.CheckerNode">CheckerNode (class in vyra_base.com.datalayer.node)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.client">client (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.client">(vyra_base.com.datalayer.service_client.ServiceInfo attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.CLOSED">CLOSED (vyra_base.defaults.constants.TimeoutConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id0">code (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.code">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id43">color (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.color">[1]</a>
-</li>
-        <li><a href="vyra_base.com.html#vyra_base.com.communication_handler.CommunicationHandler">CommunicationHandler (class in vyra_base.com.communication_handler)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.CONFLICT">CONFLICT (vyra_base.storage.db_access.DBSTATUS attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.CONNECT">CONNECT (vyra_base.defaults.constants.TimeoutConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.connected_callback">connected_callback (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.count">count() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.create">create() (vyra_base.com.feeder.feeder.BaseFeeder method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.create_action_client">create_action_client() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.VyraActionServer.create_action_server">create_action_server() (vyra_base.com.datalayer.action_server.VyraActionServer method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.create_all_tables">create_all_tables() (vyra_base.storage.db_access.DbAccess method)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.create_feeder">create_feeder() (vyra_base.com.feeder.feeder.BaseFeeder method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.VyraPublisher.create_publisher">create_publisher() (vyra_base.com.datalayer.publisher.VyraPublisher method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.create_selected_table">create_selected_table() (vyra_base.storage.db_access.DbAccess method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient.create_service">create_service() (vyra_base.com.datalayer.service_client.VyraServiceClient method)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.VyraServiceServer.create_service">(vyra_base.com.datalayer.service_server.VyraServiceServer method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.VyraSubscription.create_subscription">create_subscription() (vyra_base.com.datalayer.subscriber.VyraSubscription method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.create_vyra_callable">create_vyra_callable() (in module vyra_base.com.datalayer.interface_factory)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.create_vyra_job">create_vyra_job() (in module vyra_base.com.datalayer.interface_factory)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.create_vyra_speaker">create_vyra_speaker() (in module vyra_base.com.datalayer.interface_factory)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author.creator">creator (vyra_base.defaults.info.AuthorInfo.Author attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL.CRITICAL_FAULT">CRITICAL_FAULT (vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id52">current (vyra_base.defaults.entries.StateEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.current">[1]</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.current_state">current_state (vyra_base.state.state_machine.StateMachine property)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants">CyclicRefreshConstants (class in vyra_base.defaults.constants)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="D" class="genindex-section">
-  <h2>D</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace">DataSpace (class in vyra_base.com.datalayer.interface_factory)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.datatype">datatype (vyra_base.defaults.entries.FunctionConfigBaseParams attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.datatype">(vyra_base.defaults.entries.FunctionConfigBaseReturn attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange.date">date (vyra_base.defaults.info.AuthorInfo.FileChange attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess">DbAccess (class in vyra_base.storage.db_access)</a>
-</li>
-        <li><a href="vyra_base.com.html#vyra_base.com.db_handler.DBCommunicationHandler">DBCommunicationHandler (class in vyra_base.com.db_handler)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBMESSAGE">DBMESSAGE (class in vyra_base.storage.db_access)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue (class in vyra_base.storage.db_manipulator)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS">DBSTATUS (class in vyra_base.storage.db_access)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator">DBTableManipulator (class in vyra_base.storage.db_manipulator)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL.DEBUG">DEBUG (vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.DEBUG">(vyra_base.helper.logger.LogMode attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.debug">debug() (vyra_base.helper.logger.LogEntry method)</a>
-
-        <ul>
-          <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.debug">(vyra_base.helper.logger.Logger class method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBMESSAGE.DEFAULT_ERROR">DEFAULT_ERROR (vyra_base.storage.db_access.DBMESSAGE attribute)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Delegating">Delegating (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.delete">delete() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.description">description (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.description">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.description">(vyra_base.com.datalayer.speaker.VyraSpeaker attribute)</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id1">(vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.description">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id9">(vyra_base.defaults.entries.FunctionConfigBaseParams attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.description">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id11">(vyra_base.defaults.entries.FunctionConfigBaseReturn attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.description">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id17">(vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.description">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id30">(vyra_base.defaults.entries.ModuleEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.description">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition.dest">dest (vyra_base.state.state_config.Transition attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.details">details (vyra_base.storage.db_manipulator.DBReturnValue attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id10">displayname (vyra_base.defaults.entries.FunctionConfigBaseParams attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.displayname">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id12">(vyra_base.defaults.entries.FunctionConfigBaseReturn attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.displayname">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id18">(vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.displayname">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#id19">displaystyle (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.displaystyle">[1]</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.drop_table">drop_table() (vyra_base.storage.db_access.DbAccess method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.DURATION">DURATION (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="E" class="genindex-section">
-  <h2>E</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL.EMERGENCY_FAULT">EMERGENCY_FAULT (vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL attribute)</a>
-</li>
-        <li><a href="vyra_base.com.html#vyra_base.com.communication_handler.CommunicationHandler.emit">emit() (vyra_base.com.communication_handler.CommunicationHandler method)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.html#vyra_base.com.db_handler.DBCommunicationHandler.emit">(vyra_base.com.db_handler.DBCommunicationHandler method)</a>
-</li>
-          <li><a href="vyra_base.com.html#vyra_base.com.ros2_handler.ROS2Handler.emit">(vyra_base.com.ros2_handler.ROS2Handler method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.ERROR">ERROR (vyra_base.helper.logger.LogMode attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.ERROR">(vyra_base.storage.db_access.DBSTATUS attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.error">error() (vyra_base.helper.logger.LogEntry method)</a>
-
-        <ul>
-          <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.error">(vyra_base.helper.logger.Logger class method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.error_feeder">error_feeder (vyra_base.core.entity.VyraEntity attribute)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.error_return">error_return() (vyra_base.storage.db_manipulator.DBReturnValue method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry">ErrorEntry (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL">ErrorEntry.ERROR_LEVEL (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.error_feeder.ErrorFeeder">ErrorFeeder (class in vyra_base.com.feeder.error_feeder)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback">ErrorTraceback (class in vyra_base.helper.error_handler)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.VyraActionServer.execute_callback">execute_callback() (vyra_base.com.datalayer.action_server.VyraActionServer method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.exists">exists() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.extract_level_from_msg">extract_level_from_msg() (in module vyra_base.com.feeder.news_feeder)</a>
-</li>
-        <li><a href="vyra_base.html#vyra_base.extract_ros_interfaces">extract_ros_interfaces() (in module vyra_base)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="F" class="genindex-section">
-  <h2>F</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.error_feeder.ErrorFeeder.feed">feed() (vyra_base.com.feeder.error_feeder.ErrorFeeder method)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.feed">(vyra_base.com.feeder.feeder.BaseFeeder method)</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.NewsFeeder.feed">(vyra_base.com.feeder.news_feeder.NewsFeeder method)</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.state_feeder.StateFeeder.feed">(vyra_base.com.feeder.state_feeder.StateFeeder method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.feedback_callable">feedback_callable() (vyra_base.com.datalayer.action_client.ActionInfo method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants">FeederConstants (class in vyra_base.defaults.constants)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.exceptions.FeederException">FeederException</a>
-</li>
-        <li><a href="vyra_base.com.html#vyra_base.com.communication_handler.CommunicationHandler.FILL_AT_LOADING">FILL_AT_LOADING (vyra_base.com.communication_handler.CommunicationHandler attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.FLOAT32">FLOAT32 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.FLOAT64">FLOAT64 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams">FunctionConfigBaseParams (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn">FunctionConfigBaseReturn (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes">FunctionConfigBaseTypes (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle">FunctionConfigDisplaystyle (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry">FunctionConfigEntry (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes">FunctionConfigParamTypes (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker">FunctionConfigPeriodicSpeaker (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id20">functionname (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.functionname">[1]</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="G" class="genindex-section">
-  <h2>G</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.get_all">get_all() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.get_by_id">get_by_id() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.get_capabilities">get_capabilities() (vyra_base.core.entity.VyraEntity method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.get_result_callback">get_result_callback() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.get_table_structure">get_table_structure() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.goal_response_callback">goal_response_callback() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="H" class="genindex-section">
-  <h2>H</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL.HINT">HINT (vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="I" class="genindex-section">
-  <h2>I</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.impl">impl (vyra_base.storage.tb_base.IntEnum attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL.INFO">INFO (vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.INFO">(vyra_base.helper.logger.LogMode attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.info">info() (vyra_base.helper.logger.Logger class method)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.initialize">initialize() (vyra_base.helper.logger.Logger class method)</a>
-
-        <ul>
-          <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.initialize">(vyra_base.state.state_machine.StateMachine method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT16">INT16 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT32">INT32 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT64">INT64 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT8">INT8 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum">IntEnum (class in vyra_base.storage.tb_base)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Interrupting">Interrupting (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id29">interval (vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.interval">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller.interval_time">interval_time (vyra_base.com.datalayer.publisher.PeriodicCaller attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.CheckerNode.is_node_available">is_node_available() (vyra_base.com.datalayer.node.CheckerNode method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.is_transition_possible">is_transition_possible() (vyra_base.state.state_machine.StateMachine method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="J" class="genindex-section">
-  <h2>J</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id14">job (vyra_base.defaults.entries.FunctionConfigBaseTypes attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.job">[1]</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.jobs">jobs (vyra_base.com.datalayer.interface_factory.DataSpace attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="K" class="genindex-section">
-  <h2>K</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.kill">kill() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="L" class="genindex-section">
-  <h2>L</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.last_return">last_return (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.last_return">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.last_send">last_send (vyra_base.com.datalayer.speaker.VyraSpeaker attribute)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Learning">Learning (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id2">level (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.level">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id35">(vyra_base.defaults.entries.NewsEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.level">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.log">log() (vyra_base.helper.logger.Logger class method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry">LogEntry (class in vyra_base.helper.logger)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter">LogFilter (class in vyra_base.helper.log_filter)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger">Logger (class in vyra_base.helper.logger)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.LOGGER">LOGGER (vyra_base.defaults.constants.CyclicRefreshConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.logger">logger (vyra_base.helper.logger.Logger attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants">LoggerConstants (class in vyra_base.defaults.constants)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.logging_on">logging_on() (vyra_base.helper.logger.Logger static method)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode">LogMode (class in vyra_base.helper.logger)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="M" class="genindex-section">
-  <h2>M</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author.mail">mail (vyra_base.defaults.info.AuthorInfo.Author attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id58">major (vyra_base.defaults.info.AuthorInfo.Version attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version.major">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL.MAJOR_FAULT">MAJOR_FAULT (vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_DEFAULT_LENGTH">MAX_DEFAULT_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_ERRORFEED_LENGTH">MAX_ERRORFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_NEWSFEED_LENGTH">MAX_NEWSFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_PULLREQUESTSFEED_LENGTH">MAX_PULLREQUESTSFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants.MAX_QUEUE_LENGTH">MAX_QUEUE_LENGTH (vyra_base.defaults.constants.LoggerConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_STATEFEED_LENGTH">MAX_STATEFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.merge">merge() (vyra_base.com.datalayer.callable.VyraCallable method)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.merge">(vyra_base.com.datalayer.job.VyraJob method)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.merge">(vyra_base.com.datalayer.speaker.VyraSpeaker method)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#id36">message (vyra_base.defaults.entries.NewsEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.message">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.message">(vyra_base.helper.logger.LogEntry attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants">MessageLengthConstants (class in vyra_base.defaults.constants)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.metadata">metadata (vyra_base.storage.tb_base.Base attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id59">minor (vyra_base.defaults.info.AuthorInfo.Version attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version.minor">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL.MINOR_FAULT">MINOR_FAULT (vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id3">miscellaneous (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.miscellaneous">[1]</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.mode">mode (vyra_base.helper.logger.LogEntry attribute)</a>
-</li>
-        <li>
-    module
-
-        <ul>
-          <li><a href="vyra_base.html#module-vyra_base">vyra_base</a>
-</li>
-          <li><a href="vyra_base.com.html#module-vyra_base.com">vyra_base.com</a>
-</li>
-          <li><a href="vyra_base.com.html#module-vyra_base.com.communication_handler">vyra_base.com.communication_handler</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer">vyra_base.com.datalayer</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_client">vyra_base.com.datalayer.action_client</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_server">vyra_base.com.datalayer.action_server</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.callable">vyra_base.com.datalayer.callable</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.interface_factory">vyra_base.com.datalayer.interface_factory</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.job">vyra_base.com.datalayer.job</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.node">vyra_base.com.datalayer.node</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.publisher">vyra_base.com.datalayer.publisher</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_client">vyra_base.com.datalayer.service_client</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_server">vyra_base.com.datalayer.service_server</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.speaker">vyra_base.com.datalayer.speaker</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.subscriber">vyra_base.com.datalayer.subscriber</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.typeconverter">vyra_base.com.datalayer.typeconverter</a>
-</li>
-          <li><a href="vyra_base.com.html#module-vyra_base.com.db_handler">vyra_base.com.db_handler</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder">vyra_base.com.feeder</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.error_feeder">vyra_base.com.feeder.error_feeder</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.feeder">vyra_base.com.feeder.feeder</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.news_feeder">vyra_base.com.feeder.news_feeder</a>
-</li>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.state_feeder">vyra_base.com.feeder.state_feeder</a>
-</li>
-          <li><a href="vyra_base.com.html#module-vyra_base.com.ros2_handler">vyra_base.com.ros2_handler</a>
-</li>
-          <li><a href="vyra_base.core.html#module-vyra_base.core">vyra_base.core</a>
-</li>
-          <li><a href="vyra_base.core.html#module-vyra_base.core.entity">vyra_base.core.entity</a>
-</li>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults">vyra_base.defaults</a>
-</li>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.constants">vyra_base.defaults.constants</a>
-</li>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.entries">vyra_base.defaults.entries</a>
-</li>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.exceptions">vyra_base.defaults.exceptions</a>
-</li>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.info">vyra_base.defaults.info</a>
-</li>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper">vyra_base.helper</a>
-</li>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper.error_handler">vyra_base.helper.error_handler</a>
-</li>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper.log_filter">vyra_base.helper.log_filter</a>
-</li>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper.logger">vyra_base.helper.logger</a>
-</li>
-          <li><a href="vyra_base.state.html#module-vyra_base.state">vyra_base.state</a>
-</li>
-          <li><a href="vyra_base.state.html#module-vyra_base.state.state_config">vyra_base.state.state_config</a>
-</li>
-          <li><a href="vyra_base.state.html#module-vyra_base.state.state_machine">vyra_base.state.state_machine</a>
-</li>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage">vyra_base.storage</a>
-</li>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_access">vyra_base.storage.db_access</a>
-</li>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_manipulator">vyra_base.storage.db_manipulator</a>
-</li>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.storage">vyra_base.storage.storage</a>
-</li>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.tb_base">vyra_base.storage.tb_base</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id4">module_id (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.module_id">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id37">(vyra_base.defaults.entries.NewsEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.module_id">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id44">(vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.module_id">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id53">(vyra_base.defaults.entries.StateEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.module_id">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#id5">module_name (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.module_name">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id38">(vyra_base.defaults.entries.NewsEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.module_name">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id54">(vyra_base.defaults.entries.StateEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.module_name">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry">ModuleEntry (class in vyra_base.defaults.entries)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="N" class="genindex-section">
-  <h2>N</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.name">name (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.name">(vyra_base.com.datalayer.action_server.Action attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.name">(vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.name">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.NodeSettings.name">(vyra_base.com.datalayer.node.NodeSettings attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.name">(vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.name">(vyra_base.com.datalayer.service_client.ServiceInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.name">(vyra_base.com.datalayer.service_server.ServiceInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.name">(vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id31">(vyra_base.defaults.entries.ModuleEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.name">[1]</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.news_feeder">news_feeder (vyra_base.core.entity.VyraEntity attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry">NewsEntry (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL">NewsEntry.MESSAGE_LEVEL (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.NEWSFEED">NEWSFEED (vyra_base.defaults.constants.CyclicRefreshConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.NewsFeeder">NewsFeeder (class in vyra_base.com.feeder.news_feeder)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.VyraNode.node_settings">node_settings (vyra_base.com.datalayer.node.VyraNode property)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.NodeSettings">NodeSettings (class in vyra_base.com.datalayer.node)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.NONE">NONE (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_ALLOWED">NOT_ALLOWED (vyra_base.storage.db_access.DBSTATUS attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_AUTHORIZED">NOT_AUTHORIZED (vyra_base.storage.db_access.DBSTATUS attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_FOUND">NOT_FOUND (vyra_base.storage.db_access.DBSTATUS attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="O" class="genindex-section">
-  <h2>O</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Active">on_enter_Active() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Alert">on_enter_Alert() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Attentive">on_enter_Attentive() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Awakening">on_enter_Awakening() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Delegating">on_enter_Delegating() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Interrupting">on_enter_Interrupting() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Learning">on_enter_Learning() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Overloaded">on_enter_Overloaded() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Recovering">on_enter_Recovering() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Reflecting">on_enter_Reflecting() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_Resting">on_enter_Resting() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.on_enter_ShuttingDown">on_enter_ShuttingDown() (vyra_base.state.state_machine.StateModel method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Overloaded">Overloaded (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="P" class="genindex-section">
-  <h2>P</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter.param">param (vyra_base.helper.log_filter.LogFilter attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.NodeSettings.parameters">parameters (vyra_base.com.datalayer.node.NodeSettings attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id21">params (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.params">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id60">patch (vyra_base.defaults.info.AuthorInfo.Version attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version.patch">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id22">periodic (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.periodic">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.periodic_caller">periodic_caller (vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller">PeriodicCaller (class in vyra_base.com.datalayer.publisher)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author.phone">phone (vyra_base.defaults.info.AuthorInfo.Author attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id55">previous (vyra_base.defaults.entries.StateEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.previous">[1]</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.process_bind_param">process_bind_param() (vyra_base.storage.tb_base.IntEnum method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.process_result_value">process_result_value() (vyra_base.storage.tb_base.IntEnum method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.VyraPublisher.publish">publish() (vyra_base.com.datalayer.publisher.VyraPublisher method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id15">published (vyra_base.defaults.entries.FunctionConfigDisplaystyle attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.published">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.publisher">publisher (vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.publisher_server">publisher_server (vyra_base.com.datalayer.speaker.VyraSpeaker attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo">PublisherInfo (class in vyra_base.com.datalayer.publisher)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry">PullRequestEntry (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.RequiredVersion.PYTHON_MIN">PYTHON_MIN (vyra_base.defaults.constants.RequiredVersion attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="Q" class="genindex-section">
-  <h2>Q</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.qos_profile">qos_profile (vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.qos_profile">(vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id23">qosprofile (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.qosprofile">[1]</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="R" class="genindex-section">
-  <h2>R</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants.RECEIVE">RECEIVE (vyra_base.defaults.constants.MessageLengthConstants attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.RECEIVE">(vyra_base.defaults.constants.TimeoutConstants attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Recovering">Recovering (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Reflecting">Reflecting (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.core.html#id0">register_remote_callables() (vyra_base.core.entity.VyraEntity method)</a>, <a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.register_remote_callables">[1]</a>
-</li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.register_storage">register_storage() (vyra_base.core.entity.VyraEntity method)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.registry">registry (vyra_base.storage.tb_base.Base attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.remote_callable">remote_callable() (in module vyra_base.com.datalayer.interface_factory)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.request">request() (vyra_base.com.datalayer.service_client.ServiceInfo method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id45">request_action (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_action">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id46">request_action_args (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_action_args">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id47">request_description (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_description">[1]</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id48">request_on_date (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_on_date">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id49">request_structure (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_structure">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.RequiredVersion">RequiredVersion (class in vyra_base.defaults.constants)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id50">response (vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.response">[1]</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Resting">Resting (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.result_callable">result_callable() (vyra_base.com.datalayer.action_client.ActionInfo method)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id24">returns (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.returns">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2buildintime_to_datetime">ros2buildintime_to_datetime() (vyra_base.com.datalayer.typeconverter.Ros2TypeConverter static method)</a>
-</li>
-        <li><a href="vyra_base.com.html#vyra_base.com.ros2_handler.ROS2Handler">ROS2Handler (class in vyra_base.com.ros2_handler)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id25">ros2type (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.ros2type">[1]</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.typeconverter.Ros2TypeConverter">Ros2TypeConverter (class in vyra_base.com.datalayer.typeconverter)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2uuid_to_uuid">ros2uuid_to_uuid() (vyra_base.com.datalayer.typeconverter.Ros2TypeConverter static method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="S" class="genindex-section">
-  <h2>S</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.SEND">SEND (vyra_base.defaults.constants.TimeoutConstants attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient.send">send() (vyra_base.com.datalayer.service_client.VyraServiceClient method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.send_goal">send_goal() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.server">server (vyra_base.com.datalayer.action_server.Action attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.service">service (vyra_base.com.datalayer.service_server.ServiceInfo attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.service_server">service_server (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo">ServiceInfo (class in vyra_base.com.datalayer.service_client)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo">(class in vyra_base.com.datalayer.service_server)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.session">session() (vyra_base.storage.db_access.DbAccess method)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.ShuttingDown">ShuttingDown (vyra_base.state.state_config.Vyra_STATES attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id6">solution (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.solution">[1]</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition.source">source (vyra_base.state.state_config.Transition attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.speaker">speaker (vyra_base.defaults.entries.FunctionConfigBaseTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.speakers">speakers (vyra_base.com.datalayer.interface_factory.DataSpace attribute)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.state">state (vyra_base.state.state_machine.StateModel attribute)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel.state_entry">state_entry (vyra_base.state.state_machine.StateModel property)</a>
-</li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.state_feeder">state_feeder (vyra_base.core.entity.VyraEntity attribute)</a>
-</li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.state_machine">state_machine (vyra_base.core.entity.VyraEntity attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry">StateEntry (class in vyra_base.defaults.entries)</a>
-</li>
-        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.state_feeder.StateFeeder">StateFeeder (class in vyra_base.com.feeder.state_feeder)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine">StateMachine (class in vyra_base.state.state_machine)</a>
-</li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_machine.StateModel">StateModel (class in vyra_base.state.state_machine)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.status">status (vyra_base.storage.db_manipulator.DBReturnValue attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.storage.Storage">Storage (class in vyra_base.storage.storage)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.STRING">STRING (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.subscription">subscription (vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo">SubscriptionInfo (class in vyra_base.com.datalayer.subscriber)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.SUCCESS">SUCCESS (vyra_base.storage.db_access.DBSTATUS attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.success_return">success_return() (vyra_base.storage.db_manipulator.DBReturnValue method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="T" class="genindex-section">
-  <h2>T</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id26">tags (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.tags">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id32">template (vyra_base.defaults.entries.ModuleEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.template">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.TIME">TIME (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange.time">time (vyra_base.defaults.info.AuthorInfo.FileChange attribute)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.time_to_ros2buildintime">time_to_ros2buildintime() (vyra_base.com.datalayer.typeconverter.Ros2TypeConverter static method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.TIMEOUT_SEC">TIMEOUT_SEC (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants">TimeoutConstants (class in vyra_base.defaults.constants)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller.timer">timer (vyra_base.com.datalayer.publisher.PeriodicCaller attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id7">timestamp (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.timestamp">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id39">(vyra_base.defaults.entries.NewsEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.timestamp">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id56">(vyra_base.defaults.entries.StateEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.timestamp">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.to_dict">to_dict() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition">Transition (class in vyra_base.state.state_config)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id57">trigger (vyra_base.defaults.entries.StateEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.trigger">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition.trigger">(vyra_base.state.state_config.Transition attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.trigger_transition">trigger_transition() (vyra_base.core.entity.VyraEntity method)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.type">type (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.type">(vyra_base.com.datalayer.action_server.Action attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.type">(vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.type">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.type">(vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.type">(vyra_base.com.datalayer.service_client.ServiceInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.type">(vyra_base.com.datalayer.service_server.ServiceInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.type">(vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id27">(vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.type">[1]</a>
-</li>
-        </ul></li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="U" class="genindex-section">
-  <h2>U</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT16">UINT16 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT32">UINT32 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT64">UINT64 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT8">UINT8 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
-</li>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.update">update() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#id8">uuid (vyra_base.defaults.entries.ErrorEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.uuid">[1]</a>
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#id33">(vyra_base.defaults.entries.ModuleEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.uuid">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id40">(vyra_base.defaults.entries.NewsEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.uuid">[1]</a>
-</li>
-          <li><a href="vyra_base.defaults.html#id51">(vyra_base.defaults.entries.PullRequestEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.uuid">[1]</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.uuid_to_ros2uuid">uuid_to_ros2uuid() (vyra_base.com.datalayer.typeconverter.Ros2TypeConverter static method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="V" class="genindex-section">
-  <h2>V</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.value">value (vyra_base.storage.db_manipulator.DBReturnValue attribute)</a>
-</li>
-        <li><a href="vyra_base.defaults.html#id34">version (vyra_base.defaults.entries.ModuleEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.version">[1]</a>
-</li>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.visible">visible (vyra_base.defaults.entries.FunctionConfigDisplaystyle attribute)</a>
-</li>
-        <li>
-    vyra_base
-
-        <ul>
-          <li><a href="vyra_base.html#module-vyra_base">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com
-
-        <ul>
-          <li><a href="vyra_base.com.html#module-vyra_base.com">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.communication_handler
-
-        <ul>
-          <li><a href="vyra_base.com.html#module-vyra_base.com.communication_handler">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.action_client
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_client">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.action_server
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_server">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.callable
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.callable">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.interface_factory
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.interface_factory">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.job
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.job">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.node
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.node">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.publisher
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.publisher">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.service_client
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_client">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.service_server
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_server">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.speaker
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.speaker">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.subscriber
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.subscriber">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.datalayer.typeconverter
-
-        <ul>
-          <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.typeconverter">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.db_handler
-
-        <ul>
-          <li><a href="vyra_base.com.html#module-vyra_base.com.db_handler">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.feeder
-
-        <ul>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.feeder.error_feeder
-
-        <ul>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.error_feeder">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.feeder.feeder
-
-        <ul>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.feeder">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.feeder.news_feeder
-
-        <ul>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.news_feeder">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.feeder.state_feeder
-
-        <ul>
-          <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.state_feeder">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.com.ros2_handler
-
-        <ul>
-          <li><a href="vyra_base.com.html#module-vyra_base.com.ros2_handler">module</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li>
-    vyra_base.core
-
-        <ul>
-          <li><a href="vyra_base.core.html#module-vyra_base.core">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.core.entity
-
-        <ul>
-          <li><a href="vyra_base.core.html#module-vyra_base.core.entity">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.defaults
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.defaults.constants
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.constants">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.defaults.entries
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.entries">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.defaults.exceptions
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.exceptions">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.defaults.info
-
-        <ul>
-          <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.info">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.helper
-
-        <ul>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.helper.error_handler
-
-        <ul>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper.error_handler">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.helper.log_filter
-
-        <ul>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper.log_filter">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.helper.logger
-
-        <ul>
-          <li><a href="vyra_base.helper.html#module-vyra_base.helper.logger">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.state
-
-        <ul>
-          <li><a href="vyra_base.state.html#module-vyra_base.state">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.state.state_config
-
-        <ul>
-          <li><a href="vyra_base.state.html#module-vyra_base.state.state_config">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.state.state_machine
-
-        <ul>
-          <li><a href="vyra_base.state.html#module-vyra_base.state.state_machine">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.storage
-
-        <ul>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.storage.db_access
-
-        <ul>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_access">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.storage.db_manipulator
-
-        <ul>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_manipulator">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.storage.storage
-
-        <ul>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.storage">module</a>
-</li>
-        </ul></li>
-        <li>
-    vyra_base.storage.tb_base
-
-        <ul>
-          <li><a href="vyra_base.storage.html#module-vyra_base.storage.tb_base">module</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES">Vyra_STATES (class in vyra_base.state.state_config)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient">VyraActionClient (class in vyra_base.com.datalayer.action_client)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.VyraActionServer">VyraActionServer (class in vyra_base.com.datalayer.action_server)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable">VyraCallable (class in vyra_base.com.datalayer.callable)</a>
-</li>
-        <li><a href="vyra_base.core.html#vyra_base.core.entity.VyraEntity">VyraEntity (class in vyra_base.core.entity)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob">VyraJob (class in vyra_base.com.datalayer.job)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.VyraNode">VyraNode (class in vyra_base.com.datalayer.node)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.VyraPublisher">VyraPublisher (class in vyra_base.com.datalayer.publisher)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient">VyraServiceClient (class in vyra_base.com.datalayer.service_client)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.VyraServiceServer">VyraServiceServer (class in vyra_base.com.datalayer.service_server)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker">VyraSpeaker (class in vyra_base.com.datalayer.speaker)</a>
-</li>
-        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.VyraSubscription">VyraSubscription (class in vyra_base.com.datalayer.subscriber)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="W" class="genindex-section">
-  <h2>W</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist">w_check_error_exist() (vyra_base.helper.error_handler.ErrorTraceback static method)</a>
-</li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.warn">warn() (vyra_base.helper.logger.LogEntry method)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL.WARNING">WARNING (vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL attribute)</a>
-
-        <ul>
-          <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.WARNING">(vyra_base.helper.logger.LogMode attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.warning">warning() (vyra_base.helper.logger.Logger class method)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-
-        </article>
-      </div>
-      <footer>
-        
-        <div class="related-pages">
-          
-          
-        </div>
-        <div class="bottom-of-page">
-          <div class="left-details">
-            <div class="copyright">
-                Copyright &#169; 2025, Holger Schernewski
-            </div>
-            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-            
-            <a href="https://github.com/pradyunsg/furo">Furo</a>
-            
-          </div>
-          <div class="right-details">
-            
-          </div>
-        </div>
-        
-      </footer>
-    </div>
-    <aside class="toc-drawer no-toc">
-      
-      
-      
-    </aside>
-  </div>
-</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; vyra_base  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
-    </body>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.ack_by_user">ack_by_user (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.ack_on_date">ack_on_date (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action">Action (class in vyra_base.com.datalayer.action_server)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE.ACTION">ACTION (vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo">ActionInfo (class in vyra_base.com.datalayer.action_client)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Active">Active (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Active">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.add">add() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.add_callable">add_callable() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.add_external">add_external() (vyra_base.helper.logger.Logger class method)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.add_handler">add_handler() (vyra_base.com.feeder.feeder.BaseFeeder method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.add_job">add_job() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.add_speaker">add_speaker() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Alert">Alert (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Alert">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.ANY">ANY (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.ARRAY">ARRAY (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Attentive">Attentive (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Attentive">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo">AuthorInfo (class in vyra_base.defaults.info)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author">AuthorInfo.Author (class in vyra_base.defaults.info)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange">AuthorInfo.FileChange (class in vyra_base.defaults.info)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version">AuthorInfo.Version (class in vyra_base.defaults.info)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.AvailableModuleEntry">AvailableModuleEntry (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Awakening">Awakening (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Awakening">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.Base">Base (class in vyra_base.storage.tb_base)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder">BaseFeeder (class in vyra_base.com.feeder.feeder)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.BOOL">BOOL (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.build_newsfeed">build_newsfeed() (in module vyra_base.com.feeder.news_feeder)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.bulk_add">bulk_add() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.bulk_delete">bulk_delete() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.BYTE">BYTE (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.callable">callable (vyra_base.defaults.entries.FunctionConfigBaseTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.callables">callables (vyra_base.com.datalayer.interface_factory.DataSpace attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id0">callback (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.callback">[1]</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.callback">callback() (vyra_base.com.datalayer.action_server.Action method)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.callback">(vyra_base.com.datalayer.service_client.ServiceInfo method)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient.callback">(vyra_base.com.datalayer.service_client.VyraServiceClient method)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.callback">(vyra_base.com.datalayer.service_server.ServiceInfo method)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.VyraServiceServer.callback">(vyra_base.com.datalayer.service_server.VyraServiceServer method)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.callback">(vyra_base.com.datalayer.subscriber.SubscriptionInfo method)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.VyraSubscription.callback">(vyra_base.com.datalayer.subscriber.VyraSubscription method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller.caller">caller (vyra_base.com.datalayer.publisher.PeriodicCaller attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.caller">(vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.CHAR">CHAR (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback.check_error_exist">check_error_exist() (vyra_base.helper.error_handler.ErrorTraceback static method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.CheckerNode">CheckerNode (class in vyra_base.com.datalayer.node)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.client">client (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.client">(vyra_base.com.datalayer.service_client.ServiceInfo attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.CLOSED">CLOSED (vyra_base.defaults.constants.TimeoutConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.color">color (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.html#vyra_base.com.communication_handler.CommunicationHandler">CommunicationHandler (class in vyra_base.com.communication_handler)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.CONFLICT">CONFLICT (vyra_base.storage.db_access.DBSTATUS attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.CONNECT">CONNECT (vyra_base.defaults.constants.TimeoutConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.connected_callback">connected_callback (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.count">count() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.create_action_client">create_action_client() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.VyraActionServer.create_action_server">create_action_server() (vyra_base.com.datalayer.action_server.VyraActionServer method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.create_all">create_all() (vyra_base.storage.db_access.DbAccess method)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.create_feeder">create_feeder() (vyra_base.com.feeder.feeder.BaseFeeder method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.VyraPublisher.create_publisher">create_publisher() (vyra_base.com.datalayer.publisher.VyraPublisher method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.create_selective">create_selective() (vyra_base.storage.db_access.DbAccess method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient.create_service">create_service() (vyra_base.com.datalayer.service_client.VyraServiceClient method)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.VyraServiceServer.create_service">(vyra_base.com.datalayer.service_server.VyraServiceServer method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.VyraSubscription.create_subscription">create_subscription() (vyra_base.com.datalayer.subscriber.VyraSubscription method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.create_vyra_callable">create_vyra_callable() (in module vyra_base.com.datalayer.interface_factory)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.create_vyra_job">create_vyra_job() (in module vyra_base.com.datalayer.interface_factory)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.create_vyra_speaker">create_vyra_speaker() (in module vyra_base.com.datalayer.interface_factory)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author.creator">creator (vyra_base.defaults.info.AuthorInfo.Author attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.current">current (vyra_base.defaults.entries.StateEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants">CyclicRefreshConstants (class in vyra_base.defaults.constants)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace">DataSpace (class in vyra_base.com.datalayer.interface_factory)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.datatype">datatype (vyra_base.defaults.entries.FunctionConfigBaseParams attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.datatype">(vyra_base.defaults.entries.FunctionConfigBaseReturn attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.date">date (vyra_base.defaults.entries.ErrorEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange.date">(vyra_base.defaults.info.AuthorInfo.FileChange attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess">DbAccess (class in vyra_base.storage.db_access)</a>
+</li>
+      <li><a href="vyra_base.com.html#vyra_base.com.db_handler.DBCommunicationHandler">DBCommunicationHandler (class in vyra_base.com.db_handler)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBMESSAGE">DBMESSAGE (class in vyra_base.storage.db_access)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue (class in vyra_base.storage.db_manipulator)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS">DBSTATUS (class in vyra_base.storage.db_access)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator">DBTableManipulator (class in vyra_base.storage.db_manipulator)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE.DEBUG">DEBUG (vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.DEBUG">(vyra_base.helper.logger.LogMode attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.debug">debug() (vyra_base.helper.logger.LogEntry method)</a>
+
+      <ul>
+        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.debug">(vyra_base.helper.logger.Logger class method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBMESSAGE.DEFAULT_ERROR">DEFAULT_ERROR (vyra_base.storage.db_access.DBMESSAGE attribute)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Delegating">Delegating (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Delegating">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.delete">delete() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.description">description (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.description">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.description">(vyra_base.com.datalayer.speaker.VyraSpeaker attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.description">(vyra_base.defaults.entries.ErrorEntry attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.description">(vyra_base.defaults.entries.FunctionConfigBaseParams attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.description">(vyra_base.defaults.entries.FunctionConfigBaseReturn attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#id1">(vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.description">[1]</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.description">(vyra_base.defaults.entries.ModuleEntry attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition.dest">dest (vyra_base.state.state_config.Transition attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.details">details (vyra_base.storage.db_manipulator.DBReturnValue attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.displayname">displayname (vyra_base.defaults.entries.FunctionConfigBaseParams attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.displayname">(vyra_base.defaults.entries.FunctionConfigBaseReturn attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#id2">(vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.displayname">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#id3">displaystyle (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.displaystyle">[1]</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.drop">drop() (vyra_base.storage.db_access.DbAccess method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.DURATION">DURATION (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.html#vyra_base.com.communication_handler.CommunicationHandler.emit">emit() (vyra_base.com.communication_handler.CommunicationHandler method)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.html#vyra_base.com.db_handler.DBCommunicationHandler.emit">(vyra_base.com.db_handler.DBCommunicationHandler method)</a>
+</li>
+        <li><a href="vyra_base.com.html#vyra_base.com.ros2_handler.ROS2Handler.emit">(vyra_base.com.ros2_handler.ROS2Handler method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.ERROR">ERROR (vyra_base.helper.logger.LogMode attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.ERROR">(vyra_base.storage.db_access.DBSTATUS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.error">error() (vyra_base.helper.logger.LogEntry method)</a>
+
+      <ul>
+        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.error">(vyra_base.helper.logger.Logger class method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.error_code">error_code (vyra_base.defaults.entries.ErrorEntry attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.error_return">error_return() (vyra_base.storage.db_manipulator.DBReturnValue method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry">ErrorEntry (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.error_feeder.ErrorFeeder">ErrorFeeder (class in vyra_base.com.feeder.error_feeder)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback">ErrorTraceback (class in vyra_base.helper.error_handler)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.VyraActionServer.execute_callback">execute_callback() (vyra_base.com.datalayer.action_server.VyraActionServer method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.exists">exists() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.extract_enum_from_string">extract_enum_from_string() (in module vyra_base.com.feeder.news_feeder)</a>
+</li>
+      <li><a href="vyra_base.html#vyra_base.extract_ros_interfaces">extract_ros_interfaces() (in module vyra_base)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.error_feeder.ErrorFeeder.feed">feed() (vyra_base.com.feeder.error_feeder.ErrorFeeder method)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.feeder.BaseFeeder.feed">(vyra_base.com.feeder.feeder.BaseFeeder method)</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.NewsFeeder.feed">(vyra_base.com.feeder.news_feeder.NewsFeeder method)</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.state_feeder.StateFeeder.feed">(vyra_base.com.feeder.state_feeder.StateFeeder method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.feedback_callable">feedback_callable() (vyra_base.com.datalayer.action_client.ActionInfo method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants">FeederConstants (class in vyra_base.defaults.constants)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.exceptions.FeederException">FeederException</a>
+</li>
+      <li><a href="vyra_base.com.html#vyra_base.com.communication_handler.CommunicationHandler.FILL_AT_LOADING">FILL_AT_LOADING (vyra_base.com.communication_handler.CommunicationHandler attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.FLOAT32">FLOAT32 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.FLOAT64">FLOAT64 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams">FunctionConfigBaseParams (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn">FunctionConfigBaseReturn (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes">FunctionConfigBaseTypes (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle">FunctionConfigDisplaystyle (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry">FunctionConfigEntry (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes">FunctionConfigParamTypes (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker">FunctionConfigPeriodicSpeaker (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id4">functionname (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.functionname">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.get_all">get_all() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.get_by_id">get_by_id() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.get_result_callback">get_result_callback() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.get_table_structure">get_table_structure() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.goal_response_callback">goal_response_callback() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE.HINT">HINT (vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.impl">impl (vyra_base.storage.tb_base.IntEnum attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE.INFO">INFO (vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.INFO">(vyra_base.helper.logger.LogMode attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.info">info() (vyra_base.helper.logger.Logger class method)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.initialize">initialize() (vyra_base.helper.logger.Logger class method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT16">INT16 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT32">INT32 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT64">INT64 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT8">INT8 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum">IntEnum (class in vyra_base.storage.tb_base)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Interrupting">Interrupting (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Interrupting">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.interval">interval (vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller.interval_time">interval_time (vyra_base.com.datalayer.publisher.PeriodicCaller attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.CheckerNode.is_node_available">is_node_available() (vyra_base.com.datalayer.node.CheckerNode method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.job">job (vyra_base.defaults.entries.FunctionConfigBaseTypes attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.jobs">jobs (vyra_base.com.datalayer.interface_factory.DataSpace attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.kill">kill() (vyra_base.com.datalayer.interface_factory.DataSpace class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.last_return">last_return (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.last_return">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.last_send">last_send (vyra_base.com.datalayer.speaker.VyraSpeaker attribute)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Learning">Learning (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Learning">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.level">level (vyra_base.defaults.entries.NewsFeedEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.Body.level">(vyra_base.defaults.entries.NewsFeedEntry.Body attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.log">log() (vyra_base.helper.logger.Logger class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry">LogEntry (class in vyra_base.helper.logger)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter">LogFilter (class in vyra_base.helper.log_filter)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger">Logger (class in vyra_base.helper.logger)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.LOGGER">LOGGER (vyra_base.defaults.constants.CyclicRefreshConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.logger">logger (vyra_base.helper.logger.Logger attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants">LoggerConstants (class in vyra_base.defaults.constants)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.logging_on">logging_on() (vyra_base.helper.logger.Logger static method)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode">LogMode (class in vyra_base.helper.logger)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author.mail">mail (vyra_base.defaults.info.AuthorInfo.Author attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id12">major (vyra_base.defaults.info.AuthorInfo.Version attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version.major">[1]</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_DEFAULT_LENGTH">MAX_DEFAULT_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_ERRORFEED_LENGTH">MAX_ERRORFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_NEWSFEED_LENGTH">MAX_NEWSFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_PULLREQUESTSFEED_LENGTH">MAX_PULLREQUESTSFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants.MAX_QUEUE_LENGTH">MAX_QUEUE_LENGTH (vyra_base.defaults.constants.LoggerConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_STATEFEED_LENGTH">MAX_STATEFEED_LENGTH (vyra_base.defaults.constants.FeederConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.merge">merge() (vyra_base.com.datalayer.callable.VyraCallable method)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.merge">(vyra_base.com.datalayer.job.VyraJob method)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.merge">(vyra_base.com.datalayer.speaker.VyraSpeaker method)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.message">message (vyra_base.defaults.entries.NewsFeedEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.Body.message">(vyra_base.defaults.entries.NewsFeedEntry.Body attribute)</a>
+</li>
+        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.message">(vyra_base.helper.logger.LogEntry attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants">MessageLengthConstants (class in vyra_base.defaults.constants)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.metadata">metadata (vyra_base.storage.tb_base.Base attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id13">minor (vyra_base.defaults.info.AuthorInfo.Version attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version.minor">[1]</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.miscellaneous">miscellaneous (vyra_base.defaults.entries.ErrorEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.mode">mode (vyra_base.helper.logger.LogEntry attribute)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="vyra_base.html#module-vyra_base">vyra_base</a>
+</li>
+        <li><a href="vyra_base.com.html#module-vyra_base.com">vyra_base.com</a>
+</li>
+        <li><a href="vyra_base.com.html#module-vyra_base.com.communication_handler">vyra_base.com.communication_handler</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer">vyra_base.com.datalayer</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_client">vyra_base.com.datalayer.action_client</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_server">vyra_base.com.datalayer.action_server</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.callable">vyra_base.com.datalayer.callable</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.interface_factory">vyra_base.com.datalayer.interface_factory</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.job">vyra_base.com.datalayer.job</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.node">vyra_base.com.datalayer.node</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.publisher">vyra_base.com.datalayer.publisher</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_client">vyra_base.com.datalayer.service_client</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_server">vyra_base.com.datalayer.service_server</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.speaker">vyra_base.com.datalayer.speaker</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.subscriber">vyra_base.com.datalayer.subscriber</a>
+</li>
+        <li><a href="vyra_base.com.html#module-vyra_base.com.db_handler">vyra_base.com.db_handler</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder">vyra_base.com.feeder</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.error_feeder">vyra_base.com.feeder.error_feeder</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.feeder">vyra_base.com.feeder.feeder</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.news_feeder">vyra_base.com.feeder.news_feeder</a>
+</li>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.state_feeder">vyra_base.com.feeder.state_feeder</a>
+</li>
+        <li><a href="vyra_base.com.html#module-vyra_base.com.ros2_handler">vyra_base.com.ros2_handler</a>
+</li>
+        <li><a href="vyra_base.core.html#module-vyra_base.core">vyra_base.core</a>
+</li>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults">vyra_base.defaults</a>
+</li>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.constants">vyra_base.defaults.constants</a>
+</li>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.entries">vyra_base.defaults.entries</a>
+</li>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.exceptions">vyra_base.defaults.exceptions</a>
+</li>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.info">vyra_base.defaults.info</a>
+</li>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper">vyra_base.helper</a>
+</li>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper.error_handler">vyra_base.helper.error_handler</a>
+</li>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper.log_filter">vyra_base.helper.log_filter</a>
+</li>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper.logger">vyra_base.helper.logger</a>
+</li>
+        <li><a href="vyra_base.state.html#module-vyra_base.state">vyra_base.state</a>
+</li>
+        <li><a href="vyra_base.state.html#module-vyra_base.state.state_config">vyra_base.state.state_config</a>
+</li>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage">vyra_base.storage</a>
+</li>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_access">vyra_base.storage.db_access</a>
+</li>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_manipulator">vyra_base.storage.db_manipulator</a>
+</li>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage.tb_base">vyra_base.storage.tb_base</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.module_id">module_id (vyra_base.defaults.entries.ErrorEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.module_id">(vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.module_name">module_name (vyra_base.defaults.entries.NewsFeedEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.module_name">(vyra_base.defaults.entries.StateEntry attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.module_templatetype">module_templatetype (vyra_base.defaults.entries.NewsFeedEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.module_uuid">module_uuid (vyra_base.defaults.entries.StateEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry">ModuleEntry (class in vyra_base.defaults.entries)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.name">name (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.name">(vyra_base.com.datalayer.action_server.Action attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.name">(vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.name">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.NodeSettings.name">(vyra_base.com.datalayer.node.NodeSettings attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.name">(vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.name">(vyra_base.com.datalayer.service_client.ServiceInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.name">(vyra_base.com.datalayer.service_server.ServiceInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.name">(vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.name">(vyra_base.defaults.entries.ModuleEntry attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.NEWSFEED">NEWSFEED (vyra_base.defaults.constants.CyclicRefreshConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry">NewsFeedEntry (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.Body">NewsFeedEntry.Body (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE">NewsFeedEntry.MESSAGE_TYPE (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.news_feeder.NewsFeeder">NewsFeeder (class in vyra_base.com.feeder.news_feeder)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.VyraNode.node_settings">node_settings (vyra_base.com.datalayer.node.VyraNode property)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.NodeSettings">NodeSettings (class in vyra_base.com.datalayer.node)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.NONE">NONE (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_ALLOWED">NOT_ALLOWED (vyra_base.storage.db_access.DBSTATUS attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_AUTHORIZED">NOT_AUTHORIZED (vyra_base.storage.db_access.DBSTATUS attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_FOUND">NOT_FOUND (vyra_base.storage.db_access.DBSTATUS attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Overloaded">Overloaded (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Overloaded">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter.param">param (vyra_base.helper.log_filter.LogFilter attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.NodeSettings.parameters">parameters (vyra_base.com.datalayer.node.NodeSettings attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id5">params (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.params">[1]</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id14">patch (vyra_base.defaults.info.AuthorInfo.Version attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version.patch">[1]</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id6">periodic (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.periodic">[1]</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.periodic_caller">periodic_caller (vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller">PeriodicCaller (class in vyra_base.com.datalayer.publisher)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author.phone">phone (vyra_base.defaults.info.AuthorInfo.Author attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.previous">previous (vyra_base.defaults.entries.StateEntry attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.process_bind_param">process_bind_param() (vyra_base.storage.tb_base.IntEnum method)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.process_result_value">process_result_value() (vyra_base.storage.tb_base.IntEnum method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.VyraPublisher.publish">publish() (vyra_base.com.datalayer.publisher.VyraPublisher method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.published">published (vyra_base.defaults.entries.FunctionConfigDisplaystyle attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.publisher">publisher (vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker.publisher_server">publisher_server (vyra_base.com.datalayer.speaker.VyraSpeaker attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo">PublisherInfo (class in vyra_base.com.datalayer.publisher)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry">PullRequestEntry (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.RequiredVersion.PYTHON_MIN">PYTHON_MIN (vyra_base.defaults.constants.RequiredVersion attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.qos_profile">qos_profile (vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.qos_profile">(vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#id7">qosprofile (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.qosprofile">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants.RECEIVE">RECEIVE (vyra_base.defaults.constants.MessageLengthConstants attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.RECEIVE">(vyra_base.defaults.constants.TimeoutConstants attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Recovering">Recovering (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Recovering">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Reflecting">Reflecting (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Reflecting">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.registry">registry (vyra_base.storage.tb_base.Base attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.remote_callable">remote_callable() (in module vyra_base.com.datalayer.interface_factory)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.request">request() (vyra_base.com.datalayer.service_client.ServiceInfo method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_action">request_action (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_action_args">request_action_args (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_description">request_description (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_on_date">request_on_date (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_structure">request_structure (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.RequiredVersion">RequiredVersion (class in vyra_base.defaults.constants)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.response">response (vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.Resting">Resting (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.Resting">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.result_callable">result_callable() (vyra_base.com.datalayer.action_client.ActionInfo method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id8">returns (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.returns">[1]</a>
+</li>
+      <li><a href="vyra_base.com.html#vyra_base.com.ros2_handler.ROS2Handler">ROS2Handler (class in vyra_base.com.ros2_handler)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#id9">ros2type (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.ros2type">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.SEND">SEND (vyra_base.defaults.constants.TimeoutConstants attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient.send">send() (vyra_base.com.datalayer.service_client.VyraServiceClient method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient.send_goal">send_goal() (vyra_base.com.datalayer.action_client.VyraActionClient method)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.server">server (vyra_base.com.datalayer.action_server.Action attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.service">service (vyra_base.com.datalayer.service_server.ServiceInfo attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.service_server">service_server (vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo">ServiceInfo (class in vyra_base.com.datalayer.service_client)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo">(class in vyra_base.com.datalayer.service_server)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.session">session() (vyra_base.storage.db_access.DbAccess method)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES.ShuttingDown">ShuttingDown (vyra_base.state.state_config.Vyra_STATES attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS.ShuttingDown">(vyra_base.state.state_config.Vyra_TRANSITIONS attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.solution">solution (vyra_base.defaults.entries.ErrorEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition.source">source (vyra_base.state.state_config.Transition attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.speaker">speaker (vyra_base.defaults.entries.FunctionConfigBaseTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.interface_factory.DataSpace.speakers">speakers (vyra_base.com.datalayer.interface_factory.DataSpace attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry">StateEntry (class in vyra_base.defaults.entries)</a>
+</li>
+      <li><a href="vyra_base.com.feeder.html#vyra_base.com.feeder.state_feeder.StateFeeder">StateFeeder (class in vyra_base.com.feeder.state_feeder)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.status">status (vyra_base.storage.db_manipulator.DBReturnValue attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.STRING">STRING (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.subscription">subscription (vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo">SubscriptionInfo (class in vyra_base.com.datalayer.subscriber)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.SUCCESS">SUCCESS (vyra_base.storage.db_access.DBSTATUS attribute)</a>
+</li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.success_return">success_return() (vyra_base.storage.db_manipulator.DBReturnValue method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#id10">tags (vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.tags">[1]</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.template">template (vyra_base.defaults.entries.ModuleEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.TIME">TIME (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange.time">time (vyra_base.defaults.info.AuthorInfo.FileChange attribute)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.TIMEOUT_SEC">TIMEOUT_SEC (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants">TimeoutConstants (class in vyra_base.defaults.constants)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PeriodicCaller.timer">timer (vyra_base.com.datalayer.publisher.PeriodicCaller attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.timestamp">timestamp (vyra_base.defaults.entries.NewsFeedEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.timestamp">(vyra_base.defaults.entries.StateEntry attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.to_dict">to_dict() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition">Transition (class in vyra_base.state.state_config)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Transition.trigger">trigger (vyra_base.state.state_config.Transition attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.ActionInfo.type">type (vyra_base.com.datalayer.action_client.ActionInfo attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.Action.type">(vyra_base.com.datalayer.action_server.Action attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable.type">(vyra_base.com.datalayer.callable.VyraCallable attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob.type">(vyra_base.com.datalayer.job.VyraJob attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.PublisherInfo.type">(vyra_base.com.datalayer.publisher.PublisherInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.ServiceInfo.type">(vyra_base.com.datalayer.service_client.ServiceInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.ServiceInfo.type">(vyra_base.com.datalayer.service_server.ServiceInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.SubscriptionInfo.type">(vyra_base.com.datalayer.subscriber.SubscriptionInfo attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.type">(vyra_base.defaults.entries.ErrorEntry attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#id11">(vyra_base.defaults.entries.FunctionConfigEntry attribute)</a>, <a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.type">[1]</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.type">(vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.type">(vyra_base.defaults.entries.StateEntry attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT16">UINT16 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT32">UINT32 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT64">UINT64 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT8">UINT8 (vyra_base.defaults.entries.FunctionConfigParamTypes attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBTableManipulator.update">update() (vyra_base.storage.db_manipulator.DBTableManipulator method)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.uuid">uuid (vyra_base.defaults.entries.ModuleEntry attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.uuid">(vyra_base.defaults.entries.NewsFeedEntry attribute)</a>
+</li>
+        <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.uuid">(vyra_base.defaults.entries.PullRequestEntry attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.value">value (vyra_base.storage.db_manipulator.DBReturnValue attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.version">version (vyra_base.defaults.entries.ModuleEntry attribute)</a>
+</li>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.visible">visible (vyra_base.defaults.entries.FunctionConfigDisplaystyle attribute)</a>
+</li>
+      <li>
+    vyra_base
+
+      <ul>
+        <li><a href="vyra_base.html#module-vyra_base">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com
+
+      <ul>
+        <li><a href="vyra_base.com.html#module-vyra_base.com">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.communication_handler
+
+      <ul>
+        <li><a href="vyra_base.com.html#module-vyra_base.com.communication_handler">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.action_client
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_client">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.action_server
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.action_server">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.callable
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.callable">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.interface_factory
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.interface_factory">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.job
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.job">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.node
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.node">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.publisher
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.publisher">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.service_client
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_client">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.service_server
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_server">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.speaker
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.speaker">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.datalayer.subscriber
+
+      <ul>
+        <li><a href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.subscriber">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.db_handler
+
+      <ul>
+        <li><a href="vyra_base.com.html#module-vyra_base.com.db_handler">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.feeder
+
+      <ul>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.feeder.error_feeder
+
+      <ul>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.error_feeder">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.feeder.feeder
+
+      <ul>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.feeder">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.feeder.news_feeder
+
+      <ul>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.news_feeder">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.com.feeder.state_feeder
+
+      <ul>
+        <li><a href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.state_feeder">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    vyra_base.com.ros2_handler
+
+      <ul>
+        <li><a href="vyra_base.com.html#module-vyra_base.com.ros2_handler">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.core
+
+      <ul>
+        <li><a href="vyra_base.core.html#module-vyra_base.core">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.defaults
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.defaults.constants
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.constants">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.defaults.entries
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.entries">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.defaults.exceptions
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.exceptions">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.defaults.info
+
+      <ul>
+        <li><a href="vyra_base.defaults.html#module-vyra_base.defaults.info">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.helper
+
+      <ul>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.helper.error_handler
+
+      <ul>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper.error_handler">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.helper.log_filter
+
+      <ul>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper.log_filter">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.helper.logger
+
+      <ul>
+        <li><a href="vyra_base.helper.html#module-vyra_base.helper.logger">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.state
+
+      <ul>
+        <li><a href="vyra_base.state.html#module-vyra_base.state">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.state.state_config
+
+      <ul>
+        <li><a href="vyra_base.state.html#module-vyra_base.state.state_config">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.storage
+
+      <ul>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.storage.db_access
+
+      <ul>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_access">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.storage.db_manipulator
+
+      <ul>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage.db_manipulator">module</a>
+</li>
+      </ul></li>
+      <li>
+    vyra_base.storage.tb_base
+
+      <ul>
+        <li><a href="vyra_base.storage.html#module-vyra_base.storage.tb_base">module</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_STATES">Vyra_STATES (class in vyra_base.state.state_config)</a>
+</li>
+      <li><a href="vyra_base.state.html#vyra_base.state.state_config.Vyra_TRANSITIONS">Vyra_TRANSITIONS (class in vyra_base.state.state_config)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_client.VyraActionClient">VyraActionClient (class in vyra_base.com.datalayer.action_client)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.action_server.VyraActionServer">VyraActionServer (class in vyra_base.com.datalayer.action_server)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.callable.VyraCallable">VyraCallable (class in vyra_base.com.datalayer.callable)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.job.VyraJob">VyraJob (class in vyra_base.com.datalayer.job)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.node.VyraNode">VyraNode (class in vyra_base.com.datalayer.node)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.publisher.VyraPublisher">VyraPublisher (class in vyra_base.com.datalayer.publisher)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_client.VyraServiceClient">VyraServiceClient (class in vyra_base.com.datalayer.service_client)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.service_server.VyraServiceServer">VyraServiceServer (class in vyra_base.com.datalayer.service_server)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.speaker.VyraSpeaker">VyraSpeaker (class in vyra_base.com.datalayer.speaker)</a>
+</li>
+      <li><a href="vyra_base.com.datalayer.html#vyra_base.com.datalayer.subscriber.VyraSubscription">VyraSubscription (class in vyra_base.com.datalayer.subscriber)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist">w_check_error_exist() (vyra_base.helper.error_handler.ErrorTraceback static method)</a>
+</li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.warn">warn() (vyra_base.helper.logger.LogEntry method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE.WARNING">WARNING (vyra_base.defaults.entries.NewsFeedEntry.MESSAGE_TYPE attribute)</a>
+
+      <ul>
+        <li><a href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.WARNING">(vyra_base.helper.logger.LogMode attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vyra_base.helper.html#vyra_base.helper.logger.Logger.warning">warning() (vyra_base.helper.logger.Logger class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">vyra_base</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Holger Schernewski.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
 </html>
