@@ -18,12 +18,15 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           pip install -r docs/requirements.txt
 
+      - name: Clean build directory
+        run: rm -rf build/
+      
       - name: Build Sphinx site
         run: |
           sphinx-build -b html docs/ build/
