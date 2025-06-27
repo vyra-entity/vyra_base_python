@@ -11,6 +11,7 @@ vyra\_base.com.datalayer.action\_client module
    :members:
    :show-inheritance:
    :undoc-members:
+   :no-index:
 
 vyra\_base.com.datalayer.action\_server module
 ----------------------------------------------
@@ -19,6 +20,7 @@ vyra\_base.com.datalayer.action\_server module
    :members:
    :show-inheritance:
    :undoc-members:
+   :no-index:
 
 vyra\_base.com.datalayer.callable module
 ----------------------------------------
@@ -67,6 +69,7 @@ vyra\_base.com.datalayer.service\_client module
    :members:
    :show-inheritance:
    :undoc-members:
+   :no-index:
 
 vyra\_base.com.datalayer.service\_server module
 -----------------------------------------------
