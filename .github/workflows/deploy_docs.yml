@@ -24,16 +24,12 @@ jobs:
         run: |
           pip install -r docs/requirements.txt
 
-      - name: Install vyra_base
-        run: |
-          pip install -e .
-
       - name: Clean build directory
         run: rm -rf build/
       
       - name: Build Sphinx site
         run: |
-          sphinx-build -b html docs/ build/
+          sphinx-build -b html docs/ build/ -W --keep-going
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
