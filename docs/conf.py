@@ -25,6 +25,7 @@ autodoc_typehints = 'description'  # Typen in der Beschreibung statt Signatur
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'rclpy': ("https://docs.ros.org/en/humble/", None),
+    'sqlalchemy': ('https://docs.sqlalchemy.org/en/20/', None),
 }
 
 templates_path = ['_templates']
