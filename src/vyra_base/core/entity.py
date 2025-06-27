@@ -34,7 +34,7 @@ from vyra_base.storage.storage import Storage
 
 class VyraEntity:
     """
-    Base class for all V.Y.R.A. entities.
+    Base class for all V.Y.R.A. entities .
 
     This class initializes the entity with a ROS2 node, state, news, and error feeders.
     It also provides methods to register remote callables and manage interfaces.
