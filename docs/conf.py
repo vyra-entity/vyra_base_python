@@ -33,7 +33,8 @@ autodoc_mock_imports = [
     "std_msgs", 
     "geometry_msgs", 
     "sensor_msgs",
-    "builtin_interfaces"
+    "builtin_interfaces",
+    "unique_identifier_msgs"
 ]
 
 templates_path = ['_templates']
