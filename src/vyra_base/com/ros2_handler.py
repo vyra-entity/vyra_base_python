@@ -13,12 +13,6 @@ from vyra_base.helper.error_handler import ErrorTraceback
 class ROS2Handler(CommunicationHandler):
     """
     Abstract class for all DDS communication handlers.
-
-    This class provides the required interface for all DDS communication handlers
-    to work with the Feeder class.
-
-    :cvar __handlerName__: Name of the handler.
-    :cvar __doc__: Description of the handler.
     """
 
     __handlerName__: str = 'ROS2Handler'
