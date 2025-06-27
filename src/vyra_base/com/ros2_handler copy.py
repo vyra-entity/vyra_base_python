@@ -25,12 +25,29 @@ class ROS2Handler(CommunicationHandler):
     __doc__: str = 'ROS2 communication handler'
 
     def __init__(self, initiator: str, publisher: VyraPublisher, type: Any):
+        """
+        Initialize the ROS2Handler.
+
+        :param initiator: The initiator of the handler.
+        :type initiator: str
+        :param publisher: The publisher instance to use.
+        :type publisher: VyraPublisher
+        :param type: The ROS2 message type.
+        :type type: Any
+        """
         self._initiator = initiator
         self._publisher: VyraPublisher = publisher
         self._type: Any = type
         super().__init__()
 
     def emit(self, record: LogRecord):
+        """
+        Publish a log record as a ROS2 message.
+
+        :param record: The log record to publish.
+        :type record: logging.LogRecord
+        :return: None
+        """
         try:
             Logger.debug(
                 f"{self._initiator} instruct {ROS2Handler.__handlerName__} "
