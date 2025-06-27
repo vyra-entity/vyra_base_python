@@ -55,13 +55,6 @@ class VyraServiceClient:
     Base class for ROS2 services.
 
     This class is intended to be factory-created to implement specific service functionality.
-
-    Parameters
-    ----------
-    serviceInfo : ServiceInfo
-        Information about the service.
-    node : VyraNode
-        ROS2 node instance.
     """
 
     def __init__(self, serviceInfo: ServiceInfo, node: VyraNode) -> None:

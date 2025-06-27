@@ -45,13 +45,6 @@ class VyraActionServer:
     Base class for ROS2 actions.
 
     This class is intended to be factory-created to implement specific action functionality.
-
-    Parameters
-    ----------
-    action : Action
-        The action configuration.
-    node : VyraNode
-        The ROS2 node to attach the action server to.
     """
 
     def __init__(self, action: Action, node: VyraNode) -> None:

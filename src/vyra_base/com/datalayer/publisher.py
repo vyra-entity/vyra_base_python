@@ -52,11 +52,6 @@ class VyraPublisher:
     Base class for ROS2 publishers.
 
     This class is intended to be factory-created to implement a specific publisher for a topic.
-
-    :param publisherInfo: PublisherInfo instance containing publisher configuration.
-    :type publisherInfo: PublisherInfo
-    :param node: The ROS2 node to which the publisher belongs.
-    :type node: VyraNode
     """
 
     def __init__(self, publisherInfo: PublisherInfo, node: VyraNode) -> None:

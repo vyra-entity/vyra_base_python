@@ -49,11 +49,6 @@ class VyraActionClient:
     Base class for ROS2 action client.
 
     This class will be factory created to call specific action functionality.
-
-    :param actionInfo: Information about the action.
-    :type actionInfo: ActionInfo
-    :param node: The ROS2 node.
-    :type node: VyraNode
     """
 
     def __init__(self, actionInfo: ActionInfo, node: VyraNode) -> None:
