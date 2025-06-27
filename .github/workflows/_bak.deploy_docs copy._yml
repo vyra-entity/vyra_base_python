@@ -1,0 +1,43 @@
+name: Build and Deploy Sphinx Docs
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write  # Erlaubt Pushen ins Repo, wichtig für gh-pages Deployment
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r docs/requirements.txt
+
+      - name: Install vyra_base
+        run: |
+          pip install -e .
+
+      - name: Clean build directory
+        run: rm -rf build/
+      
+      - name: Build Sphinx site
+        run: |
+          sphinx-build -b html docs/ build/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          force_orphan: true  # ersetzt den gh-pages-Branch komplett
