@@ -24,11 +24,12 @@ class ROS2Handler(CommunicationHandler):
     __handlerName__: str = 'ROS2Handler'
     __doc__: str = 'ROS2 communication handler'
 
-    def __init__(self, initiator, publisher: VyraPublisher, type: Any):
+    def __init__(self, initiator: str, publisher: VyraPublisher, type: Any):
         """
         Initialize the ROS2Handler.
 
         :param initiator: The initiator of the handler.
+        :type initiator: str
         :param publisher: The publisher instance to use.
         :type publisher: VyraPublisher
         :param type: The ROS2 message type.
