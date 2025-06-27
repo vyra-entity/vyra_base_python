@@ -1,8 +1,9 @@
-build/*
-_build/*
-logs/*
-install/*
-temp/*
+/build/
+/_build/
+/logs/
+/install/
+/temp/
+/gh-pages/
 
 *.log
 *.tmp
