@@ -14,7 +14,7 @@ class DBCommunicationHandler(CommunicationHandler):
     :param database: Database connection or handler instance.
     """
     __handlerName__: str = 'DatabaseHandler'
-    __doc__: str = 'Database communication handler'
+    __doc__: str = 'Database(db) communication handler'
 
     def __init__(self, database):
         """
