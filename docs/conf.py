@@ -37,4 +37,4 @@ html_static_path = ['_static']
 # -- Path Setup (damit src importierbar ist) ---------------------------------
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))  # ggf. anpassen
+sys.path.insert(0, os.path.abspath('../src/'))  # ggf. anpassen
