@@ -3,6 +3,9 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.types import TypeDecorator, Integer
 
 class Base(AsyncAttrs, DeclarativeBase):
+    """
+    Base class for all SQLAlchemy models in the application.
+    """
     pass
 
 # TypeDecorator für int-Enums
