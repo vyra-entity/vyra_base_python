@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write  # Erlaubt Pushen ins Repo, wichtig für gh-pages Deployment
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
