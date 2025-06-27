@@ -2,3 +2,5 @@ furo
 myst-parser
 sphinx
 sphinx-autodoc-typehints
+sphinx.ext.intersphinx
+sphinx.ext.napoleon
