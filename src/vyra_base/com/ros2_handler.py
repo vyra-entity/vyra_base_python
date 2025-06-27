@@ -13,12 +13,33 @@ from vyra_base.helper.error_handler import ErrorTraceback
 class ROS2Handler(CommunicationHandler):
     """
     Abstract class for all DDS communication handlers.
+
+    :cvar __handlerName__: Name of the handler.
+    :type __handlerName__: str
+    :cvar __doc__: Documentation string for the handler.
+    :type __doc__: str
+    :param initiator: The initiator of the handler.
+    :type initiator: str
+    :param publisher: The publisher instance to use.
+    :type publisher: VyraPublisher
+    :param type: The ROS2 message type.
+    :type type: Any
     """
 
     __handlerName__: str = 'ROS2Handler'
     __doc__: str = 'ROS2 communication handler'
 
     def __init__(self, initiator: str, publisher: VyraPublisher, type: Any):
+        """
+        Initialize the ROS2Handler.
+
+        :param initiator: The initiator of the handler.
+        :type initiator: str
+        :param publisher: The publisher instance to use.
+        :type publisher: VyraPublisher
+        :param type: The ROS2 message type.
+        :type type: Any
+        """
         self._initiator = initiator
         self._publisher: VyraPublisher = publisher
         self._type: Any = type
