@@ -21,9 +21,9 @@ class CommunicationHandler(logging.Handler):
         :param initiator: Optional initiator string.
         :type initiator: str
         :param publisher: Optional publisher object.
-        :type publisher: object, optional
+        :type publisher: object, Optional
         :param type: Optional type information.
-        :type type: object, optional
+        :type type: object, Optional
         """
         super().__init__()
 

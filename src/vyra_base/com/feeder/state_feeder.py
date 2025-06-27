@@ -21,7 +21,7 @@ class StateFeeder(BaseFeeder):
     :param module_config: Module configuration entry.
     :type module_config: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
-    :type loggingOn: bool, optional
+    :type loggingOn: bool, Optional
 
     :raises FeederException: If the VyraSpeaker cannot be created with the given type.
 
@@ -50,7 +50,7 @@ class StateFeeder(BaseFeeder):
         :param module_config: Module configuration entry.
         :type module_config: ModuleEntry
         :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
-        :type loggingOn: bool, optional
+        :type loggingOn: bool, Optional
 
         :raises FeederException: If the VyraSpeaker cannot be created with the given type.
         """

@@ -44,7 +44,7 @@ class ROS2Handler(CommunicationHandler):
         Publish a log record as a ROS2 message.
 
         :param record: The log record to publish.
-        :type record: LogRecord
+        :type record: logging.LogRecord
         :return: None
         """
         try:

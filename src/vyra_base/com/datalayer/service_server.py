@@ -53,7 +53,7 @@ class VyraServiceServer:
         :param node: The ROS2 node to attach the service to.
         :type node: VyraNode
         :param async_loop: Optional asyncio event loop.
-        :type async_loop: Any, optional
+        :type async_loop: Any, Optional
         """
         self.service_info: ServiceInfo = serviceInfo
         self._node: VyraNode = node
@@ -66,7 +66,7 @@ class VyraServiceServer:
         :param callback: The callback function to handle service requests.
         :type callback: Callable
         :param async_loop: Optional asyncio event loop.
-        :type async_loop: Any, optional
+        :type async_loop: Any, Optional
         :raises TypeError: If the callback is not callable.
         :raises ValueError: If the service type or name is not provided.
         """

@@ -164,9 +164,9 @@ class FunctionConfigEntry:
     :param qosprofile: Quality of Service profile (default: 10)
     :type qosprofile: Union[int, QoSProfile]
     :param callback: Function to be called when the function is invoked (only for callable)
-    :type callback: Callable, optional
+    :type callback: Callable, Optional
     :param periodic: Function to be called periodically (only for speaker)
-    :type periodic: FunctionConfigPeriodicSpeaker, optional
+    :type periodic: FunctionConfigPeriodicSpeaker, Optional
     """
     tags: list[str]
     type: FunctionConfigBaseTypes

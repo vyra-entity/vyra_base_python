@@ -16,7 +16,8 @@ from vyra_base.helper.logger import Logger
 
 
 class NewsFeeder(BaseFeeder):
-    """Collection of the news messages.
+    """
+    Collection of the news messages.
 
     :param type: The ros2-msg type for the feeder.
     :type type: Any
@@ -25,7 +26,7 @@ class NewsFeeder(BaseFeeder):
     :param module_config: Module configuration entry.
     :type module_config: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
-    :type loggingOn: bool, optional
+    :type loggingOn: bool, Optional
     :raises FeederException: If the VyraSpeaker cannot be created with the given type.
     """
 
@@ -50,7 +51,8 @@ class NewsFeeder(BaseFeeder):
         self.create(loggingOn=loggingOn)
 
     def feed(self, newsElement: Union[NewsEntry, str, list]) -> None:
-        """Feed a news entry to the feeder.
+        """
+        Feed a news entry to the feeder.
 
         The content can either be a string which will be processed into a NewsEntry,
         or a NewsEntry object itself. Use the method ``build_newsfeed`` to create a
@@ -84,11 +86,13 @@ class NewsFeeder(BaseFeeder):
         super().feed(newsfeed_entry)
 
     def build_newsfeed(self, *args: Any) -> NewsEntry:
-        """Build a well structured newsfeed entry from plain text and module information.
+        """
+        Build a well structured newsfeed entry from plain text and module information.
 
         :param args: The arguments to be processed into a news entry. Can be a string or list of strings.
         :type args: Any
-        :return: A structured news entry containing the message, level, timestamp, UUID, module name, module ID, module template, and type.
+        :return: A structured news entry containing the message, level, timestamp, UUID,
+            module name, module ID, module template, and type.
         :rtype: NewsEntry
         :raises FeederException: If the type of the message level is not valid.
         """
@@ -125,7 +129,8 @@ class NewsFeeder(BaseFeeder):
 
 
 def extract_level_from_msg(message: str) -> Union[NewsEntry.MESSAGE_LEVEL, None]:
-    """Extract the message level from a given message string.
+    """
+    Extract the message level from a given message string.
 
     :param message: The message string from which to extract the level.
     :type message: str

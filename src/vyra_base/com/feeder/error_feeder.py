@@ -25,7 +25,7 @@ class ErrorFeeder(BaseFeeder):
     :param module_config: The module configuration entry.
     :type module_config: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
-    :type loggingOn: bool, optional
+    :type loggingOn: bool, Optional
     :raises FeederException: If the VyraSpeaker cannot be created with the given type.
     """
     def __init__(
@@ -53,12 +53,12 @@ class ErrorFeeder(BaseFeeder):
         Feed a news entry to the feeder.
 
         The content can either be a dictionary which will be processed into an
-        :class:`ErrorEntry`, or an :class:`ErrorEntry` object itself. Use the method
-        :meth:`build_errorfeed` to create an :class:`ErrorEntry` from a dict.
+        :class:`vyra_base.defaults.entries.ErrorEntry`, or an :class:`vyra_base.defaults.entries.ErrorEntry` object itself. Use the method
+        :meth:`build_errorfeed` to create an :class:`vyra_base.defaults.entries.ErrorEntry` from a dict.
 
-        :param errorElement: The error entry to be fed. Can be a dictionary with error details or an :class:`ErrorEntry` object.
+        :param errorElement: The error entry to be fed. Can be a dictionary with error details or an :class:`vyra_base.defaults.entries.ErrorEntry` object.
         :type errorElement: Union[ErrorEntry, dict]
-        :raises FeederException: If the type of errorElement is neither a dict nor an :class:`ErrorEntry`.
+        :raises FeederException: If the type of errorElement is neither a dict nor an :class:`vyra_base.defaults.entries.ErrorEntry`.
         """
         if isinstance(errorElement, dict):
             errorfeed_entry = self.build_errorfeed(errorElement)
@@ -95,7 +95,7 @@ class ErrorFeeder(BaseFeeder):
             - ``level``: ErrorEntry.ERROR_LEVEL - Level of the error (default: ErrorEntry.ERROR_LEVEL.MINOR_FAULT)
 
         :type errorDict: dict
-        :return: An instance of :class:`ErrorEntry` populated with the provided details.
+        :return: An instance of :class:`vyra_base.defaults.entries.ErrorEntry` populated with the provided details.
         :rtype: ErrorEntry
         """
         errorfeed_entry = ErrorEntry(

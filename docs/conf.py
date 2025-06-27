@@ -35,10 +35,10 @@ extensions = [
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
-    'rclpy': ('https://docs.ros2.org/iron/api/rclpy/', None),  # Beispiel für ROS 2 rclpy
+    'rclpy': ("https://docs.ros.org/en/humble/", None),
 }
 
 # Damit dein Code importierbar ist (z. B. src-layout)
 import os
 import sys
-sys.path.insert(0, os.path.abspath(".."))  # oder "../src", je nach Struktur
+sys.path.insert(0, os.path.abspath("../src"))  # oder "../src", je nach Struktur
