@@ -5,20 +5,14 @@ from enum import Enum
 from pathlib import Path
 from typing import Union
 
-from sqlalchemy import inspect
-from sqlalchemy import MetaData
-from sqlalchemy import Table
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy import inspect, MetaData, Table
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from vyra_base.helper.logger import Logger
-from vyra_base.helper.logger import LogEntry
-from vyra_base.helper.logger import LogMode
+from vyra_base.helper.logger import Logger, LogEntry, LogMode
+from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.storage.storage import Storage
 from vyra_base.storage.tb_base import Base
-from vyra_base.helper.error_handler import ErrorTraceback
 
 meta = MetaData()
 
@@ -37,13 +31,17 @@ class DBMESSAGE:
 class DbAccess(Storage):
     """Baseclass for database access."""
 
-    def __init__(self, module_name: str, db_config_path: str= None, db_config: dict = None):
-        """Initialize database object.
+    def __init__(self, module_name: str, db_config_path: str = None, db_config: dict = None):
+        """
+        Initialize database object.
 
-        Args:
-            module_id (str): The id of the varioboticOS module.
-            config_path (str, optional): Path to the ini file of your sqlalchemy config. 
-                                         Defaults to WORKING_PATH+PATH_DB_CONFIG.
+        :param module_name: The id of the V.Y.R.A. module.
+        :type module_name: str
+        :param db_config_path: Path to the ini file of your sqlalchemy config. Defaults to WORKING_PATH+PATH_DB_CONFIG.
+        :type db_config_path: str, optional
+        :param db_config: Dictionary with database configuration.
+        :type db_config: dict, optional
+        :raises ValueError: If neither db_config_path nor db_config is provided, or if db_config is not a dict.
         """
         try:
             self.module_name = module_name
@@ -91,14 +89,11 @@ class DbAccess(Storage):
             ErrorTraceback.check_error_exist()
 
     def session(self) -> Union[sessionmaker, async_sessionmaker]:
-        """Create a session for the database.
+        """
+        Create a session for the database.
 
-        Args:
-            async_session (bool, optional): If True, create an async session. 
-                                            Defaults to False.
-
-        Returns:
-            Session: A session object.
+        :returns: A session object.
+        :rtype: sessionmaker or async_sessionmaker
         """
         if isinstance(self.db_engine, AsyncEngine):
             return async_sessionmaker(self.db_engine, expire_on_commit=False)
@@ -106,13 +101,15 @@ class DbAccess(Storage):
             return sessionmaker(self.db_engine, expire_on_commit=False)
 
     async def create_all_tables(self) -> str:
-        """Create all database tables that are childen of the SQLAlchemy Base class.
+        """
+        Create all database tables that are children of the SQLAlchemy Base class.
+
         This method will create all tables that are defined in the SQLAlchemy Base class.
         It will also create the tables if they do not exist.
-        This method will not create the tables if they already exist.            
+        This method will not create the tables if they already exist.
 
-        Returns:
-            DBSTATUS: see DBSTATUS class
+        :returns: Status of the operation.
+        :rtype: str (see DBSTATUS class)
         """
         try:
             async with self.db_engine.begin() as conn:
@@ -127,15 +124,13 @@ class DbAccess(Storage):
                 return DBSTATUS.ERROR
 
     async def create_selected_table(self, table_structs: list[Base]) -> str:
-        """Create new database table.
+        """
+        Create new database table.
 
-        Args:
-            table_structs (dlist[object]ict): 
-                table configurations as python classes 
-                style -> sqlalchemy.ext.declarative_base
-
-        Returns:
-            str: Element of DBSTATUS class
+        :param table_structs: Table configurations as python classes (SQLAlchemy declarative base style).
+        :type table_structs: list[Base]
+        :returns: Status of the operation.
+        :rtype: str (see DBSTATUS class)
         """
         try:
             meta = MetaData()
@@ -152,14 +147,7 @@ class DbAccess(Storage):
                     
                     await async_conn.run_sync(load_table)
 
-            # conn is an instance of AsyncConnection
             async with self.db_engine.begin() as conn:
-                # to support SQLAlchemy DDL methods as well as legacy functions, the
-                # AsyncConnection.run_sync() awaitable method will pass a "sync"
-                # version of the AsyncConnection object to any synchronous method,
-                # where synchronous IO calls will be transparently translated for
-                # await.
-
                 await conn.run_sync(meta.create_all)
 
                 Logger.log(LogEntry(
@@ -172,13 +160,13 @@ class DbAccess(Storage):
                 return DBSTATUS.ERROR
 
     async def drop_table(self, table: Base) -> str:
-        """Delete table from database.
+        """
+        Delete table from database.
 
-        Args:
-            table (str): table name
-
-        Returns:
-            str: Element of DBSTATUS class
+        :param table: Table class (SQLAlchemy declarative base).
+        :type table: Base
+        :returns: Status of the operation.
+        :rtype: str (see DBSTATUS class)
         """
         try:
             table_name = table.__tablename__

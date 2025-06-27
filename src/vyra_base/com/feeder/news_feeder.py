@@ -16,7 +16,18 @@ from vyra_base.helper.logger import Logger
 
 
 class NewsFeeder(BaseFeeder):
-    """ Collection of the news messages """
+    """Collection of the news messages.
+
+    :param type: The ros2-msg type for the feeder.
+    :type type: Any
+    :param node: The VyraNode instance associated with this feeder (ROS2 Node).
+    :type node: VyraNode
+    :param module_config: Module configuration entry.
+    :type module_config: ModuleEntry
+    :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
+    :type loggingOn: bool, optional
+    :raises FeederException: If the VyraSpeaker cannot be created with the given type.
+    """
 
     def __init__(
             self, 
@@ -25,17 +36,6 @@ class NewsFeeder(BaseFeeder):
             module_config: ModuleEntry,
             loggingOn: bool = False
         ):
-        """
-        Initializes a NewsFeeder instance for collecting news messages of a module.
-        Parameters:
-            type (Any): The ros2-msg type for the feeder.
-            node (VyraNode): The VyraNode instance associated with this feeder (ROS2 Node).
-            loggingOn (bool, optional): Flag to enable or disable logging next to feeding. Defaults to False.
-            module_name (str, optional): Name of the module using this feeder. Defaults to 'N/A'.
-            module_template (str, optional): Template identifier for the module. Defaults to 'N/A'.
-        Raises:
-            FeederException: If the VyraSpeaker cannot be created with the given type.
-        """
         super().__init__()
 
         self._feederName: str = f'NewsFeeder'
@@ -50,22 +50,21 @@ class NewsFeeder(BaseFeeder):
         self.create(loggingOn=loggingOn)
 
     def feed(self, newsElement: Union[NewsEntry, str, list]) -> None:
-        """Feed a news entry to the feeder. The content can either be a string which
-        will be processed into a NewsEntry, or a NewsEntry object itself. Use the
-        method `build_newsfeed` to create a NewsEntry from a string or list.
-        Args:
-            newsElement (Union[NewsEntry, str, list]): The news entry to be fed.
-                Can be a string or list of strings to be processed into a NewsEntry,
-                or a NewsEntry object.
-        Raises:
-            FeederException: If the type of newsElement is not supported.
+        """Feed a news entry to the feeder.
+
+        The content can either be a string which will be processed into a NewsEntry,
+        or a NewsEntry object itself. Use the method ``build_newsfeed`` to create a
+        NewsEntry from a string or list.
+
+        :param newsElement: The news entry to be fed. Can be a string or list of strings
+            to be processed into a NewsEntry, or a NewsEntry object.
+        :type newsElement: Union[NewsEntry, str, list]
+        :raises FeederException: If the type of newsElement is not supported.
         """
 
         if isinstance(newsElement, str) or isinstance(newsElement, list):
-            # If a string is passed, we assume it is a message to be logged
             newsfeed_entry = self.build_newsfeed(newsElement)
         elif isinstance(newsElement, NewsEntry):
-            # If a NewsEntry object is passed, we use it directly
             newsfeed_entry = newsElement
         else:
             raise FeederException(f"Wrong Type. Expect: NewsEntry, got {type(newsElement)}")
@@ -85,15 +84,13 @@ class NewsFeeder(BaseFeeder):
         super().feed(newsfeed_entry)
 
     def build_newsfeed(self, *args: Any) -> NewsEntry:
-        """Building a well structured newsfeed entry from plain text and module information
-        Args:
-            *args (Any): The arguments to be processed into a news entry.
-                Can be a string or list of strings.
-        Returns:
-            NewsEntry: A structured news entry containing the message, level, timestamp,
-            UUID, module name, module ID, module template, and type.
-        Raises:
-            FeederException: If the type of the message level is not valid.
+        """Build a well structured newsfeed entry from plain text and module information.
+
+        :param args: The arguments to be processed into a news entry. Can be a string or list of strings.
+        :type args: Any
+        :return: A structured news entry containing the message, level, timestamp, UUID, module name, module ID, module template, and type.
+        :rtype: NewsEntry
+        :raises FeederException: If the type of the message level is not valid.
         """
        
         message: str = (''.join(map(str, args))).split('|')[-1]
@@ -128,12 +125,12 @@ class NewsFeeder(BaseFeeder):
 
 
 def extract_level_from_msg(message: str) -> Union[NewsEntry.MESSAGE_LEVEL, None]:
-    """Extracts the message level from a given message string.
-    Args:
-        message (str): The message string from which to extract the level.
-    Returns:
-        Union[NewsEntry.MESSAGE_LEVEL, None]: The extracted message level if found,
-        otherwise None.
+    """Extract the message level from a given message string.
+
+    :param message: The message string from which to extract the level.
+    :type message: str
+    :return: The extracted message level if found, otherwise None.
+    :rtype: Union[NewsEntry.MESSAGE_LEVEL, None]
     """
     match = re.search(r"<([^<>]+)>", message)
     if match:

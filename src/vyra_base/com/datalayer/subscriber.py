@@ -1,24 +1,39 @@
-
 import rclpy
-
 from dataclasses import dataclass
+from typing import Any, Callable, NoReturn, Union
+
 from rclpy.qos import QoSProfile
-from rclpy.timer import Timer
 from rclpy.subscription import Subscription as rclpySubscription
-from typing import Any
-from typing import Callable
-from typing import NoReturn
-from typing import Union
+from rclpy.timer import Timer
 
 from vyra_base.com.datalayer.node import VyraNode
 
 
 def _base_callback(*args, **kwargs) -> NoReturn:
+    """
+    Default callback that raises a NotImplementedError.
+
+    :raises NotImplementedError: Always raised to indicate no callback is provided.
+    """
     raise NotImplementedError("No execute callback provided for action server.")
 
 
 @dataclass
 class SubscriptionInfo:
+    """
+    Data class for storing subscription information.
+
+    :param name: Name of the subscription.
+    :type name: str
+    :param type: Message type for the subscription.
+    :type type: Any
+    :param callback: Callback function for the subscription.
+    :type callback: Callable
+    :param qos_profile: Quality of Service profile or depth.
+    :type qos_profile: Union[QoSProfile, int]
+    :param subscription: The actual ROS2 subscription object.
+    :type subscription: Union[rclpySubscription, None]
+    """
     name: str = 'vyra_service_server'
     type: Any = None
     callback: Callable = _base_callback
@@ -27,18 +42,28 @@ class SubscriptionInfo:
 
 class VyraSubscription:
     """
-    Base class for ROS2 subscription.
-    This class will be factory created to implement specific subscription of a topic.
+    Base class for ROS2 subscriptions.
+
+    This class is intended to be factory-created to implement specific subscriptions for topics.
     """
 
     def __init__(self, subscriptionInfo: SubscriptionInfo, node: VyraNode) -> None:
+        """
+        Initialize the VyraSubscription.
+
+        :param subscriptionInfo: Information about the subscription.
+        :type subscriptionInfo: SubscriptionInfo
+        :param node: The ROS2 node to attach the subscription to.
+        :type node: VyraNode
+        """
         self._subscription_info: SubscriptionInfo = subscriptionInfo
         self._node = node
     
     def create_subscription(self) -> None:
         """
-        Create a service in the ROS2 node.
-        This method should be called to register the service with the ROS2 node.
+        Create and register the subscription with the ROS2 node.
+
+        :raises ValueError: If the subscription type or name is not provided.
         """
         self._node.get_logger().info(f"Creating subscription: {self._subscription_info.name}")
         if not self._subscription_info.type:
@@ -54,12 +79,14 @@ class VyraSubscription:
             self._subscription_info.qos_profile
         )
 
-    def callback(self, msg)-> None:
+    def callback(self, msg) -> None:
         """
-        Add a callback to the service.
+        Callback method for the subscription.
+
         This method should be overridden in subclasses to provide specific functionality.
+
+        :param msg: The message received from the subscription.
+        :type msg: Any
         """
         self._node.get_logger().info(f"Received message on {self._subscription_info.name}")
-        
         self._subscription_info.callback(msg)
-    

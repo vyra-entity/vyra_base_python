@@ -1,10 +1,25 @@
-from dataclasses import dataclass
-from typing import NamedTuple
-from typing import List, Union, NamedTuple
 import json
 import os
+from dataclasses import dataclass
+from typing import List, Union, NamedTuple
 
 class Vyra_STATES:
+    """
+    Collection of possible Vyra state names.
+
+    :cvar str Resting: The resting state.
+    :cvar str Awakening: The awakening state.
+    :cvar str Attentive: The attentive state.
+    :cvar str Active: The active state.
+    :cvar str Reflecting: The reflecting state.
+    :cvar str Learning: The learning state.
+    :cvar str Alert: The alert state.
+    :cvar str Delegating: The delegating state.
+    :cvar str Recovering: The recovering state.
+    :cvar str Overloaded: The overloaded state.
+    :cvar str ShuttingDown: The shutting down state.
+    :cvar str Interrupting: The interrupting state.
+    """
     Resting: str = "Resting"
     Awakening: str = "Awakening"
     Attentive: str = "Attentive"
@@ -21,6 +36,13 @@ class Vyra_STATES:
 
 @dataclass
 class Transition:
+    """
+    Represents a state machine transition.
+
+    :param str trigger: The event that triggers the transition.
+    :param Union[str, List[str]] source: The source state(s).
+    :param str dest: The destination state.
+    """
     trigger: str
     source: Union[str, List[str]]
     dest: str
@@ -71,6 +93,14 @@ Vyra_TRANSITIONS_LIST: List[Transition] = [
 ]
 
 config_collection: dict = {
+    """
+    Configuration dictionary for the Vyra state machine.
+
+    :key str name: Name of the state machine.
+    :key list states: List of possible states.
+    :key list transitions: List of transition dictionaries.
+    :key str initial: Initial state.
+    """
     "name": "vyra_base.state_machine",
     "states": [
         v for k, v in Vyra_STATES.__dict__.items() 

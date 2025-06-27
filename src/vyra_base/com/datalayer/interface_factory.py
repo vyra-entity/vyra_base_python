@@ -1,42 +1,35 @@
 from __future__ import annotations
 
-from ast import Call
 import stat
-from typing import Callable
-from typing import Union
+from ast import Call
+from functools import wraps
 from inspect import iscoroutinefunction
+from typing import Any, Callable, Union
 
 from rclpy.qos import QoSProfile
 
-from typing import Any
-
-from functools import wraps
-
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.helper.logger import Logger
-
 from vyra_base.com.datalayer.action_client import VyraActionClient
 from vyra_base.com.datalayer.action_server import VyraActionServer
-
-from vyra_base.com.datalayer.subscriber import VyraSubscription
-
-from vyra_base.com.datalayer.publisher import VyraPublisher
-from vyra_base.com.datalayer.publisher import PublisherInfo
-from vyra_base.com.datalayer.publisher import PeriodicCaller
-
 from vyra_base.com.datalayer.callable import VyraCallable
 from vyra_base.com.datalayer.job import VyraJob
-from vyra_base.com.datalayer.speaker import VyraSpeaker
-
+from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.com.datalayer.publisher import PeriodicCaller, PublisherInfo, VyraPublisher
 from vyra_base.com.datalayer.service_client import VyraServiceClient
-from vyra_base.com.datalayer.service_server import VyraServiceServer
-from vyra_base.com.datalayer.service_server import ServiceInfo
+from vyra_base.com.datalayer.service_server import ServiceInfo, VyraServiceServer
+from vyra_base.com.datalayer.speaker import VyraSpeaker
+from vyra_base.com.datalayer.subscriber import VyraSubscription
+from vyra_base.helper.logger import Logger
 
 
 class DataSpace:
     """
-    DataSpace is a class that represents a data space in the V.Y.R.A..
-    It is used to create and manage various types of data layers such as callables, jobs, observables, and speakers.
+    Represents a data space in the V.Y.R.A. system.
+
+    This class is used to create and manage various types of data layers such as callables, jobs, observables, and speakers.
+
+    :cvar callables: List of registered V.Y.R.A. callables.
+    :cvar jobs: List of registered V.Y.R.A. jobs.
+    :cvar speakers: List of registered V.Y.R.A. speakers.
     """
 
     callables: list[VyraCallable] = []
@@ -46,10 +39,11 @@ class DataSpace:
     @classmethod
     def kill(cls, obj: Any) -> None:
         """
-        Kill a specific object in the DataSpace.
-        This method will remove the object from the DataSpace and clean up any resources associated with it.
-        
-        :param obj: Remove a V.Y.R.A. callable, job, or speaker from the DataSpace.
+        Remove a specific object from the DataSpace and clean up any associated resources.
+
+        :param obj: The V.Y.R.A. callable, job, or speaker to remove from the DataSpace.
+        :type obj: Any
+        :raises ValueError: If the object type is not recognized.
         :return: None
         """
         if isinstance(obj, VyraCallable):
@@ -66,16 +60,15 @@ class DataSpace:
     @classmethod
     def add_speaker(cls, obj: VyraSpeaker) -> VyraSpeaker:
         """
-        Add an object to the DataSpace.
-        This method will add the object to the appropriate list in the DataSpace.
-        
-        :param obj: Add a V.Y.R.A. callable, job, or speaker to the DataSpace. 
-                    If the object already exists, it will merge the new object with 
-                    the existing one.
+        Add a speaker object to the DataSpace.
 
-        :return: None
+        If a speaker with the same publisher name already exists, merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. speaker to add or merge.
+        :type obj: VyraSpeaker
+        :return: The added or merged VyraSpeaker object.
+        :rtype: VyraSpeaker
         """
-
         try:
             if obj.publisher_server != None:
                 obj_name: str = obj.publisher_server.publisher_info.name
@@ -85,54 +78,53 @@ class DataSpace:
                  ele.publisher_server != None and 
                  obj.publisher_server != None and
                  ele.publisher_server.publisher_info.name == obj_name),
-                -1  # Rückgabewert, falls nicht gefunden
+                -1
             )
 
             return cls.speakers[index].merge(obj)
         except IndexError:
-            index = -1  # Oder eine andere Fehlerbehandlung
+            index = -1
             cls.speakers.append(obj)
             return obj
     
     @classmethod
     def add_job(cls, obj: VyraJob) -> VyraJob:
         """
-        Add an object to the DataSpace.
-        This method will add the object to the appropriate list in the DataSpace.
-        
-        :param obj: Add a V.Y.R.A. callable, job, or speaker to the DataSpace. 
-                    If the object already exists, it will merge the new object with 
-                    the existing one.
+        Add a job object to the DataSpace.
 
-        :return: None
+        If a job with the same name already exists, merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. job to add or merge.
+        :type obj: VyraJob
+        :return: The added or merged VyraJob object.
+        :rtype: VyraJob
         """
-
         try:
             index = next(
                 (i for i, ele in enumerate(cls.jobs) if ele.name == obj.name),
-                -1  # Rückgabewert, falls nicht gefunden
+                -1
             )
             return cls.jobs[index].merge(obj)
         except ValueError:
-            index = -1  # Oder eine andere Fehlerbehandlung
+            index = -1
             cls.jobs.append(obj)
             return obj
     
     @classmethod
     def add_callable(cls, obj: VyraCallable) -> VyraCallable:
         """
-        Add an object to the DataSpace.
-        This method will add the object to the appropriate list in the DataSpace.
-        
-        :param obj: Add a V.Y.R.A. callable, job, or speaker to the DataSpace. 
-                    If the object already exists, it will merge the new object with 
-                    the existing one.
+        Add a callable object to the DataSpace.
 
-        :return: None
+        If a callable with the same name already exists, merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. callable to add or merge.
+        :type obj: VyraCallable
+        :return: The added or merged VyraCallable object.
+        :rtype: VyraCallable
         """
         index = next(
             (i for i, ele in enumerate(cls.callables) if ele.name == obj.name),
-            -1  # Rückgabewert, falls nicht gefunden
+            -1
         )
         
         if index == -1:
@@ -149,21 +141,23 @@ def create_vyra_callable(
     ) -> VyraCallable:
     """
     Create a callable for a V.Y.R.A. (V.Y.R.A. Operating System) service.
-    A callable is a function that will give a very quick response to
-    the request, and will not block the caller. A callable must return a
-    value within a given time limit, otherwise it will be considered a 
-    failure.
-    
+
+    A callable is a function that provides a quick response to the request and does not block the caller.
+    The callable must return a value within a given time limit, otherwise it is considered a failure.
+
     :param name: Name of the callable.
-    :param type: Containing the ros2 service datatype definition.
-    :param node: Definition of the ros2 node.
-    :param callback: Callback function that will be called when the 
-                     service is invoked.
-    :param parameters: Optional parameters of the callable that are needed.
-    :param callback: Optional callback function that will be called when the service is invoked.
-                     Better use the decorator `@remote_callable` to add a callable connected function.
-    
-    :return: Callable that can be used to call the service.
+    :type name: str
+    :param type: The ROS2 service datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param callback: Callback function to be called when the service is invoked.
+    :type callback: Callable or None
+    :param async_loop: Optional event loop for asynchronous execution.
+    :type async_loop: Any
+    :raises ValueError: If no callback function is provided.
+    :return: The created VyraCallable object.
+    :rtype: VyraCallable
     """
     service = ServiceInfo(
         name=name,
@@ -204,24 +198,19 @@ def create_vyra_job(
         type: Any,
         async_loop = None) -> None:
     """
-    Create a job for a V.Y.R.A. (V.Y.R.A. Operating System) service. A job
-    is a function that will be executed in the background, and will not
-    block the caller. A job can take a long time to complete, and will
-    return a result when it is done. Beside the result, a job can also
-    provide feedback information during the process, which can be used 
-    until the job is completed.
+    Create a job for a V.Y.R.A. (V.Y.R.A. Operating System) service.
 
-    has completed, or has failed.
-    :param name: Name of the service.,
-    An observer is a subscription to a topic that will receive updates of
-    simple data types. It is been used to watch variables of other variobotic
-    os modules. 
+    A job is a function that will be executed in the background and will not block the caller.
+    A job can take a long time to complete and will return a result when it is done.
+    Additionally, a job can provide feedback information during the process.
 
-    For example this could be used to watch the state of a robot, live coordinates
-    of a camera, or the status of a sensor.
-
-    :param name: Name of the service.
-    :return: Callable that can be used to watch the service.
+    :param name: Name of the job.
+    :type name: str
+    :param type: The ROS2 service datatype definition.
+    :type type: Any
+    :param async_loop: Optional event loop for asynchronous execution.
+    :type async_loop: Any
+    :return: None
     """
     pass
 
@@ -238,11 +227,29 @@ def create_vyra_speaker(
         ) -> VyraSpeaker:
     """
     Create a speaker for a V.Y.R.A. service.
-    A speaker is a publisher that will send messages to a topic. It is 
-    used to publish simple data types to other variobotic os modules.
 
-    :param name: Name of the service.
-    :return: Callable that can be used to shout to the service.
+    A speaker is a publisher that sends messages to a topic and is used to publish simple data types to other V.Y.R.A. OS modules.
+
+    :param name: Name of the speaker.
+    :type name: str
+    :param type: The ROS2 message datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param description: Description of the speaker.
+    :type description: str
+    :param periodic: Whether the speaker should publish periodically.
+    :type periodic: bool
+    :param interval_time: Interval time for periodic publishing.
+    :type interval_time: float or None
+    :param periodic_caller: Callable for periodic publishing.
+    :type periodic_caller: Callable or None
+    :param qos_profile: Quality of Service profile.
+    :type qos_profile: int or QoSProfile
+    :param async_loop: Optional event loop for asynchronous execution.
+    :type async_loop: Any
+    :return: The created VyraSpeaker object.
+    :rtype: VyraSpeaker
     """
     
     publisher = PublisherInfo(
@@ -278,6 +285,11 @@ def create_vyra_speaker(
 def remote_callable(func):
     """
     Decorator to register a function or method as a V.Y.R.A. callable.
+
+    :param func: The function to be registered as a remote callable.
+    :type func: Callable
+    :return: The wrapped function with remote callable marker.
+    :rtype: Callable
     """
     @wraps(func)
     async def async_wrapper(*args, **kwargs):
@@ -293,7 +305,7 @@ def remote_callable(func):
 
     wrapper = async_wrapper if iscoroutinefunction(func) else sync_wrapper
 
-    # Registrierung erfolgt erst später in der Instanz
-    wrapper._remote_callable = True  # Markiere, dass diese Methode registriert werden soll
+    # Registration is performed later in the instance
+    setattr(wrapper, "_remote_callable", True)  # Mark that this method should be registered
 
     return wrapper

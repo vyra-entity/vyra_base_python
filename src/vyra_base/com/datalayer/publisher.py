@@ -1,26 +1,46 @@
-
 import rclpy
 
 from dataclasses import dataclass
+from typing import Any, Callable, NoReturn, Union
+
 from rclpy.qos import QoSProfile
 from rclpy.timer import Timer
 from rclpy.publisher import Publisher as rclpyPublisher
-
-from typing import Any
-from typing import Callable
-from typing import NoReturn
-from typing import Union
 
 from vyra_base.com.datalayer.node import VyraNode
 
 @dataclass
 class PeriodicCaller:
+    """
+    Stores information for periodic function calls.
+
+    :param interval_time: Interval time in seconds between calls (default: 1.0).
+    :type interval_time: float or None
+    :param caller: Callable to be called periodically.
+    :type caller: Callable or None
+    :param timer: ROS2 timer object.
+    :type timer: Timer or None
+    """
     interval_time: Union[float, None] = 1.0  # Default interval time in seconds
     caller: Union[Callable, None] = None
     timer: Union[Timer, None] = None
 
 @dataclass
 class PublisherInfo:
+    """
+    Stores information about a ROS2 publisher.
+
+    :param name: Name of the publisher/topic.
+    :type name: str
+    :param type: Message type for the publisher.
+    :type type: Any
+    :param periodic_caller: PeriodicCaller instance for periodic publishing.
+    :type periodic_caller: PeriodicCaller or None
+    :param qos_profile: Quality of Service profile or depth.
+    :type qos_profile: QoSProfile or int
+    :param publisher: The actual ROS2 publisher object.
+    :type publisher: rclpyPublisher or None
+    """
     name: str = 'vyra_publisher'
     type: Any = None
     periodic_caller: Union[PeriodicCaller, None] = None
@@ -29,11 +49,25 @@ class PublisherInfo:
 
 class VyraPublisher:
     """
-    Base class for ROS2 publisher.
-    This class will be factory created to implement specific publisher for a topic.
+    Base class for ROS2 publishers.
+
+    This class is intended to be factory-created to implement a specific publisher for a topic.
+
+    :param publisherInfo: PublisherInfo instance containing publisher configuration.
+    :type publisherInfo: PublisherInfo
+    :param node: The ROS2 node to which the publisher belongs.
+    :type node: VyraNode
     """
 
     def __init__(self, publisherInfo: PublisherInfo, node: VyraNode) -> None:
+        """
+        Initialize the VyraPublisher.
+
+        :param publisherInfo: PublisherInfo instance containing publisher configuration.
+        :type publisherInfo: PublisherInfo
+        :param node: The ROS2 node to which the publisher belongs.
+        :type node: VyraNode
+        """
         self.publisher_info: PublisherInfo = publisherInfo
         self._node: VyraNode = node
 
@@ -52,7 +86,10 @@ class VyraPublisher:
     def create_publisher(self) -> None:
         """
         Create a publisher in the ROS2 node.
+
         This method should be called to register the publisher within the ROS2 node.
+
+        :raises ValueError: If publisher type or name is not provided.
         """
         self._node.get_logger().info(f"Creating publisher: {self.publisher_info.name}")
         if not self.publisher_info.type:
@@ -70,7 +107,12 @@ class VyraPublisher:
     def publish(self, msg: Any) -> None:
         """
         Publish a message to the topic.
+
         This method should be overridden in subclasses to provide specific functionality.
+
+        :param msg: The message to publish.
+        :type msg: Any
+        :raises ValueError: If publisher type, name, or publisher instance is not set.
         """
         self._node.get_logger().info(f"Publishing message on {self.publisher_info.name}")
         
@@ -90,4 +132,3 @@ class VyraPublisher:
             self.publisher_info.periodic_caller.timer = None
 
 # EOF
-    

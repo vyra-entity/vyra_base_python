@@ -37,6 +37,14 @@ class DBReturnValue:
         self.details = details
     
     def error_return(self, details: Union[bool, str, list, dict]=""):
+        """
+        Set the return value to error status.
+
+        :param details: Additional error details.
+        :type details: Union[bool, str, list, dict]
+        :return: Self with error status set.
+        :rtype: DBReturnValue
+        """
         self.status = DBSTATUS.ERROR
         
         if self.value == "":
@@ -48,6 +56,12 @@ class DBReturnValue:
         return self
     
     def success_return(self):
+        """
+        Set the return value to success status.
+
+        :return: Self with success status set.
+        :rtype: DBReturnValue
+        """
         self.status = DBSTATUS.SUCCESS
         return self
 
@@ -58,12 +72,15 @@ class DBTableManipulator:
     @ErrorTraceback.w_check_error_exist
     def __init__(
             self, db_access: DbAccess, model: Type[Base], module_id: str):
-        """Initialize datatable.
+        """
+        Initialize datatable.
 
-        Args:
-            db_access (DbAccess): Database access object (using SQLAlchemy).
-            table_name (str): Name of the datatable.
-            module_id (str): The id of the varioboticOS module.
+        :param db_access: Database access object (using SQLAlchemy).
+        :type db_access: DbAccess
+        :param model: SQLAlchemy model class.
+        :type model: Type[Base]
+        :param module_id: The id of the V.Y.R.A. module.
+        :type module_id: str
         """
         if isinstance(db_access, DbAccess) is False:
             raise TypeError('db_access must be of type DbAccess.')
@@ -81,18 +98,22 @@ class DBTableManipulator:
 
 
     def _read_pkey(self) -> str:
+        """
+        Get the name of the primary key column.
+
+        :return: Primary key column name.
+        :rtype: str
+        """
         return inspect(self.model).primary_key[0].name
 
     def get_table_structure(self) -> DBReturnValue:
-        """Read the datatable structure from the config file.
+        """
+        Read the datatable structure from the config file.
 
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :return: Table structure information.
+        :rtype: DBReturnValue
         """
         try:
-            # inspector = inspect(self._db.db_engine)
-            # columns = inspector.get_columns(self.model.__tablename__)
-
             columns = [column.name for column in self.model.__table__.columns]
 
             return DBReturnValue(
@@ -110,17 +131,15 @@ class DBTableManipulator:
 
 
     async def get_by_id(self, id: Union[uuid.UUID, int]=-1) -> DBReturnValue:
-        """Read line from datatable of database by 'id'.
+        """
+        Read line from datatable of database by 'id'.
 
-        If the id is -1, the last line will be read.
-        If the id is None, the last line will be read.
+        If the id is -1 or None, the last line will be read.
 
-        Args:
-            id (int, optional): Private key of the table element to 
-                                select the row to be read. Defaults to -1.
-
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param id: Private key of the table element to select the row to be read.
+        :type id: Union[uuid.UUID, int], optional
+        :return: Row data or not found status.
+        :rtype: DBReturnValue
         """
 
         try:
@@ -156,14 +175,6 @@ class DBTableManipulator:
                 value=row,
                 details='Data found').success_return()
 
-            # return_value = {}
-            # conf = self.db_conf['tables_config']['tables'][self.table_name]['columns']
-            # for idx, col in enumerate(conf.values()):
-            #     return_value[col['name']] = row[idx]
-
-            # return DBReturnValue(
-            #     value=return_value,
-            #     details='Data found').success_return()
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
@@ -175,15 +186,17 @@ class DBTableManipulator:
 
 
     async def get_all(self, filters: dict=None, order_by=None, limit=None) -> DBReturnValue:
-        """Read all lines from datatable of database.
-        Args:
-            filters (dict, optional): add filter elements to identify the rows 
-                                      to be read. Defaults to None.
-            order_by (str, optional): column name to order the result. Defaults to None.
-            limit (int, optional): number of lines to be read. Defaults to None.
+        """
+        Read all lines from datatable of database.
 
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param filters: Filter elements to identify the rows to be read.
+        :type filters: dict, optional
+        :param order_by: Column name to order the result.
+        :type order_by: str, optional
+        :param limit: Number of lines to be read.
+        :type limit: int, optional
+        :return: List of rows or not found status.
+        :rtype: DBReturnValue
         """
         try:
             async with self._db.session()() as session:
@@ -232,18 +245,18 @@ class DBTableManipulator:
                 return error_ret.error_return(error_details)
 
     async def update(self, data: dict, filters: Union[dict, None]=None) -> DBReturnValue:
-        """Add new entry to datatable of database on the bottom.
+        """
+        Add new entry to datatable of database on the bottom.
 
-        If the table config has a field 'max_lines' and the
-        number of lines are greater than this field, the lowest 'id' value will 
-        be deleted and the new entry will be added by a incremented 'id' value.
+        If the table config has a field 'max_lines' and the number of lines are greater than this field,
+        the lowest 'id' value will be deleted and the new entry will be added by a incremented 'id' value.
 
-        Args:
-            data (dict): Update data in an existing entry
-            id (int): Private key of the table element to select the row to be updated
-
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param data: Update data in an existing entry.
+        :type data: dict
+        :param filters: Filter to select the row to be updated.
+        :type filters: dict, optional
+        :return: Update status.
+        :rtype: DBReturnValue
         """
         try:
             async with self._db.session()() as session:
@@ -289,13 +302,13 @@ class DBTableManipulator:
 
 
     async def add(self, data: dict) -> DBReturnValue:
-        """Add a new a row in a datatable.
+        """
+        Add a new a row in a datatable.
 
-        Args:
-            data (dict): Content of the new entry to be added to the table
-
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param data: Content of the new entry to be added to the table.
+        :type data: dict
+        :return: Add status and details.
+        :rtype: DBReturnValue
         """
         
         try:
@@ -328,13 +341,13 @@ class DBTableManipulator:
 
             
     async def delete(self, id: Any) -> DBReturnValue:
-        """Update a line in a datatable of database by a given 'id'.
+        """
+        Update a line in a datatable of database by a given 'id'.
 
-        Args:
-            id (any): Private key of the table element to select the row to be deleted
-
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param id: Private key of the table element to select the row to be deleted.
+        :type id: Any
+        :return: Delete status and details.
+        :rtype: DBReturnValue
         """
         try:
             async with self._db.session()() as session:
@@ -368,13 +381,13 @@ class DBTableManipulator:
 
 
     async def bulk_add(self, data: list[dict]) -> DBReturnValue:
-        """Update a line in a datatable of database by a given 'id'.
+        """
+        Add multiple rows to a datatable.
 
-        Args:
-            data (list[dict]): data list to be added to the table 
-
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param data: Data list to be added to the table.
+        :type data: list[dict]
+        :return: Bulk add status and details.
+        :rtype: DBReturnValue
         """
         try:
             objs = [self.model(**d) for d in data]
@@ -410,13 +423,13 @@ class DBTableManipulator:
 
             
     async def bulk_delete(self, filters: dict) -> DBReturnValue:
-        """Update a line in a datatable of database by a given 'id'.
+        """
+        Delete multiple rows in a datatable by given filters.
 
-        Args:
-            filters (dict): add filter elements to identify the rows to be deleted
-
-        Returns:
-            dict: {Status: DBSTATUS, value: Short info, details: Detailed info}
+        :param filters: Filter elements to identify the rows to be deleted.
+        :type filters: dict
+        :return: Bulk delete status and details.
+        :rtype: DBReturnValue
         """
         try:
             async with self._db.session()() as session:
@@ -448,14 +461,13 @@ class DBTableManipulator:
 
 
     async def exists(self, id: int) -> DBReturnValue:
-        """Update a line in a datatable of database by a given 'id'.
+        """
+        Check if a row exists in the datatable by a given 'id'.
 
-        Args:
-            new_entry (dict): _description_
-            ident (str): _description_
-
-        Returns:
-            dict: {Status: HTML Status, msg: Success or not, details: If an error occures}
+        :param id: Private key of the table element to check.
+        :type id: int
+        :return: Existence status.
+        :rtype: DBReturnValue
         """
         try:
             ret_val: bool = False
@@ -492,14 +504,13 @@ class DBTableManipulator:
 
             
     async def count(self, filters: dict) -> DBReturnValue:
-        """Update a line in a datatable of database by a given 'id'.
+        """
+        Count the number of rows in a datatable matching given filters.
 
-        Args:
-            new_entry (dict): _description_
-            ident (str): _description_
-
-        Returns:
-            dict: {Status: HTML Status, msg: Success or not, details: If an error occures}
+        :param filters: Filter elements to identify the rows to be counted.
+        :type filters: dict
+        :return: Number of matching rows.
+        :rtype: DBReturnValue
         """
         try:
             async with (self._db.session())() as session:
@@ -529,9 +540,20 @@ class DBTableManipulator:
                 return error_ret.error_return(error_details)
 
     def to_dict(self, obj, exclude=None):
+        """
+        Convert a SQLAlchemy model instance to a dictionary.
+
+        :param obj: SQLAlchemy model instance.
+        :type obj: Base
+        :param exclude: List of column names to exclude.
+        :type exclude: list, optional
+        :return: Dictionary representation of the object.
+        :rtype: dict
+        """
         return {
             c.name: getattr(obj, c.name) for 
                 c in obj.__table__.columns if 
                     exclude is None or c.name not in exclude}
 
 # EOF
+

@@ -28,9 +28,15 @@ html_static_path = ['_static']
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'rclpy': ('https://docs.ros2.org/iron/api/rclpy/', None),  # Beispiel für ROS 2 rclpy
+}
 
 # Damit dein Code importierbar ist (z. B. src-layout)
 import os

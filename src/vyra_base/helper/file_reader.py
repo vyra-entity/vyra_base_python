@@ -1,35 +1,40 @@
-from asyncio import Lock
 import json
-import sys
 import os
-
-from .file_lock import get_lock_for_file, release_lock_for_file
-
+import sys
+from asyncio import Lock
 from pathlib import Path
-from aiopath import AsyncPath
-from typing import Union
-from typing import Any
+from typing import Any, Union
 
 from dotenv import load_dotenv
 
-class FileReader:
-    """ File reader.
+from vyra_base.helper._aiopath import AsyncPath
+from vyra_base.helper.file_lock import get_lock_for_file, release_lock_for_file
 
-        Reads file content from locally stored files into the module.
+class FileReader:
+    """File reader.
+
+    Reads file content from locally stored files into the module.
     """
-    
+
     @classmethod    
     async def open_json_file(
         cls, config_file: Path, config_default: Path=Path('')) -> Any: 
-        """ Reads a json file
+        """Reads a JSON file.
 
-            To ensure cross platform compatibility. We open json files per se 
-            with utf8-sig encoding
-            
-            Args:
-                config_file (str): JSON formatted file.
-                config_default (str) : JSON files as a default configuration 
-                                       for the module
+        To ensure cross platform compatibility, JSON files are opened with
+        utf8-sig encoding.
+
+        :param config_file: JSON formatted file.
+        :type config_file: Path
+        :param config_default: JSON file as a default configuration for the module.
+        :type config_default: Path
+        :returns: Parsed JSON content.
+        :rtype: Any
+        :raises IOError: If an unexpected IO error occurs.
+        :raises UnicodeDecodeError: If a decoding error occurs.
+        :raises json.decoder.JSONDecodeError: If a JSON decoding error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
         """
         try:
             lock = await get_lock_for_file(config_file)
@@ -61,12 +66,19 @@ class FileReader:
 
     @classmethod    
     async def open_markdown_file(cls, config_file: Path, config_default='') -> Any:
-        """ Reads a markdown file
-            
-        Args:
-            config_file (str)    : JSON formatted file.
-            config_default (str) : JSON files as a default configuration 
-                                   for the module
+        """Reads a markdown file.
+
+        :param config_file: Markdown formatted file.
+        :type config_file: Path
+        :param config_default: Markdown file as a default configuration for the module.
+        :type config_default: str
+        :returns: File content.
+        :rtype: Any
+        :raises IOError: If an unexpected IO error occurs.
+        :raises UnicodeDecodeError: If a decoding error occurs.
+        :raises json.decoder.JSONDecodeError: If a JSON decoding error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
         """
         try:  
             lock = await get_lock_for_file(config_file)
@@ -102,6 +114,16 @@ class FileReader:
      
     @classmethod 
     async def open_env_file(cls, env_path: Path) -> dict:
+        """Reads an environment (.env) file.
+
+        :param env_path: Path to the directory containing the .env file.
+        :type env_path: Path
+        :returns: Dictionary of environment variables.
+        :rtype: dict
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
         try:
             lock = await get_lock_for_file(env_path / '.env')
             async with lock:
@@ -123,6 +145,17 @@ class FileReader:
 
     @classmethod
     async def open_toml_file(cls, config_file: Path) -> dict[str, Any]:
+        """Reads a TOML file.
+
+        :param config_file: TOML formatted file.
+        :type config_file: Path
+        :returns: Parsed TOML content as a dictionary.
+        :rtype: dict[str, Any]
+        :raises ImportError: If tomli is not installed for Python < 3.11.
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
         try:
             if sys.version_info >= (3, 11):
                 import tomllib

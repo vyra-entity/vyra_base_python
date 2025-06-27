@@ -5,27 +5,23 @@ import json
 import logging
 import logging.config
 import logging.handlers
-import time
 import os
-
+import time
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-
-from typing import (
-    Union,
-    Any
-)
+from typing import Any, Union
 
 
 class LogMode(Enum):
-    """Enum for the different logging modes.
+    """
+    Enum for the different logging modes.
 
-    0: debug-msg
-    1: info-msg
-    2: warning-msg
-    3: error-msg
+    * 0: debug-msg
+    * 1: info-msg
+    * 2: warning-msg
+    * 3: error-msg
     """
     DEBUG = 0
     INFO = 1
@@ -35,30 +31,54 @@ class LogMode(Enum):
 
 @dataclass(slots=True)
 class LogEntry:
-    """ Object for Logger entries. """
+    """
+    Object for Logger entries.
+
+    :param message: The log message.
+    :type message: str
+    :param mode: The log mode (default: LogMode.INFO).
+    :type mode: LogMode
+    """
     message: str
     mode: LogMode = LogMode.INFO
 
     def debug(self):
-        """Set the mode to debug."""
+        """
+        Set the mode to debug.
+
+        :return: Self with mode set to DEBUG.
+        :rtype: LogEntry
+        """
         self.mode = LogMode.DEBUG
         return self
 
     def error(self):
-        """Set the mode to error."""
+        """
+        Set the mode to error.
+
+        :return: Self with mode set to ERROR.
+        :rtype: LogEntry
+        """
         self.mode = LogMode.ERROR
         return self
 
     def warn(self):
-        """Set the mode to warning."""
+        """
+        Set the mode to warning.
+
+        :return: Self with mode set to WARNING.
+        :rtype: LogEntry
+        """
         self.mode = LogMode.WARNING
         return self
 
 
 class Logger:
-    """Class for logging backend information. The logger object is used globally
-       therefore it is initialized only once. Like the OOP
-       Singleton design pattern.
+    """
+    Class for logging backend information.
+
+    The logger object is used globally and is initialized only once,
+    following the Singleton design pattern.
     """
     _LOGGER_NAME: str = 'vyra_base'
     _LOG_PATH: str = ''
@@ -72,7 +92,14 @@ class Logger:
         cls, 
         log_config_path: Path, 
         log_active: bool=True):
+        """
+        Initialize the logger with a configuration file.
 
+        :param log_config_path: Path to the logging configuration file.
+        :type log_config_path: Path
+        :param log_active: Whether logging is active.
+        :type log_active: bool
+        """
         with Path(log_config_path).open(mode='r+') as content:
             log_config = json.load(content)
 
@@ -98,15 +125,14 @@ class Logger:
 
     @classmethod
     def log(cls, entry: Union[LogEntry, str, Any]) -> None:
-        """Logging a message in different modis.
+        """
+        Log a message in different modes.
 
-        Args:
-            LogEntry: Message and log level to be logged.. For more information
-            see LogEntry class.
-
-        Returns:
-            None: If logging is not active, the message will be printed to stdout.
-            Otherwise, the message will be logged according to its mode.
+        :param entry: Message and log level to be logged. For more information see LogEntry class.
+        :type entry: Union[LogEntry, str, Any]
+        :return: None. If logging is not active, the message will be printed to stdout.
+                 Otherwise, the message will be logged according to its mode.
+        :rtype: None
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.INFO)
@@ -137,19 +163,18 @@ class Logger:
 
     @classmethod
     def debug(cls, entry: Union[LogEntry, str]):
-        """Logging a message in debug mode. Independent of the
-        logging configuration, this function will always log the message in
+        """
+        Log a message in debug mode.
+
+        Independent of the logging configuration, this function will always log the message in
         debug mode. This is useful for logging messages that should always be
         logged, regardless of the logging configuration.
 
-
-        Args:
-            LogEntry: Message and log level to be logged.. For more information
-            see LogEntry class.
-
-        Returns:
-            None: If logging is not active, the message will be printed to stdout.
-            Otherwise, the message will be logged according to its mode.
+        :param entry: Message and log level to be logged. For more information see LogEntry class.
+        :type entry: Union[LogEntry, str]
+        :return: None. If logging is not active, the message will be printed to stdout.
+                 Otherwise, the message will be logged according to its mode.
+        :rtype: None
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.DEBUG)
@@ -161,19 +186,18 @@ class Logger:
 
     @classmethod
     def warning(cls, entry: Union[LogEntry, str]):
-        """Logging a message in warning mode. Independent of the
-        logging configuration, this function will always log the message in
+        """
+        Log a message in warning mode.
+
+        Independent of the logging configuration, this function will always log the message in
         warning mode. This is useful for logging messages that should always be
         logged, regardless of the logging configuration.
 
-
-        Args:
-            LogEntry: Message and log level to be logged.. For more information
-            see LogEntry class.
-
-        Returns:
-            None: If logging is not active, the message will be printed to stdout.
-            Otherwise, the message will be logged according to its mode.
+        :param entry: Message and log level to be logged. For more information see LogEntry class.
+        :type entry: Union[LogEntry, str]
+        :return: None. If logging is not active, the message will be printed to stdout.
+                 Otherwise, the message will be logged according to its mode.
+        :rtype: None
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.DEBUG)
@@ -185,19 +209,18 @@ class Logger:
 
     @classmethod
     def error(cls, entry: Union[LogEntry, str]):
-        """Logging a message in error mode. Independent of the
-        logging configuration, this function will always log the message in
+        """
+        Log a message in error mode.
+
+        Independent of the logging configuration, this function will always log the message in
         error mode. This is useful for logging messages that should always be
         logged, regardless of the logging configuration.
 
-
-        Args:
-            LogEntry: Message and log level to be logged.. For more information
-            see LogEntry class.
-
-        Returns:
-            None: If logging is not active, the message will be printed to stdout.
-            Otherwise, the message will be logged according to its mode.
+        :param entry: Message and log level to be logged. For more information see LogEntry class.
+        :type entry: Union[LogEntry, str]
+        :return: None. If logging is not active, the message will be printed to stdout.
+                 Otherwise, the message will be logged according to its mode.
+        :rtype: None
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.DEBUG)
@@ -209,19 +232,18 @@ class Logger:
 
     @classmethod
     def info(cls, entry: Union[LogEntry, str]):
-        """Logging a message in info mode. Independent of the
-        logging configuration, this function will always log the message in
+        """
+        Log a message in info mode.
+
+        Independent of the logging configuration, this function will always log the message in
         info mode. This is useful for logging messages that should always be
         logged, regardless of the logging configuration.
 
-
-        Args:
-            LogEntry: Message and log level to be logged.. For more information
-            see LogEntry class.
-
-        Returns:
-            None: If logging is not active, the message will be printed to stdout.
-            Otherwise, the message will be logged according to its mode.
+        :param entry: Message and log level to be logged. For more information see LogEntry class.
+        :type entry: Union[LogEntry, str]
+        :return: None. If logging is not active, the message will be printed to stdout.
+                 Otherwise, the message will be logged according to its mode.
+        :rtype: None
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.DEBUG)
@@ -233,15 +255,15 @@ class Logger:
 
     @staticmethod
     def logging_on(func):
-        """Decorator-function to log the name of the functions that are called.
+        """
+        Decorator-function to log the name of the functions that are called.
 
-        The runtime duration of that function will also been logged.
+        The runtime duration of that function will also be logged.
 
-        Args:
-            func ([type]): [function to be decorated]
-
-        Returns:
-            [type]: [wrapper function]
+        :param func: Function to be decorated.
+        :type func: Callable
+        :return: Wrapper function.
+        :rtype: Callable
         """
         func_str = f'[ {func.__qualname__} ]'
         track_str = ''
@@ -280,6 +302,12 @@ class Logger:
 
     @classmethod
     def add_external(cls, descriptor: str) -> None:
+        """
+        Add an external logger by descriptor.
+
+        :param descriptor: The logger descriptor.
+        :type descriptor: str
+        """
         ext_logger = logging.getLogger(descriptor)
         ext_logger.handlers = []  # Vorhandene Handler entfernen
         for handler in cls.logger.handlers:

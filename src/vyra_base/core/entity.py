@@ -33,24 +33,32 @@ from vyra_base.state.state_machine import StateMachine
 from vyra_base.storage.storage import Storage
 
 class VyraEntity:
-
     """
     Base class for all V.Y.R.A. entities.
+
     This class initializes the entity with a ROS2 node, state, news, and error feeders.
     It also provides methods to register remote callables and manage interfaces.
     It is designed to be extended by specific entities that require additional functionality.
-    Attributes:
-        ros2_node (VyraNode): The ROS2 node for the entity.
-        state_feeder (StateFeeder): Feeder for state updates.
-        news_feeder (NewsFeeder): Feeder for news updates.
-        error_feeder (ErrorFeeder): Feeder for error updates.
-        state_machine (StateMachine): State machine for managing entity states.
-    Methods:
-        register_remote_callables(): Registers all remote callables defined in the entity.
-        add_interface(settings: list[FunctionConfigEntry]): Adds a communication interface to the entity.
-        trigger_transition(request: Any, response: Any): Triggers a state transition for the entity.
-        get_capabilities(request: Any, response: Any): Retrieves the capabilities of the entity.
+
+    :ivar ros2_node: The ROS2 node for the entity.
+    :vartype ros2_node: VyraNode
+    :ivar state_feeder: Feeder for state updates.
+    :vartype state_feeder: StateFeeder
+    :ivar news_feeder: Feeder for news updates.
+    :vartype news_feeder: NewsFeeder
+    :ivar error_feeder: Feeder for error updates.
+    :vartype error_feeder: ErrorFeeder
+    :ivar state_machine: State machine for managing entity states.
+    :vartype state_machine: StateMachine
+
+    :cvar _interface_list: List of interface configurations.
+    :vartype _interface_list: list[FunctionConfigEntry]
+    :cvar _storage_list: List of registered storage objects.
+    :vartype _storage_list: list[Storage]
+
+    :raises RuntimeError: If the node name is already available in the ROS2 system.
     """
+
     _interface_list: list[FunctionConfigEntry] = []
     _storage_list: list[Storage] = []
 
@@ -60,7 +68,19 @@ class VyraEntity:
             news_entry: NewsEntry,
             error_entry: ErrorEntry,
             module_config: ModuleEntry) -> None:
+        """
+        Initialize the VyraEntity.
 
+        :param state_entry: State entry configuration.
+        :type state_entry: StateEntry
+        :param news_entry: News entry configuration.
+        :type news_entry: NewsEntry
+        :param error_entry: Error entry configuration.
+        :type error_entry: ErrorEntry
+        :param module_config: Module configuration.
+        :type module_config: ModuleEntry
+        :raises RuntimeError: If the node name is already available in the ROS2 system.
+        """
         log_config_path = Path(__file__).resolve().parent.parent
         log_config_path: Path = log_config_path / "helper" / "logger_config.json"
 
@@ -117,8 +137,13 @@ class VyraEntity:
 
         self.state_machine.initialize()
 
-
     def register_remote_callables(self):
+        """
+        Registers all remote callables defined in the entity.
+
+        Iterates over all attributes of the instance and registers those
+        marked as remote callable with the DataSpace.
+        """
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if callable(attr) and getattr(attr, "_remote_callable", False):
@@ -129,28 +154,27 @@ class VyraEntity:
                 print(f"Registering callable {callable_obj.name} from method {attr}")
                 DataSpace.add_callable(callable_obj)
 
-
     async def add_interface(self, settings: list[FunctionConfigEntry]) -> None:
         """
-        Add an dds communication interface to this module. Interfaces are used 
-        to communicate with other modules or external systems.
-        Interface types can be:
-            - !vyra-callable: Callable function that can be invoked remotely.
-            - !vyra-job: Job that can be executed in the background.
-            - !vyra-speaker: Speaker that can publish messages periodically.
+        Add a DDS communication interface to this module.
 
-        Args:
-            settings (dict): Settings for the module functions.
-        
-        Returns:
-            dict: A dictionary containing the built module functions.
+        Interfaces are used to communicate with other modules or external systems.
+        Interface types can be:
+
+        - ``!vyra-callable``: Callable function that can be invoked remotely.
+        - ``!vyra-job``: Job that can be executed in the background.
+        - ``!vyra-speaker``: Speaker that can publish messages periodically.
+
+        :param settings: Settings for the module functions.
+        :type settings: list[FunctionConfigEntry]
+        :returns: None
+        :rtype: None
         """
         self._interface_list = settings
 
         async_loop = asyncio.get_event_loop()
 
         for setting in settings:
-            
             if setting.type == FunctionConfigBaseTypes.callable.value:
                 Logger.info(f"Creating callable: {setting.functionname}")
                 create_vyra_callable(
@@ -193,9 +217,10 @@ class VyraEntity:
     def register_storage(self, storage: Storage) -> None:
         """
         Register a storage object to the entity.
-        
-        Args:
-            storage (Storage): The storage object to register.
+
+        :param storage: The storage object to register.
+        :type storage: Storage
+        :raises TypeError: If storage is not an instance of Storage.
         """
         if not isinstance(storage, Storage):
             raise TypeError("storage must be an instance of Storage.")
@@ -207,12 +232,11 @@ class VyraEntity:
     def _check_node_availability(cls, node_name: str) -> bool:
         """
         Check if a node with the given name is available in the ROS2 system.
-        
-        Args:
-            node_name (str): The name of the node to check.
-        
-        Returns:
-            bool: True if the node is available, False otherwise.
+
+        :param node_name: The name of the node to check.
+        :type node_name: str
+        :returns: True if the node is available, False otherwise.
+        :rtype: bool
         """
         checker_node = CheckerNode()
         return checker_node.is_node_available(node_name)
@@ -221,12 +245,14 @@ class VyraEntity:
     async def trigger_transition(self, request: Any, response: Any) -> None:
         """
         Trigger a state transition for the entity from internal or remote.
-        
-        Args:
-            transition (str): The name of the transition to trigger.
-        
-        Raises:
-            NotImplementedError: If the method is not implemented in the subclass.
+
+        :param request: The request containing the transition name.
+        :type request: Any
+        :param response: The response object to update with the result.
+        :type response: Any
+        :raises NotImplementedError: If the method is not implemented in the subclass.
+        :returns: None
+        :rtype: None
         """
         trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]
         if request.trigger_name not in trigger_list:
@@ -266,4 +292,14 @@ class VyraEntity:
     
     @remote_callable
     async def get_capabilities(self, request: Any, response: Any) -> Any:
+        """
+        Retrieves the capabilities of the entity.
+
+        :param request: The request object.
+        :type request: Any
+        :param response: The response object to update with the result.
+        :type response: Any
+        :returns: None
+        :rtype: Any
+        """
         pass

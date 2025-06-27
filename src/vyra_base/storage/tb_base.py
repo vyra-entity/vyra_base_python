@@ -7,6 +7,17 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 # TypeDecorator für int-Enums
 class IntEnum(TypeDecorator):
+    """
+    A SQLAlchemy TypeDecorator for storing Python IntEnum values as integers in the database.
+
+    This class allows seamless conversion between Python IntEnum members and their integer
+    representation in the database. When binding parameters, it converts IntEnum members
+    to their integer values. When retrieving results, it converts integers back to the
+    corresponding IntEnum members.
+
+    :param enumtype: The IntEnum class to use for conversion.
+    :type enumtype: Type[IntEnum]
+    """
     impl = Integer
 
     def __init__(self, enumtype, *args, **kwargs):

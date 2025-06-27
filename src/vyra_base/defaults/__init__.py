@@ -1,17 +1,24 @@
-from .info import AuthorInfo
+"""
+This module provides default constants, entries, exceptions, and author information
+for the vyra_base package.
 
-from .constants import CyclicRefreshConstants
-from .constants import FeederConstants
-from .constants import LoggerConstants
-from .constants import MessageLengthConstants
-from .constants import RequiredVersion
-from .constants import TimeoutConstants
+:author: See AuthorInfo
+"""
 
-from .entries import AvailableModuleEntry
-from .entries import ErrorEntry
-from .entries import NewsEntry
-from .entries import PullRequestEntry
-from .entries import StateEntry
-
+from .constants import (
+    CyclicRefreshConstants,
+    FeederConstants,
+    LoggerConstants,
+    MessageLengthConstants,
+    RequiredVersion,
+    TimeoutConstants,
+)
+from .entries import (
+    AvailableModuleEntry,
+    ErrorEntry,
+    NewsEntry,
+    PullRequestEntry,
+    StateEntry,
+)
 from .exceptions import FeederException
-
+from .info import AuthorInfo

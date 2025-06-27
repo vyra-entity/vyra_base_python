@@ -2,11 +2,11 @@
 name = "vyra_base"
 version = "0.1.5"
 description = "Base library for V.Y.R.A. modules written in Python"
-authors = ["Variobotic GmbH"]
+authors = ["Holger Schernews"]
 license = "LICENSE"
 readme = "README.md"
-homepage = "https://variobotic.de"  # Replace with actual URL
-repository = "https://github.com/Variobotic-GmbH/varioboticos-base-python.git"  # Replace with actual URL
+homepage = "https://vyra-entity.github.io/vyra_base_python/"  # Replace with actual URL
+repository = "https://github.com/vyra-entity/vyra_base_python.git"  # Replace with actual URL
 keywords = ["V.Y.R.A.", "python", "library"]
 classifiers = [
     "Programming Language :: Python :: 3",

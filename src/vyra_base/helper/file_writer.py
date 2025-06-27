@@ -1,23 +1,27 @@
 import json
+from pathlib import Path
 
-from file_lock import get_lock_for_file, release_lock_for_file
-
-from pathlib import Path 
-from aiopath import AsyncPath
+from vyra_base.helper._aiopath import AsyncPath
+from vyra_base.helper.file_lock import get_lock_for_file, release_lock_for_file
 
 
 class FileWriter:
-    """ File writer
-        
-        Writes Python objects to a file.
+    """File writer.
+
+    Writes Python objects to a file.
     """
 
     @classmethod
     async def write_json_file(cls, file: Path, file_content: dict) -> bool:
-        """ Writes a json file from dict. 
+        """
+        Writes a JSON file from a dictionary.
 
-        Returns:
-            bool: In case the writing finished return true else false.
+        :param file: The path to the file to write.
+        :type file: Path
+        :param file_content: The dictionary to serialize as JSON.
+        :type file_content: dict
+        :returns: True if writing finished successfully, else False.
+        :rtype: bool
         """
         try:
             lock = await get_lock_for_file(file)
@@ -42,6 +46,14 @@ class FileWriter:
             
     @classmethod
     async def write_binary_file(cls, content: str) -> bool:
+        """
+        Writes binary content to a file.
+
+        :param content: The content to write.
+        :type content: str
+        :returns: True if writing finished successfully, else False.
+        :rtype: bool
+        """
         try:
             async with AsyncPath(content).open(mode='wb') as binary_file:
                 await binary_file.write(binary_file)

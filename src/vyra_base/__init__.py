@@ -1,13 +1,22 @@
 import os
 import shutil
 from pathlib import Path
+
 import vyra_base
 
 
 def extract_ros_interfaces(target_package_path):
     """
-    Extrahiert ROS2 Interface-Dateien aus der pip-installierten Library
-    in ein ROS2 Package
+    Extract ROS2 interface files from the pip-installed library into a ROS2 package.
+
+    :param target_package_path: Path to the target ROS2 package where interfaces will be extracted.
+    :type target_package_path: str or pathlib.Path
+
+    :return: None
+    :rtype: None
+
+    This function copies interface files (msg, srv, action, json) from the installed
+    vyra_base library to the specified ROS2 package directory.
     """
     # Finde die installierte Library
 

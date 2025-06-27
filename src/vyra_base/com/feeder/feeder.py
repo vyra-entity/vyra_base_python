@@ -17,14 +17,21 @@ from vyra_base.com.datalayer.speaker import VyraSpeaker
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.helper.logger import Logger
 
-class BaseFeeder:
-    """ Abstract class 
 
-        Abstraction that provides the required interface for deuque method all
-        inheriting deque objects require to work.
+class BaseFeeder:
+    """
+    Abstract class.
+
+    Provides the required interface for the ``deque`` method all inheriting deque objects require to work.
     """
 
     def __init__(self, loggingOn: bool = False) -> None:
+        """
+        Initialize the BaseFeeder.
+
+        :param loggingOn: If True, enables logging in the base logger.
+        :type loggingOn: bool
+        """
         self._qos = QoSProfile(
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=10,
@@ -44,6 +51,14 @@ class BaseFeeder:
         self._type: Any
 
     def create(self, loggingOn: bool = False) -> None:
+        """
+        Create the feeder and its communication handlers.
+
+        :param loggingOn: If True, enables logging in the base logger.
+        :type loggingOn: bool
+        :raises FeederException: If the speaker could not be created.
+        :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
+        """
         speaker: VyraSpeaker = create_vyra_speaker(
             name=self._feederName,
             node=self._node,
@@ -72,16 +87,23 @@ class BaseFeeder:
             self.add_handler(handler)
 
     def feed(self, msg: Any) -> None:
+        """
+        Feed a message to the feeder.
+
+        :param msg: The message to feed.
+        :type msg: Any
+        """
         self._feeder.log(self._level, msg)
 
         if self._loggingOn:
             Logger.log(
-                f"Feeder {self._feederName} fed with message: {msg}",
-                level=self._level
+                f"Feeder {self._feederName} fed with message: {msg}"
             )
 
     def create_feeder(self):
-        """ Set the logger for the feeder. """
+        """
+        Set the logger for the feeder.
+        """
         feed_logger_name: str = f"{self._feedBaseName}.{self._feederName}"
         self._feeder = logging.getLogger(feed_logger_name)
         self._feeder.setLevel(self._level)
@@ -91,7 +113,15 @@ class BaseFeeder:
             Logger.add_external(feed_logger_name)
 
     def add_handler(self, handler: CommunicationHandler) -> bool:
-        """ Add a communication handler to the feeder. """
+        """
+        Add a communication handler to the feeder.
+
+        :param handler: The communication handler to add.
+        :type handler: CommunicationHandler
+        :raises TypeError: If the handler is not a CommunicationHandler.
+        :return: True if the handler was added, False if it was already present.
+        :rtype: bool
+        """
         if not isinstance(handler, CommunicationHandler):
             raise TypeError(
                 f"Expected a CommunicationHandler, got {type(handler)}"

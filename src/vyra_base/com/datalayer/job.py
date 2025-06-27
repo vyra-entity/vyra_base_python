@@ -1,21 +1,31 @@
-from __future__ import annotations
-
 from typing import Any
 
 class VyraJob:
     """
-    Class representing a job in the data layer.
+    Represents a job in the data layer.
+
+    :ivar name: The name of the job.
+    :vartype name: str
+    :ivar type: The type of the job.
+    :vartype type: Any
+    :ivar description: The description of the job.
+    :vartype description: str
+    :ivar last_return: The last return value of the job.
+    :vartype last_return: Any
     """
     name: str = ""
     type: Any = None
     description: str = ""
     last_return: Any = None
 
-    def merge(self, other: Any) -> VyraJob:
+    def merge(self, other: Any) -> "VyraJob":
         """
-        Merge another Job into this one, combining their attributes.
+        Merges another Job into this one, combining their attributes.
+
         :param other: Another Job instance to merge with.
+        :type other: Any
         :return: A new Job instance with merged attributes.
+        :rtype: VyraJob
         """
         self.name = other.name or self.name
         self.type = other.type or self.type
