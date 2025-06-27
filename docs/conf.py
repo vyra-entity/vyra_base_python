@@ -28,7 +28,13 @@ intersphinx_mapping = {
     'sqlalchemy': ('https://docs.sqlalchemy.org/en/20/', None)
 }
 
-autodoc_mock_imports = ["rclpy", "std_msgs", "geometry_msgs", "sensor_msgs"]
+autodoc_mock_imports = [
+    "rclpy", 
+    "std_msgs", 
+    "geometry_msgs", 
+    "sensor_msgs",
+    "builtin_interfaces"
+]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
