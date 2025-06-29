@@ -76,7 +76,7 @@ class StateMachine:
         """
         return config_collection['transitions']
 
-    def is_transition_possible(self, trigger_name):
+    def is_transition_possible(self, trigger_name: str) -> tuple[bool, List[str]]:
         """
         Checks if a transition is possible for the given trigger name.
 
