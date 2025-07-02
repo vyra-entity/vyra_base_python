@@ -11,3 +11,6 @@
 
 *.env
 *.pyc
+
+/.pytest_cache/
+.coverage
