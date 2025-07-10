@@ -16,7 +16,7 @@ class ACCESS_LEVEL:
         pass
 
 class AccessManager:
-    """
+    """ 
     AccessManager class to manage access levels.
     """
     
