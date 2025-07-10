@@ -185,7 +185,7 @@ class Logger:
         Logger.logger.debug(entry.message)
 
     @classmethod
-    def warning(cls, entry: Union[LogEntry, str]):
+    def warn(cls, entry: Union[LogEntry, str]):
         """
         Log a message in warning mode.
 
