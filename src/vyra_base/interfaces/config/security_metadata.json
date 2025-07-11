@@ -1,0 +1,50 @@
+[
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "request_access",
+        "displayname": "Request Access",
+        "description": "Request access to this module to read parameters, control the module, or perform other actions.",
+        "filetype": "srv/RequestAccess.srv",
+        "params": [
+            {
+                "datatype": "string",
+                "displayname": "certificate",
+                "description": "The certificate to use for authentication"
+            },
+            {
+                "datatype": "uuid",
+                "displayname": "module_id",
+                "description": "The ID of the module to access"
+            },
+            {
+                "datatype": "int",
+                "displayname": "requested_level",
+                "description": "The requested access level (1: Read, 2: Extended Read, 3: Control and Parameter, 4: Extended Control, 5: Full Access)"
+            },
+            {
+                "datatype": "string",
+                "displayname": "level_4_psw",
+                "description": "Password for level 4 access (optional)"
+            },
+            {
+                "datatype": "string",
+                "displayname": "level_5_passkey",
+                "description": "Passkey for level 5 access (optional)"
+            }
+        ],
+        "returns": [
+            {
+                "name": "access_status",
+                "datatype": "int",
+                "displayname": "Access Status",
+                "description": "The access status, e.g., '0:ACCESS_GRANTED', '1:ACCESS_DENIED', '2:MISSING_ACCESS_PARAMETERS', '3:INTERNAL_ERROR'"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]

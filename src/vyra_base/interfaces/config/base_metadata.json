@@ -38,6 +38,7 @@
                 "description": "The timestamp when the error occurred"
             }
         ],
+        "access_level": 1,
         "visible": true,
         "published": false
     },
@@ -65,6 +66,7 @@
                 "description": "The timestamp when the state was reported"
             }
         ],
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": false
@@ -104,6 +106,7 @@
                 "description": "The name of the module that published the news"
             }
         ],
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": false
@@ -125,6 +128,7 @@
                 "description": "A list of strings representing the system capabilities"
             }
         ],
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": false
@@ -152,6 +156,7 @@
                 "description": "A message providing additional information about the transition"
             }
         ],
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
             "published": false
