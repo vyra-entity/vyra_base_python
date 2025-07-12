@@ -94,6 +94,10 @@ class TrustlevelManager:
                 return TRUST_STATUS.UNKNOWN
             
     def verify_id(self, id) -> bool:
+        """
+        Verify a module_id if it is a valid UUID5 generated from the module name
+        and VYRA namespace.
+        """
         eh = EnvHandler()
         eh.load_env()
         module_name = eh.env['MODULE_NAME']
