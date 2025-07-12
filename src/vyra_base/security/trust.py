@@ -3,7 +3,7 @@ from pathlib import Path
 
 from vyra_base.helper.env_handler import EnvHandler
 from vyra_base.helper.logger import Logger
-
+from vyra_base.helper.uuid_generator import validate_module_id
 class TRUST_LEVEL(Enum, int):
     TRUST_NONE = 0
     TRUST_ONE_RESERVE = 1
@@ -58,6 +58,7 @@ class TrustlevelManager:
                 Logger.info(f"ID {trust_id} is added and trusted.")
                 self.trusted_ids.append(trust_id)
                 return TRUST_STATUS.SUCCEED
+            
             case TRUST_LEVEL.TRUST_ONE_RESERVE:
                 if len(self.trusted_ids) < 1:
                     Logger.info(f"ID {trust_id} is added and trusted.")
@@ -65,8 +66,8 @@ class TrustlevelManager:
                 else:
                     Logger.warn(f"Access denied, module already reserved.")
                     return TRUST_STATUS.FAILED
-            case TRUST_LEVEL.TRUST_ONE_RELATED:
                 
+            case TRUST_LEVEL.TRUST_ONE_RELATED:
                 if (len(self.trusted_ids) > 0 and 
                     trust_id not in self.trusted_ids):
                     Logger.warn(f"Access denied, module already reserved.")
@@ -87,13 +88,18 @@ class TrustlevelManager:
 
                 Logger.info(f"ID {trust_id} is added and trusted.")
                 return TRUST_STATUS.SUCCEED
+            
             case _:
                 Logger.warn(f"Unknown trust level {self.level}")
                 return TRUST_STATUS.UNKNOWN
             
     def verify_id(self, id) -> bool:
-        if (False):
+        eh = EnvHandler()
+        eh.load_env()
+        module_name = eh.env['MODULE_NAME']
+        if (not validate_module_id(id, module_name)):
             Logger.warn(f"ID {id} is not valid, access denied.")
             return False
         else:
+            Logger.info(f"ID {id} is valid for {module_name}.")
             return True

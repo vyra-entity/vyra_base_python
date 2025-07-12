@@ -1,0 +1,52 @@
+[
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "get_capabilities",
+        "displayname": "Get Capabilities",
+        "description": "Retrieve the capabilities of the vyra system.",
+        "filetype": "srv/GetCapabilities.srv",
+        "params": [],
+        "returns": [
+            {
+                "name": "capabilities",
+                "datatype": "string[]",
+                "displayname": "Capabilities",
+                "description": "A list of strings representing the system capabilities"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "trigger_transition",
+        "displayname": "Trigger Transition",
+        "description": "Trigger a transition in the vyra system.",
+        "filetype": "srv/TriggerTransition.srv",
+        "params": [],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]
