@@ -40,8 +40,8 @@ class VyraEntity:
     It also provides methods to register remote callables and manage interfaces.
     It is designed to be extended by specific entities that require additional functionality.
 
-    :ivar ros2_node: The ROS2 node for the entity.
-    :vartype ros2_node: VyraNode
+    :ivar node: The ROS2 node for the entity.
+    :vartype node: VyraNode
     :ivar state_feeder: Feeder for state updates.
     :vartype state_feeder: StateFeeder
     :ivar news_feeder: Feeder for news updates.
@@ -86,7 +86,7 @@ class VyraEntity:
 
         Logger.initialize(log_config_path=log_config_path)
 
-        self.register_remote_callables()
+        self._register_remote_callables()
 
         if VyraEntity._check_node_availability(module_config.name):
             raise RuntimeError(
@@ -100,23 +100,23 @@ class VyraEntity:
             name=f"{self.module_config.name}"
         )
 
-        self.ros2_node = VyraNode(node_settings)
+        self._node = VyraNode(node_settings)
 
         self.state_feeder = StateFeeder(
             type=state_entry._type, 
-            node=self.ros2_node, 
+            node=self._node, 
             module_config=self.module_config
         )
 
         self.news_feeder = NewsFeeder(
             type=news_entry._type, 
-            node=self.ros2_node,
+            node=self._node,
             module_config=self.module_config
         )
         
         self.error_feeder = ErrorFeeder(
             type=error_entry._type, 
-            node=self.ros2_node,
+            node=self._node,
             module_config=self.module_config
         )
 
@@ -137,7 +137,19 @@ class VyraEntity:
 
         self.state_machine.initialize()
 
-    def register_remote_callables(self):
+    @property
+    def node(self) -> VyraNode:
+        """
+        Get the ROS2 node of the entity.
+
+        :returns: The ROS2 node.
+        :rtype: VyraNode
+        """
+        if not hasattr(self, '_node'):
+            return None
+        return self._node
+
+    def _register_remote_callables(self):
         """
         Registers all remote callables defined in the entity.
 
@@ -151,8 +163,38 @@ class VyraEntity:
                     name=attr.__name__,
                     connected_callback=attr
                 )
-                print(f"Registering callable {callable_obj.name} from method {attr}")
+                Logger.debug(
+                    f"Registering callable {callable_obj.name} from method {attr}")
                 DataSpace.add_callable(callable_obj)
+
+    def register_remote_callable(self, callable_obj: Union[callable, list]) -> None:
+        """
+        Register a remote callable or a list of callables to the entity.
+
+        :param callable_obj: The callable or list of callables to register.
+        :type callable_obj: callable or list
+        :raises TypeError: If any element is not a callable function.
+        """
+        if not isinstance(callable_obj, list):
+            if not callable(callable_obj):
+                raise TypeError("callable_obj must be a callable or a list of callables.")
+            
+            callable_list = [callable_obj]
+
+        for callable_element in callable_list:
+            if not callable(callable_element):
+                raise TypeError(f"{callable_element} is not a callable function.")
+
+            # Wrap the callable with @remote_callable decorator
+            wrapped_callable = remote_callable(callable_element)
+            Logger.debug(f"Registering remote callable: {wrapped_callable.__name__}")
+
+            DataSpace.add_callable(
+                VyraCallable(
+                    name=wrapped_callable.__name__, 
+                    connected_callback=wrapped_callable
+                )
+            )
 
     async def add_interface(self, settings: list[FunctionConfigEntry]) -> None:
         """
@@ -180,7 +222,7 @@ class VyraEntity:
                 create_vyra_callable(
                     name=setting.functionname,
                     type=setting.ros2type,
-                    node=self.ros2_node,
+                    node=self._node,
                     callback=setting.callback,
                     async_loop=async_loop
                 )
@@ -205,7 +247,7 @@ class VyraEntity:
                 create_vyra_speaker(
                     name=setting.functionname,
                     type=setting.ros2type,
-                    node=self.ros2_node,
+                    node=self._node,
                     description=setting.description,
                     periodic=periodic,
                     interval_time=periodic_interval,
