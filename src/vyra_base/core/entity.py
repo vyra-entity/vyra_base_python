@@ -263,7 +263,7 @@ class VyraEntity:
             
             response.success = False
             response.message = fail_msg
-            Logger.warning(fail_msg)
+            Logger.warn(fail_msg)
             return None
         
         can_trigger, possible_trigger = self.state_machine.is_transition_possible(
@@ -278,7 +278,7 @@ class VyraEntity:
             
             response.success = False
             response.message = fail_msg
-            Logger.warning(fail_msg)
+            Logger.warn(fail_msg)
             return None
         
         getattr(self.state_machine.model, f"{request.trigger_name}")()

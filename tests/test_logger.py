@@ -295,7 +295,7 @@ class TestLogger:
             Logger.logger.debug.assert_called_with("debug message")
     
     def test_logger_warning_method(self):
-        """Test Logger.warning method"""
+        """Test Logger.warn method"""
         with tempfile.TemporaryDirectory() as temp_dir:
             log_file = os.path.join(temp_dir, "test.log")
             config_file = os.path.join(temp_dir, "log_config.json")
@@ -310,15 +310,15 @@ class TestLogger:
             Logger.logger.warning = Mock()
             
             # Test with string
-            Logger.warning("warning message")
+            Logger.warn("warning message")
             Logger.logger.warning.assert_called_with("warning message")
             
             # Test with LogEntry
-            Logger.warning(LogEntry("warning entry"))
+            Logger.warn(LogEntry("warning entry"))
             Logger.logger.warning.assert_called_with("warning entry")
     
     def test_logger_warning_inactive(self):
-        """Test Logger.warning when logging is inactive"""
+        """Test Logger.warn when logging is inactive"""
         with patch('builtins.print') as mock_print:
             Logger._LOG_ACTIVE = False
             
@@ -326,7 +326,7 @@ class TestLogger:
             Logger.logger = Mock()
             Logger.logger.warning = Mock()
             
-            Logger.warning("warning message")
+            Logger.warn("warning message")
             mock_print.assert_called_with("warning message")
             Logger.logger.warning.assert_called_with("warning message")
     
@@ -585,7 +585,7 @@ class TestLogger:
             
             # Test that string inputs in warning method should get DEBUG mode (bug in original code)
             Logger.logger.warning = Mock()
-            Logger.warning("warning message")
+            Logger.warn("warning message")
             Logger.logger.warning.assert_called_with("warning message")
     
     def test_logger_with_json_loading_error(self):
@@ -677,7 +677,7 @@ class TestLogger:
             Logger.logger.info = Mock()
             
             # Test the bug - these methods create LogEntry with DEBUG mode instead of their respective modes
-            Logger.warning("warning message")
+            Logger.warn("warning message")
             Logger.error("error message") 
             Logger.info("info message")
             
