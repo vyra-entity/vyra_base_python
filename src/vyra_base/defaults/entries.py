@@ -221,6 +221,12 @@ class ErrorEntry:
     module_name: str = 'N/A'
     module_id: Union[UUID, Any] = 'N/A'
 
+    def __repr__(self) -> str:
+        return (
+            f"ErrorEntry(level={self.level}, code={self.code}, "
+            f"description={self.description}, solution={self.solution}"
+        )
+
     class ERROR_LEVEL(IntEnum):
         """
         Enum for the error level.
@@ -285,6 +291,11 @@ class NewsEntry(dict):
         self.module_id: Union[UUID, Any] = module_id
         self._type: Any = _type
 
+    def __repr__(self) -> str:
+        return (
+            f"NewsEntry(level={self.level}, message={self.message}"
+        )
+
     class MESSAGE_LEVEL(IntEnum):
         """
         Enum for the message type.
@@ -347,6 +358,15 @@ class PullRequestEntry:
     module_id: str
     color: int
 
+    def __repr__(self) -> str:
+        return (
+            f"PullRequestEntry(uuid={self.uuid}, ack_by_user={self.ack_by_user}, "
+            f"ack_on_date={self.ack_on_date}, request_structure={self.request_structure}, "
+            f"request_on_date={self.request_on_date}, request_description={self.request_description}, "
+            f"response={self.response}, request_action={self.request_action}, "
+            f"request_action_args={self.request_action_args}, module_id={self.module_id}, "
+            f"color={self.color})"
+        )
 
 @dataclass(repr=True, slots=True)
 class StateEntry:
@@ -378,6 +398,11 @@ class StateEntry:
     timestamp: Any
     previous: str = 'N/A'
 
+    def __repr__(self) -> str:
+        return (
+            f"StateEntry(current={self.current}, trigger={self.trigger}, "
+            f"previous={self.previous})"
+        )
 
 @dataclass(slots=True)
 class ModuleEntry:
@@ -402,6 +427,13 @@ class ModuleEntry:
     template: str
     description: str
     version: str
+
+    def __repr__(self) -> str:
+        return (
+            f"ModuleEntry(uuid={self.uuid}, name={self.name}, "
+            f"template={self.template}, description={self.description}, "
+            f"version={self.version})"
+        )
 
 
 @dataclass(slots=True)

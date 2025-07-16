@@ -56,7 +56,7 @@ class Param:
         """
         pass
 
-    def get_param_change_event_topic(self):
+    def get_param_change_event_topic(self) -> str:
         """
         Get the topic for parameter change events.
 

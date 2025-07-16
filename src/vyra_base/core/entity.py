@@ -5,8 +5,6 @@ import datetime
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
 
-from rclpy.qos import QoSProfile
-
 from vyra_base.com.datalayer.callable import VyraCallable
 from vyra_base.com.datalayer.interface_factory import (
     DataSpace,
@@ -28,9 +26,9 @@ from vyra_base.defaults.entries import (
     StateEntry,
 )
 from vyra_base.helper.logger import Logger
-from vyra_base.state import state_machine
 from vyra_base.state.state_machine import StateMachine
 from vyra_base.storage.storage import Storage
+from vyra_base.core.params import Param
 
 class VyraEntity:
     """
@@ -101,20 +99,11 @@ class VyraEntity:
 
         self.__init_feeders(state_entry, news_entry, error_entry)
 
-        self.state_machine = StateMachine(
-            self.state_feeder,
-            state_entry._type,
-            module_config=self.module_config
-        )
+        self._init_state_machine(state_entry)
+
+        self._init_params()
 
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
-
-        self.state_machine.initialize()
-
-        # self.param_manager = Param(
-        #     storage_access_persistant=self.database_access,
-        #     storage_access_transient=self.redis_access
-        # )
 
     @property
     def node(self) -> Optional[VyraNode]:
@@ -170,6 +159,36 @@ class VyraEntity:
             loggingOn=True
         )
 
+    def _init_storages(self) -> None:
+        """
+        Initialize storages for the entity.
+
+        This method sets up the storage access for the entity, including persistent and transient storage.
+        It should be called during the initialization of the entity.
+        """
+        self.database_access = Storage(
+            storage_type="database",
+            name=f"{self.module_config.name}_db"
+        )
+        
+        self.redis_access = Storage(
+            storage_type="redis",
+            name=f"{self.module_config.name}_redis"
+        )
+
+    def _init_params(self) -> None:
+        """
+        Initialize parameters for the entity.
+
+        This method should be implemented to set up initial parameters.
+        It is called during the initialization of the entity.
+        """
+        Logger.debug("Initializing parameters for the entity.")
+        
+        self.param_manager = Param(
+            storage_access_persistant=self.database_access,
+            storage_access_transient=self.redis_access
+        )
 
     def _register_remote_callables(self):
         """
@@ -188,6 +207,23 @@ class VyraEntity:
                 Logger.debug(
                     f"Registering callable {callable_obj.name} from method {attr}")
                 DataSpace.add_callable(callable_obj)
+
+    def _init_state_machine(self, state_entry: StateEntry) -> None:
+        """
+        Initialize the state machine for the entity.
+
+        This method sets up the state machine with the provided state entry.
+        It should be called during the initialization of the entity.
+        
+        :param state_entry: The state entry configuration.
+        :type state_entry: StateEntry
+        """
+        self.state_machine = StateMachine(
+            self.state_feeder,
+            state_entry._type,
+            module_config=self.module_config
+        )
+        self.state_machine.initialize()
 
     def register_remote_callable(self, callable_obj: Union[Callable, list]) -> None:
         """

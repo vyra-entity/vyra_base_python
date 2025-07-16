@@ -25,7 +25,7 @@ SQLAlchemy = "^2.0.41"
 transitions = "^0.9.2"
 python-dotenv = "^1.0.0"
 tomli = "^2.0.1"
-redis = "^6.0.0"
+redis-om = "^0.3.0"
 
 
 [tool.poetry.group.dev.dependencies]
