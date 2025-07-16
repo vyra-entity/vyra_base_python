@@ -40,8 +40,8 @@ class VyraEntity:
     It also provides methods to register remote callables and manage interfaces.
     It is designed to be extended by specific entities that require additional functionality.
 
-    :ivar ros2_node: The ROS2 node for the entity.
-    :vartype ros2_node: VyraNode
+    :ivar _node: The ROS2 node for the entity.
+    :vartype _node: VyraNode
     :ivar state_feeder: Feeder for state updates.
     :vartype state_feeder: StateFeeder
     :ivar news_feeder: Feeder for news updates.
@@ -81,10 +81,7 @@ class VyraEntity:
         :type module_config: ModuleEntry
         :raises RuntimeError: If the node name is already available in the ROS2 system.
         """
-        log_config_path = Path(__file__).resolve().parent.parent
-        log_config_path: Path = log_config_path / "helper" / "logger_config.json"
-
-        Logger.initialize(log_config_path=log_config_path)
+        self._init_logger()
 
         self.register_remote_callables()
 
@@ -100,25 +97,9 @@ class VyraEntity:
             name=f"{self.module_config.name}"
         )
 
-        self.ros2_node = VyraNode(node_settings)
+        self._node = VyraNode(node_settings)
 
-        self.state_feeder = StateFeeder(
-            type=state_entry._type, 
-            node=self.ros2_node, 
-            module_config=self.module_config
-        )
-
-        self.news_feeder = NewsFeeder(
-            type=news_entry._type, 
-            node=self.ros2_node,
-            module_config=self.module_config
-        )
-        
-        self.error_feeder = ErrorFeeder(
-            type=error_entry._type, 
-            node=self.ros2_node,
-            module_config=self.module_config
-        )
+        self.__init_feeders(state_entry, news_entry, error_entry)
 
         self.state_machine = StateMachine(
             self.state_feeder,
@@ -126,16 +107,56 @@ class VyraEntity:
             module_config=self.module_config
         )
 
-        Logger.info("Initializing V.Y.R.A. entity...")
-        self.error_feeder.feed(
-            {
-                "description": "Initialization of the entity.",
-                "solution": "No action required.",
-                "miscellaneous": "Initialization complete."
-            }
-        )
+        self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
         self.state_machine.initialize()
+
+        # self.param_manager = Param(
+        #     storage_access_persistant=self.database_access,
+        #     storage_access_transient=self.redis_access
+        # )
+
+    def _init_logger(self) -> None:
+        """
+        Initialize the logger for the entity.
+        
+        This method sets up the logger configuration based on the provided log configuration path.
+        It should be called during the initialization of the entity.
+        """
+        log_config_path = Path(__file__).resolve().parent.parent
+        log_config_path: Path = log_config_path / "helper" / "logger_config.json"
+        Logger.initialize(log_config_path=log_config_path)
+
+    def __init_feeders(
+            self, 
+            state_entry: StateEntry, 
+            news_entry: NewsEntry, 
+            error_entry: ErrorEntry) -> None:
+        """
+        Initialize the feeders for the entity.
+
+        This method sets up the state, news, and error feeders for the entity.
+        It should be called during the initialization of the entity.
+        """
+        self.state_feeder = StateFeeder(
+            type=state_entry._type, 
+            node=self._node, 
+            module_config=self.module_config
+        )
+
+        self.news_feeder = NewsFeeder(
+            type=news_entry._type, 
+            node=self._node,
+            module_config=self.module_config,
+            loggingOn=True
+        )
+        
+        self.error_feeder = ErrorFeeder(
+            type=error_entry._type, 
+            node=self._node,
+            module_config=self.module_config,
+            loggingOn=True
+        )
 
     def register_remote_callables(self):
         """
@@ -180,7 +201,7 @@ class VyraEntity:
                 create_vyra_callable(
                     name=setting.functionname,
                     type=setting.ros2type,
-                    node=self.ros2_node,
+                    node=self._node,
                     callback=setting.callback,
                     async_loop=async_loop
                 )
@@ -205,7 +226,7 @@ class VyraEntity:
                 create_vyra_speaker(
                     name=setting.functionname,
                     type=setting.ros2type,
-                    node=self.ros2_node,
+                    node=self._node,
                     description=setting.description,
                     periodic=periodic,
                     interval_time=periodic_interval,
