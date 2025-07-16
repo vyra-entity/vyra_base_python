@@ -92,15 +92,15 @@ Vyra_TRANSITIONS_LIST: List[Transition] = [
     Transition(trigger="ReturnAfterInterrupt", source="Interrupting", dest="prevState"),
 ]
 
-config_collection: dict = {
-    """
-    Configuration dictionary for the Vyra state machine.
+"""
+Configuration dictionary for the Vyra state machine.
 
-    :key str name: Name of the state machine.
-    :key list states: List of possible states.
-    :key list transitions: List of transition dictionaries.
-    :key str initial: Initial state.
-    """
+:key str name: Name of the state machine.
+:key list states: List of possible states.
+:key list transitions: List of transition dictionaries.
+:key str initial: Initial state.
+"""
+config_collection: dict = {
     "name": "vyra_base.state_machine",
     "states": [
         v for k, v in Vyra_STATES.__dict__.items() 

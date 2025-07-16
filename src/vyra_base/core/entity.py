@@ -40,8 +40,8 @@ class VyraEntity:
     It also provides methods to register remote callables and manage interfaces.
     It is designed to be extended by specific entities that require additional functionality.
 
-    :ivar _node: The ROS2 node for the entity.
-    :vartype _node: VyraNode
+    :ivar node: The ROS2 node for the entity.
+    :vartype node: VyraNode
     :ivar state_feeder: Feeder for state updates.
     :vartype state_feeder: StateFeeder
     :ivar news_feeder: Feeder for news updates.
@@ -83,7 +83,7 @@ class VyraEntity:
         """
         self._init_logger()
 
-        self.register_remote_callables()
+        self._register_remote_callables()
 
         if VyraEntity._check_node_availability(module_config.name):
             raise RuntimeError(
@@ -99,45 +99,6 @@ class VyraEntity:
 
         self._node = VyraNode(node_settings)
 
-        self.__init_feeders(state_entry, news_entry, error_entry)
-
-        self.state_machine = StateMachine(
-            self.state_feeder,
-            state_entry._type,
-            module_config=self.module_config
-        )
-
-        self.news_feeder.feed("...V.Y.R.A. entity initialized")
-
-        self.state_machine.initialize()
-
-        # self.param_manager = Param(
-        #     storage_access_persistant=self.database_access,
-        #     storage_access_transient=self.redis_access
-        # )
-
-    def _init_logger(self) -> None:
-        """
-        Initialize the logger for the entity.
-        
-        This method sets up the logger configuration based on the provided log configuration path.
-        It should be called during the initialization of the entity.
-        """
-        log_config_path = Path(__file__).resolve().parent.parent
-        log_config_path: Path = log_config_path / "helper" / "logger_config.json"
-        Logger.initialize(log_config_path=log_config_path)
-
-    def __init_feeders(
-            self, 
-            state_entry: StateEntry, 
-            news_entry: NewsEntry, 
-            error_entry: ErrorEntry) -> None:
-        """
-        Initialize the feeders for the entity.
-
-        This method sets up the state, news, and error feeders for the entity.
-        It should be called during the initialization of the entity.
-        """
         self.state_feeder = StateFeeder(
             type=state_entry._type, 
             node=self._node, 
@@ -147,18 +108,45 @@ class VyraEntity:
         self.news_feeder = NewsFeeder(
             type=news_entry._type, 
             node=self._node,
-            module_config=self.module_config,
-            loggingOn=True
+            module_config=self.module_config
         )
         
         self.error_feeder = ErrorFeeder(
             type=error_entry._type, 
             node=self._node,
-            module_config=self.module_config,
-            loggingOn=True
+            module_config=self.module_config
         )
 
-    def register_remote_callables(self):
+        self.state_machine = StateMachine(
+            self.state_feeder,
+            state_entry._type,
+            module_config=self.module_config
+        )
+
+        Logger.info("Initializing V.Y.R.A. entity...")
+        self.error_feeder.feed(
+            {
+                "description": "Initialization of the entity.",
+                "solution": "No action required.",
+                "miscellaneous": "Initialization complete."
+            }
+        )
+
+        self.state_machine.initialize()
+
+    @property
+    def node(self) -> VyraNode:
+        """
+        Get the ROS2 node of the entity.
+
+        :returns: The ROS2 node.
+        :rtype: VyraNode
+        """
+        if not hasattr(self, '_node'):
+            return None
+        return self._node
+
+    def _register_remote_callables(self):
         """
         Registers all remote callables defined in the entity.
 
@@ -172,8 +160,38 @@ class VyraEntity:
                     name=attr.__name__,
                     connected_callback=attr
                 )
-                print(f"Registering callable {callable_obj.name} from method {attr}")
+                Logger.debug(
+                    f"Registering callable {callable_obj.name} from method {attr}")
                 DataSpace.add_callable(callable_obj)
+
+    def register_remote_callable(self, callable_obj: Union[callable, list]) -> None:
+        """
+        Register a remote callable or a list of callables to the entity.
+
+        :param callable_obj: The callable or list of callables to register.
+        :type callable_obj: callable or list
+        :raises TypeError: If any element is not a callable function.
+        """
+        if not isinstance(callable_obj, list):
+            if not callable(callable_obj):
+                raise TypeError("callable_obj must be a callable or a list of callables.")
+            
+            callable_list = [callable_obj]
+
+        for callable_element in callable_list:
+            if not callable(callable_element):
+                raise TypeError(f"{callable_element} is not a callable function.")
+
+            # Wrap the callable with @remote_callable decorator
+            wrapped_callable = remote_callable(callable_element)
+            Logger.debug(f"Registering remote callable: {wrapped_callable.__name__}")
+
+            DataSpace.add_callable(
+                VyraCallable(
+                    name=wrapped_callable.__name__, 
+                    connected_callback=wrapped_callable
+                )
+            )
 
     async def add_interface(self, settings: list[FunctionConfigEntry]) -> None:
         """
@@ -284,7 +302,7 @@ class VyraEntity:
             
             response.success = False
             response.message = fail_msg
-            Logger.warning(fail_msg)
+            Logger.warn(fail_msg)
             return None
         
         can_trigger, possible_trigger = self.state_machine.is_transition_possible(
@@ -299,7 +317,7 @@ class VyraEntity:
             
             response.success = False
             response.message = fail_msg
-            Logger.warning(fail_msg)
+            Logger.warn(fail_msg)
             return None
         
         getattr(self.state_machine.model, f"{request.trigger_name}")()
