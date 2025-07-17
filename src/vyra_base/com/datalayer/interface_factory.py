@@ -58,6 +58,51 @@ class DataSpace:
         # Additional cleanup logic can be added here if needed
     
     @classmethod
+    def get_speaker(cls, name: str) -> VyraSpeaker:
+        """
+        Get a speaker by its name.
+
+        :param name: Name of the speaker to retrieve.
+        :type name: str
+        :return: The VyraSpeaker object if found, otherwise None.
+        :rtype: VyraSpeaker or None
+        """
+        for speaker in cls.speakers:
+            if speaker.name == name:
+                return speaker
+        raise ValueError(f"Speaker with name {name} not found in DataSpace.")
+    
+    @classmethod
+    def get_callable(cls, name: str) -> VyraCallable:
+        """
+        Get a callable by its name.
+
+        :param name: Name of the callable to retrieve.
+        :type name: str
+        :return: The VyraCallable object if found, otherwise None.
+        :rtype: VyraCallable or None
+        """
+        for callable_ in cls.callables:
+            if callable_.name == name:
+                return callable_
+        raise ValueError(f"Callable with name {name} not found in DataSpace.")
+
+    @classmethod
+    def get_job(cls, name: str) -> VyraJob:
+        """
+        Get a job by its name.
+
+        :param name: Name of the job to retrieve.
+        :type name: str
+        :return: The VyraJob object if found, otherwise None.
+        :rtype: VyraJob or None
+        """
+        for job in cls.jobs:
+            if job.name == name:
+                return job
+        raise ValueError(f"Job with name {name} not found in DataSpace.")
+
+    @classmethod
     def add_speaker(cls, obj: VyraSpeaker) -> VyraSpeaker:
         """
         Add a speaker object to the DataSpace.
@@ -71,7 +116,7 @@ class DataSpace:
         """
         try:
             if obj.publisher_server != None:
-                obj_name: str = obj.publisher_server.publisher_info.name
+                obj_name: str = obj.name
 
             index = next(
                 (i for i, ele in enumerate(cls.speakers) if 
@@ -274,6 +319,8 @@ def create_vyra_speaker(
     publisher_server.create_publisher()
 
     vyra_speaker: VyraSpeaker = VyraSpeaker(
+        name=name,
+        type=type,
         description=description,
         publisher_server=publisher_server,
     )
@@ -281,6 +328,45 @@ def create_vyra_speaker(
     vyra_speaker: VyraSpeaker = DataSpace.add_speaker(vyra_speaker)
     
     return vyra_speaker
+
+def remove_vyra_speaker(name: str) -> None:
+    """
+    Remove a V.Y.R.A. speaker by name.
+
+    :param name: Name of the speaker to remove.
+    :type name: str
+    :return: None
+    """
+    speaker_obj = DataSpace.get_speaker(name)
+    
+    DataSpace.kill(speaker_obj)
+    Logger.info(f"Speaker '{name}' removed from DataSpace.")
+
+def remove_vyra_callable(name: str) -> None:
+    """
+    Remove a V.Y.R.A. callable by name.
+
+    :param name: Name of the callable to remove.
+    :type name: str
+    :return: None
+    """
+    callable_obj = DataSpace.get_callable(name)
+    
+    DataSpace.kill(callable_obj)
+    Logger.info(f"Callable '{name}' removed from DataSpace.")
+
+def remove_vyra_job(name: str) -> None:
+    """
+    Remove a V.Y.R.A. job by name.
+
+    :param name: Name of the job to remove.
+    :type name: str
+    :return: None
+    """
+    job_obj = DataSpace.get_job(name)
+    
+    DataSpace.kill(job_obj)
+    Logger.info(f"Job '{name}' removed from DataSpace.")
 
 def remote_callable(func):
     """

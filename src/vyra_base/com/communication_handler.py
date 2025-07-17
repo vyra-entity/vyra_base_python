@@ -14,14 +14,14 @@ class CommunicationHandler(logging.Handler):
     FILL_AT_LOADING: bool = True
     #: bool: The handler will fill the communication interface at loading time if feed list is not empty.
 
-    def __init__(self, initiator: str = '', publisher=None, type=None):
+    def __init__(self, initiator: str = '', speaker=None, type=None):
         """
         Initialize the CommunicationHandler.
 
         :param initiator: Optional initiator string.
         :type initiator: str
-        :param publisher: Optional publisher object.
-        :type publisher: object, Optional
+        :param speaker: Optional speaker object.
+        :type speaker: object, Optional
         :param type: Optional type information.
         :type type: object, Optional
         """

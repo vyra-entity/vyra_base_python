@@ -20,15 +20,14 @@ class Param:
         self.storage_access = storage_access_persistant
         self.storage_access_transient: Any|None = storage_access_transient
 
-        self._init_params()
-
-    def _init_params(self) -> None:
+    def init_params(self, parameter_names: dict[str, Any]) -> None:
         """
         Initialize parameters. Load default parameters if they does not exist. 
         Also add them to the transient storage.
         This method should be implemented to set up initial parameters.
         """
         pass
+
 
     def get_param(self, key: str) -> Any:
         """

@@ -1,0 +1,149 @@
+import asyncio
+from typing import Any, Type
+from uuid import UUID
+
+from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.com.datalayer.speaker import VyraSpeaker
+from vyra_base.helper.error_handler import ErrorTraceback
+from vyra_base.storage.redis_access import RedisAccess
+from vyra_base.storage.redis_manipulator import RedisManipulator
+from vyra_base.storage.redis_manipulator import REDIS_TYPE
+from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
+
+from vyra_base.interfaces.msg.VolatileList import VolatileList
+from vyra_base.interfaces.msg.VolatileSet import VolatileSet
+from vyra_base.interfaces.msg.VolatileHash import VolatileHash
+from vyra_base.interfaces.msg.VolatileString import VolatileString
+
+
+REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
+    REDIS_TYPE.STRING: VolatileString,
+    REDIS_TYPE.HASH: VolatileHash,
+    REDIS_TYPE.LIST: VolatileList,
+    REDIS_TYPE.SET: VolatileSet
+}
+
+
+class Volatile:
+    """
+    A class to manage volatile parameters. Volatile parameters are
+    temporary parameters that are not persisted in the database.
+    They are stored in Redis and can be used for temporary data storage.
+    This class provides methods to read, write, and manage volatile parameters.
+    It also provides methods to subscribe to changes on volatile parameters.
+    The volatile parameters are identified by their keys, which are strings.
+    The class uses Redis as the storage backend for volatile parameters.
+    """
+    EVENT_TOPIC_PREFIX = "volatile/"
+
+    def __init__(
+            self, 
+            storage_access_transient: RedisAccess, 
+            module_id: UUID,
+            node: VyraNode):
+        """
+        Initialize the Volatile class.
+        """
+        self.module_id = module_id
+        self.communication_node = node
+        self.redis: RedisManipulator = RedisManipulator(
+            storage_access_transient, module_id)
+        self._active_shouter: dict[str, VyraSpeaker] = {}
+        self._listener: asyncio.Task | None = None
+        self._listener_active: bool = False
+
+    def __del__(self):
+        """
+        Clean up the Volatile instance.
+        This will unsubscribe from all active shouters and stop the listener if active.
+        """
+        if self._listener_active and self._listener:
+            self._listener.cancel()
+            self._listener = None
+
+        for key, speaker in self._active_shouter.items():
+            asyncio.run(speaker.unsubscribe_from_key(key))
+        
+        self._active_shouter.clear()
+
+    async def activate_listener(self):
+        """
+        Activate the listener for transient events.
+        This method starts listening for changes on volatile parameters.
+        It will create a speaker for each volatile parameter and subscribe to it.
+        """
+        # Start listening for transient events
+        self._listener = asyncio.create_task(
+            self.transient_event_listener())
+        
+
+    async def transient_event_listener(self):
+        self._listener_active = True
+        async for message in self.redis.pubsub.listen():
+            if message["type"] == "message":
+                channel = message["channel"]
+                if channel in self._active_shouter:
+                    self._active_shouter[channel].shout(message["data"])
+
+    @ErrorTraceback.w_check_error_exist
+    async def read_all_volatile_names(self) -> list:
+        """
+        Read all volatile parameter names.
+        """
+        return list(await self.redis.get_all_keys())
+
+    @ErrorTraceback.w_check_error_exist
+    async def set_volatile_value(self, key: Any, value: Type[REDIS_TYPE]):
+        """
+        Set the value of the volatile parameter.
+        """
+        await self.redis.set(key, value)
+
+
+    @ErrorTraceback.w_check_error_exist
+    def get_volatile_value(self, key: str) -> Any:
+        """
+        Get the value of the volatile parameter.
+        """
+        return self.redis.get(key)
+
+    @ErrorTraceback.w_check_error_exist
+    async def add_change_event(self, key: str):
+        """
+        Publish a change event for the volatile parameter. 
+        :param key: The key of the volatile parameter. Used to identify the parameter.
+        """
+        if not await self.redis.exists(key):
+            raise KeyError(f"Key '{key}' does not exist in the transient storage.")
+
+        get_type: REDIS_TYPE | None = await self.redis.get_type(key)
+
+        if get_type is None:
+            raise KeyError(f"Key '{key}' does not exist in the transient storage.")
+        
+        if get_type not in REDIS_TYPE_MAP:
+            raise ValueError(
+                f"Unsupported Redis type: {get_type}. "
+                f"Must be one of {list(REDIS_TYPE_MAP)}.")
+
+        speaker: VyraSpeaker = create_vyra_speaker(
+            name=self.EVENT_TOPIC_PREFIX + key,
+            type=REDIS_TYPE_MAP[get_type],
+            node=self.communication_node,
+            description="Volatile parameter changes: " + key,
+
+        )
+        self._active_shouter[key] = speaker
+        
+        await self.redis.subscribe_to_key(key)
+
+    @ErrorTraceback.w_check_error_exist
+    async def remove_change_event(self, key: str):
+        """
+        Remove the change event for the volatile parameter.
+        :param key: The key of the volatile parameter.
+        """
+        if await self.redis.exists(key):
+            await self.redis.unsubscribe_from_key(key)
+        else:
+            raise KeyError(f"Key '{key}' does not exist in the transient storage.")

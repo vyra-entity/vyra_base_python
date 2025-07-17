@@ -59,3 +59,13 @@ class VyraCallable:
         self.connected_callback = other.connected_callback or self.connected_callback
 
         return self
+    
+    def __del__(self):
+        """
+        Destructor to clean up the callable.
+        If the callable has a service server, it will be destroyed.
+        """
+        if self.service_server:
+            self.service_server.destroy_service()
+            self.service_server = None
+            print(f"VyraCallable '{self.name}' destroyed.")

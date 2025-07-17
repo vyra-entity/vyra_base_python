@@ -44,7 +44,8 @@ class BaseFeeder:
         self._doc: str = 'Abstract class for all feeder classes.'
         self._level: int = logging.DEBUG
 
-        self._handler: list[Type[CommunicationHandler]] = []
+        self._handler_classes: list[Type[CommunicationHandler]] = []  # Store handler classes
+        self._handler: list[Type[CommunicationHandler]] = []  # Store handler instances
         self._feeder: logging.Logger
         self._loggingOn: bool  # If true, the feeder will log messages in the base logger
         self._node: VyraNode
@@ -75,13 +76,13 @@ class BaseFeeder:
 
         self.create_feeder()
 
-        for handler_class in self._handler:
+        for handler_class in self._handler_classes:
             if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
                 raise TypeError("Handler class must be a subclass of CommunicationHandler")
 
             handler = handler_class(
                 initiator=self._feederName,
-                publisher=speaker.publisher_server,
+                speaker=speaker,
                 type=speaker.publisher_server.publisher_info.type
             )
             self.add_handler(handler)
@@ -131,5 +132,19 @@ class BaseFeeder:
             return False
         
         self._feeder.addHandler(handler)
+        self._handler.append(handler)  # Store the instance
 
         return True
+
+    def add_handler_class(self, handler_class: Type[CommunicationHandler]) -> None:
+        """
+        Add a handler class to the feeder.
+
+        :param handler_class: The handler class to add.
+        :type handler_class: Type[CommunicationHandler]
+        :raises TypeError: If handler_class is not a subclass of CommunicationHandler.
+        """
+        if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
+            raise TypeError("Handler class must be a subclass of CommunicationHandler")
+        if handler_class not in self._handler_classes:
+            self._handler_classes.append(handler_class)

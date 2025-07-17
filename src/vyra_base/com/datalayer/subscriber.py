@@ -78,6 +78,17 @@ class VyraSubscription:
             self.callback,
             self._subscription_info.qos_profile
         )
+    
+    def remove_subscription(self) -> None:
+        """
+        Remove the subscription from the ROS2 node.
+
+        This method will destroy the subscription if it exists.
+        """
+        if self._subscription_info.subscription:
+            self._node.destroy_subscription(self._subscription_info.subscription)
+            self._subscription_info.subscription = None
+            self._node.get_logger().info(f"Subscription '{self._subscription_info.name}' removed.")
 
     def callback(self, msg) -> None:
         """

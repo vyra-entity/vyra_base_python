@@ -28,7 +28,7 @@ from vyra_base.defaults.entries import (
 from vyra_base.helper.logger import Logger
 from vyra_base.state.state_machine import StateMachine
 from vyra_base.storage.storage import Storage
-from vyra_base.core.params import Param
+from vyra_base.core.parameter import Param
 
 class VyraEntity:
     """

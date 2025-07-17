@@ -97,6 +97,17 @@ class VyraServiceServer:
             f"type {self.service_info.type} and "
             f"callback {callback}.")
 
+    def destroy_service(self) -> None:
+        """
+        Destroy the service in the ROS2 node.
+
+        This method will remove the service if it exists.
+        """
+        if self.service_info.service:
+            self._node.destroy_service(self.service_info.service)
+            self.service_info.service = None
+            self._node.get_logger().info(f"Service '{self.service_info.name}' destroyed.")
+
     async def callback(self, request, response) -> None:
         """
         Handle incoming service requests.

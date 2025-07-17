@@ -126,4 +126,17 @@ class VyraPublisher:
             self.publisher_info.periodic_caller.caller = None
             self.publisher_info.periodic_caller.timer = None
 
+    def destroy(self) -> None:
+        """
+        Destroy the publisher and clean up resources.
+
+        This method should be called to properly shut down the publisher.
+        """
+        if self.publisher_info.publisher is not None:
+            self._node.get_logger().info(f"Destroying publisher: {self.publisher_info.name}")
+            self._node.destroy_publisher(self.publisher_info.publisher)
+            self.publisher_info.publisher = None
+        else:
+            self._node.get_logger().warning(f"Publisher {self.publisher_info.name} already destroyed or not created.")
+
 # EOF

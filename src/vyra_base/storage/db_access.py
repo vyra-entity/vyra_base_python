@@ -25,27 +25,39 @@ class DBSTATUS(str, Enum):
     NOT_AUTHORIZED = "not_authorized"
     CONFLICT = "conflict"
 
+
+class DBTYPE(str, Enum):
+    SQLITE = "sqlite"
+    MYSQL = "mysql"
+    POSTGRESQL = "postgresql"
+
+
 class DBMESSAGE:
     DEFAULT_ERROR = 'Something went wrong while processing the query. See the details.'
+
 
 class DbAccess(Storage):
     """Baseclass for database access."""
 
-    def __init__(self, module_name: str, db_config_path: str = None, db_config: dict = None):
+    def __init__(self, module_name: str, db_config_path: str = None, 
+                 db_config: dict = None, db_type: DBTYPE = DBTYPE.SQLITE) -> None:
         """
         Initialize database object.
 
         :param module_name: The id of the V.Y.R.A. module.
         :type module_name: str
-        :param db_config_path: Path to the ini file of your sqlalchemy config. Defaults to WORKING_PATH+PATH_DB_CONFIG.
+        :param db_config_path: Path to the ini file of your sqlalchemy config. 
+                               Defaults to WORKING_PATH+PATH_DB_CONFIG.
         :type db_config_path: str, optional
         :param db_config: Dictionary with database configuration.
         :type db_config: dict, optional
-        :raises ValueError: If neither db_config_path nor db_config is provided, or if db_config is not a dict.
+        :raises ValueError: If neither db_config_path nor db_config is provided, 
+                            or if db_config is not a dict.
         """
-        try:
-            self.module_name = module_name
 
+        self.module_name = module_name
+
+        try:
             if db_config_path is not None and db_config is None:
                 self._config = configparser.ConfigParser()
                 self._config.read(db_config_path)
@@ -54,22 +66,24 @@ class DbAccess(Storage):
 
                 if not isinstance(db_config, dict):
                     raise ValueError("db_config must be a dictionary.")
-                
-                if 'sqlite' not in db_config:
-                    Logger.error(f"Currently only 'sqlite' is implemented: {db_config}")
-                    raise ValueError(
-                        "Currently only 'sqlite' is implemented."
-                        "Please use sqlite in your db_config.")
 
                 self._config = db_config
             else:
                 raise ValueError("Either db_config_path or db_config must be provided.")
             
-            self._user: str|None = os.environ.get("USER")
-            self._path = self._config['sqlite']['path']
+
+            if db_type not in DBTYPE:
+                raise ValueError(f"Unsupported database type: {db_type}. Supported types: {list(DBTYPE)}")
+            
+            self.db_type = db_type
+            self._user: str | None = os.environ.get("USER")
+            self._path: str | None = self._config[self.db_type]['path']
+            self._port: str | None = self._config[self.db_type].get('port', None)
+            self._host: str | None = self._config[self.db_type].get('host', None)
+            
             self._path = self._path.replace("${user}", str(self._user))
 
-            self._database = self._config['sqlite']['database']
+            self._database = self._config[self.db_type]['database']
             self._database = self._database.replace("${module_name}", self.module_name)
 
             if not self._path.endswith('/'):
@@ -77,16 +91,38 @@ class DbAccess(Storage):
 
             Path(self._path).mkdir(parents=True, exist_ok=True)
 
-            self.db_engine: AsyncEngine = create_async_engine(
-                f"sqlite+aiosqlite:///{self._path}{self._database}",
-                echo=True,
-            )
+            self.db_engine: AsyncEngine = self._build_engine()
 
             Logger.debug(f"Database config: {self._config}")
             Logger.add_external('sqlalchemy.engine')
 
         finally:
             ErrorTraceback.check_error_exist()
+
+    def _build_engine(self) -> AsyncEngine:
+        """
+        Build the database engine based on the configuration.
+
+        :returns: An instance of AsyncEngine.
+        :rtype: AsyncEngine
+        """
+        if self.db_type == DBTYPE.SQLITE:
+            return create_async_engine(
+                f"sqlite+aiosqlite:///{self._path}{self._database}",
+                echo=True,
+            )
+        elif self.db_type == DBTYPE.MYSQL:
+            return create_async_engine(
+                f"mysql+aiomysql://{self._user}@{self._host}:{self._port}/{self._database}",
+                echo=True,
+            )
+        elif self.db_type == DBTYPE.POSTGRESQL:
+            return create_async_engine(
+                f"postgresql+asyncpg://{self._user}@{self._host}:{self._port}/{self._database}",
+                echo=True,
+            )
+        else:
+            raise ValueError(f"Unsupported database type: {self.db_type}")
 
     def session(self) -> Union[sessionmaker, async_sessionmaker]:
         """
