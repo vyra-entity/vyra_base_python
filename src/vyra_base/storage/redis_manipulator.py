@@ -254,7 +254,7 @@ class RedisManipulator:
         :param callback: The callback function to call when the key changes.
         :type callback: Callable
         """
-        await self.pubsub.subscribe(**{key: callback})
+        await self.pubsub.subscribe()
 
     async def unsubscribe_from_key(self, key: str) -> None:
         """

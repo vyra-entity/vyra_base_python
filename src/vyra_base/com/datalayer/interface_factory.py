@@ -329,7 +329,7 @@ def create_vyra_speaker(
     
     return vyra_speaker
 
-def remove_vyra_speaker(name: str) -> None:
+def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:
     """
     Remove a V.Y.R.A. speaker by name.
 
@@ -337,12 +337,16 @@ def remove_vyra_speaker(name: str) -> None:
     :type name: str
     :return: None
     """
-    speaker_obj = DataSpace.get_speaker(name)
+    if speaker is None and name == "":
+        raise ValueError("Either name or speaker must be provided.")
     
-    DataSpace.kill(speaker_obj)
+    if speaker is None:
+        speaker = DataSpace.get_speaker(name)
+
+    DataSpace.kill(speaker)
     Logger.info(f"Speaker '{name}' removed from DataSpace.")
 
-def remove_vyra_callable(name: str) -> None:
+def remove_vyra_callable(name: str, callable: VyraCallable = None) -> None:
     """
     Remove a V.Y.R.A. callable by name.
 
@@ -350,12 +354,16 @@ def remove_vyra_callable(name: str) -> None:
     :type name: str
     :return: None
     """
-    callable_obj = DataSpace.get_callable(name)
+    if callable is None and name == "":
+        raise ValueError("Either name or callable must be provided.")
     
-    DataSpace.kill(callable_obj)
+    if callable is None:
+        callable = DataSpace.get_callable(name)
+    
+    DataSpace.kill(callable)
     Logger.info(f"Callable '{name}' removed from DataSpace.")
 
-def remove_vyra_job(name: str) -> None:
+def remove_vyra_job(name: str, job: VyraJob = None) -> None:
     """
     Remove a V.Y.R.A. job by name.
 
@@ -363,9 +371,13 @@ def remove_vyra_job(name: str) -> None:
     :type name: str
     :return: None
     """
-    job_obj = DataSpace.get_job(name)
+    if job is None and name == "":
+        raise ValueError("Either name or job must be provided.")
     
-    DataSpace.kill(job_obj)
+    if job is None:
+        job = DataSpace.get_job(name)
+
+    DataSpace.kill(job)
     Logger.info(f"Job '{name}' removed from DataSpace.")
 
 def remote_callable(func):

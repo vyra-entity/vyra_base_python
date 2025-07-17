@@ -9,6 +9,7 @@ from vyra_base.storage.redis_access import RedisAccess
 from vyra_base.storage.redis_manipulator import RedisManipulator
 from vyra_base.storage.redis_manipulator import REDIS_TYPE
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
+from vyra_base.com.datalayer.interface_factory import remove_vyra_speaker
 
 from vyra_base.interfaces.msg.VolatileList import VolatileList
 from vyra_base.interfaces.msg.VolatileSet import VolatileSet
@@ -50,20 +51,19 @@ class Volatile:
             storage_access_transient, module_id)
         self._active_shouter: dict[str, VyraSpeaker] = {}
         self._listener: asyncio.Task | None = None
-        self._listener_active: bool = False
 
     def __del__(self):
         """
         Clean up the Volatile instance.
         This will unsubscribe from all active shouters and stop the listener if active.
         """
-        if self._listener_active and self._listener:
+        if self._listener:
             self._listener.cancel()
             self._listener = None
 
         for key, speaker in self._active_shouter.items():
-            asyncio.run(speaker.unsubscribe_from_key(key))
-        
+            remove_vyra_speaker(key)
+
         self._active_shouter.clear()
 
     async def activate_listener(self):
