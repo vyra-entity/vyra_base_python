@@ -27,8 +27,14 @@ from vyra_base.defaults.entries import (
 )
 from vyra_base.helper.logger import Logger
 from vyra_base.state.state_machine import StateMachine
+from vyra_base.storage.db_access import DbAccess
+from vyra_base.storage.db_access import DBTYPE
+from vyra_base.storage.redis_access import RedisAccess
 from vyra_base.storage.storage import Storage
-from vyra_base.core.parameter import Param
+from vyra_base.core.parameter import Parameter
+from vyra_base.core.volatile import Volatile
+from vyra_base.helper.error_handler import ErrorTraceback
+
 
 class VyraEntity:
     """
@@ -60,12 +66,14 @@ class VyraEntity:
     _interface_list: list[FunctionConfigEntry] = []
     _storage_list: list[Storage] = []
 
+    @ErrorTraceback.w_check_error_exist
     def __init__(
             self, 
             state_entry: StateEntry,
             news_entry: NewsEntry,
             error_entry: ErrorEntry,
-            module_config: ModuleEntry) -> None:
+            module_entry: ModuleEntry,
+            module_config: dict[str, Any]) -> None:
         """
         Initialize the VyraEntity.
 
@@ -75,24 +83,30 @@ class VyraEntity:
         :type news_entry: NewsEntry
         :param error_entry: Error entry configuration.
         :type error_entry: ErrorEntry
-        :param module_config: Module configuration.
-        :type module_config: ModuleEntry
+        :param module_entry: Module entry configuration.
+        :type module_entry: ModuleEntry
+        :param module_config: Module configuration. Containing settings that are used during runtime. 
+                              For example simulation settings, livecycle settings
+        :type module_config: dict[str, Any]
+        :raises TypeError: If the provided entries are not of the correct type.
+        :raises ValueError: If the module entry is not valid.
         :raises RuntimeError: If the node name is already available in the ROS2 system.
         """
         self._init_logger()
 
         self._register_remote_callables()
 
-        if VyraEntity._check_node_availability(module_config.name):
+        if VyraEntity._check_node_availability(module_entry.name):
             raise RuntimeError(
-                f"Node {module_config.name} is available in the ROS2 system."
+                f"Node {module_entry.name} is available in the ROS2 system."
                 " Please choose a different name."
             )
 
-        self.module_config: ModuleEntry = module_config
+        self.module_entry: ModuleEntry = module_entry
+        self.module_config: dict[str, Any] = module_config
 
         node_settings = NodeSettings(
-            name=f"{self.module_config.name}"
+            name=f"{self.module_entry.name}"
         )
 
         self._node = VyraNode(node_settings)
@@ -100,8 +114,6 @@ class VyraEntity:
         self.__init_feeders(state_entry, news_entry, error_entry)
 
         self._init_state_machine(state_entry)
-
-        self._init_params()
 
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
@@ -142,52 +154,82 @@ class VyraEntity:
         self.state_feeder = StateFeeder(
             type=state_entry._type, 
             node=self._node, 
-            module_config=self.module_config
+            module_config=self.module_entry
         )
 
         self.news_feeder = NewsFeeder(
             type=news_entry._type, 
             node=self._node,
-            module_config=self.module_config,
+            module_config=self.module_entry,
             loggingOn=True
         )
         
         self.error_feeder = ErrorFeeder(
             type=error_entry._type, 
             node=self._node,
-            module_config=self.module_config,
+            module_config=self.module_entry,
             loggingOn=True
         )
 
-    def _init_storages(self) -> None:
+    def _init_storages_accesses(
+            self, persistent_config: dict[str, Any], 
+            transient_config: dict[str, Any]) -> None:
         """
         Initialize storages for the entity.
 
         This method sets up the storage access for the entity, including persistent and transient storage.
         It should be called during the initialization of the entity.
         """
-        self.database_access = Storage(
-            storage_type="database",
-            name=f"{self.module_config.name}_db"
-        )
-        
-        self.redis_access = Storage(
-            storage_type="redis",
-            name=f"{self.module_config.name}_redis"
+        self.database_access = DbAccess(
+            module_name=self.module_entry.name,
+            db_config=persistent_config
         )
 
-    def _init_params(self) -> None:
+        self.redis_access = RedisAccess(
+            module_name=self.module_entry.name,
+            redis_config=transient_config,
+        )
+
+    def _init_params(self, default_config: Any) -> None:
         """
         Initialize parameters for the entity.
 
         This method should be implemented to set up initial parameters.
         It is called during the initialization of the entity.
+        :param default_config: Configuration for the database containing default parameters.
+        :type default_config: Any
         """
         Logger.debug("Initializing parameters for the entity.")
         
-        self.param_manager = Param(
+        self.param_manager = Parameter(
             storage_access_persistant=self.database_access,
             storage_access_transient=self.redis_access
+        )
+
+        self.default_database_access = DbAccess(
+            module_name=self.module_entry.name,
+            db_config=default_config
+        )
+
+        self.param_manager.load_defaults(self.default_database_access)
+
+    def _init_volatiles(self, transient_base_types: dict[str, Any]) -> None:
+        """
+        Initialize volatile parameters for the entity.
+
+        This method sets up the volatile parameters using Redis for transient storage.
+        It should be called during the initialization of the entity.
+        
+        :param transient_base_types: Dictionary containing base types for volatile parameters.
+        :type transient_base_types: dict[str, Any]
+        """
+        Logger.debug("Initializing volatile parameters for the entity.")
+        
+        self.volatile = Volatile(
+            storage_access_transient=self.redis_access,
+            module_id=self.module_entry.uuid,
+            node=self._node,
+            transient_base_types=transient_base_types
         )
 
     def _register_remote_callables(self):
@@ -221,9 +263,64 @@ class VyraEntity:
         self.state_machine = StateMachine(
             self.state_feeder,
             state_entry._type,
-            module_config=self.module_config
+            module_config=self.module_entry
         )
         self.state_machine.initialize()
+
+    def setup_storage(
+            self, config: dict[str, Any], 
+            transient_base_types: dict[str, Any]) -> None:
+        """
+        Set up the storage for the entity.
+
+        This method initializes the storage access for the entity, including persistent and transient storage.
+        It should be called during the initialization of the entity.
+        
+        :param config: Optional configuration for the storage setup.
+        :type config: dict[str, Any]
+        :param transient_base_types: Dictionary containing base types for transient storage. 
+                                     Must be defined in the vyra module interfaces.
+        :type transient_base_types: dict[str, Any]
+        :raises ValueError: If the configuration is invalid or incomplete.
+        :raises RuntimeError: If the storage setup fails.
+        :returns: None
+        """
+        if not isinstance(config, dict) or config == {}:
+            Logger.warn("No storage configuration provided. Skipping storage setup.")
+            return
+
+        persistent_config: dict[str, Any] = {}
+        transient_config: dict[str, Any] = {}
+
+        for config_key in config.keys():
+            if config_key in (item.value for item in DBTYPE):
+                Logger.debug(f"Configuring {config_key} for persistent storage.")
+                persistent_config[config_key] = config[config_key]
+            elif config_key == "redis":
+                Logger.debug(f"Configuring {config_key} for transient storage.")
+                transient_config[config_key] = config[config_key]
+
+        if not persistent_config or not transient_config:
+            Logger.warn("Incomplete storage configuration provided. Skipping storage setup.")
+            raise ValueError(
+                "Both persistent and transient storage configurations must be provided."
+            )
+
+        self._init_storages_accesses(
+            persistent_config=persistent_config,
+            transient_config=transient_config
+        )
+
+        if 'default_database' not in config:
+            Logger.warn("No default database configuration provided. Skipping parameter initialization.")
+            return
+        else:
+            config['database'] = config['default_database']
+            self._init_params(config)
+
+        self._init_volatiles(transient_base_types=transient_base_types)
+
+        Logger.log("Storage access initialized.")
 
     def register_remote_callable(self, callable_obj: Union[Callable, list]) -> None:
         """
@@ -388,6 +485,44 @@ class VyraEntity:
 
         self.news_feeder.feed(
             f"Transition {request.trigger_name} triggered successfully."
+        )
+
+    @remote_callable
+    async def startup(self, request: Any, response: Any) -> None:
+        """
+        Start up the entity and initialize its components.
+
+        :param request: The request object containing startup parameters.
+        :type request: Any
+        :param response: The response object to update with the result.
+        :type response: Any
+        :raises NotImplementedError: If the method is not implemented in the subclass.
+        :returns: None
+        :rtype: None
+        """
+        
+        can_trigger, possible_trigger = self.state_machine.is_transition_possible(
+            'StartUp')
+
+        if not can_trigger:
+            fail_msg = (
+                f"<StartUp> not possible in "
+                f"current state {self.state_machine.model.state}."
+                f" Possible transitions are: {possible_trigger}."
+            )
+            
+            response.success = False
+            response.message = fail_msg
+            Logger.warn(fail_msg)
+            return None
+        
+        getattr(self.state_machine.model, f"StartUp")()
+
+        response.success = True
+        response.message = f"<StartUp> triggered successfully."
+
+        self.news_feeder.feed(
+            f"<StartUp> triggered successfully."
         )
     
     @remote_callable

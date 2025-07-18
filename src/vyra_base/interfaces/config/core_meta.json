@@ -48,5 +48,33 @@
             "visible": true,
             "published": false
         }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "startup",
+        "displayname": "Start Up",
+        "description": "Start up the vyra system.",
+        "filetype": "srv/StartUp.srv",
+        "params": [],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
     }
 ]

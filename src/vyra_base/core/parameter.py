@@ -3,7 +3,7 @@
 from typing import Any
 
 
-class Param:
+class Parameter:
     """
     Managing module parameters.
     """
@@ -17,10 +17,10 @@ class Param:
 
         :param storage_access: An object that provides access to the storage system.
         """
-        self.storage_access = storage_access_persistant
+        self.storage_access_persistant = storage_access_persistant
         self.storage_access_transient: Any|None = storage_access_transient
 
-    def init_params(self, parameter_names: dict[str, Any]) -> None:
+    def load_defaults(self, storage_access_default: Any) -> None:
         """
         Initialize parameters. Load default parameters if they does not exist. 
         Also add them to the transient storage.

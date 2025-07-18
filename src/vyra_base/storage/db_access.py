@@ -72,7 +72,7 @@ class DbAccess(Storage):
                 raise ValueError("Either db_config_path or db_config must be provided.")
             
 
-            if db_type not in DBTYPE:
+            if db_type not in (item.value for item in DBTYPE):
                 raise ValueError(f"Unsupported database type: {db_type}. Supported types: {list(DBTYPE)}")
             
             self.db_type = db_type

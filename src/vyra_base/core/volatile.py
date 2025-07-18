@@ -1,4 +1,5 @@
 import asyncio
+from csv import Error
 from typing import Any, Type
 from uuid import UUID
 
@@ -10,19 +11,6 @@ from vyra_base.storage.redis_manipulator import RedisManipulator
 from vyra_base.storage.redis_manipulator import REDIS_TYPE
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.interface_factory import remove_vyra_speaker
-
-from vyra_base.interfaces.msg.VolatileList import VolatileList
-from vyra_base.interfaces.msg.VolatileSet import VolatileSet
-from vyra_base.interfaces.msg.VolatileHash import VolatileHash
-from vyra_base.interfaces.msg.VolatileString import VolatileString
-
-
-REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
-    REDIS_TYPE.STRING: VolatileString,
-    REDIS_TYPE.HASH: VolatileHash,
-    REDIS_TYPE.LIST: VolatileList,
-    REDIS_TYPE.SET: VolatileSet
-}
 
 
 class Volatile:
@@ -41,16 +29,27 @@ class Volatile:
             self, 
             storage_access_transient: RedisAccess, 
             module_id: UUID,
-            node: VyraNode):
+            node: VyraNode,
+            transient_base_types: dict[str, Any]):
         """
         Initialize the Volatile class.
         """
         self.module_id = module_id
         self.communication_node = node
+
+        self.REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
+            REDIS_TYPE.STRING: transient_base_types['VolatileString'],
+            REDIS_TYPE.HASH: transient_base_types['VolatileHash'],
+            REDIS_TYPE.LIST: transient_base_types['VolatileList'],
+            REDIS_TYPE.SET: transient_base_types['VolatileSet']
+        }
+        
         self.redis: RedisManipulator = RedisManipulator(
             storage_access_transient, module_id)
         self._active_shouter: dict[str, VyraSpeaker] = {}
         self._listener: asyncio.Task | None = None
+
+
 
     def __del__(self):
         """
@@ -66,6 +65,7 @@ class Volatile:
 
         self._active_shouter.clear()
 
+    @ErrorTraceback.w_check_error_exist
     async def activate_listener(self):
         """
         Activate the listener for transient events.
@@ -75,8 +75,8 @@ class Volatile:
         # Start listening for transient events
         self._listener = asyncio.create_task(
             self.transient_event_listener())
-        
-
+    
+    @ErrorTraceback.w_check_error_exist
     async def transient_event_listener(self):
         self._listener_active = True
         async for message in self.redis.pubsub.listen():
@@ -120,15 +120,15 @@ class Volatile:
 
         if get_type is None:
             raise KeyError(f"Key '{key}' does not exist in the transient storage.")
-        
-        if get_type not in REDIS_TYPE_MAP:
+
+        if get_type not in self.REDIS_TYPE_MAP:
             raise ValueError(
                 f"Unsupported Redis type: {get_type}. "
-                f"Must be one of {list(REDIS_TYPE_MAP)}.")
+                f"Must be one of {list(self.REDIS_TYPE_MAP)}.")
 
         speaker: VyraSpeaker = create_vyra_speaker(
             name=self.EVENT_TOPIC_PREFIX + key,
-            type=REDIS_TYPE_MAP[get_type],
+            type=self.REDIS_TYPE_MAP[get_type],
             node=self.communication_node,
             description="Volatile parameter changes: " + key,
 

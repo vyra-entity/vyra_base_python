@@ -1,4 +1,3 @@
-from cairo import Path
 from vyra_base.storage.db_access import DBTYPE
 from vyra_base.storage.storage import Storage
 from vyra_base.helper.error_handler import ErrorTraceback
@@ -11,7 +10,9 @@ class RedisAccess(Storage):
 
     @ErrorTraceback.w_check_error_exist
     def __init__(
-            self, module_name: str, redis_config_path: str = None, 
+            self, 
+            module_name: str,
+            redis_config_path: str = None,
             redis_config: dict = None) -> None:
 
         self.module_name = module_name
@@ -33,7 +34,7 @@ class RedisAccess(Storage):
             raise ValueError("redis_config must contain a 'redis' section.")
         
         self._host: str | None = self._config['redis'].get('host', 'localhost')
-        self._port: int | None = self._config['redis'].getint('port', 6379)
+        self._port: int | None = int(self._config['redis'].get('port', '6379'))
         self._requirepass: str | None = self._config['redis'].get('requirepass', None)
         self._logfile: str | None = self._config['redis'].get('logfile', None)
         self._maxmemory: str | None = self._config['redis'].get('maxmemory', None)
