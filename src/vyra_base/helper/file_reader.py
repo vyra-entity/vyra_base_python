@@ -39,13 +39,13 @@ class FileReader:
         try:
             lock = await get_lock_for_file(config_file)
             async with lock:
-                async with AsyncPath(str(config_file)).open(mode='r', 
+                async with await AsyncPath(str(config_file)).open(mode='r', 
                                                 encoding='utf-8') as file:
                     json_content = json.loads(await file.read())
                     if json_content:
                         return json_content
                     else:
-                        async with AsyncPath(str(config_default)) \
+                        async with await AsyncPath(str(config_default)) \
                                     .open(mode='r', encoding='utf-8-sig') as file:
                             await AsyncPath(str(config_file)).write_text(str(file))
                         return json.loads(await file.read())
@@ -83,13 +83,13 @@ class FileReader:
         try:  
             lock = await get_lock_for_file(config_file)
             async with lock:
-                async with AsyncPath(str(config_file)) \
+                async with await AsyncPath(str(config_file)) \
                             .open(mode='r', encoding='utf-8') as file:
                     content = await file.read()
                     if content:
                         return content
                     else:
-                        async with AsyncPath(str(config_default)) \
+                        async with await AsyncPath(str(config_default)) \
                                     .open(mode='r', encoding='utf-8-sig') as file:
                             await AsyncPath(str(config_file)).write_text(str(file))
                         return await file.read()
@@ -171,7 +171,7 @@ class FileReader:
             lock: Lock = await get_lock_for_file(config_file)
             async with lock:
                 toml_content: dict = {}
-                async with AsyncPath(config_file) \
+                async with await AsyncPath(config_file) \
                             .open(mode='r', encoding='utf-8-sig') as file:
                     raw_content = await file.read()
                     

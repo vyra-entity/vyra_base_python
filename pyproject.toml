@@ -18,7 +18,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10, <4"
+python = ">=3.12, <4"
 aiopath = "^0.6.0"
 asyncua = "^1.1.5"
 SQLAlchemy = "^2.0.41"
@@ -26,7 +26,6 @@ transitions = "^0.9.2"
 python-dotenv = "^1.0.0"
 tomli = "^2.0.1"
 redis-om = "^0.3.0"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.0"

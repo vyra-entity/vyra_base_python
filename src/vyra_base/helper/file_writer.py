@@ -26,37 +26,39 @@ class FileWriter:
         try:
             lock = await get_lock_for_file(file)
             async with lock:
-                async with AsyncPath(file).open(mode='w') as writer:
+                async with await AsyncPath(file).open(mode='w') as writer:
                     await writer.write(json.dumps(file_content, indent=4))
                     return True
             release_lock_for_file(file)
         except (IOError, UnicodeDecodeError, json.decoder.JSONDecodeError, 
                  TypeError, FileNotFoundError) as error:
-            if error == IOError():
+            if isinstance(error, IOError):
                 raise IOError('An unexpected io error occured!')
-            if error == UnicodeDecodeError('', b'', 0, 0, ''):
-                raise UnicodeDecodeError('A decoding error occured!', writer, 0, 0, '')
-            if error == json.decoder.JSONDecodeError('', '', 0):
+            if isinstance(error, UnicodeDecodeError):
+                raise UnicodeDecodeError('A decoding error occured!', b'', 0, 0, '')
+            if isinstance(error, json.decoder.JSONDecodeError):
                 raise json.decoder.JSONDecodeError('JSON decoding error:', '', 0)
-            if error == TypeError():
+            if isinstance(error, TypeError):
                 raise TypeError("An unexpected type error uccured!")
-            if error == FileNotFoundError():
+            if isinstance(error, FileNotFoundError):
                 raise FileNotFoundError("File not found error!")
         return False
             
     @classmethod
-    async def write_binary_file(cls, content: str) -> bool:
+    async def write_binary_file(cls, file: Path, content: bytes) -> bool:
         """
         Writes binary content to a file.
 
-        :param content: The content to write.
-        :type content: str
+        :param file: The path to the file to write.
+        :type file: Path
+        :param content: The binary content to write.
+        :type content: bytes
         :returns: True if writing finished successfully, else False.
         :rtype: bool
         """
         try:
-            async with AsyncPath(content).open(mode='wb') as binary_file:
-                await binary_file.write(binary_file)
+            async with await AsyncPath(file).open(mode='wb') as binary_file:
+                await binary_file.write(content)
                 return True 
         except (FileNotFoundError, IOError):  
             if FileNotFoundError:

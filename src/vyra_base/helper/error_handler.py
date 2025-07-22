@@ -51,7 +51,7 @@ class ErrorTraceback:
         :rtype: callable
         """
         if iscoroutinefunction(func):
-            async def sync_wrapper(*args, **kwargs):
+            async def async_wrapper(*args, **kwargs):
                 """
                 Wrapper for asynchronous functions.
 
@@ -64,9 +64,9 @@ class ErrorTraceback:
                 finally:
                     ErrorTraceback.check_error_exist()
 
-            return sync_wrapper
+            return async_wrapper
         else:
-            def async_wrapper(*args, **kwargs):
+            def sync_wrapper(*args, **kwargs):
                 """
                 Wrapper for synchronous functions.
 
@@ -79,4 +79,4 @@ class ErrorTraceback:
                 finally:
                     ErrorTraceback.check_error_exist()
 
-            return async_wrapper
+            return sync_wrapper
