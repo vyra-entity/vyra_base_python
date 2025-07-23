@@ -171,7 +171,7 @@ class VyraEntity:
             loggingOn=True
         )
 
-    def _init_storages_accesses(
+    async def _init_storages_accesses(
             self, persistent_config: dict[str, Any], 
             transient_config: dict[str, Any]) -> None:
         """
@@ -189,6 +189,8 @@ class VyraEntity:
             module_name=self.module_entry.name,
             redis_config=transient_config,
         )
+
+        await self.redis_access.configure_base_settings()
 
     def _init_params(self, default_config: Any) -> None:
         """
@@ -267,7 +269,7 @@ class VyraEntity:
         )
         self.state_machine.initialize()
 
-    def setup_storage(
+    async def setup_storage(
             self, config: dict[str, Any], 
             transient_base_types: dict[str, Any]) -> None:
         """
@@ -306,7 +308,7 @@ class VyraEntity:
                 "Both persistent and transient storage configurations must be provided."
             )
 
-        self._init_storages_accesses(
+        await self._init_storages_accesses(
             persistent_config=persistent_config,
             transient_config=transient_config
         )

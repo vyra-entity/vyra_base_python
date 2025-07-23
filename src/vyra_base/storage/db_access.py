@@ -106,6 +106,11 @@ class DbAccess(Storage):
         :returns: An instance of AsyncEngine.
         :rtype: AsyncEngine
         """
+        Logger.info("Building database engine: "
+                    f"\nType: {self.db_type}\nName: {self._database}\n"
+                    f"Path: {self._path}\nHost: {self._host}\n"
+                    f"Port: {self._port}")
+
         if self.db_type == DBTYPE.SQLITE:
             return create_async_engine(
                 f"sqlite+aiosqlite:///{self._path}{self._database}",
