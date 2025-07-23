@@ -66,12 +66,12 @@ class DBReturnValue:
         return self
 
 
-class DBTableManipulator:
+class DbManipulator:
     """Datatable class manipulator"""
 
     @ErrorTraceback.w_check_error_exist
     def __init__(
-            self, db_access: DbAccess, model: Type[Base], module_id: str):
+            self, db_access: DbAccess, model: Type[Base]):
         """
         Initialize datatable.
 
@@ -92,7 +92,6 @@ class DBTableManipulator:
             )
 
         self._db = db_access
-        self.module_id = module_id
         self.model = model
         self.table_name = model.__tablename__
 

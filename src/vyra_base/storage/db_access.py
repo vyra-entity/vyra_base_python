@@ -93,7 +93,6 @@ class DbAccess(Storage):
 
             self.db_engine: AsyncEngine = self._build_engine()
 
-            Logger.debug(f"Database config: {self._config}")
             Logger.add_external('sqlalchemy.engine')
 
         finally:
@@ -159,7 +158,6 @@ class DbAccess(Storage):
                     LogEntry(f'Successfully created all defined tables', mode=LogMode.INFO))
 
             return DBSTATUS.SUCCESS
-
         finally:
             if ErrorTraceback.check_error_exist():
                 return DBSTATUS.ERROR
