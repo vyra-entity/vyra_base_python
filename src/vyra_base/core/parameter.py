@@ -1,5 +1,6 @@
 
 
+import re
 from typing import Any
 import uuid
 
@@ -34,66 +35,109 @@ class Parameter:
 
         self.storage_access_transient: Any|None = storage_access_transient
 
-    async def load_defaults(self, storage_access_default: DbAccess) -> None:
+    async def load_defaults(
+            self, 
+            storage_access_default: DbAccess, 
+            override_exist: bool=False) -> bool:
         """
         Initialize parameters. Load default parameters if they does not exist. 
         Also add them to the transient storage.
         This method should be implemented to set up initial parameters.
+        :param storage_access_default: The database access object for default parameters.
+        :param override_exist: If True, existing parameters will be overridden with defaults.
+        :return: None
+        :raises ValueError: If the storage_access_default is not of type DbAccess.
         """
+
+        if not isinstance(storage_access_default, DbAccess):
+            raise ValueError("Invalid storage_access_default. Must be of type DbAccess.")
 
         default_manipulator = DbManipulator(
             storage_access_default, 
             DbParameter
         )
-        all_params: DBReturnValue = await self.persistant_manipulator.get_all()
-        if all_params.status == DBSTATUS.NOT_FOUND:
-            all_default: DBReturnValue = await default_manipulator.get_all()
-            if not isinstance(all_default.value, dict):
-                Logger.warn(
-                    "Default parameters are not a dictionary. "
-                    "Cannot load defaults. "
-                    "Check the default parameters in the database."
-                )
-                return
+        all_return: DBReturnValue = await self.persistant_manipulator.get_all()
 
-            for name, param in all_default.value.items():
-                param_obj: dict[str, Any] = DbParameter(
-                    name=name,
-                    value=param["value"],
-                    type=param["type"],
-                    visible=param["visible"],
-                    editable=param["editable"],
-                    displayname=param["displayname"],
-                    description=param["description"]
-                ).__dict__
-                await default_manipulator.add(param_obj)
+        if not isinstance(all_return.value, list):
+            raise ValueError("all_params.value must be a list.")
+        
+        all_params: list[dict] = [default_manipulator.to_dict(p) for p in all_return.value]
 
+        all_default_return: DBReturnValue = await default_manipulator.get_all()
 
-    def get_param(self, key: str) -> Any:
+        if not isinstance(all_default_return.value, list):
+            raise ValueError("all_default.value must be a list.")
+        
+        all_default: list[dict] = [
+            default_manipulator.to_dict(p) for p in all_default_return.value
+        ]
+
+        param_name_list: list[str] = [n["name"] for n in all_params]
+
+        for default_item in all_default:
+            if default_item["name"] not in param_name_list:
+                Logger.info("Loading default parameter "
+                            f"'{default_item['name']}: {default_item['value']}'")
+
+                param_obj: dict[str, Any] = {
+                    key: default_item[key] for key in default_item if key != "id"
+                }
+                await self.persistant_manipulator.add(param_obj)
+            elif override_exist:
+                Logger.info("Overriding existing parameter "
+                            f"'{default_item['name']}: {default_item['value']}'")
+
+                param_obj: dict[str, Any] = {
+                    key: default_item[key] for key in default_item if key != "id"
+                }
+
+                await self.persistant_manipulator.update(param_obj)
+
+        return True
+
+    async def get_param(self, key: str) -> DBReturnValue:
         """
         Get a parameter value by its key.
 
         :param key: The key of the parameter to retrieve.
         :return: The value of the parameter.
         """
-        pass
+        ret_obj: DBReturnValue = await self.persistant_manipulator.get_all(
+            filters={"name": key})
+        
+        if not isinstance(ret_obj.value, list):
+            raise ValueError("ret_obj.value must be a list.")
+        
+        ret_obj.value = self.persistant_manipulator.to_dict(ret_obj.value[0])
+        
+        return ret_obj
 
-    def set_param(self, key: str, value: Any) -> None:
+    async def set_param(self, key: str, value: Any) -> DBReturnValue:
         """
         Set a parameter value by its key.
 
         :param key: The key of the parameter to set.
         :param value: The value to set for the parameter.
         """
-        pass
+        param_obj = {
+            "value": value
+        }
+        return await self.persistant_manipulator.update(
+            param_obj, filters={"name": key})
 
-    def read_all_params(self) -> dict[str, Any]:
+    async def read_all_params(self) -> DBReturnValue:
         """
         Read all parameters.
 
         :return: A dictionary containing all parameters.
         """
-        pass
+        ret_obj: DBReturnValue = await self.persistant_manipulator.get_all()
+        if not isinstance(ret_obj.value, list):
+            raise ValueError("ret_obj.value must be a list.")
+
+        ret_obj.value = [self.persistant_manipulator.to_dict(p) for p in ret_obj.value]
+
+        return ret_obj
 
     def get_param_change_event_topic(self) -> str:
         """
@@ -101,4 +145,4 @@ class Parameter:
 
         :return: The topic for parameter change events.
         """
-        pass
+        return ""

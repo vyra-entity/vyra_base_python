@@ -245,7 +245,7 @@ class DbManipulator:
 
     async def update(self, data: dict, filters: Union[dict, None]=None) -> DBReturnValue:
         """
-        Add new entry to datatable of database on the bottom.
+        Update a line in a datatable of database by given data.
 
         If the table config has a field 'max_lines' and the number of lines are greater than this field,
         the lowest 'id' value will be deleted and the new entry will be added by a incremented 'id' value.

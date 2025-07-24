@@ -106,8 +106,8 @@ class DbAccess(Storage):
         :rtype: AsyncEngine
         """
         Logger.info("Building database engine: "
-                    f"\nType: {self.db_type}\nName: {self._database}\n"
-                    f"Path: {self._path}\nHost: {self._host}\n"
+                    f"Type: {self.db_type}\nName: {self._database}"
+                    f"Path: {self._path}\nHost: {self._host}"
                     f"Port: {self._port}")
 
         if self.db_type == DBTYPE.SQLITE:

@@ -192,7 +192,7 @@ class VyraEntity:
 
         await self.redis_access.configure_base_settings()
 
-    def _init_params(self, default_config: Any) -> None:
+    async def _init_params(self, default_config: Any) -> None:
         """
         Initialize parameters for the entity.
 
@@ -213,7 +213,7 @@ class VyraEntity:
             db_config=default_config
         )
 
-        self.param_manager.load_defaults(self.default_database_access)
+        await self.param_manager.load_defaults(self.default_database_access)
 
     def _init_volatiles(self, transient_base_types: dict[str, Any]) -> None:
         """
@@ -303,7 +303,9 @@ class VyraEntity:
                 transient_config[config_key] = config[config_key]
 
         if not persistent_config or not transient_config:
-            Logger.warn("Incomplete storage configuration provided. Skipping storage setup.")
+            Logger.warn(
+                "Incomplete storage configuration provided. "
+                "Skipping storage setup.")
             raise ValueError(
                 "Both persistent and transient storage configurations must be provided."
             )
@@ -313,12 +315,16 @@ class VyraEntity:
             transient_config=transient_config
         )
 
-        if 'default_database' not in config:
-            Logger.warn("No default database configuration provided. Skipping parameter initialization.")
+        if 'default_database' not in persistent_config[self.database_access.db_type]:
+            Logger.warn(
+                "No default database configuration provided. "
+                "Skipping parameter initialization.")
             return
         else:
-            config['database'] = config['default_database']
-            self._init_params(config)
+            dtype = self.database_access.db_type
+            persistent_config[dtype]['database'] = persistent_config[dtype]['default_database']
+            
+            await self._init_params(persistent_config)
 
         self._init_volatiles(transient_base_types=transient_base_types)
 
