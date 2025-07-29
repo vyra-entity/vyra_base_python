@@ -45,22 +45,24 @@ class BaseFeeder:
         self._level: int = logging.DEBUG
 
         self._handler_classes: list[Type[CommunicationHandler]] = []  # Store handler classes
-        self._handler: list[Type[CommunicationHandler]] = []  # Store handler instances
+        self._handler: list[Type[CommunicationHandler] | CommunicationHandler] = []  # Store handler instances
         self._feeder: logging.Logger
         self._loggingOn: bool  # If true, the feeder will log messages in the base logger
         self._node: VyraNode
         self._type: Any
+        self._speaker: VyraSpeaker
 
     def create(self, loggingOn: bool = False) -> None:
         """
         Create the feeder and its communication handlers.
-
+        :raises FeederException: If the speaker could not be created.
+        :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
         :param loggingOn: If True, enables logging in the base logger.
         :type loggingOn: bool
         :raises FeederException: If the speaker could not be created.
         :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
         """
-        speaker: VyraSpeaker = create_vyra_speaker(
+        self._speaker: VyraSpeaker = create_vyra_speaker(
             name=self._feederName,
             node=self._node,
             type=self._type,
@@ -69,7 +71,7 @@ class BaseFeeder:
         )
         self._loggingOn: bool = loggingOn
 
-        if speaker.publisher_server is None:
+        if self._speaker.publisher_server is None:
             raise FeederException(
                 f"Could not create speaker for {self._feederName} with type {type}."
             )        
@@ -82,8 +84,8 @@ class BaseFeeder:
 
             handler = handler_class(
                 initiator=self._feederName,
-                speaker=speaker,
-                type=speaker.publisher_server.publisher_info.type
+                speaker=self._speaker,
+                type=self._speaker.publisher_server.publisher_info.type
             )
             self.add_handler(handler)
 

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Union
 
 from vyra_base.com.datalayer.service_server import VyraServiceServer
+from vyra_base.helper.logger import Logger
 
 @dataclass
 class VyraCallable:
@@ -68,4 +69,3 @@ class VyraCallable:
         if self.service_server:
             self.service_server.destroy_service()
             self.service_server = None
-            print(f"VyraCallable '{self.name}' destroyed.")

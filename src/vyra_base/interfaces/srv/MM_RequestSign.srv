@@ -1,0 +1,23 @@
+# MM_SignRequest.srv
+
+# Request
+string module_name
+unique_identifier_msgs/UUID module_id
+string certificate_file
+string permission_file
+---
+# Response
+uint8 access_status
+string signed_certificate
+string signed_permission
+
+# This service is used to sign a request for module access, providing the necessary
+# module name, ID, and files for the certificate and permissions. The response includes
+# the access status and the signed certificate and permission files.
+
+# Access Status Codes:
+# 0 - ACCESS_GRANTED
+# 1 - NOT_ALLOWED
+# 2 - MISSING_ACCESS_PARAMETERS
+# 3 - INTERNAL_ERROR
+# 4 - FRAUD_SUSPICION

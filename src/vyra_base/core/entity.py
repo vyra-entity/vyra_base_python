@@ -128,6 +128,18 @@ class VyraEntity:
         if not hasattr(self, '_node'):
             return None
         return self._node
+    
+    @property
+    def namespace(self) -> str:
+        """
+        Get the namespace of the ROS2 node.
+
+        :returns: The namespace of the node.
+        :rtype: str
+        """
+        if not hasattr(self, '_node'):
+            return ''
+        return self._node.get_namespace()
 
     def _init_logger(self) -> None:
         """
@@ -184,6 +196,8 @@ class VyraEntity:
             module_name=self.module_entry.name,
             db_config=persistent_config
         )
+
+        await self.database_access.create_all_tables()
 
         self.redis_access = RedisAccess(
             module_name=self.module_entry.name,

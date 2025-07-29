@@ -1,5 +1,7 @@
 from typing import Any
 
+from vyra_base.helper.logger import Logger
+
 class VyraJob:
     """
     Represents a job in the data layer.
@@ -33,3 +35,15 @@ class VyraJob:
         self.last_return = other.last_return or self.last_return
 
         return self
+    
+    def __del__(self):
+        """
+        Destructor to clean up the job.
+        If the job has a service server, it will be destroyed.
+        """
+        Logger.log(f"<NOT IMPLEMENTED> VyraJob '{self.name}' destroyed.")
+        pass
+        # if hasattr(self, 'service_server') and self.service_server:
+        #     self.service_server.destroy_service()
+        #     self.service_server = None
+        #     Logger.log(f"VyraJob '{self.name}' destroyed.")

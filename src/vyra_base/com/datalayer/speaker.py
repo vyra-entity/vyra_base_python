@@ -37,7 +37,6 @@ class VyraSpeaker:
         if self.publisher_server:
             self.publisher_server.destroy()
             self.publisher_server = None
-            Logger.info(f"VyraSpeaker '{self.name}' destroyed.")
 
     def merge(self, other: VyraSpeaker) -> VyraSpeaker:
         """

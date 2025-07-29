@@ -4,11 +4,13 @@ import re
 from typing import Any
 import uuid
 
+from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.helper.logger import Logger
 from vyra_base.storage.db_access import DbAccess
 from vyra_base.storage.redis_access import RedisAccess
 from vyra_base.storage.db_access import DBSTATUS
 from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
+
 from vyra_base.storage.redis_manipulator import RedisManipulator
 from vyra_base.storage.tb_params import Parameter as DbParameter
 
@@ -35,6 +37,7 @@ class Parameter:
 
         self.storage_access_transient: Any|None = storage_access_transient
 
+    @ErrorTraceback.w_check_error_exist
     async def load_defaults(
             self, 
             storage_access_default: DbAccess, 
@@ -56,6 +59,11 @@ class Parameter:
             storage_access_default, 
             DbParameter
         )
+
+        if not await storage_access_default.check_table_exists(DbParameter):
+            Logger.warn(f"Table '{DbParameter.__tablename__}' does not exist in the default database.")
+            return False
+        
         all_return: DBReturnValue = await self.persistant_manipulator.get_all()
 
         if not isinstance(all_return.value, list):

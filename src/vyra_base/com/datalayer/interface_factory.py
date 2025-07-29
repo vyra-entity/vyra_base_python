@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from csv import Error
 import stat
 from ast import Call
 from functools import wraps
@@ -19,7 +20,7 @@ from vyra_base.com.datalayer.service_server import ServiceInfo, VyraServiceServe
 from vyra_base.com.datalayer.speaker import VyraSpeaker
 from vyra_base.com.datalayer.subscriber import VyraSubscription
 from vyra_base.helper.logger import Logger
-
+from vyra_base.helper.error_handler import ErrorTraceback
 
 class DataSpace:
     """
@@ -107,28 +108,33 @@ class DataSpace:
         """
         Add a speaker object to the DataSpace.
 
-        If a speaker with the same publisher name already exists, merges the new object with the existing one.
+        If a speaker with the same publisher name already exists, 
+        merges the new object with the existing one.
 
         :param obj: The V.Y.R.A. speaker to add or merge.
         :type obj: VyraSpeaker
         :return: The added or merged VyraSpeaker object.
         :rtype: VyraSpeaker
         """
-        try:
-            if obj.publisher_server != None:
-                obj_name: str = obj.name
 
-            index = next(
-                (i for i, ele in enumerate(cls.speakers) if 
-                 ele.publisher_server != None and 
-                 obj.publisher_server != None and
-                 ele.publisher_server.publisher_info.name == obj_name),
-                -1
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.speakers) if 
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.log(
+                f"{cls}Merging existing speaker {obj.name}<->"
+                f"{cls.speakers[index].name}."
             )
+            if obj.publisher_server is None:
+                Logger.warn(
+                    f"Speaker {obj.name} has no publisher server. "
+                    "It will still be added to the DataSpace."
+                )
 
             return cls.speakers[index].merge(obj)
-        except IndexError:
-            index = -1
+        else:
+            Logger.log(f"{cls}Adding new speaker {obj.name}.")
             cls.speakers.append(obj)
             return obj
     
@@ -144,16 +150,27 @@ class DataSpace:
         :return: The added or merged VyraJob object.
         :rtype: VyraJob
         """
-        try:
-            index = next(
-                (i for i, ele in enumerate(cls.jobs) if ele.name == obj.name),
-                -1
+        # if obj.service_server is None:
+        #     Logger.warn(
+        #         f"Job {obj.name} has no service server. "
+        #         "It will still be added to the DataSpace."
+        #     )
+        
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.jobs) if 
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.log(
+                f"{cls}Merging existing job {obj.name}<->"
+                f"{cls.jobs[index].name}."
             )
             return cls.jobs[index].merge(obj)
-        except ValueError:
-            index = -1
+        else:
+            Logger.log(f"{cls}Adding new job {obj.name}.")
             cls.jobs.append(obj)
             return obj
+
     
     @classmethod
     def add_callable(cls, obj: VyraCallable) -> VyraCallable:
@@ -167,16 +184,105 @@ class DataSpace:
         :return: The added or merged VyraCallable object.
         :rtype: VyraCallable
         """
-        index = next(
-            (i for i, ele in enumerate(cls.callables) if ele.name == obj.name),
-            -1
-        )
+
         
-        if index == -1:
+        
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.callables) if 
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.log(
+                f"{cls}Merging existing callable {obj.name}<->"
+                f"{cls.callables[index].name}."
+            )
+
+            if obj.service_server is None:
+                Logger.warn(
+                    f"Callable {obj.name} has no service server. "
+                    "It will still be added to the DataSpace."
+                )
+
+            return cls.callables[index].merge(obj)
+        else:
+            Logger.log(f"{cls}Adding new callable {obj.name}.")
             cls.callables.append(obj)
             return obj
-        return cls.callables[index].merge(obj)
+
+
+@ErrorTraceback.w_check_error_exist
+def create_vyra_speaker(
+        name: str, 
+        type: Any, 
+        node: VyraNode,
+        description: str,
+        periodic: bool = False,
+        interval_time: Union[float, None] = None,
+        periodic_caller: Union[Callable, None] = None,
+        qos_profile: Union[int, QoSProfile] = 10,
+        async_loop = None
+        ) -> VyraSpeaker:
+    """
+    Create a speaker for a V.Y.R.A. service.
+
+    A speaker is a publisher that sends messages to a topic and is used to publish simple data types to other V.Y.R.A. OS modules.
+
+    :param name: Name of the speaker.
+    :type name: str
+    :param type: The ROS2 message datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param description: Description of the speaker.
+    :type description: str
+    :param periodic: Whether the speaker should publish periodically.
+    :type periodic: bool
+    :param interval_time: Interval time for periodic publishing.
+    :type interval_time: float or None
+    :param periodic_caller: Callable for periodic publishing.
+    :type periodic_caller: Callable or None
+    :param qos_profile: Quality of Service profile.
+    :type qos_profile: int or QoSProfile
+    :param async_loop: Optional event loop for asynchronous execution.
+    :type async_loop: Any
+    :return: The created VyraSpeaker object.
+    :rtype: VyraSpeaker
+    """
+
+    publisher = PublisherInfo(
+        name=name,
+        type=type
+    )
+
+    if periodic and periodic_caller is not None:
+        publisher.periodic_caller = PeriodicCaller(
+            interval_time=interval_time,
+            caller=periodic_caller,
+        )
     
+    if qos_profile is not None:
+        publisher.qos_profile = qos_profile
+
+    publisher_server = VyraPublisher(
+        publisherInfo=publisher,
+        node=node
+    )
+
+    publisher_server.create_publisher()
+
+    vyra_speaker: VyraSpeaker = VyraSpeaker(
+        name=name,
+        type=type,
+        description=description,
+        publisher_server=publisher_server,
+    )
+
+    vyra_speaker: VyraSpeaker = DataSpace.add_speaker(vyra_speaker)
+
+    Logger.log(f'VyraSpeaker created: {name}')
+    return vyra_speaker
+
+@ErrorTraceback.w_check_error_exist
 def create_vyra_callable(
         name: str, 
         type: Any, 
@@ -221,6 +327,7 @@ def create_vyra_callable(
         description="A callable for the V.Y.R.A. Operating System.",
         service_server=server
     )
+    Logger.log(f"DEBUG: SERVICE SERVER: {vyra_callable.service_server}")
     vyra_callable: VyraCallable = DataSpace.add_callable(vyra_callable)
 
     if callback is not None:
@@ -236,8 +343,11 @@ def create_vyra_callable(
 
     server.create_service(vyra_callable.connected_callback)
 
+    Logger.log(f'VyraCallable created: {name}')
+
     return vyra_callable
 
+@ErrorTraceback.w_check_error_exist
 def create_vyra_job(
         name: str, 
         type: Any,
@@ -259,76 +369,7 @@ def create_vyra_job(
     """
     pass
 
-def create_vyra_speaker(
-        name: str, 
-        type: Any, 
-        node: VyraNode,
-        description: str,
-        periodic: bool = False,
-        interval_time: Union[float, None] = None,
-        periodic_caller: Union[Callable, None] = None,
-        qos_profile: Union[int, QoSProfile] = 10,
-        async_loop = None
-        ) -> VyraSpeaker:
-    """
-    Create a speaker for a V.Y.R.A. service.
-
-    A speaker is a publisher that sends messages to a topic and is used to publish simple data types to other V.Y.R.A. OS modules.
-
-    :param name: Name of the speaker.
-    :type name: str
-    :param type: The ROS2 message datatype definition.
-    :type type: Any
-    :param node: The ROS2 node definition.
-    :type node: VyraNode
-    :param description: Description of the speaker.
-    :type description: str
-    :param periodic: Whether the speaker should publish periodically.
-    :type periodic: bool
-    :param interval_time: Interval time for periodic publishing.
-    :type interval_time: float or None
-    :param periodic_caller: Callable for periodic publishing.
-    :type periodic_caller: Callable or None
-    :param qos_profile: Quality of Service profile.
-    :type qos_profile: int or QoSProfile
-    :param async_loop: Optional event loop for asynchronous execution.
-    :type async_loop: Any
-    :return: The created VyraSpeaker object.
-    :rtype: VyraSpeaker
-    """
-    
-    publisher = PublisherInfo(
-        name=name,
-        type=type
-    )
-
-    if periodic and periodic_caller is not None:
-        publisher.periodic_caller = PeriodicCaller(
-            interval_time=interval_time,
-            caller=periodic_caller,
-        )
-    
-    if qos_profile is not None:
-        publisher.qos_profile = qos_profile
-
-    publisher_server = VyraPublisher(
-        publisherInfo=publisher,
-        node=node
-    )
-
-    publisher_server.create_publisher()
-
-    vyra_speaker: VyraSpeaker = VyraSpeaker(
-        name=name,
-        type=type,
-        description=description,
-        publisher_server=publisher_server,
-    )
-
-    vyra_speaker: VyraSpeaker = DataSpace.add_speaker(vyra_speaker)
-    
-    return vyra_speaker
-
+@ErrorTraceback.w_check_error_exist
 def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:
     """
     Remove a V.Y.R.A. speaker by name.
@@ -344,8 +385,9 @@ def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:
         speaker = DataSpace.get_speaker(name)
 
     DataSpace.kill(speaker)
-    Logger.info(f"Speaker '{name}' removed from DataSpace.")
+    Logger.info(f"VyraSpeaker removed: {name}")
 
+@ErrorTraceback.w_check_error_exist
 def remove_vyra_callable(name: str, callable: VyraCallable = None) -> None:
     """
     Remove a V.Y.R.A. callable by name.
@@ -361,8 +403,9 @@ def remove_vyra_callable(name: str, callable: VyraCallable = None) -> None:
         callable = DataSpace.get_callable(name)
     
     DataSpace.kill(callable)
-    Logger.info(f"Callable '{name}' removed from DataSpace.")
+    Logger.info(f"VyraCallable removed: {name}")
 
+@ErrorTraceback.w_check_error_exist
 def remove_vyra_job(name: str, job: VyraJob = None) -> None:
     """
     Remove a V.Y.R.A. job by name.
@@ -378,8 +421,9 @@ def remove_vyra_job(name: str, job: VyraJob = None) -> None:
         job = DataSpace.get_job(name)
 
     DataSpace.kill(job)
-    Logger.info(f"Job '{name}' removed from DataSpace.")
+    Logger.info(f"VyraJob removed: {name}")
 
+@ErrorTraceback.w_check_error_exist
 def remote_callable(func):
     """
     Decorator to register a function or method as a V.Y.R.A. callable.

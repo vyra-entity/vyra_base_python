@@ -3,13 +3,26 @@ import os
 
 from enum import Enum
 from pathlib import Path
-from typing import Union
+from typing import Type, Union, Any
 
-from sqlalchemy import inspect, MetaData, Table
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy import (
+    inspect, 
+    MetaData, 
+    Table
+)
+from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine, 
+    async_sessionmaker, 
+    create_async_engine
+)
 from sqlalchemy.orm import sessionmaker
 
-from vyra_base.helper.logger import Logger, LogEntry, LogMode
+from vyra_base.helper.logger import (
+    Logger, 
+    LogEntry, 
+    LogMode
+)
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.storage.storage import Storage
 from vyra_base.storage.tb_base import Base
@@ -232,3 +245,26 @@ class DbAccess(Storage):
         finally:
             if ErrorTraceback.check_error_exist():
                 return DBSTATUS.ERROR
+                return DBSTATUS.ERROR
+            
+    async def check_table_exists(self, table: Type[Base]) -> bool:
+        """
+        Check if a table exists in the database.
+
+        :param table: Table class (SQLAlchemy declarative base).
+        :type table: Base
+        :returns: True if the table exists, False otherwise.
+        :rtype: bool
+        """
+        try:
+            table_name = table.__tablename__
+
+            async with self.db_engine.connect() as conn:
+                tables = await conn.run_sync(
+                    lambda sync_conn: inspect(sync_conn).get_table_names()
+                )
+            return table_name in tables
+
+        finally:
+            if ErrorTraceback.check_error_exist():
+                return False

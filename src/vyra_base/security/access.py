@@ -1,6 +1,6 @@
 from enum import Enum
 import uuid
-from typing import Union
+from typing import Any, Literal, LiteralString, Union
 
 from vyra_base.helper.logger import Logger
 from vyra_base.security.trust import (
@@ -14,13 +14,18 @@ class ACCESS_STATUS(Enum, int):
     """
     Enum for access levels.
     """
-    NOT_ALLOWED = 0
-    ACCESS_GRANTED = 1
+    ACCESS_GRANTED = 0
+    NOT_ALLOWED = 1
     MISSING_ACCESS_PARAMETERS = 2
     INTERNAL_ERROR = 3
 
-    def __repr__(self):
-        pass
+    def __repr__(self) -> LiteralString:
+        return (
+            "Access granted and allowed(0), "
+            "Access not allowed(1), "
+            "Access not allowed due to missing parameters(2), "
+            "Access not allowed due to internal error(3)"
+        )
 
 class ACCESS_LEVEL(Enum, int):
     """
@@ -73,34 +78,34 @@ class AccessManager:
 
         if not self._check_certificate_signature(certificate):
             Logger.error(f"Invalid certificate signature for module {module_id}.")
-            return ACCESS_STATUS.NOT_ALLOWED.value()
+            return ACCESS_STATUS.NOT_ALLOWED.value
 
         func = None
-        args = []
+        args: list[Any] = []
 
         match ACCESS_LEVEL(requested_level):
             case ACCESS_LEVEL.READ_ONLY:
                 Logger.info(f"Read-only access granted for module {module_id}.")
-                return ACCESS_STATUS.ACCESS_GRANTED.value()
+                return ACCESS_STATUS.ACCESS_GRANTED.value
             case ACCESS_LEVEL.EXTENDED_READ:
                 Logger.info(f"Extended read access granted for module {module_id}.")
-                return ACCESS_STATUS.ACCESS_GRANTED.value()
+                return ACCESS_STATUS.ACCESS_GRANTED.value
             case ACCESS_LEVEL.CONTROL_AND_PARAM:
                 Logger.info(f"Control and parameter access granted for module {module_id}.")
-                return ACCESS_STATUS.ACCESS_GRANTED.value()
+                return ACCESS_STATUS.ACCESS_GRANTED.value
             case ACCESS_LEVEL.EXTENDED_CONTROL:
                 if level_4_psw is None:
                     Logger.error("Level 4 password required for extended control access.")
-                    return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value()
+                    return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value
                 func = self._verify_extended_control
                 args = [level_4_psw]
             case ACCESS_LEVEL.FULL_ACCESS:
                 if level_4_psw is None:
                     Logger.error("Level 4 password required for extended control access.")
-                    return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value()
+                    return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value
                 if level_5_passkey is None:
                     Logger.error("Level 5 passkey required for extended control access.")
-                    return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value()
+                    return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value
                 func = self._verify_full_access
                 args = [level_4_psw, level_5_passkey]
                 Logger.info(f"Full access granted for module {module_id}.")
@@ -112,19 +117,19 @@ class AccessManager:
             if func(*args):
                 if self.tlm.check_trust_access(module_id) != TRUST_STATUS.SUCCEED:
                     Logger.error(f"Access denied for module {module_id}.")
-                    return ACCESS_STATUS.NOT_ALLOWED.value()
+                    return ACCESS_STATUS.NOT_ALLOWED.value
                 Logger.info(
                     f"Access granted for module {module_id} "
                     f"with level {requested_level}.")
-                return ACCESS_STATUS.ACCESS_GRANTED.value()
+                return ACCESS_STATUS.ACCESS_GRANTED.value
             else:
                 Logger.error(
                     f"Access denied for module {module_id} "
                     f"with level {requested_level}.")
-                return ACCESS_STATUS.NOT_ALLOWED.value()
+                return ACCESS_STATUS.NOT_ALLOWED.value
         except Exception as e:
             Logger.error(f"Error occurred while verifying access for module {module_id}: {e}")
-            return ACCESS_STATUS.INTERNAL_ERROR.value()
+            return ACCESS_STATUS.INTERNAL_ERROR.value
 
     def _verify_extended_control(
             self, level_4_psw: str) -> bool:
