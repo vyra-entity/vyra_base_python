@@ -1,19 +1,26 @@
+import uuid
+
 from enum import Enum
 from pathlib import Path
 
 from vyra_base.helper.env_handler import EnvHandler
 from vyra_base.helper.logger import Logger
 from vyra_base.helper.uuid_generator import validate_module_id
-class TRUST_LEVEL(Enum, int):
+
+
+class TRUST_LEVEL(int, Enum):
     TRUST_NONE = 0
     TRUST_ONE_RESERVE = 1
     TRUST_ONE_RELATED = 2
     TRUST_ALL = 3
-    
-class TRUST_STATUS(Enum, int):
+
+
+class TRUST_STATUS(int, Enum):
     SUCCEED = 0
     FAILED = 1
-    UNKNOWN = 2
+    ALREADY_TRUSTED = 2
+    UNKNOWN = 3
+
 
 class TrustlevelManager:
     def __init__(self):
@@ -22,11 +29,15 @@ class TrustlevelManager:
         """
         self.level = 1
         self.ENV_PATH: Path = Path('.')
-        self.trusted_ids: list = []
-        self.related_ids: list[set] = []
+        self.trusted_ids: list[uuid.UUID] = []
+        # Change type annotation to list of tuples
+        self.related_ids: list[tuple[uuid.UUID, uuid.UUID]] = []
 
 
-    def check_trust_access(self, trust_id, related_ids: list = []) -> TRUST_STATUS:
+    def check_trust_access(
+            self, 
+            trust_id: uuid.UUID, 
+            related_ids: list[uuid.UUID] = []) -> TRUST_STATUS:
         """
         Check if the given id has access based on the trust level.
         
@@ -52,6 +63,7 @@ class TrustlevelManager:
                 if len(self.trusted_ids) < 1:
                     Logger.info(f"ID {trust_id} is added and trusted.")
                     self.trusted_ids.append(trust_id)
+                    return TRUST_STATUS.SUCCEED
                 else:
                     Logger.warn(f"Access denied, module already reserved.")
                     return TRUST_STATUS.FAILED
@@ -61,15 +73,18 @@ class TrustlevelManager:
                     trust_id not in self.trusted_ids):
                     Logger.warn(f"Access denied, module already reserved.")
                     return TRUST_STATUS.FAILED
+                
                 elif (len(self.trusted_ids) > 0 and 
                     trust_id in self.trusted_ids):
                     Logger.info(f"ID {trust_id} is already trusted.")
-                    
+                    return TRUST_STATUS.ALREADY_TRUSTED
+                
                 for related_id in related_ids:
                     if not self.verify_id(related_id):
                         Logger.warn(f"Related ID {related_id} is not valid, access denied.")
                         return TRUST_STATUS.FAILED
-                    if related_id not in self.related_ids:
+                    # Check for existence in list of tuples
+                    if (trust_id, related_id) not in self.related_ids:
                         Logger.info(f"Related ID {related_id} is added and trusted.")
                         self.related_ids.append((trust_id, related_id))
                     else:

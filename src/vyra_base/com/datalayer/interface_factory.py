@@ -1,24 +1,17 @@
 from __future__ import annotations
 
-from csv import Error
-import stat
-from ast import Call
 from functools import wraps
 from inspect import iscoroutinefunction
 from typing import Any, Callable, Union
 
 from rclpy.qos import QoSProfile
 
-from vyra_base.com.datalayer.action_client import VyraActionClient
-from vyra_base.com.datalayer.action_server import VyraActionServer
 from vyra_base.com.datalayer.callable import VyraCallable
 from vyra_base.com.datalayer.job import VyraJob
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.publisher import PeriodicCaller, PublisherInfo, VyraPublisher
-from vyra_base.com.datalayer.service_client import VyraServiceClient
 from vyra_base.com.datalayer.service_server import ServiceInfo, VyraServiceServer
 from vyra_base.com.datalayer.speaker import VyraSpeaker
-from vyra_base.com.datalayer.subscriber import VyraSubscription
 from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
@@ -139,6 +132,41 @@ class DataSpace:
             return obj
     
     @classmethod
+    def add_callable(cls, obj: VyraCallable) -> VyraCallable:
+        """
+        Add a callable object to the DataSpace.
+
+        If a callable with the same name already exists, merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. callable to add or merge.
+        :type obj: VyraCallable
+        :return: The added or merged VyraCallable object.
+        :rtype: VyraCallable
+        """
+        
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.callables) if 
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.log(
+                f"{cls}Merging existing callable {obj.name}<->"
+                f"{cls.callables[index].name}."
+            )
+
+            if obj.service_server is None:
+                Logger.warn(
+                    f"Callable {obj.name} has no service server. "
+                    "It will still be added to the DataSpace."
+                )
+
+            return cls.callables[index].merge(obj)
+        else:
+            Logger.log(f"{cls}Adding new callable {obj.name}.")
+            cls.callables.append(obj)
+            return obj
+    
+    @classmethod
     def add_job(cls, obj: VyraJob) -> VyraJob:
         """
         Add a job object to the DataSpace.
@@ -169,44 +197,6 @@ class DataSpace:
         else:
             Logger.log(f"{cls}Adding new job {obj.name}.")
             cls.jobs.append(obj)
-            return obj
-
-    
-    @classmethod
-    def add_callable(cls, obj: VyraCallable) -> VyraCallable:
-        """
-        Add a callable object to the DataSpace.
-
-        If a callable with the same name already exists, merges the new object with the existing one.
-
-        :param obj: The V.Y.R.A. callable to add or merge.
-        :type obj: VyraCallable
-        :return: The added or merged VyraCallable object.
-        :rtype: VyraCallable
-        """
-
-        
-        
-        index: int | None = next(
-            (i for i, ele in enumerate(cls.callables) if 
-                ele.name == obj.name), None
-        )
-        if index is not None:
-            Logger.log(
-                f"{cls}Merging existing callable {obj.name}<->"
-                f"{cls.callables[index].name}."
-            )
-
-            if obj.service_server is None:
-                Logger.warn(
-                    f"Callable {obj.name} has no service server. "
-                    "It will still be added to the DataSpace."
-                )
-
-            return cls.callables[index].merge(obj)
-        else:
-            Logger.log(f"{cls}Adding new callable {obj.name}.")
-            cls.callables.append(obj)
             return obj
 
 
@@ -338,10 +328,11 @@ def create_vyra_callable(
 
     if not vyra_callable.connected_callback:
         Logger.error(
-            f"Callable <{name}> has no callback function."
+            f"Callable <{name}> has no callback function. "
         )
         raise ValueError(
-            f"A callback function must be provided for the callable: {name}."
+            "A callback function must be provided before "
+            f"creation of the callable: {name}."
         )
 
     server.create_service(vyra_callable.connected_callback)

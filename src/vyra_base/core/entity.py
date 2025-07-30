@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Type, Union
 
 from vyra_base.com.datalayer.callable import VyraCallable
 from vyra_base.com.datalayer.interface_factory import (
@@ -95,8 +95,6 @@ class VyraEntity:
         """
         self._init_logger()
 
-        self._register_remote_callables()
-
         if VyraEntity._check_node_availability(module_entry.name):
             raise RuntimeError(
                 f"Node {module_entry.name} is available in the ROS2 system."
@@ -112,9 +110,17 @@ class VyraEntity:
 
         self._node = VyraNode(node_settings)
 
-        self.__init_feeders(state_entry, news_entry, error_entry)
+        feeder = self.__init_feeders(state_entry, news_entry, error_entry)
+        self.state_feeder: StateFeeder = feeder[0]
+        self.news_feeder: NewsFeeder = feeder[1]
+        self.error_feeder: ErrorFeeder = feeder[2]
 
-        self._init_state_machine(state_entry)
+        self.state_machine: StateMachine = self._init_state_machine(state_entry)
+
+        self.access_manager: AccessManager = self._init_security_access()
+
+        register_remote_callables(self)
+        register_remote_callables(self.access_manager)
 
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
@@ -157,32 +163,33 @@ class VyraEntity:
             self, 
             state_entry: StateEntry, 
             news_entry: NewsEntry, 
-            error_entry: ErrorEntry) -> None:
+            error_entry: ErrorEntry) -> tuple[StateFeeder, NewsFeeder, ErrorFeeder]:
         """
         Initialize the feeders for the entity.
 
         This method sets up the state, news, and error feeders for the entity.
         It should be called during the initialization of the entity.
         """
-        self.state_feeder = StateFeeder(
+        state_feeder = StateFeeder(
             type=state_entry._type, 
             node=self._node, 
             module_config=self.module_entry
         )
 
-        self.news_feeder = NewsFeeder(
+        news_feeder = NewsFeeder(
             type=news_entry._type, 
             node=self._node,
             module_config=self.module_entry,
             loggingOn=True
         )
         
-        self.error_feeder = ErrorFeeder(
+        error_feeder = ErrorFeeder(
             type=error_entry._type, 
             node=self._node,
             module_config=self.module_entry,
             loggingOn=True
         )
+        return state_feeder, news_feeder, error_feeder
 
     async def _init_storages_accesses(
             self, persistent_config: dict[str, Any], 
@@ -249,27 +256,7 @@ class VyraEntity:
             transient_base_types=transient_base_types
         )
 
-    def _register_remote_callables(self):
-        """
-        Registers all remote callables defined in the entity.
-
-        Iterates over all attributes of the instance and registers those
-        marked as remote callable with the DataSpace.
-        """
-        for attr_name in dir(self):
-            attr = getattr(self, attr_name)
-            if callable(attr) and getattr(attr, "_remote_callable", False):
-                callable_obj = VyraCallable(
-                    name=attr.__name__,
-                    connected_callback=attr
-                )
-                Logger.debug(
-                    f"Registering callable {callable_obj.name} from method {attr}")
-                DataSpace.add_callable(callable_obj)
-
-                setattr(attr, "_remote_callable", False)
-
-    def _init_state_machine(self, state_entry: StateEntry) -> None:
+    def _init_state_machine(self, state_entry: StateEntry) -> StateMachine:
         """
         Initialize the state machine for the entity.
 
@@ -279,12 +266,24 @@ class VyraEntity:
         :param state_entry: The state entry configuration.
         :type state_entry: StateEntry
         """
-        self.state_machine = StateMachine(
+        state_machine = StateMachine(
             self.state_feeder,
             state_entry._type,
             module_config=self.module_entry
         )
-        self.state_machine.initialize()
+        state_machine.initialize()
+        return state_machine
+
+    def _init_security_access(self) -> AccessManager:
+        """
+        Initialize the security access for the entity.
+
+        This method sets up the security access manager for the entity.
+        It should be called during the initialization of the entity.
+        """
+        Logger.debug("Initializing security access for the entity.")
+        
+        return AccessManager()
 
     async def setup_storage(
             self, config: dict[str, Any], 
@@ -347,37 +346,7 @@ class VyraEntity:
 
         Logger.log("Storage access initialized.")
 
-    def add_remote_callables(self, callable_obj: Union[Callable, list]) -> None:
-        """
-        Register a remote callable or a list of callables to the entity.
-
-        :param callable_obj: The callable or list of callables to register.
-        :type callable_obj: callable or list
-        :raises TypeError: If any element is not a callable function.
-        """
-        if not isinstance(callable_obj, list):
-            if not callable(callable_obj):
-                raise TypeError("callable_obj must be a callable or a list of callables.")
-            
-            callable_list = [callable_obj]
-
-        for callable_element in callable_list:
-            if not callable(callable_element):
-                raise TypeError(f"{callable_element} is not a callable function.")
-
-            # Wrap the callable with @remote_callable decorator
-            wrapped_callable = remote_callable(callable_element)
-
-            DataSpace.add_callable(
-                VyraCallable(
-                    name=wrapped_callable.__name__, 
-                    connected_callback=wrapped_callable
-                )
-            )
-        
-        self._register_remote_callables()
-
-    async def add_interface(
+    async def set_interfaces(
             self, 
             settings: list[FunctionConfigEntry],
             permission_xml: str=None) -> None:
@@ -591,3 +560,30 @@ class VyraEntity:
         :rtype: Any
         """
         pass
+
+
+def register_remote_callables(callable_owner: object):
+    """
+    Registers all remote callables defined in the entity.
+
+    Iterates over all attributes of the instance and registers those
+    marked as remote callable with the DataSpace.
+    :param callable_owner: The class or instance containing the remote callables.
+    :type callable_owner: Type[object]
+    """
+    for attr_name in dir(callable_owner):
+        attr = getattr(callable_owner, attr_name)
+        if callable(attr) and getattr(attr, "_remote_callable", False):
+            callable_obj = VyraCallable(
+                name=attr.__name__,
+                connected_callback=attr
+            )
+            Logger.debug(
+                f"Registering callable {callable_obj.name} from method {attr}")
+            DataSpace.add_callable(callable_obj)
+
+            # Set on the underlying function object
+            if hasattr(attr, "__func__"):
+                setattr(attr.__func__, "_remote_callable", False)
+            else:
+                setattr(attr, "_remote_callable", False)

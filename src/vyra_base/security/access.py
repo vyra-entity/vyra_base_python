@@ -9,8 +9,9 @@ from vyra_base.security.trust import (
     TRUST_STATUS
 )
 from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.helper.error_handler import ErrorTraceback
 
-class ACCESS_STATUS(Enum, int):
+class ACCESS_STATUS(int, Enum):
     """
     Enum for access levels.
     """
@@ -28,7 +29,8 @@ class ACCESS_STATUS(Enum, int):
             "Access not allowed due to internal error(3)"
         )
 
-class ACCESS_LEVEL(Enum, int):
+
+class ACCESS_LEVEL(int, Enum):
     """
     Enum for access levels.
     """
@@ -47,6 +49,7 @@ class ACCESS_LEVEL(Enum, int):
             return ACCESS_LEVEL(level)
         except ValueError:
             raise ValueError(f"Invalid access level: {level}")
+
 
 class AccessManager:
     """ 
@@ -142,14 +145,17 @@ class AccessManager:
                 f"for module {request.module_id}: {e}")
             return ACCESS_STATUS.INTERNAL_ERROR.value
 
+    @ErrorTraceback.w_check_error_exist
     def _verify_extended_control(
             self, level_4_psw: str) -> bool:
         pass
 
+    @ErrorTraceback.w_check_error_exist
     def _verify_full_access(
             self, level_4_psw: str, level_5_passkey: bytes) -> bool:
         pass
 
+    @ErrorTraceback.w_check_error_exist
     def _check_certificate_signature(self, certificate: str) -> bool:
         """
         Check the signature of the certificate.
