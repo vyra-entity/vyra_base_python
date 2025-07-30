@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Final, NamedTuple
+import uuid
 
 # Namespace to generate unique uuidv5 for a specific module id
-MODULE_ID_NAMESPACE = "8dfcec18-b48e-4fa4-bb11-21e3f324ca44"
+MODULE_ID_NAMESPACE: uuid.UUID = uuid.uuid5(uuid.NAMESPACE_DNS, "VYRA")
 
 class RequiredVersion(Enum):
     """

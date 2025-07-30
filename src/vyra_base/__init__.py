@@ -5,7 +5,7 @@ from pathlib import Path
 import vyra_base
 
 
-def extract_ros_interfaces(target_package_path):
+def extract_ros_interfaces(target_package_path: str):
     """
     Extract ROS2 interface files from the pip-installed library into a ROS2 package.
 
@@ -28,7 +28,7 @@ def extract_ros_interfaces(target_package_path):
     
     # Copy interface files from source to target
     print(f"Extracting ROS2 interfaces from {source_path} to {target_path}")
-    for interface_type in ['msg', 'srv', 'action', 'json']:
+    for interface_type in ['msg', 'srv', 'action']:
         source_dir: Path = source_path / interface_type
         target_dir: Path = target_path / interface_type
         
@@ -37,5 +37,16 @@ def extract_ros_interfaces(target_package_path):
             for file in source_dir.glob(f'*.{interface_type}'):
                 shutil.copy2(file, target_dir / file.name)
                 print(f"Copied {file.name} to {target_dir}")
+
+    config_path: Path = source_path / 'config'
+    target_config: Path = target_path / 'config'
+    
+    if not target_config.exists():
+        target_config.mkdir(parents=True, exist_ok=True)
+    
+    for type in ['json', 'yaml', 'xml']:
+        for file in config_path.glob(f'*.{type}'):
+            shutil.copy2(file, target_config)
+            print(f"Copied {file.name} to {target_config}")
 
     print(f"ROS2 interfaces extracted to {target_path} successfully.")

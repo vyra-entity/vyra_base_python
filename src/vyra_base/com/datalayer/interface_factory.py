@@ -337,8 +337,11 @@ def create_vyra_callable(
         vyra_callable.connected_callback = callback
 
     if not vyra_callable.connected_callback:
+        Logger.error(
+            f"Callable <{name}> has no callback function."
+        )
         raise ValueError(
-            "A callback function must be provided for the callable."
+            f"A callback function must be provided for the callable: {name}."
         )
 
     server.create_service(vyra_callable.connected_callback)
@@ -379,6 +382,9 @@ def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:
     :return: None
     """
     if speaker is None and name == "":
+        Logger.error(
+            "Either name or speaker must be provided."
+        )
         raise ValueError("Either name or speaker must be provided.")
     
     if speaker is None:
@@ -397,8 +403,9 @@ def remove_vyra_callable(name: str, callable: VyraCallable = None) -> None:
     :return: None
     """
     if callable is None and name == "":
-        raise ValueError("Either name or callable must be provided.")
-    
+        raise ValueError("Either name or callable must be " 
+                         f"provided for the callable: {name}.")
+
     if callable is None:
         callable = DataSpace.get_callable(name)
     
@@ -415,7 +422,8 @@ def remove_vyra_job(name: str, job: VyraJob = None) -> None:
     :return: None
     """
     if job is None and name == "":
-        raise ValueError("Either name or job must be provided.")
+        raise ValueError("Either name or job must be provided "
+                         f"for the job: {name}.")
     
     if job is None:
         job = DataSpace.get_job(name)
@@ -435,17 +443,22 @@ def remote_callable(func):
     """
     @wraps(func)
     async def async_wrapper(*args, **kwargs):
-        print(f"Calling function async: {func.__name__} with args: {args} and kwargs: {kwargs}")
+        Logger.debug(f"Calling function async: {func.__name__} "
+                     f"with args: {args} and kwargs: {kwargs}")
         result = await func(*args, **kwargs)
         return result
 
     @wraps(func)
     def sync_wrapper(*args, **kwargs):
-        print(f"Calling function: {func.__name__} with args: {args} and kwargs: {kwargs}")
+        Logger.debug(f"Calling function: {func.__name__} "
+                     f"with args: {args} and kwargs: {kwargs}")
         result = func(*args, **kwargs)
         return result
 
-    wrapper = async_wrapper if iscoroutinefunction(func) else sync_wrapper
+    if iscoroutinefunction(func):
+        wrapper = async_wrapper  
+    else:
+        wrapper = sync_wrapper
 
     # Registration is performed later in the instance
     setattr(wrapper, "_remote_callable", True)  # Mark that this method should be registered

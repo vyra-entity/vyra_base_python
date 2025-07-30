@@ -34,6 +34,7 @@ from vyra_base.storage.storage import Storage
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
 from vyra_base.helper.error_handler import ErrorTraceback
+from vyra_base.security.access import AccessManager
 
 
 class VyraEntity:
@@ -266,6 +267,8 @@ class VyraEntity:
                     f"Registering callable {callable_obj.name} from method {attr}")
                 DataSpace.add_callable(callable_obj)
 
+                setattr(attr, "_remote_callable", False)
+
     def _init_state_machine(self, state_entry: StateEntry) -> None:
         """
         Initialize the state machine for the entity.
@@ -344,7 +347,7 @@ class VyraEntity:
 
         Logger.log("Storage access initialized.")
 
-    def register_remote_callable(self, callable_obj: Union[Callable, list]) -> None:
+    def add_remote_callables(self, callable_obj: Union[Callable, list]) -> None:
         """
         Register a remote callable or a list of callables to the entity.
 
@@ -364,7 +367,6 @@ class VyraEntity:
 
             # Wrap the callable with @remote_callable decorator
             wrapped_callable = remote_callable(callable_element)
-            Logger.debug(f"Registering remote callable: {wrapped_callable.__name__}")
 
             DataSpace.add_callable(
                 VyraCallable(
@@ -372,8 +374,13 @@ class VyraEntity:
                     connected_callback=wrapped_callable
                 )
             )
+        
+        self._register_remote_callables()
 
-    async def add_interface(self, settings: list[FunctionConfigEntry]) -> None:
+    async def add_interface(
+            self, 
+            settings: list[FunctionConfigEntry],
+            permission_xml: str=None) -> None:
         """
         Add a DDS communication interface to this module.
 
@@ -386,14 +393,29 @@ class VyraEntity:
 
         :param settings: Settings for the module functions.
         :type settings: list[FunctionConfigEntry]
+        :param permission_file: Path to the permission file for the interface.
+        :type permission_file: str
         :returns: None
         :rtype: None
         """
-        self._interface_list = settings
+
+        if not permission_xml:
+            Logger.warn(
+                "No permission XML provided. "
+                "Skipping interface creation."
+            )
 
         async_loop = asyncio.get_event_loop()
 
         for setting in settings:
+            if setting.functionname in [i.functionname for i in self._interface_list]:
+                Logger.warn(
+                    f"Interface {setting.functionname} already "
+                    "exists. Skipping creation.")
+                continue
+            
+            self._interface_list.append(setting)
+
             if setting.type == FunctionConfigBaseTypes.callable.value:
                 Logger.info(f"Creating callable: {setting.functionname}")
                 create_vyra_callable(
@@ -432,6 +454,15 @@ class VyraEntity:
                     qos_profile=setting.qosprofile,
                     async_loop=async_loop
                 )
+            else:
+                fail_msg = (
+                    f"Unsupported interface type: {setting.type}. "
+                    "Supported types are callable, job, speaker."
+                )
+                Logger.error(fail_msg)
+                raise ValueError(fail_msg)
+        
+            
 
     def register_storage(self, storage: Storage) -> None:
         """

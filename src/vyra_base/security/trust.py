@@ -20,22 +20,11 @@ class TrustlevelManager:
         """
         Initialize the TrustlevelManager class.
         """
-        self.level = self.get_level()
+        self.level = 1
         self.ENV_PATH: Path = Path('.')
         self.trusted_ids: list = []
         self.related_ids: list[set] = []
 
-    def get_level(self) -> TRUST_LEVEL:
-        """
-        Reads the trust level from a ENV file.
-        """
-        eh = EnvHandler()
-        eh.load_env()
-
-        if 'TRUST_LEVEL' not in eh.env.keys():
-            raise ValueError("TRUST_LEVEL not found in environment variables.")
-        
-        return TRUST_LEVEL(eh.env["TRUST_LEVEL"])
 
     def check_trust_access(self, trust_id, related_ids: list = []) -> TRUST_STATUS:
         """
@@ -92,18 +81,21 @@ class TrustlevelManager:
             case _:
                 Logger.warn(f"Unknown trust level {self.level}")
                 return TRUST_STATUS.UNKNOWN
-            
-    def verify_id(self, id) -> bool:
+
+    async def verify_id(self, id) -> bool:
         """
         Verify a module_id if it is a valid UUID5 generated from the module name
         and VYRA namespace.
         """
-        eh = EnvHandler()
-        eh.load_env()
-        module_name = eh.env['MODULE_NAME']
-        if (not validate_module_id(id, module_name)):
-            Logger.warn(f"ID {id} is not valid, access denied.")
-            return False
-        else:
-            Logger.info(f"ID {id} is valid for {module_name}.")
-            return True
+        return True
+
+        # Example below
+        # eh = EnvHandler()
+        # await eh.load_env(Path('.'))
+        # module_name = eh.env['MODULE_NAME']
+        # if (not validate_module_id(id, module_name)):
+        #     Logger.warn(f"ID {id} is not valid, access denied.")
+        #     return False
+        # else:
+        #     Logger.info(f"ID {id} is valid for {module_name}.")
+        #     return True

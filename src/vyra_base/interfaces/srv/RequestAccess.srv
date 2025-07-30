@@ -9,3 +9,4 @@ string level_5_passkey
 ---
 # Response
 uint8 access_status
+string error_message

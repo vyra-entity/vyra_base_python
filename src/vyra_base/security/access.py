@@ -17,7 +17,8 @@ class ACCESS_STATUS(Enum, int):
     ACCESS_GRANTED = 0
     NOT_ALLOWED = 1
     MISSING_ACCESS_PARAMETERS = 2
-    INTERNAL_ERROR = 3
+    BLOCKED = 3
+    INTERNAL_ERROR = 4
 
     def __repr__(self) -> LiteralString:
         return (
@@ -59,76 +60,86 @@ class AccessManager:
         self.tlm = TrustlevelManager()
 
     @remote_callable
-    def request_access(self,
-                       certificate: str,
-                       module_id: uuid.UUID,
-                       requested_level: Union[int, ACCESS_LEVEL],
-                       level_4_psw: str = None,
-                       level_5_passkey: bytes = None) -> int:
+    def request_access(self, request: Any, response: Any):
         """
         Request access to a module.
         """
-        if not self.tlm.verify_id(module_id):
+        if not self.tlm.verify_id(request.module_id):
+            Logger.warn(
+                f"Remote access not verified. Id:{request.module_id}."
+            )
+
             raise ValueError("Module ID is not verified.")
 
-        if not isinstance(requested_level, (int, ACCESS_LEVEL)):
-            Logger.warn(f"Invalid access level: {requested_level}")
+        if not isinstance(request.requested_level, (int, ACCESS_LEVEL)):
+            Logger.warn(f"Invalid access level: {request.requested_level}")
+            response.access_status
             raise ValueError(
                 "access_level must be an integer or an ACCESS_LEVEL enum.")
 
-        if not self._check_certificate_signature(certificate):
-            Logger.error(f"Invalid certificate signature for module {module_id}.")
-            return ACCESS_STATUS.NOT_ALLOWED.value
-
+        if not self._check_certificate_signature(request.certificate):
+            Logger.error(f"Invalid certificate signature for module {request.module_id}.")
+            response.access_status = int(ACCESS_STATUS.NOT_ALLOWED.value)
+            return
         func = None
         args: list[Any] = []
 
-        match ACCESS_LEVEL(requested_level):
+        match ACCESS_LEVEL(request.requested_level):
             case ACCESS_LEVEL.READ_ONLY:
-                Logger.info(f"Read-only access granted for module {module_id}.")
+                Logger.info(
+                    f"Read-only access granted for module {request.module_id}.")
                 return ACCESS_STATUS.ACCESS_GRANTED.value
+            
             case ACCESS_LEVEL.EXTENDED_READ:
-                Logger.info(f"Extended read access granted for module {module_id}.")
+                Logger.info(
+                    f"Extended read access granted for module {request.module_id}.")
                 return ACCESS_STATUS.ACCESS_GRANTED.value
+            
             case ACCESS_LEVEL.CONTROL_AND_PARAM:
-                Logger.info(f"Control and parameter access granted for module {module_id}.")
+                Logger.info(
+                    f"Control and parameter access granted for module {request.module_id}.")
                 return ACCESS_STATUS.ACCESS_GRANTED.value
+            
             case ACCESS_LEVEL.EXTENDED_CONTROL:
-                if level_4_psw is None:
+                if request.level_4_psw is None:
                     Logger.error("Level 4 password required for extended control access.")
                     return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value
                 func = self._verify_extended_control
-                args = [level_4_psw]
+                args = [request.level_4_psw]
+
             case ACCESS_LEVEL.FULL_ACCESS:
-                if level_4_psw is None:
+                if request.level_4_psw is None:
                     Logger.error("Level 4 password required for extended control access.")
                     return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value
-                if level_5_passkey is None:
+                if request.level_5_passkey is None:
                     Logger.error("Level 5 passkey required for extended control access.")
                     return ACCESS_STATUS.MISSING_ACCESS_PARAMETERS.value
                 func = self._verify_full_access
-                args = [level_4_psw, level_5_passkey]
-                Logger.info(f"Full access granted for module {module_id}.")
+                args = [request.level_4_psw, request.level_5_passkey]
+                Logger.info(f"Full access granted for module {request.module_id}.")
+
             case _:
                 Logger.error(f"Invalid access level: {requested_level}")
                 return ACCESS_STATUS.NOT_ALLOWED.value()
 
         try:            
             if func(*args):
-                if self.tlm.check_trust_access(module_id) != TRUST_STATUS.SUCCEED:
-                    Logger.error(f"Access denied for module {module_id}.")
+                if self.tlm.check_trust_access(request.module_id) != TRUST_STATUS.SUCCEED:
+                    Logger.error(f"Access denied for module {request.module_id}.")
                     return ACCESS_STATUS.NOT_ALLOWED.value
                 Logger.info(
-                    f"Access granted for module {module_id} "
-                    f"with level {requested_level}.")
+                    f"Access granted for module {request.module_id} "
+                    f"with level {request.requested_level}.")
                 return ACCESS_STATUS.ACCESS_GRANTED.value
             else:
                 Logger.error(
-                    f"Access denied for module {module_id} "
-                    f"with level {requested_level}.")
+                    f"Access denied for module {request.module_id} "
+                    f"with level {request.requested_level}.")
                 return ACCESS_STATUS.NOT_ALLOWED.value
         except Exception as e:
-            Logger.error(f"Error occurred while verifying access for module {module_id}: {e}")
+            Logger.error(
+                "Error occurred while verifying access "
+                f"for module {request.module_id}: {e}")
             return ACCESS_STATUS.INTERNAL_ERROR.value
 
     def _verify_extended_control(

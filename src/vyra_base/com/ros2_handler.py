@@ -61,12 +61,10 @@ class ROS2Handler(CommunicationHandler):
             for field in type_fields:
                 value = getattr(record_msg, field, '__not_found__')
                 if value == '__not_found__':
-                    Logger.log(
-                        LogEntry(
-                            f"Ros2-Field '{field}' not found in msg-type "
-                            f"{record_msg.__class__.__name__}. "
-                            "Abort publishing this message."
-                        ).warn()
+                    Logger.warn(
+                        f"Ros2-Field '{field}' not found in msg-type "
+                        f"{record_msg.__class__.__name__}. "
+                        "Abort publishing this message."
                     )
                     return None
 
