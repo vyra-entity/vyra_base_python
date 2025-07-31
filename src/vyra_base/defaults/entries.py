@@ -422,7 +422,7 @@ class ModuleEntry:
     :param version: Version of the module (semantic versioning, e.g. '1.0.0')
     :type version: str
     """
-    uuid: UUID
+    uuid: str
     name: str
     template: str
     description: str
@@ -434,6 +434,35 @@ class ModuleEntry:
             f"template={self.template}, description={self.description}, "
             f"version={self.version})"
         )
+    
+    def to_dict(self) -> dict:
+        """
+        Returns the dictionary representation of the ModuleEntry.
+
+        :return: Dictionary containing the module details.
+        :rtype: dict
+        """
+        return {
+            'uuid': str(self.uuid),
+            'name': self.name,
+            'template': self.template,
+            'description': self.description,
+            'version': self.version
+        }
+
+    @staticmethod
+    def gen_uuid() -> str:
+        """Generates a new UUID for the module entry in hex format"""
+        return uuid.uuid4().hex
+
+    def restructure_uuid(self) -> UUID:
+        """
+        Converts the UUID string to a UUID object.
+
+        :return: UUID object of the module entry.
+        :rtype: UUID
+        """
+        return uuid.UUID(hex=self.uuid)
 
 
 @dataclass(slots=True)

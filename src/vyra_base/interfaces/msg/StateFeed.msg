@@ -3,7 +3,7 @@
 string previous
 string current
 string trigger
-unique_identifier_msgs/UUID module_id
+string module_id
 string module_name
 builtin_interfaces/Time timestamp
 

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import datetime
 from pathlib import Path
-from typing import Any, Callable, Optional, Type, Union
+from typing import Any, Optional, Union
 
 from vyra_base.com.datalayer.callable import VyraCallable
 from vyra_base.com.datalayer.interface_factory import (
@@ -105,12 +104,12 @@ class VyraEntity:
         self.module_config: dict[str, Any] = module_config
 
         node_settings = NodeSettings(
-            name=f"{self.module_entry.name}"
+            name=f"{self.module_entry.name}_{self.module_entry.uuid}"
         )
 
         self._node = VyraNode(node_settings)
 
-        feeder = self.__init_feeders(state_entry, news_entry, error_entry)
+        feeder: tuple = self.__init_feeder(state_entry, news_entry, error_entry)
         self.state_feeder: StateFeeder = feeder[0]
         self.news_feeder: NewsFeeder = feeder[1]
         self.error_feeder: ErrorFeeder = feeder[2]
@@ -119,8 +118,8 @@ class VyraEntity:
 
         self.access_manager: AccessManager = self._init_security_access()
 
-        register_remote_callables(self)
-        register_remote_callables(self.access_manager)
+        VyraEntity.register_callables_callbacks(self)
+        VyraEntity.register_callables_callbacks(self.access_manager)
 
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
@@ -159,7 +158,7 @@ class VyraEntity:
         log_config_path: Path = log_config_path / "helper" / "logger_config.json"
         Logger.initialize(log_config_path=log_config_path)
 
-    def __init_feeders(
+    def __init_feeder(
             self, 
             state_entry: StateEntry, 
             news_entry: NewsEntry, 
@@ -370,8 +369,8 @@ class VyraEntity:
 
         if not permission_xml:
             Logger.warn(
-                "No permission XML provided. "
-                "Skipping interface creation."
+                f"No permission XML provided for provided settings: {settings}. "
+                "Skip loading interfaces in permission.xml"
             )
 
         async_loop = asyncio.get_event_loop()
@@ -388,18 +387,19 @@ class VyraEntity:
             if setting.type == FunctionConfigBaseTypes.callable.value:
                 Logger.info(f"Creating callable: {setting.functionname}")
                 create_vyra_callable(
-                    name=setting.functionname,
                     type=setting.ros2type,
                     node=self._node,
                     callback=setting.callback,
-                    async_loop=async_loop
+                    async_loop=async_loop,
+                    domain_name=setting.functionname
                 )
             elif setting.type == FunctionConfigBaseTypes.job.value:
                 Logger.info(f"Creating job: {setting.functionname}")
                 create_vyra_job(
-                    name=setting.functionname,
                     type=setting.ros2type,
-                    async_loop=async_loop
+                    node=self._node,
+                    async_loop=async_loop,
+                    domain_name=setting.functionname
                 )
             elif setting.type == FunctionConfigBaseTypes.speaker.value:
                 Logger.info(f"Creating speaker: {setting.functionname}")
@@ -413,7 +413,6 @@ class VyraEntity:
                     periodic_interval = setting.periodic.interval if periodic else None
                 
                 create_vyra_speaker(
-                    name=setting.functionname,
                     type=setting.ros2type,
                     node=self._node,
                     description=setting.description,
@@ -421,7 +420,8 @@ class VyraEntity:
                     interval_time=periodic_interval,
                     periodic_caller= periodic_caller,
                     qos_profile=setting.qosprofile,
-                    async_loop=async_loop
+                    async_loop=async_loop,
+                    domain_name=setting.functionname
                 )
             else:
                 fail_msg = (
@@ -561,29 +561,63 @@ class VyraEntity:
         """
         pass
 
+    @staticmethod
+    def register_callables_callbacks(callback_parent: object):
+        """
+        Registers all remote callables defined in the callback_parent. Remote
+        callables must be decorated with the
 
-def register_remote_callables(callable_owner: object):
-    """
-    Registers all remote callables defined in the entity.
+        @vyra_base.com.datalayer.callable.remote_callable
 
-    Iterates over all attributes of the instance and registers those
-    marked as remote callable with the DataSpace.
-    :param callable_owner: The class or instance containing the remote callables.
-    :type callable_owner: Type[object]
-    """
-    for attr_name in dir(callable_owner):
-        attr = getattr(callable_owner, attr_name)
-        if callable(attr) and getattr(attr, "_remote_callable", False):
-            callable_obj = VyraCallable(
-                name=attr.__name__,
-                connected_callback=attr
-            )
-            Logger.debug(
-                f"Registering callable {callable_obj.name} from method {attr}")
-            DataSpace.add_callable(callable_obj)
+        Example:
+        from vyra_base.com.datalayer.interface_factory import remote_callable
 
-            # Set on the underlying function object
-            if hasattr(attr, "__func__"):
-                setattr(attr.__func__, "_remote_callable", False)
-            else:
-                setattr(attr, "_remote_callable", False)
+        class MyParentClass:
+            @remote_callable
+            async def my_remote_function(self, request: Any, response: Any):
+                <your implementation here>
+
+        instance_my_parent = MyParentClass()
+
+        To register the remote callable in this example, the instance_my_parent
+        object must be passed to this function:
+            - register_callables_callbacks(instance_my_parent)
+
+        Inside your MyParentClass in a method you can call the same function and
+        set the callback_parent to self to register the callables of the
+        instance itself:
+            - register_callables_callbacks(self)
+
+        This function will iterate over all attributes of the instance and
+        register those marked as remote callable with the DataSpace.
+
+        !!!
+        This function will only register the callbacks. Run 
+        entity.set_interfaces(your_config) afterwards to run load the interfaces 
+        in vyra. 
+        !!!
+
+        :param callback_parent: The class or instance containing the remote callables.
+        :type callback_parent: Type[object]
+        :raises TypeError: If callback_parent is not an instance of object.
+        :raises ValueError: If callback_parent does not have any remote callables.
+        :raises RuntimeError: If the callable registration fails.
+        :returns: None
+        :rtype: None
+        """
+        for attr_name in dir(callback_parent):
+            attr = getattr(callback_parent, attr_name)
+            if callable(attr) and getattr(attr, "_remote_callable", False):
+                callable_obj = VyraCallable(
+                    name=attr.__name__,
+                    connected_callback=attr
+                )
+                Logger.debug(
+                    f"Registering callable {callable_obj.name} from method {attr}")
+                DataSpace.add_callable(callable_obj)
+
+                # Set on the underlying function object
+                if hasattr(attr, "__func__"):
+                    setattr(attr.__func__, "_remote_callable", False)
+                else:
+                    setattr(attr, "_remote_callable", False)

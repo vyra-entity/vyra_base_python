@@ -28,13 +28,13 @@ class Volatile:
     def __init__(
             self, 
             storage_access_transient: RedisAccess, 
-            module_id: UUID,
+            module_id: str,
             node: VyraNode,
             transient_base_types: dict[str, Any]):
         """
         Initialize the Volatile class.
         """
-        self.module_id = module_id
+        self.module_id: str = module_id
         self.communication_node = node
 
         self.REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
@@ -127,11 +127,10 @@ class Volatile:
                 f"Must be one of {list(self.REDIS_TYPE_MAP)}.")
 
         speaker: VyraSpeaker = create_vyra_speaker(
-            name=self.EVENT_TOPIC_PREFIX + key,
             type=self.REDIS_TYPE_MAP[get_type],
             node=self.communication_node,
             description="Volatile parameter changes: " + key,
-
+            domain_name="volatile"
         )
         self._active_shouter[key] = speaker
         

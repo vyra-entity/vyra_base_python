@@ -20,12 +20,12 @@ async def get_lock_for_file(file_path: Union[Path, AsyncPath]) -> asyncio.Lock:
         file_locks[file_path] = asyncio.Lock()
     return file_locks[file_path]
 
-async def release_lock_for_file(file_path: str):
+async def release_lock_for_file(file_path: Union[Path, AsyncPath]):
     """
     Remove the lock from the dictionary if no tasks are waiting for it.
 
     :param file_path: The path to the file.
-    :type file_path: str
+    :type file_path: pathlib.Path or AsyncPath
     """
     if file_path in file_locks:
         # Prüfe, ob der Lock gerade verwendet wird

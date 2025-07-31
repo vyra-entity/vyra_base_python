@@ -63,7 +63,7 @@ class StateFeeder(BaseFeeder):
         self._node: VyraNode = node
         self._module_config: ModuleEntry = module_config
 
-        self._handler.append(ROS2Handler)
+        self._handler_classes.append(ROS2Handler)
 
         self.create(loggingOn=loggingOn)
         
@@ -79,8 +79,6 @@ class StateFeeder(BaseFeeder):
         if isinstance(stateElement, StateEntry):
             stateElement.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
                 stateElement.timestamp)
-            stateElement.module_id = Ros2TypeConverter.uuid_to_ros2uuid(
-                self._module_config.uuid)
             super().feed(stateElement)
         else:
             raise FeederException(f"Wrong Type. Expect: StateEntry, got {type(stateElement)}")

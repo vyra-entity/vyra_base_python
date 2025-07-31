@@ -2,7 +2,7 @@
 
 uint8 level
 uint32 code
-unique_identifier_msgs/UUID uuid
+string uuid
 builtin_interfaces/Time timestamp
 string description
 string solution

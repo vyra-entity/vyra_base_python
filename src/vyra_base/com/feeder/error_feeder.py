@@ -44,7 +44,7 @@ class ErrorFeeder(BaseFeeder):
         self._node: VyraNode = node
         self._module_config: ModuleEntry = module_config
 
-        self._handler.append(ROS2Handler)
+        self._handler_classes.append(ROS2Handler)
 
         self.create(loggingOn=loggingOn)
 
@@ -73,10 +73,6 @@ class ErrorFeeder(BaseFeeder):
         
         errorfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
             errorfeed_entry.uuid if errorfeed_entry.uuid else uuid.uuid4()
-        )
-
-        errorfeed_entry.module_id = Ros2TypeConverter.uuid_to_ros2uuid(
-            self._module_config.uuid
         )
 
         super().feed(errorfeed_entry)

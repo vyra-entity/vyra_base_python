@@ -35,7 +35,7 @@ class NewsFeeder(BaseFeeder):
             type: Any,
             node: VyraNode,
             module_config: ModuleEntry,
-            loggingOn: bool = False
+            loggingOn: bool = True
         ):
         super().__init__()
 
@@ -46,7 +46,7 @@ class NewsFeeder(BaseFeeder):
         self._node: VyraNode = node
         self._module_config: ModuleEntry = module_config
 
-        self._handler.append(ROS2Handler)
+        self._handler_classes.append(ROS2Handler)
 
         self.create(loggingOn=loggingOn)
 
@@ -77,10 +77,6 @@ class NewsFeeder(BaseFeeder):
         
         newsfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
             newsfeed_entry.uuid if newsfeed_entry.uuid else uuid.uuid4()
-        )
-
-        newsfeed_entry.module_id = Ros2TypeConverter.uuid_to_ros2uuid(
-            self._module_config.uuid
         )
 
         super().feed(newsfeed_entry)

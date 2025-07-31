@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from functools import wraps
 from inspect import iscoroutinefunction
-from typing import Any, Callable, Union
+from typing import Any, Callable, Optional, Union
+from xml import dom
 
 from rclpy.qos import QoSProfile
 
 from vyra_base.com.datalayer.callable import VyraCallable
 from vyra_base.com.datalayer.job import VyraJob
-from vyra_base.com.datalayer.node import VyraNode
+from vyra_base.com.datalayer.node import NodeSettings, VyraNode, CheckerNode
 from vyra_base.com.datalayer.publisher import PeriodicCaller, PublisherInfo, VyraPublisher
 from vyra_base.com.datalayer.service_server import ServiceInfo, VyraServiceServer
 from vyra_base.com.datalayer.speaker import VyraSpeaker
@@ -202,7 +203,6 @@ class DataSpace:
 
 @ErrorTraceback.w_check_error_exist
 def create_vyra_speaker(
-        name: str, 
         type: Any, 
         node: VyraNode,
         description: str,
@@ -210,15 +210,14 @@ def create_vyra_speaker(
         interval_time: Union[float, None] = None,
         periodic_caller: Union[Callable, None] = None,
         qos_profile: Union[int, QoSProfile] = 10,
+        domain_name: str = "global_speaker",
         async_loop = None
         ) -> VyraSpeaker:
     """
     Create a speaker for a V.Y.R.A. service.
 
     A speaker is a publisher that sends messages to a topic and is used to publish simple data types to other V.Y.R.A. OS modules.
-
-    :param name: Name of the speaker.
-    :type name: str
+    :param domain_name: Domain name of the speaker to categorize.
     :param type: The ROS2 message datatype definition.
     :type type: Any
     :param node: The ROS2 node definition.
@@ -238,6 +237,16 @@ def create_vyra_speaker(
     :return: The created VyraSpeaker object.
     :rtype: VyraSpeaker
     """
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a speaker."
+        )
+
+    name: str = _name_parser(base_name, domain_name)
 
     publisher = PublisherInfo(
         name=name,
@@ -261,7 +270,7 @@ def create_vyra_speaker(
     publisher_server.create_publisher()
 
     vyra_speaker: VyraSpeaker = VyraSpeaker(
-        name=name,
+        name=domain_name,
         type=type,
         description=description,
         publisher_server=publisher_server,
@@ -274,20 +283,19 @@ def create_vyra_speaker(
 
 @ErrorTraceback.w_check_error_exist
 def create_vyra_callable(
-        name: str, 
         type: Any, 
         node: VyraNode,
         callback: Union[Callable, None] = None,
+        domain_name: str = "global_callable",
         async_loop = None
     ) -> VyraCallable:
     """
     Create a callable for a V.Y.R.A. (V.Y.R.A. Operating System) service.
 
-    A callable is a function that provides a quick response to the request and does not block the caller.
-    The callable must return a value within a given time limit, otherwise it is considered a failure.
+    A callable is a function that provides a quick response to the request and 
+    does not block the caller. The callable must return a value within a given 
+    time limit, otherwise it is considered a failure.
 
-    :param name: Name of the callable.
-    :type name: str
     :param type: The ROS2 service datatype definition.
     :type type: Any
     :param node: The ROS2 node definition.
@@ -300,8 +308,19 @@ def create_vyra_callable(
     :return: The created VyraCallable object.
     :rtype: VyraCallable
     """
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a callable."
+        )
+
+    name: str = _name_parser(base_name, domain_name)
+
     service = ServiceInfo(
-        name=name,
+        name=domain_name,
         type=type
     )
 
@@ -312,7 +331,7 @@ def create_vyra_callable(
     )
 
     vyra_callable: VyraCallable = VyraCallable(
-        name=name,
+        name=domain_name,
         type=type,
         description="A callable for the V.Y.R.A. Operating System.",
         service_server=server
@@ -322,7 +341,7 @@ def create_vyra_callable(
 
     if callback is not None:
         Logger.info((f"Overwrite callback function {callback.__name__}"
-                     f" to callable {vyra_callable.name}.")
+                     f" over callable {vyra_callable.name}.")
         )
         vyra_callable.connected_callback = callback
 
@@ -343,8 +362,9 @@ def create_vyra_callable(
 
 @ErrorTraceback.w_check_error_exist
 def create_vyra_job(
-        name: str, 
         type: Any,
+        node: VyraNode,
+        domain_name: str = "global_job",
         async_loop = None) -> None:
     """
     Create a job for a V.Y.R.A. (V.Y.R.A. Operating System) service.
@@ -361,7 +381,16 @@ def create_vyra_job(
     :type async_loop: Any
     :return: None
     """
-    pass
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a callable."
+        )
+
+    name: str = _name_parser(base_name, domain_name)
 
 @ErrorTraceback.w_check_error_exist
 def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:
@@ -455,3 +484,17 @@ def remote_callable(func):
     setattr(wrapper, "_remote_callable", True)  # Mark that this method should be registered
 
     return wrapper
+
+def _name_parser(*names) -> str:
+    if not CheckerNode.check_node_name('/'.join(names)):
+        Logger.error(
+            f"Invalid callable prefix name: {'/'.join(names)}. Could not be created. "
+            "Names must start with a letter and can contain letters, "
+            "numbers, underscores, and hyphens[a-zA-Z0-9_-]."
+        )
+        raise NameError(
+            f"Invalid callable prefix name: {'/'.join(names)}. "
+            "Names must start with a letter and can contain letters, "
+            "numbers, underscores, and hyphens[a-zA-Z0-9_-]."
+        )
+    return '/'.join(names)

@@ -56,7 +56,8 @@ class ROS2Handler(CommunicationHandler):
             ros_msg: Any = self._type()
 
             record_fields = [f.lstrip('_') for f in record_msg.__slots__]
-            type_fields = [f.lstrip('_') for f in self._type.__slots__]
+            # type_fields = [f.lstrip('_') for f in self._type.__slots__]
+            type_fields = list(self._type.get_fields_and_field_types().keys())
 
             for field in type_fields:
                 value = getattr(record_msg, field, '__not_found__')
@@ -64,6 +65,8 @@ class ROS2Handler(CommunicationHandler):
                     Logger.warn(
                         f"Ros2-Field '{field}' not found in msg-type "
                         f"{record_msg.__class__.__name__}. "
+                        f"Needed fields are: {type_fields}. "
+                        f"Provided message fields are: {record_fields}. "
                         "Abort publishing this message."
                     )
                     return None

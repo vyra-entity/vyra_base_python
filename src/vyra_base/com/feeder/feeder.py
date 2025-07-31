@@ -25,12 +25,9 @@ class BaseFeeder:
     Provides the required interface for the ``deque`` method all inheriting deque objects require to work.
     """
 
-    def __init__(self, loggingOn: bool = False) -> None:
+    def __init__(self) -> None:
         """
         Initialize the BaseFeeder.
-
-        :param loggingOn: If True, enables logging in the base logger.
-        :type loggingOn: bool
         """
         self._qos = QoSProfile(
             history=QoSHistoryPolicy.KEEP_LAST,
@@ -42,7 +39,7 @@ class BaseFeeder:
         self._feedBaseName: str = 'vyraFeeder'
         self._feederName: str = 'AbstractFeeder'
         self._doc: str = 'Abstract class for all feeder classes.'
-        self._level: int = logging.DEBUG
+        self._level: int = logging.INFO
 
         self._handler_classes: list[Type[CommunicationHandler]] = []  # Store handler classes
         self._handler: list[Type[CommunicationHandler] | CommunicationHandler] = []  # Store handler instances
@@ -63,11 +60,11 @@ class BaseFeeder:
         :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
         """
         self._speaker: VyraSpeaker = create_vyra_speaker(
-            name=self._feederName,
-            node=self._node,
             type=self._type,
+            node=self._node,
             description=self._doc,
-            qos_profile=self._qos
+            qos_profile=self._qos,
+            domain_name=self._feederName,
         )
         self._loggingOn: bool = loggingOn
 

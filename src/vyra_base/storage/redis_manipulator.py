@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from uuid import UUID
 from enum import Enum
-from typing import Any, Awaitable
-from typing import Callable
+from typing import Any
+
+from redis.asyncio.client import PubSub
 
 from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
@@ -44,7 +44,7 @@ class RedisManipulator:
 
     @ErrorTraceback.w_check_error_exist
     def __init__(
-            self, redis_access: RedisAccess, module_id: UUID):
+            self, redis_access: RedisAccess, module_id: str):
         """
         Initialize datatable.
 
@@ -59,8 +59,8 @@ class RedisManipulator:
             raise TypeError('redis_access must be of type RedisAccess.')
 
         self.redis: redis.Redis = redis_access.redis
-        self.pubsub = self.redis.pubsub()
-        self.module_id = module_id
+        self.pubsub: PubSub = self.redis.pubsub()
+        self.module_id: str = module_id
 
     @ErrorTraceback.w_check_error_exist
     async def get(self, key: str) -> Any:

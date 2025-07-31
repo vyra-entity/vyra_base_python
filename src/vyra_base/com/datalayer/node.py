@@ -1,6 +1,8 @@
+import re
+
 from dataclasses import dataclass, field
-import rclpy
 from rclpy.node import Node
+
 
 @dataclass
 class NodeSettings:
@@ -56,3 +58,15 @@ class CheckerNode(Node):
         """
         node_names_and_namespaces = self.get_node_names_and_namespaces()
         return any(name == node_name for name, _ in node_names_and_namespaces)
+
+    @staticmethod
+    def check_node_name(node_name: str) -> bool:
+        """
+        Check if the node name is valid.
+
+        :param node_name: Name of the node to check.
+        :type node_name: str
+        :return: True if the node name is valid, False otherwise.
+        :rtype: bool
+        """
+        return bool(re.match(r'^[a-zA-Z0-9_/]*$', node_name))

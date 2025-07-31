@@ -3,7 +3,7 @@ import os
 import sys
 from asyncio import Lock
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from dotenv import load_dotenv
 
@@ -59,10 +59,6 @@ class FileReader:
                         'utf-8', b'', 0, 0, 'A decoding error occured!') # type: ignore
                 if error == json.decoder.JSONDecodeError('', '', 0): 
                     raise json.decoder.JSONDecodeError('JSON decoding error:', '', 0)
-                if error == TypeError():
-                    raise TypeError("An unexpected type error uccured!")
-                if error == FileNotFoundError():
-                    raise FileNotFoundError("File not found error!")
 
     @classmethod    
     async def open_markdown_file(cls, config_file: Path, config_default='') -> Any:
@@ -98,22 +94,16 @@ class FileReader:
 
         except (IOError, UnicodeDecodeError, json.decoder.JSONDecodeError, 
                  TypeError, FileNotFoundError) as error:
-            
-            if error == IOError():
-                raise IOError('An unexpected io error occured!')
             if error == UnicodeDecodeError: # type: ignore
-                raise UnicodeDecodeError('utf-8', b'', 0, 0, 'A decoding error occured!') # type: ignore
+                raise UnicodeDecodeError(
+                    'utf-8', b'', 0, 0, 'A decoding error occured!') # type: ignore
             if error == json.decoder.JSONDecodeError: # type: ignore
                 raise json.decoder.JSONDecodeError('JSON decoding error.', '', 0)
-            if error == TypeError():
-                raise TypeError("An unexpected type error uccured!")
-            if error == FileNotFoundError():
-                raise FileNotFoundError("File not found error!")
         finally:
-            return ''
-     
-    @classmethod 
-    async def open_env_file(cls, env_path: Path) -> dict:
+            await release_lock_for_file(config_file)
+
+    @classmethod
+    async def open_env_file(cls, env_path: Path) -> Optional[dict]:
         """Reads an environment (.env) file.
 
         :param env_path: Path to the directory containing the .env file.
@@ -125,26 +115,17 @@ class FileReader:
         :raises FileNotFoundError: If the file is not found.
         """
         try:
-            lock = await get_lock_for_file(env_path / '.env')
+            lock: Lock = await get_lock_for_file(env_path / '.env')
             async with lock:
                 load_dotenv(dotenv_path=env_path)
                 env_content: list = []
                 env_vars: dict = dict(os.environ)
                 return env_vars
-            
-            release_lock_for_file(config_file)
-
-        except (IOError, TypeError, FileNotFoundError) as error:
-            if error == IOError():
-                raise IOError('An unexpected io error occured!')
-            if error == TypeError():
-                raise TypeError("An unexpected type error uccured!")
-            if error == FileNotFoundError():
-                raise FileNotFoundError("File not found error!")
-        return {}
+        finally:
+            await release_lock_for_file(env_path / '.env')
 
     @classmethod
-    async def open_toml_file(cls, config_file: Path) -> dict[str, Any]:
+    async def open_toml_file(cls, config_file: Path) -> Optional[Any]:
         """Reads a TOML file.
 
         :param config_file: TOML formatted file.
@@ -164,8 +145,8 @@ class FileReader:
                     import tomli as tomllib
                 except ImportError:
                     raise ImportError(
-                        "Python < 3.11 benötigt das Paket 'tomli' zum Parsen von TOML-Dateien.\n"
-                        "Installiere es mit: pip install tomli"
+                        "Python < 3.11 benötigt das Paket 'tomli' zum Parsen "
+                        "von TOML-Dateien. Installiere es mit: pip install tomli"
                     )
             
             lock: Lock = await get_lock_for_file(config_file)
@@ -182,14 +163,55 @@ class FileReader:
 
                     toml_content = tomllib.loads(raw_content)
                 return toml_content
-            
-            release_lock_for_file(config_file)
+        finally:
+            await release_lock_for_file(config_file)
 
-        except (IOError, TypeError, FileNotFoundError) as error:
-            if error == IOError():
-                raise IOError('An unexpected io error occured!')
-            if error == TypeError():
-                raise TypeError("An unexpected type error uccured!")
-            if error == FileNotFoundError():
-                raise FileNotFoundError("File not found error!")
-        return {}
+    @classmethod
+    async def open_ini_file(cls, config_file: Path) -> Optional[Any]:
+        """Reads an INI file.
+
+        :param config_file: INI formatted file.
+        :type config_file: Path
+        :returns: Parsed INI content as a dictionary.
+        :rtype: dict[str, Any]
+        :raises ImportError: If configparser is not available.
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            import configparser
+            
+            lock: Lock = await get_lock_for_file(config_file)
+            async with lock:
+                config = configparser.ConfigParser()
+                config.read(str(config_file))
+            
+            return {s: dict(config.items(s)) for s in config.sections()}
+        finally:
+            await release_lock_for_file(config_file)
+
+    @classmethod
+    async def open_yaml_file(cls, config_file: Path) -> Optional[Any]:
+        """Reads a YAML file.
+
+        :param config_file: YAML formatted file.
+        :type config_file: Path
+        :returns: Parsed YAML content as a dictionary.
+        :rtype: dict[str, Any]
+        :raises ImportError: If PyYAML is not installed.
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            import yaml
+            
+            lock: Lock = await get_lock_for_file(config_file)
+            async with lock:
+                async with await AsyncPath(config_file) \
+                            .open(mode='r', encoding='utf-8-sig') as file:
+                    yaml_content = yaml.safe_load(await file.read())
+                    return yaml_content
+        finally:
+            await release_lock_for_file(config_file)

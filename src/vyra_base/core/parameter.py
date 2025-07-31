@@ -1,18 +1,11 @@
-
-
-import re
 from typing import Any
-import uuid
 
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.helper.logger import Logger
 from vyra_base.storage.db_access import DbAccess
-from vyra_base.storage.redis_access import RedisAccess
-from vyra_base.storage.db_access import DBSTATUS
 from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
-
-from vyra_base.storage.redis_manipulator import RedisManipulator
 from vyra_base.storage.tb_params import Parameter as DbParameter
+
 
 class Parameter:
     """
@@ -61,14 +54,16 @@ class Parameter:
         )
 
         if not await storage_access_default.check_table_exists(DbParameter):
-            Logger.warn(f"Table '{DbParameter.__tablename__}' does not exist in the default database.")
+            Logger.warn(
+                f"Table '{DbParameter.__tablename__}' does not exist in the default "
+                "database. Skipping default parameter loading.")
             return False
         
         all_return: DBReturnValue = await self.persistant_manipulator.get_all()
 
         if not isinstance(all_return.value, list):
-            raise ValueError("all_params.value must be a list.")
-        
+            raise ValueError(f"all_return.value must be a list. Is: {all_return.value}")
+
         all_params: list[dict] = [default_manipulator.to_dict(p) for p in all_return.value]
 
         all_default_return: DBReturnValue = await default_manipulator.get_all()
@@ -103,6 +98,7 @@ class Parameter:
 
         return True
 
+    @ErrorTraceback.w_check_error_exist
     async def get_param(self, key: str) -> DBReturnValue:
         """
         Get a parameter value by its key.
@@ -120,6 +116,7 @@ class Parameter:
         
         return ret_obj
 
+    @ErrorTraceback.w_check_error_exist
     async def set_param(self, key: str, value: Any) -> DBReturnValue:
         """
         Set a parameter value by its key.
@@ -133,6 +130,7 @@ class Parameter:
         return await self.persistant_manipulator.update(
             param_obj, filters={"name": key})
 
+    @ErrorTraceback.w_check_error_exist
     async def read_all_params(self) -> DBReturnValue:
         """
         Read all parameters.
@@ -147,6 +145,7 @@ class Parameter:
 
         return ret_obj
 
+    @ErrorTraceback.w_check_error_exist
     def get_param_change_event_topic(self) -> str:
         """
         Get the topic for parameter change events.
