@@ -22,6 +22,17 @@
             <topic>ros_discovery_info</topic>
           </topics>
         </subscribe>
+        <request>
+          <services>
+            <service></service>
+          </services>
+        </request>
+        <reply>
+          <services>
+            <service></service>
+          </services>
+        </reply>
+        
       </allow_rule>
       <default>DENY</default>
     </grant>

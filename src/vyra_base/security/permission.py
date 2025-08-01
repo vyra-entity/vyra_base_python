@@ -206,170 +206,133 @@ class BaseInterface:
     client: list[str] = []
     server: list[str] = []
 
+    @classmethod
+    def add(cls, list_ref: list[str], name: str) -> bool:
+        if name not in list_ref:
+            list_ref.append(name)
+            return True
+        return False
+
+    @classmethod
+    def remove(cls, list_ref: list[str], name: str) -> bool:
+        if name in list_ref:
+            list_ref.remove(name)
+            return True
+        Logger.warn(f"Registration {name} not found in {cls.__name__}.")
+        return False
 
     @classmethod
     def add_client(cls, name: str) -> bool:
         """Add a new client registration."""
-        if name not in cls.client:
-            cls.client.append(name)
-            return True
-        return False
+        return BaseInterface.add(cls.client, name)
 
     @classmethod
     def add_server(cls, name: str) -> bool:
         """Add a new server registration."""
-        if name not in cls.server:
-            cls.server.append(name)
-            return True
-        return False
+        return BaseInterface.add(cls.server, name)
 
     @classmethod
     def remove_client(cls, name: str) -> bool:
         """Remove a client registration."""
-        if name in cls.client:
-            cls.client.remove(name)
-            return True
-        Logger.warn(f"Registration {name} not found in {cls.__name__}.")
-        return False
-    
+        return BaseInterface.remove(cls.client, name)
+
     @classmethod
     def remove_server(cls, name: str) -> bool:
         """Remove a server registration."""
-        if name in cls.server:
-            cls.server.remove(name)
-            return True
-        Logger.warn(f"Registration {name} not found in {cls.__name__}.")
-        return False
-
-
-# def create_base_permissions_xml() -> ET.Element:
-#     root = ET.Element("permissions")
-    
-#     # Beispiel für Topic Permissions
-#     topic = ET.SubElement(root, "topic")
-#     topic_name = ET.SubElement(topic, "name")
-#     topic_name.text = "/example_topic"
-    
-#     permissions = ET.SubElement(topic, "permissions")
-    
-#     publish = ET.SubElement(permissions, "publish")
-#     identity_publish = ET.SubElement(publish, "identity")
-#     identity_publish_name = ET.SubElement(identity_publish, "name")
-#     identity_publish_name.text = "user1"
-#     permission_publish = ET.SubElement(identity_publish, "permission")
-#     permission_publish.text = "allow"
-
-#     subscribe = ET.SubElement(permissions, "subscribe")
-#     identity_subscribe = ET.SubElement(subscribe, "identity")
-#     identity_subscribe_name = ET.SubElement(identity_subscribe, "name")
-#     identity_subscribe_name.text = "user2"
-#     permission_subscribe = ET.SubElement(identity_subscribe, "permission")
-#     permission_subscribe.text = "deny"
-    
-#     # Beispiel für Service Permissions
-#     service = ET.SubElement(root, "service")
-#     service_name = ET.SubElement(service, "name")
-#     service_name.text = "/example_service"
-    
-#     permissions_service = ET.SubElement(service, "permissions")
-    
-#     call_service = ET.SubElement(permissions_service, "call")
-#     identity_service = ET.SubElement(call_service, "identity")
-#     identity_service_name = ET.SubElement(identity_service, "name")
-#     identity_service_name.text = "user1"
-#     permission_service = ET.SubElement(identity_service, "permission")
-#     permission_service.text = "allow"
-
-#     # Baum in XML umwandeln und speichern
-#     return root # ET.ElementTree(root)
+        return BaseInterface.remove(cls.server, name)
 
 
 class Speaker(BaseInterface):
     client: list[str] = []
     server: list[str] = []
+    permission_templates: dict = {
+        "client": ["request", "topics", "topic", "{name}"],
+        "server": ["reply", "topics", "topic", "{name}"]
+    }
 
     @classmethod
-    def get_client_subs(cls):
-        return [f"rq/{name}" for name in cls.client]
-    
-    @classmethod
-    def get_server_pubs(cls):
-        return [f"rq/{name}" for name in cls.client]
+    def add_speaker_client(cls, name: str) -> bool:
+        """Add a new speaker client registration."""
+        return Speaker.add(cls.client, name)
 
+    @classmethod
+    def remove_speaker_client(cls, name: str) -> bool:
+        """Remove a speaker client registration."""
+        return Speaker.remove(cls.client, name)
 
 class Callable(BaseInterface):
     client: list[str] = []
     server: list[str] = []
+    permission_templates: dict = {
+        "client": [
+            ["request", "services", "service", "{name}"]
+        ],
+        "server": [
+            ["reply", "services", "service", "{name}"]
+        ]
+    }
 
     @classmethod
-    def get_client_subs(cls):
-        return [f"rq/{name}Request" for name in cls.client]
+    def add_callable_client(cls, name: str) -> bool:
+        """Add a new callable client registration."""
+        return Callable.add(cls.client, name)
     
     @classmethod
-    def get_client_pubs(cls):
-        return [f"rr/{name}Reply" for name in cls.client]
+    def add_callable_server(cls, name: str) -> bool:
+        """Add a new callable server registration."""
+        return Callable.add(cls.server, name)
     
     @classmethod
-    def get_server_subs(cls):
-        return [f"rr/{name}Request" for name in cls.server]
+    def remove_callable_client(cls, name: str) -> bool:
+        """Remove a callable client registration."""
+        return Callable.remove(cls.client, name)
     
     @classmethod
-    def get_server_pubs(cls):
-        return [f"rq/{name}Reply" for name in cls.server]
+    def remove_callable_server(cls, name: str) -> bool:
+        """Remove a callable server registration."""
+        return Callable.remove(cls.server, name)
 
 
 class Job(BaseInterface):
     client: list[str] = []  # Jede Klasse braucht ihre eigene REG Liste
     server: list[str] = []
+    permission_templates: dict = {
+        "client": [
+            ["request", "services", "service", "{name}/_action/send_goal"],
+            ["request", "services", "service", "{name}/_action/get_result"],
+            ["request", "services", "service", "{name}/_action/cancel"],
+            ["subscribe", "topics", "topic", "{name}/_action/feedback"],
+            ["subscribe", "topics", "topic", "{name}/_action/status"]
+
+        ],
+        "server": [
+            ["reply", "services", "service", "{name}/_action/send_goal"],
+            ["reply", "services", "services", "{name}/_action/get_result"],
+            ["reply", "services", "services", "{name}/_action/cancel"],
+            ["publish", "topics", "topic", "{name}/_action/feedback"],
+            ["publish", "topics", "topic", "{name}/_action/status"],
+        ]
+    }
+    @classmethod
+    def add_job_client(cls, name: str) -> bool:
+        """Add a new job client registration."""
+        return Job.add(cls.client, name)
 
     @classmethod
-    def get_client_subs(cls):
-        entries = []
-        for name in cls.client:
-            entries.extend([
-                f"rr/{name}/_action/send_goalReply",
-                f"rr/{name}/_action/cancel_goalReply",
-                f"rr/{name}/_action/get_resultReply",
-                f"rt/{name}/_action/feedback",
-                f"rt/{name}/_action/status"
-            ])
-        return entries
-    
+    def add_job_server(cls, name: str) -> bool:
+        """Add a new job server registration."""
+        return Job.add(cls.server, name)
+
     @classmethod
-    def get_client_pubs(cls):
-        entries = []
-        for name in cls.client:
-            entries.extend([
-                f"rq/{name}/_action/send_goalRequest",
-                f"rq/{name}/_action/cancel_goalRequest",
-                f"rq/{name}/_action/get_resultRequest"
-            ])
-        return entries
-    
+    def remove_job_client(cls, name: str) -> bool:
+        """Remove a job client registration."""
+        return Job.remove(cls.client, name)
+
     @classmethod
-    def get_server_subs(cls):
-        entries = []
-        for name in cls.server:
-            entries.extend([
-                f"rq/{name}/_action/send_goalRequest",
-                f"rq/{name}/_action/cancel_goalRequest",
-                f"rq/{name}/_action/get_resultRequest"
-            ])
-        return entries
-    
-    @classmethod
-    def get_server_pubs(cls):
-        entries = []
-        for name in cls.server:
-            entries.extend([
-                f"rr/{name}/_action/send_goalReply",
-                f"rr/{name}/_action/cancel_goalReply",
-                f"rr/{name}/_action/get_resultReply",
-                f"rt/{name}/_action/feedback",
-                f"rt/{name}/_action/status"
-            ])
-        return entries
-    
+    def remove_job_server(cls, name: str) -> bool:
+        """Remove a job server registration."""
+        return Job.remove(cls.server, name)
+
 
 def prev_test():
     print("Add speaker_client: " + str(Speaker.add_client("my_speaker_client")))  # True
@@ -380,16 +343,16 @@ def prev_test():
     print("Add action_server: " + str(Job.add_server("my_action_server")))  # True
     
 
-    print("Speaker client subscriptions: " + str(Speaker.get_client_subs()))  # ["rq/my_speaker_client"]
-    print("Speaker server publications: " + str(Speaker.get_server_pubs()))  # ["rq/my_speaker_client"]
-    print("Callable client subscriptions: " + str(Callable.get_client_subs()))  # ["rq/my_service_clientRequest"]
-    print("Callable client publications: " + str(Callable.get_client_pubs()))  # ["rr/my_service_clientReply"]
-    print("Callable server subscriptions: " + str(Callable.get_server_subs()))  # ["rr/my_service_serverRequest"]
-    print("Callable server publications: " + str(Callable.get_server_pubs()))  # ["rq/my_service_serverReply"]
-    print("Job client subscriptions: " + str(Job.get_client_subs()))  # Alle action client subscriptions
-    print("Job client publications: " + str(Job.get_client_pubs()))  # Alle action client publications
-    print("Job server subscriptions: " + str(Job.get_server_subs()))  # Alle action server subscriptions
-    print("Job server publications: " + str(Job.get_server_pubs()))  # Alle action server publications
+    print("Speaker client subscriptions: " + str(Speaker.client))  # ["rq/my_speaker_client"]
+    print("Speaker server publications: " + str(Speaker.server))  # ["rq/my_speaker_client"]
+    print("Callable client subscriptions: " + str(Callable.client))  # ["rq/my_service_clientRequest"]
+    print("Callable client publications: " + str(Callable.client))  # ["rr/my_service_clientReply"]
+    print("Callable server subscriptions: " + str(Callable.server))  # ["rr/my_service_serverRequest"]
+    print("Callable server publications: " + str(Callable.server))  # ["rq/my_service_serverReply"]
+    print("Job client subscriptions: " + str(Job.client))  # Alle action client subscriptions
+    print("Job client publications: " + str(Job.client))  # Alle action client publications
+    print("Job server subscriptions: " + str(Job.server))  # Alle action server subscriptions
+    print("Job server publications: " + str(Job.server))  # Alle action server publications
 
     print("Remove speaker_client: " + str(Speaker.remove_client("my_speaker_client")))  # True
     print("Remove speaker_server: " + str(Speaker.remove_server("my_speaker_server")))  # True
