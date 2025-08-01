@@ -116,7 +116,7 @@ class DataSpace:
                 ele.name == obj.name), None
         )
         if index is not None:
-            Logger.log(
+            Logger.debug(
                 f"{cls}Merging existing speaker {obj.name}<->"
                 f"{cls.speakers[index].name}."
             )
@@ -128,7 +128,7 @@ class DataSpace:
 
             return cls.speakers[index].merge(obj)
         else:
-            Logger.log(f"{cls}Adding new speaker {obj.name}.")
+            Logger.debug(f"{cls}Adding new speaker {obj.name}.")
             cls.speakers.append(obj)
             return obj
     
@@ -150,7 +150,7 @@ class DataSpace:
                 ele.name == obj.name), None
         )
         if index is not None:
-            Logger.log(
+            Logger.debug(
                 f"{cls}Merging existing callable {obj.name}<->"
                 f"{cls.callables[index].name}."
             )
@@ -163,7 +163,7 @@ class DataSpace:
 
             return cls.callables[index].merge(obj)
         else:
-            Logger.log(f"{cls}Adding new callable {obj.name}.")
+            Logger.debug(f"{cls}Adding new callable {obj.name}.")
             cls.callables.append(obj)
             return obj
     
@@ -190,13 +190,13 @@ class DataSpace:
                 ele.name == obj.name), None
         )
         if index is not None:
-            Logger.log(
+            Logger.debug(
                 f"{cls}Merging existing job {obj.name}<->"
                 f"{cls.jobs[index].name}."
             )
             return cls.jobs[index].merge(obj)
         else:
-            Logger.log(f"{cls}Adding new job {obj.name}.")
+            Logger.debug(f"{cls}Adding new job {obj.name}.")
             cls.jobs.append(obj)
             return obj
 
@@ -210,7 +210,7 @@ def create_vyra_speaker(
         interval_time: Union[float, None] = None,
         periodic_caller: Union[Callable, None] = None,
         qos_profile: Union[int, QoSProfile] = 10,
-        domain_name: str = "global_speaker",
+        ident_name: str = "global_speaker",
         async_loop = None
         ) -> VyraSpeaker:
     """
@@ -232,11 +232,14 @@ def create_vyra_speaker(
     :type periodic_caller: Callable or None
     :param qos_profile: Quality of Service profile.
     :type qos_profile: int or QoSProfile
+    :param ident_name: Identifier name for the speaker.
+    :type ident_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
     :return: The created VyraSpeaker object.
     :rtype: VyraSpeaker
     """
+    domain_name = "speaker"
     base_name: str = node.node_settings.name
 
     if base_name == NodeSettings.name:
@@ -245,8 +248,8 @@ def create_vyra_speaker(
             "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
             "creating a speaker."
         )
-
-    name: str = _name_parser(base_name, domain_name)
+    
+    name: str = _name_parser(base_name, domain_name, ident_name)
 
     publisher = PublisherInfo(
         name=name,
@@ -270,7 +273,7 @@ def create_vyra_speaker(
     publisher_server.create_publisher()
 
     vyra_speaker: VyraSpeaker = VyraSpeaker(
-        name=domain_name,
+        name=ident_name,
         type=type,
         description=description,
         publisher_server=publisher_server,
@@ -286,7 +289,7 @@ def create_vyra_callable(
         type: Any, 
         node: VyraNode,
         callback: Union[Callable, None] = None,
-        domain_name: str = "global_callable",
+        ident_name: str = "global_callable",
         async_loop = None
     ) -> VyraCallable:
     """
@@ -302,12 +305,15 @@ def create_vyra_callable(
     :type node: VyraNode
     :param callback: Callback function to be called when the service is invoked.
     :type callback: Callable or None
+    :param ident_name: Identifier name for the callable.
+    :type ident_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
     :raises ValueError: If no callback function is provided.
     :return: The created VyraCallable object.
     :rtype: VyraCallable
     """
+    domain_name = "callable"
     base_name: str = node.node_settings.name
 
     if base_name == NodeSettings.name:
@@ -317,10 +323,10 @@ def create_vyra_callable(
             "creating a callable."
         )
 
-    name: str = _name_parser(base_name, domain_name)
+    name: str = _name_parser(base_name, domain_name, ident_name)
 
     service = ServiceInfo(
-        name=domain_name,
+        name=name,
         type=type
     )
 
@@ -331,12 +337,11 @@ def create_vyra_callable(
     )
 
     vyra_callable: VyraCallable = VyraCallable(
-        name=domain_name,
+        name=ident_name,
         type=type,
         description="A callable for the V.Y.R.A. Operating System.",
         service_server=server
     )
-    Logger.log(f"DEBUG: SERVICE SERVER: {vyra_callable.service_server}")
     vyra_callable: VyraCallable = DataSpace.add_callable(vyra_callable)
 
     if callback is not None:
@@ -364,7 +369,7 @@ def create_vyra_callable(
 def create_vyra_job(
         type: Any,
         node: VyraNode,
-        domain_name: str = "global_job",
+        ident_name: str = "global_job",
         async_loop = None) -> None:
     """
     Create a job for a V.Y.R.A. (V.Y.R.A. Operating System) service.
@@ -377,10 +382,15 @@ def create_vyra_job(
     :type name: str
     :param type: The ROS2 service datatype definition.
     :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param ident_name: Identifier name for the job.
+    :type ident_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
     :return: None
     """
+    domain_name = "job"
     base_name: str = node.node_settings.name
 
     if base_name == NodeSettings.name:
@@ -390,7 +400,8 @@ def create_vyra_job(
             "creating a callable."
         )
 
-    name: str = _name_parser(base_name, domain_name)
+    name: str = _name_parser(base_name, domain_name, ident_name)
+    # TBD: Implement job creation logic
 
 @ErrorTraceback.w_check_error_exist
 def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:

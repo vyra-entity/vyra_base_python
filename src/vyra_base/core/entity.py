@@ -73,7 +73,8 @@ class VyraEntity:
             news_entry: NewsEntry,
             error_entry: ErrorEntry,
             module_entry: ModuleEntry,
-            module_config: dict[str, Any]) -> None:
+            module_config: dict[str, Any],
+            log_config: Optional[dict[str, Any]] = None) -> None:
         """
         Initialize the VyraEntity.
 
@@ -88,11 +89,13 @@ class VyraEntity:
         :param module_config: Module configuration. Containing settings that are used during runtime. 
                               For example simulation settings, livecycle settings
         :type module_config: dict[str, Any]
+        :param log_config: Optional configuration for the logger. Using python logging config to configurate.
+        :type log_config: dict[str, Any], optional
         :raises TypeError: If the provided entries are not of the correct type.
         :raises ValueError: If the module entry is not valid.
         :raises RuntimeError: If the node name is already available in the ROS2 system.
         """
-        self._init_logger()
+        self._init_logger(log_config)
 
         if VyraEntity._check_node_availability(module_entry.name):
             raise RuntimeError(
@@ -147,7 +150,7 @@ class VyraEntity:
             return ''
         return self._node.get_namespace()
 
-    def _init_logger(self) -> None:
+    def _init_logger(self, log_config: Optional[dict[str, Any]]) -> None:
         """
         Initialize the logger for the entity.
         
@@ -156,7 +159,7 @@ class VyraEntity:
         """
         log_config_path = Path(__file__).resolve().parent.parent
         log_config_path: Path = log_config_path / "helper" / "logger_config.json"
-        Logger.initialize(log_config_path=log_config_path)
+        Logger.initialize(log_config_path=log_config_path, log_config=log_config)
 
     def __init_feeder(
             self, 
@@ -391,7 +394,7 @@ class VyraEntity:
                     node=self._node,
                     callback=setting.callback,
                     async_loop=async_loop,
-                    domain_name=setting.functionname
+                    ident_name=setting.functionname
                 )
             elif setting.type == FunctionConfigBaseTypes.job.value:
                 Logger.info(f"Creating job: {setting.functionname}")
@@ -399,7 +402,7 @@ class VyraEntity:
                     type=setting.ros2type,
                     node=self._node,
                     async_loop=async_loop,
-                    domain_name=setting.functionname
+                    ident_name=setting.functionname
                 )
             elif setting.type == FunctionConfigBaseTypes.speaker.value:
                 Logger.info(f"Creating speaker: {setting.functionname}")
@@ -421,7 +424,7 @@ class VyraEntity:
                     periodic_caller= periodic_caller,
                     qos_profile=setting.qosprofile,
                     async_loop=async_loop,
-                    domain_name=setting.functionname
+                    ident_name=setting.functionname
                 )
             else:
                 fail_msg = (
@@ -612,8 +615,10 @@ class VyraEntity:
                     name=attr.__name__,
                     connected_callback=attr
                 )
+                
                 Logger.debug(
-                    f"Registering callable {callable_obj.name} from method {attr}")
+                    f"Registering callable callback <{callable_obj.name}> from method {attr}")
+                
                 DataSpace.add_callable(callable_obj)
 
                 # Set on the underlying function object

@@ -11,8 +11,9 @@ from collections import deque
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Optional, Union
 
+from vyra_base.helper.func import deep_merge
 
 class LogMode(Enum):
     """
@@ -87,11 +88,15 @@ class Logger:
     _ext_logger: list = []
     logger: logging.Logger
 
+    pre_log_buffer: list[LogEntry] = []  # List to store log entries before logger is initialized
+
     @classmethod
     def initialize(
         cls, 
         log_config_path: Path, 
-        log_active: bool=True):
+        log_active: bool=True,
+        log_config: Optional[dict]=None
+    ) -> None:
         """
         Initialize the logger with a configuration file.
 
@@ -101,16 +106,19 @@ class Logger:
         :type log_active: bool
         """
         with Path(log_config_path).open(mode='r+') as content:
-            log_config = json.load(content)
+            loaded_log_config: dict = json.load(content)
 
-            # Pfad zum Logfile extrahieren
-            logfile = log_config["handlers"]["file_handler"]["filename"]
-            logdir = os.path.dirname(logfile)
+        if log_config:
+            loaded_log_config = deep_merge(loaded_log_config, log_config)
 
-            # Verzeichnis erstellen, falls nötig
-            os.makedirs(logdir, exist_ok=True)
+        # Pfad zum Logfile extrahieren
+        logfile = loaded_log_config["handlers"]["file_handler"]["filename"]
+        logdir = os.path.dirname(logfile)
 
-            logging.config.dictConfig(log_config)
+        # Verzeichnis erstellen, falls nötig
+        os.makedirs(logdir, exist_ok=True)
+
+        logging.config.dictConfig(loaded_log_config)
 
         Logger._LOG_ACTIVE = log_active
         Logger.logger = logging.getLogger(Logger._LOGGER_NAME)
@@ -123,6 +131,8 @@ class Logger:
                 handler.flush()
                 break
 
+        [cls.log(entry) for entry in cls.pre_log_buffer]
+
     @classmethod
     def log(cls, entry: Union[LogEntry, str, Any]) -> None:
         """
@@ -134,20 +144,19 @@ class Logger:
                  Otherwise, the message will be logged according to its mode.
         :rtype: None
         """
-        if isinstance(entry, str):
-            entry = LogEntry(message=entry, mode=LogMode.INFO)
-        elif isinstance(entry, LogEntry):
-            pass
-        else:
+        if not isinstance(entry, LogEntry):
             entry = LogEntry(
                 message=f"{entry}",
                 mode=LogMode.INFO
             )
 
-        if not Logger._LOG_ACTIVE:
-            print(entry.message)
+        if not hasattr(Logger, 'logger'):
+            Logger.pre_log_buffer.append(entry)
             return None
 
+        if not Logger._LOG_ACTIVE:
+            print(f"WARNING_LOGGER_NOT_ACTIVE: {entry.message}")
+            return None
         
         match entry.mode:
             case LogMode.DEBUG:
@@ -178,11 +187,10 @@ class Logger:
         """
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.DEBUG)
-
-        if not Logger._LOG_ACTIVE:
-            print(entry.message)
-
-        Logger.logger.debug(entry.message)
+        else:
+            entry.mode = LogMode.DEBUG
+        
+        Logger.log(entry)
 
     @classmethod
     def warn(cls, entry: Union[LogEntry, str]):
@@ -200,12 +208,11 @@ class Logger:
         :rtype: None
         """
         if isinstance(entry, str):
-            entry = LogEntry(message=entry, mode=LogMode.DEBUG)
+            entry = LogEntry(message=entry, mode=LogMode.WARNING)
+        else:
+            entry.mode = LogMode.WARNING
 
-        if not Logger._LOG_ACTIVE:
-            print(entry.message)
-
-        Logger.logger.warning(entry.message)
+        Logger.log(entry)
 
     @classmethod
     def error(cls, entry: Union[LogEntry, str]):
@@ -223,12 +230,11 @@ class Logger:
         :rtype: None
         """
         if isinstance(entry, str):
-            entry = LogEntry(message=entry, mode=LogMode.DEBUG)
+            entry = LogEntry(message=entry, mode=LogMode.ERROR)
+        else:
+            entry.mode = LogMode.ERROR
 
-        if not Logger._LOG_ACTIVE:
-            print(entry.message)
-
-        Logger.logger.error(entry.message)
+        Logger.log(entry)
 
     @classmethod
     def info(cls, entry: Union[LogEntry, str]):
@@ -246,12 +252,11 @@ class Logger:
         :rtype: None
         """
         if isinstance(entry, str):
-            entry = LogEntry(message=entry, mode=LogMode.DEBUG)
+            entry = LogEntry(message=entry, mode=LogMode.INFO)
+        else:
+            entry.mode = LogMode.INFO
 
-        if not Logger._LOG_ACTIVE:
-            print(entry.message)
-
-        Logger.logger.info(entry.message)
+        Logger.log(entry)
 
     @staticmethod
     def logging_on(func):

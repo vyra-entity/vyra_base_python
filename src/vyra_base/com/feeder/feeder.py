@@ -10,7 +10,7 @@ from rclpy.qos import (
     QoSDurabilityPolicy,
 )
 
-from vyra_base.com.communication_handler import CommunicationHandler
+from vyra_base.com.handler.communication_handler import CommunicationHandler
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.speaker import VyraSpeaker
@@ -64,7 +64,7 @@ class BaseFeeder:
             node=self._node,
             description=self._doc,
             qos_profile=self._qos,
-            domain_name=self._feederName,
+            ident_name=self._feederName,
         )
         self._loggingOn: bool = loggingOn
 

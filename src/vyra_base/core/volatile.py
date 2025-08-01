@@ -130,7 +130,7 @@ class Volatile:
             type=self.REDIS_TYPE_MAP[get_type],
             node=self.communication_node,
             description="Volatile parameter changes: " + key,
-            domain_name="volatile"
+            ident_name="volatile"
         )
         self._active_shouter[key] = speaker
         
