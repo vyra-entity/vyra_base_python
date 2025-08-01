@@ -145,6 +145,12 @@ class PermissionGenerator:
             "permissions/grant/allow_rule/domains/subscribe",
             "permissions/grant/allow_rule/domains/publish/topics",
             "permissions/grant/allow_rule/domains/subscribe/topics",
+            "permissions/grant/allow_rule/domains/request",
+            "permissions/grant/allow_rule/domains/request/services",
+            "permissions/grant/allow_rule/domains/request/services/service",
+            "permissions/grant/allow_rule/domains/reply",
+            "permissions/grant/allow_rule/domains/reply/services",
+            "permissions/grant/allow_rule/domains/reply/services/service",
             "permissions/grant/default",
         ]
         for elem in required_elements:
@@ -191,8 +197,13 @@ class PermissionGenerator:
         Logger.info("subject_name element is valid.")
         return True
 
-    def _set_defaults(self) -> None:
-        """Set default values for permissions."""
+    def load_permission_from_interface(self) -> None:
+        """Load permissions from the interface and update the XML structure."""
+        
+        speaker =Speaker()
+        callable_ = Callable()
+        job = Job()
+
         publish: list = [
             "ros_discovery_info"
         ]
