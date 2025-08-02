@@ -5,7 +5,7 @@
         "functionname": "ErrorFeed",
         "displayname": "Error Feed",
         "description": "Communicate error information in the system between different components or modules.",
-        "filetype": "msg/ErrorFeed.msg",
+        "filetype": "VBASEErrorFeed.msg",
         "params": [
             {
                 "datatype": "uint32",
@@ -48,7 +48,7 @@
         "functionname": "StateFeed",
         "displayname": "State Feed",
         "description": "Communicate state information in the system between different components or modules.",
-        "filetype": "msg/ErrorFeed.msg",
+        "filetype": "VBASEStateFeed.msg",
         "params": [
             {
                 "datatype": "string",
@@ -78,7 +78,7 @@
         "functionname": "NewsFeed",
         "displayname": "News Feed",
         "description": "Communicate news in the system between different components or modules.",
-        "filetype": "msg/NewsFeed.msg",
+        "filetype": "VBASENewsFeed.msg",
         "params": [
             {
                 "datatype": "string",

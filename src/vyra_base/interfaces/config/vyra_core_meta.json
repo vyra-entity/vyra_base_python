@@ -5,7 +5,7 @@
         "functionname": "get_capabilities",
         "displayname": "Get Capabilities",
         "description": "Retrieve the capabilities of the vyra system.",
-        "filetype": "srv/GetCapabilities.srv",
+        "filetype": "VBASEGetCapabilities.srv",
         "params": [],
         "returns": [
             {
@@ -27,7 +27,7 @@
         "functionname": "trigger_transition",
         "displayname": "Trigger Transition",
         "description": "Trigger a transition in the vyra system.",
-        "filetype": "srv/TriggerTransition.srv",
+        "filetype": "VBASETriggerTransition.srv",
         "params": [],
         "returns": [
             {
@@ -55,7 +55,7 @@
         "functionname": "startup",
         "displayname": "Start Up",
         "description": "Start up the vyra system.",
-        "filetype": "srv/StartUp.srv",
+        "filetype": "VBASEStartUp.srv",
         "params": [],
         "returns": [
             {

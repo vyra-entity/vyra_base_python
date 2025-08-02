@@ -1,6 +1,6 @@
 # VolatileHash.msg
 
-KeyValue[] entries
+VBASEKeyValue[] entries
 
 # This message is used to represent a volatile hash parameter in the system.
 # The entries field contains the key-value pairs that can change over time.

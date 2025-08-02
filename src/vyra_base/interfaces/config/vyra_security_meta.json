@@ -5,7 +5,7 @@
         "functionname": "request_access",
         "displayname": "Request Access",
         "description": "Request access to this module to read parameters, control the module, or perform other actions.",
-        "filetype": "srv/RequestAccess.srv",
+        "filetype": "VBASERequestAccess.srv",
         "params": [
             {
                 "datatype": "string",
