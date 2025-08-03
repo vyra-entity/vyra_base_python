@@ -35,12 +35,9 @@ def extract_ros_interfaces(target_package_path: str):
         if source_dir.exists():
             target_dir.mkdir(exist_ok=True)
             for file in source_dir.rglob(f'*.{interface_type}'):
-                # Ziel-Unterordner berechnen
-                relative_subdir = file.parent.relative_to(source_dir)
-                target_subdir = target_dir / relative_subdir
-                target_subdir.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(file, target_subdir / file.name)
-                print(f"Copied {file.name} to {target_subdir}")
+                shutil.copy2(file, target_dir / file.name)
+                print(f"Copied {file.name} to {target_dir}")
+
     config_path: Path = source_path / 'config'
     target_config: Path = target_path / 'config'
     
