@@ -4,7 +4,7 @@ int32 log_lines
 uint8 log_level
 ---
 # Response
-vyra_base/LoggerStream[] log_messages
+vyra_base/VBASELoggerStream[] log_messages
 
 # This service is used to retrieve logs from the vyra system.
 # The log_lines field specifies the number of log lines to retrieve.
