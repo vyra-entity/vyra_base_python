@@ -200,40 +200,36 @@ class DbManipulator:
         try:
             async with self._db.session()() as session:
                 async with session.begin():
-                    try:
-                        stmt = select(self.model)
-                        if filters:
-                            for key, value in filters.items():
-                                if not hasattr(self.model, key):
-                                    raise ValueError(
-                                        f"Model '{self.model.__name__}' has no column '{key}'")
-                                
-                                if isinstance(value, list):
-                                    stmt = stmt.where(getattr(self.model, key).in_(value))
-                                else:
-                                    stmt = stmt.where(getattr(self.model, key) == value)
-                        
-                        if order_by:
-                            stmt = stmt.order_by(getattr(self.model, order_by))
-                        
-                        if limit:
-                            stmt = stmt.limit(limit)
+                    stmt = select(self.model)
+                    if filters:
+                        for key, value in filters.items():
+                            if not hasattr(self.model, key):
+                                raise ValueError(
+                                    f"Model '{self.model.__name__}' has no column '{key}'")
+                            
+                            if isinstance(value, list):
+                                stmt = stmt.where(getattr(self.model, key).in_(value))
+                            else:
+                                stmt = stmt.where(getattr(self.model, key) == value)
+                    
+                    if order_by:
+                        stmt = stmt.order_by(getattr(self.model, order_by))
+                    
+                    if limit:
+                        stmt = stmt.limit(limit)
 
-                        result = await session.execute(stmt)
-                        value = result.scalars().all()
+                    result = session.execute(stmt)
+                    value = result.scalars().all()
 
-                        if len(value) == 0:
-                            return DBReturnValue(
-                                status=DBSTATUS.NOT_FOUND,
-                                value=value,
-                                details='No data found')
-
+                    if len(value) == 0:
                         return DBReturnValue(
+                            status=DBSTATUS.NOT_FOUND,
                             value=value,
-                            details='Data found').success_return()
-                    except Exception as e:
-                        Logger.log(LogEntry(f'Error in get_all: {e}').error())
-                        raise e
+                            details='No data found')
+
+                    return DBReturnValue(
+                        value=value,
+                        details='Data found').success_return()
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
