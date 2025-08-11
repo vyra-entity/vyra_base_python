@@ -218,7 +218,13 @@ class DbManipulator:
                     if limit:
                         stmt = stmt.limit(limit)
 
-                    result = session.execute(stmt)
+                    Logger.log("Start executing query")
+                    try:
+                        result = await session.execute(stmt)
+                    finally:
+                        Logger.log("Ran execute on session")
+                        ErrorTraceback.check_error_exist()
+                    Logger.log(f"Executed query: {stmt}: {result}")
                     value = result.scalars().all()
 
                     if len(value) == 0:
