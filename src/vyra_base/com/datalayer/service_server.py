@@ -1,3 +1,4 @@
+from asyncio import AbstractEventLoop
 import rclpy
 from dataclasses import dataclass
 from inspect import iscoroutine
@@ -8,6 +9,7 @@ from rclpy.service import Service as rclService
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
+import asyncio
 
 def _dummy_callback(*args, **kwargs) -> NoReturn:
     """
@@ -58,8 +60,12 @@ class VyraServiceServer:
         self.service_info: ServiceInfo = serviceInfo
         self._node: VyraNode = node
         self._async_loop = async_loop
-    
-    def create_service(self, callback: Callable, async_loop = None) -> None:
+        self.callback_task = None
+
+    def create_service(
+            self, 
+            callback: Callable, 
+            async_loop: AbstractEventLoop = None) -> None:
         """
         Create and register a service in the ROS2 node.
 
@@ -76,7 +82,7 @@ class VyraServiceServer:
             raise TypeError("Callback must be a callable function.")
 
         if async_loop is not None:
-            self._async_loop = async_loop
+            self._async_loop: AbstractEventLoop = async_loop
 
         self._node.get_logger().info(f"Creating service: {self.service_info.name}")
         
@@ -108,7 +114,8 @@ class VyraServiceServer:
             self.service_info.service = None
             self._node.get_logger().info(f"Service '{self.service_info.name}' destroyed.")
 
-    async def callback(self, request, response) -> None:
+    @ErrorTraceback.w_check_error_exist
+    def callback(self, request, response) -> None:
         """
         Handle incoming service requests.
 
@@ -121,19 +128,21 @@ class VyraServiceServer:
         :return: The response object.
         :rtype: Any
         """
-        self._node.get_logger().info(f"Received request on {self.service_info.name}")
-
-        try:
-            await self.service_info.callback(request=request, response=response)
         
-            print(f">>>>>>{response}")
-           
-        finally:
-            if ErrorTraceback.check_error_exist():
-                self._node.get_logger().error(
-                    f"Error in service callback for {self.service_info.name}")
-                print("Error in service callback:")
+        @ErrorTraceback.w_check_error_exist
+        async def handle_callback(coro, request, response):
+            Logger.info(f"Handling request in {self.service_info.name} callback.")
+            await coro(request=request, response=response)
 
-            print(self.service_info.callback)
-        
+        # If the main event loop is already running, schedule the coroutine with run_coroutine_threadsafe
+        if self._async_loop is not None and iscoroutine(self.service_info.callback):
+            future = asyncio.run_coroutine_threadsafe(
+            handle_callback(self.service_info.callback, request, response),
+            self._async_loop
+            )
+            future.result()  # Wait for completion
+        elif callable(self.service_info.callback):
+            # Fallback: just call the callback directly (sync)
+            self.service_info.callback(request=request, response=response)
+        Logger.info(f"Async loop: {self._async_loop}")
         return response

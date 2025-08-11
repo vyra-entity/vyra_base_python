@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from asyncio import AbstractEventLoop
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -376,7 +377,7 @@ class VyraEntity:
                 "Skip loading interfaces in permission.xml"
             )
 
-        async_loop = asyncio.get_event_loop()
+        async_loop: AbstractEventLoop = asyncio.get_event_loop()
 
         for setting in settings:
             if setting.functionname in [i.functionname for i in self._interface_list]:
@@ -476,6 +477,16 @@ class VyraEntity:
         :returns: None
         :rtype: None
         """
+        # TEST -----------------------------------------------------
+        from vyra_base.storage.db_manipulator import DbManipulator
+        from vyra_base.storage.tb_params import Parameter
+        self.mr_manipulator = DbManipulator(
+            self.database_access, 
+            Parameter
+        )
+        Logger.log(await self.mr_manipulator.get_all())
+        # ----------------------------------------------------------
+
         trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]
         if request.trigger_name not in trigger_list:
             fail_msg = (
