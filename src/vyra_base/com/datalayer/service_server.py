@@ -1,8 +1,10 @@
 from asyncio import AbstractEventLoop
 import rclpy
 from dataclasses import dataclass
-from inspect import iscoroutine
+from inspect import iscoroutinefunction
 from typing import Any, Callable, NoReturn, Union
+import threading
+import concurrent.futures
 
 from rclpy.service import Service as rclService
 
@@ -33,11 +35,14 @@ class ServiceInfo:
     :type callback: Callable
     :param service: The ROS2 service instance.
     :type service: Union[rclService, None]
+    :param callback_timeout: Optional timeout for the callback.
+    :type callback_timeout: int | None
     """
     name: str = 'vyra_service_server'
     type: Any = None
     callback: Callable = _dummy_callback
     service: Union[rclService, None] = None
+    callback_timeout: int | None = None
 
 class VyraServiceServer:
     """
@@ -59,7 +64,7 @@ class VyraServiceServer:
         """
         self.service_info: ServiceInfo = serviceInfo
         self._node: VyraNode = node
-        self._async_loop = async_loop
+        self._async_loop: AbstractEventLoop | None = async_loop
         self.callback_task = None
 
     def create_service(
@@ -82,7 +87,7 @@ class VyraServiceServer:
             raise TypeError("Callback must be a callable function.")
 
         if async_loop is not None:
-            self._async_loop: AbstractEventLoop = async_loop
+            self._async_loop = async_loop
 
         self._node.get_logger().info(f"Creating service: {self.service_info.name}")
         
@@ -95,7 +100,7 @@ class VyraServiceServer:
         self.service_info.service = self._node.create_service(
             self.service_info.type, 
             self.service_info.name, 
-            self.callback
+            self._service_callback
         )
 
         self._node.get_logger().info(
@@ -115,7 +120,7 @@ class VyraServiceServer:
             self._node.get_logger().info(f"Service '{self.service_info.name}' destroyed.")
 
     @ErrorTraceback.w_check_error_exist
-    def callback(self, request, response) -> None:
+    def _service_callback(self, request, response) -> None:
         """
         Handle incoming service requests.
 
@@ -129,20 +134,64 @@ class VyraServiceServer:
         :rtype: Any
         """
         
-        @ErrorTraceback.w_check_error_exist
-        async def handle_callback(coro, request, response):
-            Logger.info(f"Handling request in {self.service_info.name} callback.")
-            await coro(request=request, response=response)
+        Logger.info(f"Service callback triggered for: {self.service_info.name}")
 
-        # If the main event loop is already running, schedule the coroutine with run_coroutine_threadsafe
-        if self._async_loop is not None and iscoroutine(self.service_info.callback):
-            future = asyncio.run_coroutine_threadsafe(
-            handle_callback(self.service_info.callback, request, response),
-            self._async_loop
+        # Check if it's an async function or async method
+        is_async = (iscoroutinefunction(self.service_info.callback) or 
+                   (hasattr(self.service_info.callback, '__func__') and 
+                    iscoroutinefunction(self.service_info.callback.__func__)))
+
+        if self._async_loop is not None and is_async:
+            Logger.debug(
+                f"Scheduling async callback for service {self.service_info.name}."
             )
-            future.result()  # Wait for completion
+
+            result = self.run_async_in_thread(
+                self.service_info.callback(request, response),
+                self.service_info.callback_timeout
+            )
+            Logger.debug(
+                f"Async callback for {self.service_info.name} completed: {result}"
+            )
+        
         elif callable(self.service_info.callback):
+            Logger.log(f"Executing sync callback for service {self.service_info.name}.")
             # Fallback: just call the callback directly (sync)
             self.service_info.callback(request=request, response=response)
-        Logger.info(f"Async loop: {self._async_loop}")
+
         return response
+    
+    def run_async_in_thread(self, coro, timeout=None):
+        def target():
+            # Prüfe ob bereits ein Loop im aktuellen Thread existiert
+            try:
+                existing_loop = asyncio.get_running_loop()
+                Logger.debug(
+                    f"Warning: Thread already has running loop: {existing_loop}"
+                )
+                # Das sollte in einem neuen Thread nie passieren
+            except RuntimeError:
+                # Das ist normal - neuer Thread hat keinen Loop
+                pass
+            
+            # Erstelle neuen Loop für diesen Thread
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            try:
+                Logger.debug(
+                    f"Created new event loop in thread: {threading.current_thread().name}"
+                )
+                if timeout is not None:
+                    return loop.run_until_complete(asyncio.wait_for(coro, timeout))
+                else:
+                    return loop.run_until_complete(coro)
+            finally:
+                # WICHTIG: Loop schließen um Ressourcen freizugeben
+                loop.close()
+                # Optional: Loop aus Thread entfernen
+                asyncio.set_event_loop(None)
+        
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(target)
+            return future.result()

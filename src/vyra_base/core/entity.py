@@ -478,13 +478,13 @@ class VyraEntity:
         :rtype: None
         """
         # TEST -----------------------------------------------------
-        from vyra_base.storage.db_manipulator import DbManipulator
-        from vyra_base.storage.tb_params import Parameter
-        self.mr_manipulator = DbManipulator(
-            self.database_access, 
-            Parameter
-        )
-        Logger.log(await self.mr_manipulator.get_all())
+        # from vyra_base.storage.db_manipulator import DbManipulator
+        # from vyra_base.storage.tb_params import Parameter
+        # self.mr_manipulator = DbManipulator(
+        #     self.database_access, 
+        #     Parameter
+        # )
+        # Logger.log(await self.mr_manipulator.get_all())
         # ----------------------------------------------------------
 
         trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]

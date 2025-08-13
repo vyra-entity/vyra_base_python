@@ -5,7 +5,7 @@ from pathlib import Path
 import vyra_base
 
 
-def extract_ros_interfaces(target_package_path: str):
+def extract_ros_interfaces(target_path: str | Path):
     """
     Extract ROS2 interface files from the pip-installed library into a ROS2 package.
 
@@ -24,7 +24,9 @@ def extract_ros_interfaces(target_package_path: str):
     package_path: Path = Path(vyra_base.__file__).parent / 'interfaces'
 
     source_path = Path(package_path)
-    target_path = Path(target_package_path)
+
+    if isinstance(target_path, str):
+        target_path = Path(target_path)
     
     # Copy interface files from source to target
     print(f"Extracting ROS2 interfaces from {source_path} to {target_path}")
