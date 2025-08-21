@@ -4,218 +4,14 @@ from xml.etree import ElementTree as ET
 from vyra_base.helper.logger import Logger
 
 
-class PermissionGenerator:
-    """Class to handle permission.xml-related operations."""
-
-    def __init__(
-            self, 
-            db_session, 
-            permission_file: str | ET.Element[str], 
-            module_name: str,
-            base_node_name: str="core",
-            domain_id: int = 42) -> None:
-        """
-        Initialize the PermissionGenerator.
-        :param db_session: Database session for accessing permissions.
-        :type db_session: Any
-        :param permission_file: Path to the permission file or an XML Element.
-        :type permission_file: str | ET.Element[str]
-        :param domain_id: Domain ID for the permissions.
-        :type domain_id: int
-        :raises ValueError: If the permission_file is not a valid string or XML Element.
-        """
-        self.db_session = db_session
-        self._module_name = module_name
-        self.base_node_name = base_node_name
-
-        if isinstance(permission_file, str):
-            self._root: ET.Element[str] = ET.fromstring(permission_file)
-        else:
-            self._root = permission_file
-
-        Logger.info(f"Domain ID set to {domain_id}")
-        self.domain_id: int = domain_id
-
-    @property
-    def permission_xml(self) -> ET.Element[str]:
-        """Return the permission XML root element."""
-        return self._root
-    
-    @permission_xml.setter
-    def permission_xml(self, value: ET.Element[str]) -> None:
-        """Set the permission XML root element."""
-        raise ValueError(
-            "Permission XML cannot be set directly. "
-            "Use the constructor to initialize it.")
-
-    def remove_module(self, module_name: str) -> None:
-        """Remove all interfaces belonging to a specific module 
-        from a permission xml file."""
-        pass  # TODO: Implement this method
-
-    def _set_grant_and_subject_name(self, name: str) -> None:
-        """Set the grant name for a permission."""
-
-        if not name:
-            raise ValueError("Grant name cannot be empty.")
-        
-        grant: ET.Element[str] | None = self._root.find("./permissions/grant")
-        subject_name_element: ET.Element[str] | None = self._root.find(
-            "./permissions/grant/subject_name")
-
-        if grant is None or subject_name_element is None:
-            err_msg = "No grant or subject_name element found in the permission XML."
-            Logger.error(err_msg)
-            raise ValueError(err_msg)
-
-        grant.set("name", f"/{self._module_name}/{self.base_node_name}")
-        subject_name_element.set("name", f"CN=/{self._module_name}/{self.base_node_name}")
-
-    def _set_validity_dates(
-            self, 
-            from_date: str="2025-01-01T00:00:00", 
-            to_date: str="2125-01-01T00:00:00") -> None:
-        """Set the validity period for a permission."""
-
-        if not from_date or not to_date:
-            raise ValueError("Both from_date and to_date must be provided.")
-
-        if not self._check_datetime_format(from_date) or \
-           not self._check_datetime_format(to_date):
-            Logger.warn(f"Invalid date format: {from_date}, {to_date}. "
-                         "Must be YYYY-MM-DDTHH:MM:SS.")
-            raise ValueError(
-                "Date format must be YYYY-MM-DDTHH:MM:SS, e.g. 2025-01-01T00:00:00.")
-
-        validity_element: ET.Element[str] | None = self._root.find(
-            "./permissions/grant/validity")
-        
-        if validity_element is None:
-            err_msg = "No validity element found in the permission XML."
-            Logger.error(err_msg)
-            raise ValueError(err_msg)
-
-        from_element = self._root.find(
-            "./permissions/grant/validity/not_before_utc")
-        
-        if from_element is None:
-            from_element = ET.SubElement(validity_element, "not_before_utc")
-
-        from_element.text = from_date
-
-        to_element = self._root.find(
-            "./permissions/grant/validity/not_after_utc")
-        
-        if to_element is None:
-            to_element = ET.SubElement(validity_element, "not_after_utc")
-
-        to_element.text = to_date
-
-    def _check_datetime_format(self, date_str: str) -> bool:
-        """Check if the date string is in the correct format."""
-        import re
-        pattern = r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$"
-        return bool(re.match(pattern, date_str))
-
-    def validate_permission(self) -> bool:
-        """Validate the permission XML structure."""
-        if not isinstance(self._root, ET.Element):
-            Logger.error("Permission XML root is not a valid Element.")
-            return False
-
-        self._validate_permission_structure()
-        self._validate_subject_name()
-
-
-        Logger.info("Permission XML is valid.")
-        return True
-
-    def _validate_permission_structure(self) -> bool:
-        # Check for required elements
-        required_elements = [
-            "permissions",
-            "permissions/grant", 
-            "permissions/grant/subject_name", 
-            "permissions/grant/validity", 
-            "permissions/grant/validity/not_before_utc", 
-            "permissions/grant/validity/not_after_utc"
-            "permissions/grant/allow_rule",
-            "permissions/grant/allow_rule/domains",
-            "permissions/grant/allow_rule/domains/publish",
-            "permissions/grant/allow_rule/domains/subscribe",
-            "permissions/grant/allow_rule/domains/publish/topics",
-            "permissions/grant/allow_rule/domains/subscribe/topics",
-            "permissions/grant/allow_rule/domains/request",
-            "permissions/grant/allow_rule/domains/request/services",
-            "permissions/grant/allow_rule/domains/request/services/service",
-            "permissions/grant/allow_rule/domains/reply",
-            "permissions/grant/allow_rule/domains/reply/services",
-            "permissions/grant/allow_rule/domains/reply/services/service",
-            "permissions/grant/default",
-        ]
-        for elem in required_elements:
-            element_count = len(self._root.findall(f"./{elem}"))
-            if not element_count:
-                Logger.error(f"Missing required element: {elem}")
-                return False
-            if element_count > 1:
-                Logger.warn(f"Multiple elements found for: {elem}. "
-                            "Only the first one will be permitted.")
-                return False
-
-        default_rule: ET.Element[str] | None = self._root.find("./permissions/grant/default")
-        if default_rule is None:
-            Logger.error("Missing default_rule element in permission XML.")
-            return False
-
-        if default_rule.text != "DENY":
-            Logger.warn("Default rule is not set to DENY. "
-                        "It should be set to DENY for security reasons.")
-            return False
-        
-        Logger.info("Permission XML structure is valid.")
-        return True
-
-    def _validate_subject_name(self) -> bool:
-        """Validate the subject_name element."""
-        subject_name_element: ET.Element[str] | None = self._root.find(
-            "./permissions/grant/subject_name")
-        
-        if subject_name_element is None:
-            Logger.error("Missing subject_name element in permission XML.")
-            return False
-        
-        if not subject_name_element.text:
-            Logger.error("subject_name element is empty.")
-            return False
-    
-        if subject_name_element.text != self._module_name:
-            Logger.warn(f"subject_name element does not match module name: "
-                        f"{subject_name_element.text} != {self._module_name}")
-            return False
-        
-        Logger.info("subject_name element is valid.")
-        return True
-
-    def load_permission_from_interface(self) -> None:
-        """Load permissions from the interface and update the XML structure."""
-        
-        speaker =Speaker()
-        callable_ = Callable()
-        job = Job()
-
-        publish: list = [
-            "ros_discovery_info"
-        ]
-        subscribe: list = [
-            "ros_discovery_info"
-        ]
-
-
 class BaseInterface:
     """Base class for all interface types with common add/remove functionality."""
     client: list[str] = []
     server: list[str] = []
+    permission_templates: dict = {
+        "client": [],
+        "server": []
+    }
 
     @classmethod
     def add(cls, list_ref: list[str], name: str) -> bool:
@@ -251,25 +47,78 @@ class BaseInterface:
     def remove_server(cls, name: str) -> bool:
         """Remove a server registration."""
         return BaseInterface.remove(cls.server, name)
+    
+    @classmethod
+    def clear_all(cls) -> None:
+        """Clear all client and server registrations."""
+        cls.client.clear()
+        cls.server.clear()
+        Logger.info(f"Cleared all registrations for {cls.__name__}.")
+    
+    @classmethod
+    def clear_client(cls) -> None:
+        """Clear all client registrations."""
+        cls.client.clear()
+        Logger.info(f"Cleared all client registrations for {cls.__name__}.")
+
+    @classmethod
+    def clear_server(cls) -> None:
+        """Clear all server registrations."""
+        cls.server.clear()
+        Logger.info(f"Cleared all server registrations for {cls.__name__}.")
+
+    
+    @classmethod
+    def get_all_permissions(cls) -> list:
+        """Get the client permissions based on the permission templates."""
+        s_template = cls.permission_templates.get("server", [])
+        c_template = cls.permission_templates.get("client", [])
+
+        permissions = []
+
+        for name in cls.client:
+            for entry in s_template:
+                permissions.append([n.replace("{name}", name) for n in entry])
+        
+        for name in cls.server:
+            for entry in c_template:
+                permissions.append([n.replace("{name}", name) for n in entry])
+        
+        return permissions
 
 
 class Speaker(BaseInterface):
     client: list[str] = []
     server: list[str] = []
     permission_templates: dict = {
-        "client": ["request", "topics", "topic", "{name}"],
-        "server": ["reply", "topics", "topic", "{name}"]
+        "client": [
+            ["request", "topics", "topic", "{name}"]
+        ],
+        "server": [
+            ["reply", "topics", "topic", "{name}"]
+        ]
     }
 
     @classmethod
-    def add_speaker_client(cls, name: str) -> bool:
+    def add_client(cls, name: str) -> bool:
         """Add a new speaker client registration."""
         return Speaker.add(cls.client, name)
 
     @classmethod
-    def remove_speaker_client(cls, name: str) -> bool:
+    def add_server(cls, name: str) -> bool:
+        """Add a new speaker server registration."""
+        return Speaker.add(cls.server, name)
+
+    @classmethod
+    def remove_client(cls, name: str) -> bool:
         """Remove a speaker client registration."""
         return Speaker.remove(cls.client, name)
+
+    @classmethod
+    def remove_server(cls, name: str) -> bool:
+        """Remove a speaker server registration."""
+        return Speaker.remove(cls.server, name)
+
 
 class Callable(BaseInterface):
     client: list[str] = []
@@ -284,22 +133,22 @@ class Callable(BaseInterface):
     }
 
     @classmethod
-    def add_callable_client(cls, name: str) -> bool:
+    def add_client(cls, name: str) -> bool:
         """Add a new callable client registration."""
         return Callable.add(cls.client, name)
     
     @classmethod
-    def add_callable_server(cls, name: str) -> bool:
+    def add_server(cls, name: str) -> bool:
         """Add a new callable server registration."""
         return Callable.add(cls.server, name)
     
     @classmethod
-    def remove_callable_client(cls, name: str) -> bool:
+    def remove_client(cls, name: str) -> bool:
         """Remove a callable client registration."""
         return Callable.remove(cls.client, name)
     
     @classmethod
-    def remove_callable_server(cls, name: str) -> bool:
+    def remove_server(cls, name: str) -> bool:
         """Remove a callable server registration."""
         return Callable.remove(cls.server, name)
 
@@ -325,22 +174,22 @@ class Job(BaseInterface):
         ]
     }
     @classmethod
-    def add_job_client(cls, name: str) -> bool:
+    def add_client(cls, name: str) -> bool:
         """Add a new job client registration."""
         return Job.add(cls.client, name)
 
     @classmethod
-    def add_job_server(cls, name: str) -> bool:
+    def add_server(cls, name: str) -> bool:
         """Add a new job server registration."""
         return Job.add(cls.server, name)
 
     @classmethod
-    def remove_job_client(cls, name: str) -> bool:
+    def remove_client(cls, name: str) -> bool:
         """Remove a job client registration."""
         return Job.remove(cls.client, name)
 
     @classmethod
-    def remove_job_server(cls, name: str) -> bool:
+    def remove_server(cls, name: str) -> bool:
         """Remove a job server registration."""
         return Job.remove(cls.server, name)
 
@@ -365,12 +214,19 @@ def prev_test():
     print("Job server subscriptions: " + str(Job.server))  # Alle action server subscriptions
     print("Job server publications: " + str(Job.server))  # Alle action server publications
 
-    print("Remove speaker_client: " + str(Speaker.remove_client("my_speaker_client")))  # True
-    print("Remove speaker_server: " + str(Speaker.remove_server("my_speaker_server")))  # True
-    print("Remove service_client: " + str(Callable.remove_client("my_service_client")))  # True
-    print("Remove service_server: " + str(Callable.remove_server("my_service_server")))  # True
-    print("Remove action_client: " + str(Job.remove_client("my_action_client")))  # True
-    print("Remove action_server: " + str(Job.remove_server("my_action_server")))  # True
+    # print("Remove speaker_client: " + str(Speaker.remove_client("my_speaker_client")))  # True
+    # print("Remove speaker_server: " + str(Speaker.remove_server("my_speaker_server")))  # True
+    # print("Remove service_client: " + str(Callable.remove_client("my_service_client")))  # True
+    # print("Remove service_server: " + str(Callable.remove_server("my_service_server")))  # True
+    # print("Remove action_client: " + str(Job.remove_client("my_action_client")))  # True
+    # print("Remove action_server: " + str(Job.remove_server("my_action_server")))  # True
+
+    print("\nAll speaker permissions:")
+    print(Speaker.get_all_permissions())
+    print("\nAll callable permissions:")
+    print(Callable.get_all_permissions())
+    print("\nAll job permissions:")
+    print(Job.get_all_permissions())
 
     # permission_root = create_base_permissions_xml()
 
