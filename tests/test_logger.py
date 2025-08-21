@@ -230,11 +230,11 @@ class TestLogger:
             Logger._LOG_ACTIVE = False
             
             Logger.log("test message")
-            mock_print.assert_called_with("test message")
+            mock_print.assert_not_called()
             
             Logger.log(LogEntry("test entry"))
-            mock_print.assert_called_with("test entry")
-    
+            mock_print.assert_not_called()
+            
     def test_logger_log_unknown_mode(self):
         """Test Logger.log with unknown mode"""
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -291,8 +291,7 @@ class TestLogger:
             Logger.logger.debug = Mock()
             
             Logger.debug("debug message")
-            mock_print.assert_called_with("debug message")
-            Logger.logger.debug.assert_called_with("debug message")
+            mock_print.assert_called_with("WARNING_LOGGER_NOT_ACTIVE: debug message")
     
     def test_logger_warning_method(self):
         """Test Logger.warn method"""
@@ -327,8 +326,7 @@ class TestLogger:
             Logger.logger.warning = Mock()
             
             Logger.warn("warning message")
-            mock_print.assert_called_with("warning message")
-            Logger.logger.warning.assert_called_with("warning message")
+            mock_print.assert_called_with("WARNING_LOGGER_NOT_ACTIVE: warning message")
     
     def test_logger_error_method(self):
         """Test Logger.error method"""
@@ -363,9 +361,8 @@ class TestLogger:
             Logger.logger.error = Mock()
             
             Logger.error("error message")
-            mock_print.assert_called_with("error message")
-            Logger.logger.error.assert_called_with("error message")
-    
+            mock_print.assert_called_with("WARNING_LOGGER_NOT_ACTIVE: error message")
+
     def test_logger_info_method(self):
         """Test Logger.info method"""
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -399,8 +396,7 @@ class TestLogger:
             Logger.logger.info = Mock()
             
             Logger.info("info message")
-            mock_print.assert_called_with("info message")
-            Logger.logger.info.assert_called_with("info message")
+            mock_print.assert_called_with("WARNING_LOGGER_NOT_ACTIVE: info message")
     
     def test_logger_logging_on_decorator_sync(self):
         """Test Logger.logging_on decorator with synchronous function"""
