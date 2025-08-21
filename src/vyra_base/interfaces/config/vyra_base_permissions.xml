@@ -1,7 +1,7 @@
 <dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.omg.org/spec/DDS-SECURITY/20170901/omg_shared_ca_permissions.xsd">
   <permissions>
-    <grant name="/vyra_module_template/core">
-      <subject_name>CN=/vyra_module_template/core</subject_name>
+    <grant name="/template">
+      <subject_name>CN=/template</subject_name>
       <validity>
         <not_before_utc>2025-01-01T00:00:00</not_before_utc>
         <not_after_utc>2035-01-01T00:00:00</not_after_utc>
@@ -12,27 +12,20 @@
         </domains>
         <publish>
           <topics>
-            <topic>rq/MMRegisterRequest</topic>
-            <topic>ros_discovery_info</topic>
           </topics>
         </publish>
         <subscribe>
           <topics>
-            <topic>rr/MMRegisterReply</topic>
-            <topic>ros_discovery_info</topic>
           </topics>
         </subscribe>
         <request>
           <services>
-            <service></service>
           </services>
         </request>
         <reply>
           <services>
-            <service></service>
           </services>
         </reply>
-        
       </allow_rule>
       <default>DENY</default>
     </grant>
