@@ -1,4 +1,5 @@
 import re
+import asyncio
 
 from dataclasses import dataclass, field
 from rclpy.node import Node
@@ -28,6 +29,13 @@ class VyraNode(Node):
     def __init__(self, node_settings: NodeSettings) -> None:
         super().__init__(node_settings.name)
         self._node_settings: NodeSettings = node_settings
+        self.reload_event = asyncio.Event()
+
+    def set_reload(self) -> None:
+        """
+        Set the reload event to notify that the node settings have changed.
+        """
+        self.reload_event.set()
 
     @property
     def node_settings(self) -> NodeSettings:
