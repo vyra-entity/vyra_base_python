@@ -2,10 +2,10 @@
     {
         "tags": ["ros2_srv"],
         "type": "callable",
-        "functionname": "get_capabilities",
-        "displayname": "Get Capabilities",
-        "description": "Retrieve the capabilities of the vyra system.",
-        "filetype": "VBASEGetCapabilities.srv",
+        "functionname": "get_interface_list",
+        "displayname": "Get Interface List",
+        "description": "Retrieve the list of interfaces of the vyra system.",
+        "filetype": "VBASEGetInterfaceList.srv",
         "params": [],
         "returns": [
             {

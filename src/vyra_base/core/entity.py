@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from asyncio import AbstractEventLoop
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -562,9 +563,10 @@ class VyraEntity:
         )
     
     @remote_callable
-    async def get_capabilities(self, request: Any, response: Any) -> Any:
+    async def get_interface_list(self, request: Any, response: Any) -> Any:
         """
-        Retrieves the capabilities of the entity.
+        Retrieves all capabilities (speaker, callable, job) of the entity that are set to
+        visible from the module to external access.
 
         :param request: The request object.
         :type request: Any
@@ -573,7 +575,13 @@ class VyraEntity:
         :returns: None
         :rtype: Any
         """
-        pass
+        response_interface_list = []
+        for interface in self._interface_list:
+            if interface.displaystyle.visible:
+                response_interface_list.append(asdict(interface))
+
+        response.interface_list = response_interface_list
+        return None
 
     @staticmethod
     def register_callables_callbacks(callback_parent: object):
