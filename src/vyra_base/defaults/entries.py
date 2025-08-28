@@ -73,7 +73,8 @@ class FunctionConfigBaseTypes(Enum):
     job = 'job'
 
 
-class FunctionConfigBaseParams(Enum):
+@dataclass(slots=True)
+class FunctionConfigBaseParams:
     """
     Enum for the function configuration base parameters.
 
@@ -88,7 +89,8 @@ class FunctionConfigBaseParams(Enum):
     description: str
 
 
-class FunctionConfigBaseReturn(Enum):
+@dataclass(slots=True)
+class FunctionConfigBaseReturn:
     """
     Enum for the function configuration base return values.
 
@@ -103,7 +105,8 @@ class FunctionConfigBaseReturn(Enum):
     description: str
 
 
-class FunctionConfigDisplaystyle(Enum):
+@dataclass(slots=True)
+class FunctionConfigDisplaystyle:
     """
     Enum for the function configuration display style.
 
@@ -112,8 +115,8 @@ class FunctionConfigDisplaystyle(Enum):
     :ivar visible: If True, the function is visible in the GUI
     :ivar published: If True, the function is published in the GUI
     """
-    visible: bool
-    published: bool
+    visible: bool = False
+    published: bool = False
 
 
 @dataclass(slots=True)
