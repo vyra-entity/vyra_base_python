@@ -88,6 +88,13 @@ class FunctionConfigBaseParams:
     displayname: str
     description: str
 
+    def __dict__(self) -> dict:
+        return {
+            "datatype": dict(self.datatype),
+            "displayname": self.displayname,
+            "description": self.description
+        }
+
 
 @dataclass(slots=True)
 class FunctionConfigBaseReturn:
@@ -104,6 +111,13 @@ class FunctionConfigBaseReturn:
     displayname: str
     description: str
 
+    def __dict__(self) -> dict:
+        return {
+            "datatype": dict(self.datatype),
+            "displayname": self.displayname,
+            "description": self.description
+        }
+
 
 @dataclass(slots=True)
 class FunctionConfigDisplaystyle:
@@ -117,6 +131,12 @@ class FunctionConfigDisplaystyle:
     """
     visible: bool = False
     published: bool = False
+
+    def __dict__(self) -> dict:
+        return {
+            "visible": self.visible,
+            "published": self.published
+        }
 
 
 @dataclass(slots=True)
@@ -138,6 +158,11 @@ class FunctionConfigPeriodicSpeaker:
         if not (0.01 <= self.interval <= 10.0):
             raise ValueError(f"speed {self.interval} out of bounds (0.01–10.0)")
 
+    def __dict__(self) -> dict:
+        return {
+            "caller": self.caller.__name__,
+            "interval": self.interval
+        }
 
 @dataclass(slots=True)
 class FunctionConfigEntry:
@@ -183,6 +208,22 @@ class FunctionConfigEntry:
     qosprofile: Union[int, QoSProfile] = 10
     callback: Union[Callable, None] = None
     periodic: Union[FunctionConfigPeriodicSpeaker, None] = None
+
+    def __dict__(self) -> dict:
+        return {
+            "tags": self.tags,
+            "type": dict(self.type),
+            "ros2type": self.ros2type,
+            "functionname": self.functionname,
+            "displayname": self.displayname,
+            "description": self.description,
+            "displaystyle": dict(self.displaystyle),
+            "params": [dict(p) for p in self.params],
+            "returns": [dict(r) for r in self.returns],
+            "qosprofile": self.qosprofile,
+            "callback": self.callback.__name__ if self.callback else "N/A",
+            "periodic": dict(self.periodic) if self.periodic else "N/A",
+        }
 
 
 @dataclass(slots=True)
