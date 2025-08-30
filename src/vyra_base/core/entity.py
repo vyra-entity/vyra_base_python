@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from asyncio import AbstractEventLoop
 from dataclasses import asdict
 from pathlib import Path
@@ -578,8 +579,9 @@ class VyraEntity:
         response_interface_list = []
         for interface in self._interface_list:
             if interface.displaystyle.visible:
-                Logger.debug(f"Adding interface <{interface}> to response.")
-                response_interface_list.append(dict(interface))
+                Logger.debug(f"Adding interface name: {interface.displayname}")
+                Logger.debug(f"Adding interface <{interface.asdict()}> to response.")
+                response_interface_list.append(str(interface.asdict()))
 
         response.interface_list = response_interface_list
         return None

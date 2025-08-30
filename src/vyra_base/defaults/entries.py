@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass, fields
 from datetime import datetime
 from enum import Enum, IntEnum
 from re import DEBUG
@@ -59,6 +59,11 @@ class FunctionConfigParamTypes(Enum):
     ARRAY = "array"
 
 
+@dataclass(slots=True)
+class DCBase:
+    def asdict(self):
+        return asdict(self)
+
 class FunctionConfigBaseTypes(Enum):
     """
     Enum for the function configuration base types.
@@ -75,7 +80,7 @@ class FunctionConfigBaseTypes(Enum):
 
 
 @dataclass(slots=True)
-class FunctionConfigBaseParams:
+class FunctionConfigBaseParams(DCBase):
     """
     Enum for the function configuration base parameters.
 
@@ -87,18 +92,11 @@ class FunctionConfigBaseParams:
     """
     datatype: FunctionConfigParamTypes
     displayname: str
-    description: str
-
-    def __dict__(self) -> dict:
-        return {
-            "datatype": dict(self.datatype),
-            "displayname": self.displayname,
-            "description": self.description
-        }
+    description: str    
 
 
 @dataclass(slots=True)
-class FunctionConfigBaseReturn:
+class FunctionConfigBaseReturn(DCBase):
     """
     Enum for the function configuration base return values.
 
@@ -112,16 +110,9 @@ class FunctionConfigBaseReturn:
     displayname: str
     description: str
 
-    def __dict__(self) -> dict:
-        return {
-            "datatype": dict(self.datatype),
-            "displayname": self.displayname,
-            "description": self.description
-        }
-
 
 @dataclass(slots=True)
-class FunctionConfigDisplaystyle:
+class FunctionConfigDisplaystyle(DCBase):
     """
     Enum for the function configuration display style.
 
@@ -133,15 +124,9 @@ class FunctionConfigDisplaystyle:
     visible: bool = False
     published: bool = False
 
-    def __dict__(self) -> dict:
-        return {
-            "visible": self.visible,
-            "published": self.published
-        }
-
 
 @dataclass(slots=True)
-class FunctionConfigPeriodicSpeaker:
+class FunctionConfigPeriodicSpeaker(DCBase):
     """
     Stores the periodic speaker settings.
 
@@ -159,14 +144,19 @@ class FunctionConfigPeriodicSpeaker:
         if not (0.01 <= self.interval <= 10.0):
             raise ValueError(f"speed {self.interval} out of bounds (0.01–10.0)")
 
-    def __dict__(self) -> dict:
-        return {
-            "caller": self.caller.__name__,
-            "interval": self.interval
-        }
+    def asdict(self):
+        result = {}
+        for f in fields(self):
+            if f.name == "caller":
+                result[f.name] = getattr(self.caller, "__name__", None)
+                continue
+            value = getattr(self, f.name)
+            result[f.name] = value
+        return result
+
 
 @dataclass(slots=True)
-class FunctionConfigEntry:
+class FunctionConfigEntry(DCBase):
     """
     Contains the function configuration.
 
@@ -210,26 +200,22 @@ class FunctionConfigEntry:
     callback: Union[Callable, None] = None
     periodic: Union[FunctionConfigPeriodicSpeaker, None] = None
 
-    @ErrorTraceback.w_check_error_exist
-    def __dict__(self) -> dict:
-        return {
-            "tags": self.tags,
-            "type": dict(self.type),
-            "ros2type": self.ros2type,
-            "functionname": self.functionname,
-            "displayname": self.displayname,
-            "description": self.description,
-            "displaystyle": dict(self.displaystyle),
-            "params": [dict(p) for p in self.params],
-            "returns": [dict(r) for r in self.returns],
-            "qosprofile": self.qosprofile,
-            "callback": self.callback.__name__ if self.callback else "N/A",
-            "periodic": dict(self.periodic) if self.periodic else "N/A",
-        }
+    def asdict(self):
+        result = {}
+        for f in fields(self):
+            if f.name == "callback":
+                result[f.name] = getattr(self.callback, "__name__", None)
+                continue
+            if f.name == "ros2type":
+                result[f.name] = getattr(self.ros2type, "__name__", None)
+                continue
+            value = getattr(self, f.name)
+            result[f.name] = value
+        return result
 
 
 @dataclass(slots=True)
-class ErrorEntry:
+class ErrorEntry(DCBase):
     """
     Container for the error entry.
 
@@ -360,7 +346,7 @@ class NewsEntry(dict):
 
 
 @dataclass(slots=True)
-class PullRequestEntry:
+class PullRequestEntry(DCBase):
     """
     Contains the pull request entry.
 
@@ -415,7 +401,7 @@ class PullRequestEntry:
         )
 
 @dataclass(repr=True, slots=True)
-class StateEntry:
+class StateEntry(DCBase):
     """
     Contains the state entry.
 
@@ -451,7 +437,7 @@ class StateEntry:
         )
 
 @dataclass(slots=True)
-class ModuleEntry:
+class ModuleEntry(DCBase):
     """
     Contains the module entry.
 
@@ -512,7 +498,7 @@ class ModuleEntry:
 
 
 @dataclass(slots=True)
-class AvailableModuleEntry:
+class AvailableModuleEntry(DCBase):
     """
     Not used in the current implementation.
     """
