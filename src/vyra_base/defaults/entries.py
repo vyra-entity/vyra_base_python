@@ -9,6 +9,7 @@ from typing import Any, Callable, Union
 from uuid import UUID
 
 from rclpy.qos import QoSProfile
+from vyra_base.helper.error_handler import ErrorTraceback
 
 
 class FunctionConfigParamTypes(Enum):
@@ -209,6 +210,7 @@ class FunctionConfigEntry:
     callback: Union[Callable, None] = None
     periodic: Union[FunctionConfigPeriodicSpeaker, None] = None
 
+    @ErrorTraceback.w_check_error_exist
     def __dict__(self) -> dict:
         return {
             "tags": self.tags,

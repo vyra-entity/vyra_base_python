@@ -578,7 +578,7 @@ class VyraEntity:
         response_interface_list = []
         for interface in self._interface_list:
             if interface.displaystyle.visible:
-                Logger.debug(f"Adding interface <{dict(interface)}> to response.")
+                Logger.debug(f"Adding interface <{interface}> to response.")
                 response_interface_list.append(dict(interface))
 
         response.interface_list = response_interface_list
