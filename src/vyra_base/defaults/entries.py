@@ -209,6 +209,9 @@ class FunctionConfigEntry(DCBase):
             if f.name == "ros2type":
                 result[f.name] = getattr(self.ros2type, "__name__", None)
                 continue
+            if f.name == "displaystyle":
+                result[f.name] = self.displaystyle.asdict()
+                continue
             value = getattr(self, f.name)
             result[f.name] = value
         return result

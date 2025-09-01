@@ -121,7 +121,7 @@ class VyraServiceClient:
         if self._service_info.client is None:
             raise RuntimeError("Service client is not created. Call create_service() first.")
         
-        result = self._service_info.client.call_async(
+        result = await self._service_info.client.call_async(
             self._service_info.request,
         )
 

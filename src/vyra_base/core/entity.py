@@ -577,7 +577,7 @@ class VyraEntity:
         response_interface_list = []
         for interface in self._interface_list:
             if interface.displaystyle.visible:
-                response_interface_list.append(str(interface.asdict()))
+                response_interface_list.append(json.dumps(interface.asdict()))
 
         response.interface_list = response_interface_list
         return None
