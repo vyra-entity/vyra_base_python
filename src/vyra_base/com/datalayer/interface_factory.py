@@ -1,20 +1,23 @@
 from __future__ import annotations
 
+from csv import Error
 from functools import wraps
 from inspect import iscoroutinefunction
-from typing import Any, Callable, Optional, Union
-from xml import dom
+from typing import Any, Callable, Union
 
 from rclpy.qos import QoSProfile
 
-from vyra_base.com.datalayer.callable import VyraCallable
-from vyra_base.com.datalayer.job import VyraJob
+from vyra_base.com.datalayer.callable import VyraCallable, VyraCallableExecutor
+from vyra_base.com.datalayer.job import VyraJob, VyraJobRunner
 from vyra_base.com.datalayer.node import NodeSettings, VyraNode, CheckerNode
 from vyra_base.com.datalayer.publisher import PeriodicCaller, PublisherInfo, VyraPublisher
-from vyra_base.com.datalayer.service_server import ServiceInfo, VyraServiceServer
-from vyra_base.com.datalayer.speaker import VyraSpeaker
-from vyra_base.helper.logger import Logger
+from vyra_base.com.datalayer.service_client import ServiceClientInfo, VyraServiceClient
+from vyra_base.com.datalayer.service_server import ServiceServerInfo, VyraServiceServer
+from vyra_base.com.datalayer.speaker import VyraSpeaker, VyraSpeakerListener
+from vyra_base.com.datalayer.subscriber import SubscriptionInfo, VyraSubscriber
 from vyra_base.helper.error_handler import ErrorTraceback
+from vyra_base.helper.logger import Logger
+
 
 class DataSpace:
     """
@@ -27,9 +30,14 @@ class DataSpace:
     :cvar speakers: List of registered V.Y.R.A. speakers.
     """
 
+    speakers: list[VyraSpeaker] = []
     callables: list[VyraCallable] = []
     jobs: list[VyraJob] = []
-    speakers: list[VyraSpeaker] = []
+    
+    speakers_listener: list[VyraSpeakerListener] = []
+    callables_executor: list[VyraCallableExecutor] = []
+    jobs_runner: list[VyraJobRunner] = []
+
 
     @classmethod
     def kill(cls, obj: Any) -> None:
@@ -47,6 +55,12 @@ class DataSpace:
             cls.jobs.remove(obj)
         elif isinstance(obj, VyraSpeaker):
             cls.speakers.remove(obj)
+        elif isinstance(obj, VyraSpeakerListener):
+            cls.speakers_listener.remove(obj)
+        elif isinstance(obj, VyraCallableExecutor):
+            cls.callables_executor.remove(obj)
+        elif isinstance(obj, VyraJobRunner):
+            cls.jobs_runner.remove(obj)
         else:
             raise ValueError("Object type not recognized for killing.")
         
@@ -123,7 +137,7 @@ class DataSpace:
             if obj.publisher_server is None:
                 Logger.warn(
                     f"Speaker {obj.name} has no publisher server. "
-                    "It will still be added to the DataSpace."
+                    "It will nevertheless be added to the DataSpace."
                 )
 
             return cls.speakers[index].merge(obj)
@@ -198,6 +212,159 @@ class DataSpace:
         else:
             Logger.debug(f"{cls}Adding new job {obj.name}.")
             cls.jobs.append(obj)
+            return obj
+        
+    @classmethod
+    def get_speaker_listener(cls, name: str) -> VyraSpeakerListener:
+        """
+        Get a speaker listener by its name.
+
+        :param name: Name of the speaker to retrieve.
+        :type name: str
+        :return: The VyraSpeaker object if found, otherwise None.
+        :rtype: VyraSpeaker or None
+        """
+        for speaker in cls.speakers_listener:
+            if speaker.name == name:
+                return speaker
+        raise ValueError(f"Speaker listener with name {name} not found in DataSpace.")
+
+    @classmethod
+    def get_callable_executor(cls, name: str) -> VyraCallableExecutor:
+        """
+        Get a callable executor by its name.
+
+        :param name: Name of the callable to retrieve.
+        :type name: str
+        :return: The VyraCallableExecutor object if found, otherwise None.
+        :rtype: VyraCallableExecutor or None
+        """
+        for callable_ in cls.callables_executor:
+            if callable_.name == name:
+                return callable_
+        raise ValueError(f"Callable executor with name {name} not found in DataSpace.")
+
+    @classmethod
+    def get_job_runner(cls, name: str) -> VyraJobRunner:
+        """
+        Get a job runner by its name.
+
+        :param name: Name of the job to retrieve.
+        :type name: str
+        :return: The VyraJobRunner object if found, otherwise None.
+        :rtype: VyraJobRunner or None
+        """
+        for job in cls.jobs_runner:
+            if job.name == name:
+                return job
+        raise ValueError(f"Job runner with name {name} not found in DataSpace.")
+
+    @classmethod
+    def add_speaker_listener(cls, obj: VyraSpeakerListener) -> VyraSpeakerListener:
+        """
+        Add a speaker listener object to the DataSpace.
+
+        If a speaker listener with the same name already exists, 
+        merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. speaker listener to add or merge.
+        :type obj: VyraSpeakerListener
+        :return: The added or merged VyraSpeakerListener object.
+        :rtype: VyraSpeakerListener
+        """
+
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.speakers_listener) if 
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.debug(
+                f"{cls}Merging existing speaker listener {obj.name}<->"
+                f"{cls.speakers_listener[index].name}."
+            )
+            if obj.subscriber_server is None:
+                Logger.warn(
+                    f"Speaker listener {obj.name} has no subscriber server. "
+                    "It will nevertheless be added to the DataSpace."
+                )
+
+            return cls.speakers_listener[index].merge(obj)
+        else:
+            Logger.debug(f"{cls}Adding new speaker listener {obj.name}.")
+            cls.speakers_listener.append(obj)
+            return obj
+    
+    @classmethod
+    def add_callable_executor(cls, obj: VyraCallableExecutor) -> VyraCallableExecutor:
+        """
+        Add a callable executor object to the DataSpace.
+
+        If a callable executor with the same name already exists, merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. callable executor to add or merge.
+        :type obj: VyraCallableExecutor
+        :return: The added or merged VyraCallableExecutor object.
+        :rtype: VyraCallableExecutor
+        """
+
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.callables_executor) if
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.debug(
+                f"{cls}Merging existing callable executor {obj.name}<->"
+                f"{cls.callables_executor[index].name}."
+            )
+        
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.callables_executor) if 
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.debug(
+                f"{cls}Merging existing callable {obj.name}<->"
+                f"{cls.callables_executor[index].name}."
+            )
+
+            if obj.service_client is None:
+                Logger.warn(
+                    f"Callable {obj.name} has no service client. "
+                    "It will still be added to the DataSpace."
+                )
+
+            return cls.callables_executor[index].merge(obj)
+        else:
+            Logger.debug(f"{cls}Adding new callable {obj.name}.")
+            cls.callables_executor.append(obj)
+            return obj
+    
+    @classmethod
+    def add_job_runner(cls, obj: VyraJobRunner) -> VyraJobRunner:
+        """
+        Add a job runner object to the DataSpace.
+
+        If a job runner with the same name already exists, merges the new object with the existing one.
+
+        :param obj: The V.Y.R.A. job runner to add or merge.
+        :type obj: VyraJobRunner
+        :return: The added or merged VyraJob object.
+        :rtype: VyraJob
+        """
+        
+        index: int | None = next(
+            (i for i, ele in enumerate(cls.jobs_runner) if
+                ele.name == obj.name), None
+        )
+        if index is not None:
+            Logger.debug(
+                f"{cls}Merging existing job runner {obj.name}<->"
+                f"{cls.jobs_runner[index].name}."
+            )
+            return cls.jobs_runner[index].merge(obj)
+        else:
+            Logger.debug(f"{cls}Adding new job runner {obj.name}.")
+            cls.jobs_runner.append(obj)
             return obj
 
 
@@ -325,7 +492,7 @@ def create_vyra_callable(
 
     name: str = _name_parser(base_name, domain_name, ident_name)
 
-    service = ServiceInfo(
+    service = ServiceServerInfo(
         name=name,
         type=type
     )
@@ -369,6 +536,8 @@ def create_vyra_callable(
 def create_vyra_job(
         type: Any,
         node: VyraNode,
+        fb_callback: Callable,
+        result_callback: Callable,
         ident_name: str = "global_job",
         async_loop = None) -> None:
     """
@@ -401,7 +570,8 @@ def create_vyra_job(
         )
 
     name: str = _name_parser(base_name, domain_name, ident_name)
-    # TBD: Implement job creation logic
+    raise NotImplementedError("Jobs are not yet implemented.")
+
 
 @ErrorTraceback.w_check_error_exist
 def remove_vyra_speaker(name: str= "", speaker: VyraSpeaker= None) -> None:
@@ -461,6 +631,220 @@ def remove_vyra_job(name: str, job: VyraJob = None) -> None:
 
     DataSpace.kill(job)
     Logger.info(f"VyraJob removed: {name}")
+
+@ErrorTraceback.w_check_error_exist
+def listen_vyra_speaker(
+    type: Any, 
+    node: VyraNode,
+    description: str,
+    callback: Callable[[Any], None],
+    ident_name: str = "global_speaker_listener",
+    qos_profile: Union[int, QoSProfile] = 10
+    ) -> VyraSpeakerListener:
+    """
+    Create a listener for a V.Y.R.A. speaker.
+    A listener is a subscriber that listens to messages from a topic and is used to receive simple 
+    data types from other V.Y.R.A. OS modules.
+    :param type: The ROS2 message datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param callback: Callback function to be called when a message is received.
+    :type callback: Callable[[Any], None]
+    :param ident_name: Identifier name for the speaker.
+    :type ident_name: str
+    :raises ValueError: If no callback function is provided.
+    :return: The created VyraSpeaker object.
+    :rtype: VyraSpeaker
+    """
+    domain_name = "speaker"
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a speaker."
+        )
+
+    if (not callable(callback) or callback == None):
+        raise ValueError("Invalid callback. A callable callback must be provided.")
+
+
+    name: str = _name_parser(base_name, domain_name, ident_name)
+    subscriber = SubscriptionInfo(
+        name=name,
+        type=type,
+        callback=callback
+    )
+    
+    if qos_profile is not None:
+        subscriber.qos_profile = qos_profile
+
+    subscriber_server = VyraSubscriber(
+        subscriptionInfo=subscriber,
+        node=node
+    )
+
+    subscriber_server.create_subscription()
+
+    listener: VyraSpeakerListener = VyraSpeakerListener(
+        name=ident_name,
+        type=type,
+        description=description,
+        subscriber_server=subscriber_server,
+    )
+
+    listener: VyraSpeakerListener = DataSpace.add_speaker_listener(
+        listener)
+
+    Logger.log(f'VyraSpeaker listener created: {name}')
+    return listener
+
+def remove_vyra_speaker_listener(
+    name: str= "", 
+    listener: VyraSpeakerListener= None
+    ) -> None:
+    """ Remove a V.Y.R.A. speaker listener by name.
+    :param name: Name of the speaker listener to remove.
+    :type name: str
+    :return: None
+    """
+    if listener is None and name == "":
+        Logger.error(
+            "Either name or listener must be provided."
+        )
+        raise ValueError("Either name or listener must be provided.")
+    
+    if listener is None:
+        listener = DataSpace.get_speaker_listener(name)
+    
+    DataSpace.kill(listener)
+    Logger.info(f"VyraSpeakerListener removed: {name}")
+
+@ErrorTraceback.w_check_error_exist
+async def execute_vyra_callable(
+    type: Any, 
+    node: VyraNode,
+    send_data: dict,
+    ident_name: str = "global_callable_executor",
+    timeout: float = 30.0,
+    async_loop = None
+    ) -> Any:
+    """
+    Create a callable executor for an external V.Y.R.A. (V.Y.R.A. Operating System) 
+    service.
+
+    A callable is a function that provides a quick response to the request and 
+    does not block the caller. The callable must return a value within a given 
+    time limit, otherwise it is considered a failure. This method creates a client
+    that can call an external callable service.
+
+    :param type: The ROS2 service datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param send_data: Data to be sent to the callable service.
+    :type send_data: dict
+    :param ident_name: Identifier name for the callable.
+    :type ident_name: str
+    :param async_loop: Optional event loop for asynchronous execution.
+    :type async_loop: Any
+    :raises ValueError: If no callback function is provided.
+    :return: The created VyraCallable object.
+    :rtype: VyraCallable
+    """
+    domain_name = "callable"
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a callable."
+        )
+
+    name: str = _name_parser(base_name, domain_name, ident_name)
+
+    service = ServiceClientInfo(
+        name=name,
+        type=type,
+        timeout=timeout
+    )
+
+    client = VyraServiceClient(
+        serviceInfo=service,
+        node=node
+    )
+
+    executor: VyraCallableExecutor = VyraCallableExecutor(
+        name=ident_name,
+        type=type,
+        description="A callable executor for the V.Y.R.A. Operating System.",
+        service_client=client
+    )
+
+    executor: VyraCallableExecutor = DataSpace.add_callable_executor(executor)
+
+    try:
+        if executor.service_client is None:
+            Logger.error(
+                f"Callable executor <{name}> has no service client. "
+            )
+            raise ValueError(
+                "A service client must be provided before "
+                f"creation of the callable executor: {name}."
+            )
+    
+        executor.service_client.create_service_caller()
+
+        Logger.log(f'VyraCallable executor created: {name}')
+
+        return (await executor.service_client.send(**send_data))
+    finally:
+        DataSpace.kill(executor)
+
+def run_vyra_job(
+    type: Any,
+    node: VyraNode,
+    send_data: dict,
+    ident_name: str = "global_job_runner",
+    async_loop = None) -> VyraJobRunner:
+    """
+    Create a job runner for an external V.Y.R.A. (V.Y.R.A. Operating System) 
+    service.
+
+    A job is a function that will be executed in the background and will not block the caller.
+    A job can take a long time to complete and will return a result when it is done.
+    Additionally, a job can provide feedback information during the process.
+    This method creates a client that can call an external job service.
+
+    :param type: The ROS2 service datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param send_data: Data to be sent to the job service.
+    :type send_data: dict
+    :param ident_name: Identifier name for the job.
+    :type ident_name: str
+    :param async_loop: Optional event loop for asynchronous execution.
+    :type async_loop: Any
+    :return: The created VyraJobRunner object.
+    :rtype: VyraJobRunner
+    """
+    domain_name = "job"
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a callable."
+        )
+
+    name: str = _name_parser(base_name, domain_name, ident_name)
+    # TBD: Implement job runner creation and execution logic
+    raise NotImplementedError("Job runner creation not implemented yet.")
 
 @ErrorTraceback.w_check_error_exist
 def remote_callable(func):

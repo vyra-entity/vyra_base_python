@@ -401,12 +401,10 @@ class VyraEntity:
                 )
             elif setting.type == FunctionConfigBaseTypes.job.value:
                 Logger.info(f"Creating job: {setting.functionname}")
-                create_vyra_job(
-                    type=setting.ros2type,
-                    node=self._node,
-                    async_loop=async_loop,
-                    ident_name=setting.functionname
-                )
+                # TBD: vyra job implementation
+                # create_vyra_job(...)
+                Logger.warn(f"Vyra Jobs are not implemented yet.")
+
             elif setting.type == FunctionConfigBaseTypes.speaker.value:
                 Logger.info(f"Creating speaker: {setting.functionname}")
                 periodic: bool = False
@@ -579,8 +577,6 @@ class VyraEntity:
         response_interface_list = []
         for interface in self._interface_list:
             if interface.displaystyle.visible:
-                Logger.debug(f"Adding interface name: {interface.displayname}")
-                Logger.debug(f"Adding interface <{interface.asdict()}> to response.")
                 response_interface_list.append(str(interface.asdict()))
 
         response.interface_list = response_interface_list

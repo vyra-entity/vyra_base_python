@@ -1,20 +1,15 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from http import client
+from datetime import datetime
+from socket import timeout
 from typing import Any, Callable, NoReturn, Union
 
 import rclpy
 from rclpy.client import Client
 
 from vyra_base.com.datalayer.node import VyraNode
-
-def _base_callback(*args, **kwargs) -> NoReturn:
-    """
-    Raises
-    ------
-    NotImplementedError
-        If no callback is provided for the service client.
-    """
-    raise NotImplementedError("No callback provided for service client.")
+from vyra_base.helper.error_handler import ErrorTraceback
+from vyra_base.helper.logger import Logger
 
 def _base_request(*args, **kwargs) -> NoReturn:
     """
@@ -27,7 +22,7 @@ def _base_request(*args, **kwargs) -> NoReturn:
 
 
 @dataclass
-class ServiceInfo:
+class ServiceClientInfo:
     """
     Data class for storing service information.
 
@@ -43,12 +38,17 @@ class ServiceInfo:
         Callback function for the service.
     client : Union[Client, None]
         ROS2 client instance or None.
+    timeout : int | None
+        Optional timeout for the service client.
+    calls_at_timeout : int
+        Number of calls to attempt at timeout before giving up.
     """
-    name: str = 'vyra_service_server'
+    name: str = 'vyra_service_client'
     type: Any = None
     request: Callable = _base_request
-    callback: Callable = _base_callback
     client: Union[Client, None] = None
+    timeout: float | None = None
+    last_responses: list = field(default_factory=list)
 
 class VyraServiceClient:
     """
@@ -57,7 +57,7 @@ class VyraServiceClient:
     This class is intended to be factory-created to implement specific service functionality.
     """
 
-    def __init__(self, serviceInfo: ServiceInfo, node: VyraNode) -> None:
+    def __init__(self, serviceInfo: ServiceClientInfo, node: VyraNode) -> None:
         """
         Initialize the VyraServiceClient.
 
@@ -68,15 +68,14 @@ class VyraServiceClient:
         node : VyraNode
             ROS2 node instance.
         """
-        self._service_info: ServiceInfo = serviceInfo
+        self._service_info: ServiceClientInfo = serviceInfo
         self._node: VyraNode = node
-        self.TIMEOUT_SEC = 1.0  # Timeout for service calls in seconds
     
-    def create_service(self) -> None:
+    def create_service_caller(self) -> None:
         """
-        Create a service in the ROS2 node.
+        Create a service caller in the ROS2 node.
 
-        This method should be called to register the service with the ROS2 node.
+        This method should be called to register the service caller with the ROS2 node.
 
         Raises
         ------
@@ -95,12 +94,19 @@ class VyraServiceClient:
             self._service_info.name
         )
 
-        while not self._service_info.client.wait_for_service(timeout_sec=self.TIMEOUT_SEC):
-            self._node.get_logger().info('service not available, waiting again...')
+        while not self._service_info.client.wait_for_service(
+            timeout_sec=self._service_info.timeout):
+    
+            Logger.error(
+                f'service <{self._service_info.name}> not available, timeout...')
+            
+            raise TimeoutError(
+                f'Service <{self._service_info.name}> not available, timeout...') 
 
         self._service_info.request = self._service_info.type.Request()
 
-    def send(self, **kwargs: dict) -> Any:
+    @ErrorTraceback.w_check_error_exist
+    async def send(self, **kwargs: dict) -> Any:
         """
         Set attributes on the service request.
 
@@ -112,20 +118,13 @@ class VyraServiceClient:
         for key, value in kwargs.items():
             setattr(self._service_info.request, key, value)
 
+        if self._service_info.client is None:
+            raise RuntimeError("Service client is not created. Call create_service() first.")
+        
+        result = self._service_info.client.call_async(
+            self._service_info.request,
+        )
 
-    def callback(self, request, response) -> None:
-        """
-        Add a callback to the service.
+        self._service_info.last_responses.append((datetime.now(), result))
 
-        This method should be overridden in subclasses to provide specific functionality.
-
-        Parameters
-        ----------
-        request : Any
-            The service request.
-        response : Any
-            The service response.
-        """
-        self._node.get_logger().info(f"Received request on {self._service_info.name}")
-
-        self._service_info.callback(request, response)
+        return result

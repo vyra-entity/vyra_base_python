@@ -23,7 +23,7 @@ def _dummy_callback(*args, **kwargs) -> NoReturn:
 
 
 @dataclass
-class ServiceInfo:
+class ServiceServerInfo:
     """
     Data class for storing service information.
 
@@ -51,7 +51,7 @@ class VyraServiceServer:
     This class is intended to be factory-created to implement specific service functionality.
     """
 
-    def __init__(self, serviceInfo: ServiceInfo, node: VyraNode, async_loop = None) -> None:
+    def __init__(self, serviceInfo: ServiceServerInfo, node: VyraNode, async_loop = None) -> None:
         """
         Initialize the VyraServiceServer.
 
@@ -62,7 +62,7 @@ class VyraServiceServer:
         :param async_loop: Optional asyncio event loop.
         :type async_loop: Any, Optional
         """
-        self.service_info: ServiceInfo = serviceInfo
+        self.service_info: ServiceServerInfo = serviceInfo
         self._node: VyraNode = node
         self._async_loop: AbstractEventLoop | None = async_loop
         self.callback_task = None

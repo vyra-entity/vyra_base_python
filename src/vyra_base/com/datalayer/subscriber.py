@@ -7,7 +7,7 @@ from rclpy.subscription import Subscription as rclpySubscription
 from rclpy.timer import Timer
 
 from vyra_base.com.datalayer.node import VyraNode
-
+from vyra_base.helper.logger import Logger
 
 def _base_callback(*args, **kwargs) -> NoReturn:
     """
@@ -40,14 +40,18 @@ class SubscriptionInfo:
     qos_profile: Union[QoSProfile, int] = 10
     subscription: Union[rclpySubscription, None] = None
 
-class VyraSubscription:
+class VyraSubscriber:
     """
     Base class for ROS2 subscriptions.
 
-    This class is intended to be factory-created to implement specific subscriptions for topics.
+    This class is intended to be factory-created to implement specific 
+    subscriptions for topics.
     """
 
-    def __init__(self, subscriptionInfo: SubscriptionInfo, node: VyraNode) -> None:
+    def __init__(
+            self, 
+            subscriptionInfo: SubscriptionInfo, 
+            node: VyraNode) -> None:
         """
         Initialize the VyraSubscription.
 
@@ -58,14 +62,20 @@ class VyraSubscription:
         """
         self._subscription_info: SubscriptionInfo = subscriptionInfo
         self._node = node
-    
+
     def create_subscription(self) -> None:
         """
         Create and register the subscription with the ROS2 node.
 
         :raises ValueError: If the subscription type or name is not provided.
         """
-        self._node.get_logger().info(f"Creating subscription: {self._subscription_info.name}")
+        if self._subscription_info.subscription is not None:
+            self.remove_subscription()
+            Logger.warn(f"Subscription '{self._subscription_info.name}' already exists. It will be replaced.")
+        
+        self._node.get_logger().info(
+            f"Creating subscription: {self._subscription_info.name}")
+        
         if not self._subscription_info.type:
             raise ValueError("Service type must be provided.")
         
@@ -75,7 +85,7 @@ class VyraSubscription:
         self._subscription_info.subscription = self._node.create_subscription(
             self._subscription_info.type, 
             self._subscription_info.name, 
-            self.callback,
+            self._subscription_info.callback,
             self._subscription_info.qos_profile
         )
     
@@ -88,7 +98,9 @@ class VyraSubscription:
         if self._subscription_info.subscription:
             self._node.destroy_subscription(self._subscription_info.subscription)
             self._subscription_info.subscription = None
-            self._node.get_logger().info(f"Subscription '{self._subscription_info.name}' removed.")
+
+            self._node.get_logger().info(
+                f"Subscription '{self._subscription_info.name}' removed.")
 
     def callback(self, msg) -> None:
         """
