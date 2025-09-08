@@ -219,7 +219,10 @@ class VyraEntity:
 
         await self.redis_access.configure_base_settings()
 
-    async def _init_params(self, default_config: Any) -> None:
+    async def _init_params(
+            self, 
+            default_config: Any, 
+            parameter_base_types: dict[str, Any]) -> None:
         """
         Initialize parameters for the entity.
 
@@ -231,6 +234,8 @@ class VyraEntity:
         Logger.debug("Initializing parameters for the entity.")
         
         self.param_manager = Parameter(
+            parameter_base_types=parameter_base_types,
+            node=self._node,
             storage_access_persistant=self.database_access,
             storage_access_transient=self.redis_access
         )
@@ -244,7 +249,8 @@ class VyraEntity:
 
     def _init_volatiles(self, transient_base_types: dict[str, Any]) -> None:
         """
-        Initialize volatile parameters for the entity.
+        Initialize volatile parameters for the entity. Volatile parameters are stored in Redis.
+        Thus they could only be used during runtime and are not persisted.
 
         This method sets up the volatile parameters using Redis for transient storage.
         It should be called during the initialization of the entity.
@@ -292,7 +298,8 @@ class VyraEntity:
 
     async def setup_storage(
             self, config: dict[str, Any], 
-            transient_base_types: dict[str, Any]) -> None:
+            transient_base_types: dict[str, Any],
+            parameter_base_types: dict[str, Any]) -> None:
         """
         Set up the storage for the entity.
 
@@ -345,7 +352,7 @@ class VyraEntity:
             dtype = self.database_access.db_type
             persistent_config[dtype]['database'] = persistent_config[dtype]['default_database']
             
-            await self._init_params(persistent_config)
+            await self._init_params(persistent_config, parameter_base_types)
 
         self._init_volatiles(transient_base_types=transient_base_types)
 

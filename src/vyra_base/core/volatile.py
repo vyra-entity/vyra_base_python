@@ -22,6 +22,19 @@ class Volatile:
     It also provides methods to subscribe to changes on volatile parameters.
     The volatile parameters are identified by their keys, which are strings.
     The class uses Redis as the storage backend for volatile parameters.
+    API:
+        - Volatiles could only be written by the module itself.
+        - Volatiles could be subscribed by other modules to get notified on changes.
+        - Volatiles are not persisted and will be lost on system restart.
+        - Volatiles are not shared between modules, each module has its own set of volatiles.
+        - Volatiles are identified by their keys, which are strings.
+        - Volatiles could be of different types, such as string, hash, list, set.
+    Example usage:
+        - current robot state
+        - io states
+        - status information
+        - temporary data storage
+        - any custom data defined by the module.
     """
     EVENT_TOPIC_PREFIX = "volatile/"
 
