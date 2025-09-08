@@ -1,0 +1,14 @@
+# GetParam.srv
+
+# Request
+string key
+
+---
+# Response
+bool success
+string error_message
+string value
+
+# Get a parameter in the vyra system in the database for this module.
+# Success indicates if the parameter was retrieved successfully.
+# The error_message field contains details in case of failure.

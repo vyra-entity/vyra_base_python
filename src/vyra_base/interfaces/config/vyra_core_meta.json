@@ -76,5 +76,147 @@
             "visible": true,
             "published": false
         }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "set_param",
+        "displayname": "Set Parameter",
+        "description": "Set a parameter in the vyra system.",
+        "filetype": "VBASESetParam.srv",
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Parameter Key",
+                "description": "The key of the parameter to set."
+            },
+            {
+                "name": "value",
+                "datatype": "string",
+                "displayname": "Parameter Value",
+                "description": "The value to set for the parameter."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "get_param",
+        "displayname": "Get Parameter",
+        "description": "Get a parameter in the vyra system.",
+        "filetype": "VBASEGetParam.srv",
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Parameter Key",
+                "description": "The key of the parameter to get."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            },
+            {
+                "name": "value",
+                "datatype": "string",
+                "displayname": "Parameter Value",
+                "description": "The value of the parameter."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "get_update_param_event_topic",
+        "displayname": "Get Update Parameter Event Topic",
+        "description": "Get the topic for update parameter events.",
+        "filetype": "VBASEGetUpdateParamEventTopic.srv",
+        "params": [],
+        "returns": [
+            {
+                "name": "topic",
+                "datatype": "string",
+                "displayname": "Topic",
+                "description": "The topic for update parameter events."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_msg"],
+        "type": "speaker",
+        "functionname": "updateParamEvent",
+        "displayname": "Update Parameter Event",
+        "description": "Communicate parameter updates in the system between different components or modules.",
+        "filetype": "VBASEUpdateParamEvent.msg",
+        "returns": [
+            {
+                "datatype": "string",
+                "displayname": "param_key",
+                "description": "The key of the parameter that was updated"
+            },
+            {
+                "datatype": "string",
+                "displayname": "changed_from",
+                "description": "Display the previous value of the parameter"
+            },
+            {
+                "datatype": "string",
+                "displayname": "changed_to",
+                "description": "Display the new value of the parameter"
+            },
+            {
+                "datatype": "string",
+                "displayname": "id",
+                "description": "The unique identifier of the parameter"
+            },
+            {
+                "datatype": "datetime",
+                "displayname": "timestamp",
+                "description": "The timestamp when the parameter was changed"
+            }
+        ],
+        "access_level": 1,
+        "visible": true,
+        "published": false
     }
 ]
