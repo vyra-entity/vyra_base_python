@@ -230,11 +230,11 @@ class TestLogger:
             Logger._LOG_ACTIVE = False
             
             Logger.log("test message")
-            mock_print.assert_not_called()
-            
+            mock_print.assert_called_with("WARNING_LOGGER_NOT_ACTIVE: test message")
+
             Logger.log(LogEntry("test entry"))
-            mock_print.assert_not_called()
-            
+            mock_print.assert_called_with("WARNING_LOGGER_NOT_ACTIVE: test entry")
+
     def test_logger_log_unknown_mode(self):
         """Test Logger.log with unknown mode"""
         with tempfile.TemporaryDirectory() as temp_dir:
