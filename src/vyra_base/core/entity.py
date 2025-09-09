@@ -606,8 +606,7 @@ class VyraEntity:
 
         class MyParentClass:
           @remote_callable
-          async def my_remote_function(self, request: Any, response: Any):
-            <your implementation here>
+          async def my_remote_function(self, request: Any, response: Any)
 
         instance_my_parent = MyParentClass()
 
