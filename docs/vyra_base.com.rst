@@ -29,10 +29,10 @@ vyra\_base.com.db\_handler module
    :show-inheritance:
    :undoc-members:
 
-vyra\_base.com.ros2\_handler module
+vyra\_base.com.handler.ros2\_handler module
 -----------------------------------
 
-.. automodule:: vyra_base.com.ros2_handler
+.. automodule:: vyra_base.com.handler.ros2_handler
    :members:
    :show-inheritance:
    :undoc-members:
