@@ -240,6 +240,8 @@ class VyraEntity:
             storage_access_transient=self.redis_access
         )
 
+        VyraEntity.register_callables_callbacks(self.param_manager)
+
         self.default_database_access = DbAccess(
             module_name=self.module_entry.name,
             db_config=default_config
@@ -266,6 +268,8 @@ class VyraEntity:
             node=self._node,
             transient_base_types=transient_base_types
         )
+
+        VyraEntity.register_callables_callbacks(self.volatile)
 
     def _init_state_machine(self, state_entry: StateEntry) -> StateMachine:
         """
@@ -635,7 +639,9 @@ class VyraEntity:
         """
         for attr_name in dir(callback_parent):
             attr = getattr(callback_parent, attr_name)
-            if callable(attr) and getattr(attr, "_remote_callable", False):
+            rc_active = getattr(attr, "_remote_callable", False)
+
+            if callable(attr) and rc_active:
                 callable_obj = VyraCallable(
                     name=attr.__name__,
                     connected_callback=attr

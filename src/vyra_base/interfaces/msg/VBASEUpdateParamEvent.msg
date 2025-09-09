@@ -4,7 +4,7 @@ string param_key
 string changed_from
 string changed_to
 string id
-time timestamp
+builtin_interfaces/Time timestamp
 
 # Event message for parameter updates in the vyra system.
 # 'param_key' is the key of the parameter that was changed.

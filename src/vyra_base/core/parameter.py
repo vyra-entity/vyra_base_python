@@ -9,6 +9,7 @@ from vyra_base.com.datalayer.interface_factory import (
     create_vyra_speaker,
     remote_callable
 )
+from vyra_base.com.datalayer.publisher import VyraPublisher
 from vyra_base.com.datalayer.speaker import VyraSpeaker
 from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
 from vyra_base.helper.error_handler import ErrorTraceback
@@ -54,12 +55,12 @@ class Parameter:
         )
 
         self.parameter_base_types = parameter_base_types
-        self.update_param_event_ident = "param_update_event_feeder"
+        self.update_param_event_ident = "param_update_event_speaker"
 
         self.update_parameter_speaker: VyraSpeaker = create_vyra_speaker(
             type=parameter_base_types['UpdateParamEvent'], 
             node=node, 
-            description="Parameter update event feeder.",
+            description="Parameter update event speaker.",
             ident_name=self.update_param_event_ident
         )
 
@@ -135,7 +136,6 @@ class Parameter:
 
         return True
 
-    @ErrorTraceback.w_check_error_exist
     @remote_callable
     async def get_param(self, request: Any, response: Any) -> None:
         """
@@ -172,8 +172,6 @@ class Parameter:
 
         return None
 
-
-    @ErrorTraceback.w_check_error_exist
     @remote_callable
     async def set_param(self, request: Any, response: Any) -> None:
         """
@@ -228,7 +226,6 @@ class Parameter:
         response.message = f"Parameter '{key}' updated successfully."
         return None
 
-    @ErrorTraceback.w_check_error_exist
     @remote_callable
     async def read_all_params(self, request: Any, response: Any) -> None:
         """
@@ -278,7 +275,6 @@ class Parameter:
             }
         )
 
-    @ErrorTraceback.w_check_error_exist
     @remote_callable
     async def get_update_param_event_topic(self, request: Any, response: Any) -> None:
         """
@@ -286,7 +282,7 @@ class Parameter:
 
         :return: The topic for parameter change events.
         """
-        pub_server = self.update_parameter_speaker.publisher_server
+        pub_server: VyraPublisher | None = self.update_parameter_speaker.publisher_server
         if pub_server is None:
             raise RuntimeError("Publisher server is not initialized.")
         else:

@@ -1,7 +1,5 @@
 import asyncio
-from csv import Error
 from typing import Any, Type
-from uuid import UUID
 
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.speaker import VyraSpeaker

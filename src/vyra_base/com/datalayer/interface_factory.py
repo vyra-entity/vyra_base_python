@@ -871,12 +871,10 @@ def remote_callable(func):
         return result
 
     if iscoroutinefunction(func):
-        Logger.info(f"Function {func.__name__} is a coroutine. "
-                    "Using async wrapper for remote callable.")
-        wrapper = async_wrapper  
+        Logger.info(f"(API) Registering {func.__name__} as coroutine.")
+        wrapper = async_wrapper
     else:
-        Logger.warn(f"Function {func.__name__} is not a coroutine. "
-                    "Using synchronous wrapper instead.")
+        Logger.warn(f"(API) Registering {func.__name__} as regular function.")
         wrapper = sync_wrapper
 
     # Registration is performed later in the instance
