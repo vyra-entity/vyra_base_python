@@ -605,20 +605,20 @@ class VyraEntity:
         from vyra_base.com.datalayer.interface_factory import remote_callable
 
         class MyParentClass:
-            @remote_callable
-            async def my_remote_function(self, request: Any, response: Any):
-                <your implementation here>
+          @remote_callable
+          async def my_remote_function(self, request: Any, response: Any):
+            <your implementation here>
 
         instance_my_parent = MyParentClass()
 
         To register the remote callable in this example, the instance_my_parent
         object must be passed to this function:
-            - register_callables_callbacks(instance_my_parent)
+          - register_callables_callbacks(instance_my_parent)
 
         Inside your MyParentClass in a method you can call the same function and
         set the callback_parent to self to register the callables of the
         instance itself:
-            - register_callables_callbacks(self)
+          - register_callables_callbacks(self)
 
         This function will iterate over all attributes of the instance and
         register those marked as remote callable with the DataSpace.
