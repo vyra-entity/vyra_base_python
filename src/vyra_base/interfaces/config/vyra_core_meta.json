@@ -24,62 +24,6 @@
     {
         "tags": ["ros2_srv"],
         "type": "callable",
-        "functionname": "trigger_transition",
-        "displayname": "Trigger Transition",
-        "description": "Trigger a transition in the vyra system.",
-        "filetype": "VBASETriggerTransition.srv",
-        "params": [],
-        "returns": [
-            {
-                "name": "success",
-                "datatype": "bool",
-                "displayname": "Success",
-                "description": "Indicates whether the transition was successful"
-            },
-            {
-                "name": "message",
-                "datatype": "string",
-                "displayname": "Message",
-                "description": "A message providing additional information about the transition"
-            }
-        ],
-        "access_level": 1,
-        "displaystyle": {
-            "visible": true,
-            "published": false
-        }
-    },
-    {
-        "tags": ["ros2_srv"],
-        "type": "callable",
-        "functionname": "startup",
-        "displayname": "Start Up",
-        "description": "Start up the vyra system.",
-        "filetype": "VBASEStartUp.srv",
-        "params": [],
-        "returns": [
-            {
-                "name": "success",
-                "datatype": "bool",
-                "displayname": "Success",
-                "description": "Indicates whether the transition was successful"
-            },
-            {
-                "name": "message",
-                "datatype": "string",
-                "displayname": "Message",
-                "description": "A message providing additional information about the transition"
-            }
-        ],
-        "access_level": 1,
-        "displaystyle": {
-            "visible": true,
-            "published": false
-        }
-    },
-    {
-        "tags": ["ros2_srv"],
-        "type": "callable",
         "functionname": "set_param",
         "displayname": "Set Parameter",
         "description": "Set a parameter in the vyra system.",

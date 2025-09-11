@@ -475,102 +475,102 @@ class VyraEntity:
         checker_node = CheckerNode()
         return checker_node.is_node_available(node_name)
 
-    @remote_callable
-    async def trigger_transition(self, request: Any, response: Any) -> None:
-        """
-        Trigger a state transition for the entity from internal or remote.
+    # @remote_callable
+    # async def trigger_transition(self, request: Any, response: Any) -> None:
+    #     """
+    #     Trigger a state transition for the entity from internal or remote.
 
-        :param request: The request containing the transition name.
-        :type request: Any
-        :param response: The response object to update with the result.
-        :type response: Any
-        :raises NotImplementedError: If the method is not implemented in the subclass.
-        :returns: None
-        :rtype: None
-        """
-        # TEST -----------------------------------------------------
-        # from vyra_base.storage.db_manipulator import DbManipulator
-        # from vyra_base.storage.tb_params import Parameter
-        # self.mr_manipulator = DbManipulator(
-        #     self.database_access, 
-        #     Parameter
-        # )
-        # Logger.log(await self.mr_manipulator.get_all())
-        # ----------------------------------------------------------
+    #     :param request: The request containing the transition name.
+    #     :type request: Any
+    #     :param response: The response object to update with the result.
+    #     :type response: Any
+    #     :raises NotImplementedError: If the method is not implemented in the subclass.
+    #     :returns: None
+    #     :rtype: None
+    #     """
+    #     # TEST -----------------------------------------------------
+    #     # from vyra_base.storage.db_manipulator import DbManipulator
+    #     # from vyra_base.storage.tb_params import Parameter
+    #     # self.mr_manipulator = DbManipulator(
+    #     #     self.database_access, 
+    #     #     Parameter
+    #     # )
+    #     # Logger.log(await self.mr_manipulator.get_all())
+    #     # ----------------------------------------------------------
 
-        trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]
-        if request.trigger_name not in trigger_list:
-            fail_msg = (
-                f"Transition {request.trigger_name} not found in "
-                f"available transitions: {trigger_list}."
-            )
+    #     trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]
+    #     if request.trigger_name not in trigger_list:
+    #         fail_msg = (
+    #             f"Transition {request.trigger_name} not found in "
+    #             f"available transitions: {trigger_list}."
+    #         )
             
-            response.success = False
-            response.message = fail_msg
-            Logger.warn(fail_msg)
-            return None
+    #         response.success = False
+    #         response.message = fail_msg
+    #         Logger.warn(fail_msg)
+    #         return None
         
-        can_trigger, possible_trigger = self.state_machine.is_transition_possible(
-            request.trigger_name)
+    #     can_trigger, possible_trigger = self.state_machine.is_transition_possible(
+    #         request.trigger_name)
 
-        if not can_trigger:
-            fail_msg = (
-                f"Transition {request.trigger_name} not possible in "
-                f"current state {self.state_machine.model.state}."
-                f" Possible transitions are: {possible_trigger}."
-            )
+    #     if not can_trigger:
+    #         fail_msg = (
+    #             f"Transition {request.trigger_name} not possible in "
+    #             f"current state {self.state_machine.model.state}."
+    #             f" Possible transitions are: {possible_trigger}."
+    #         )
             
-            response.success = False
-            response.message = fail_msg
-            Logger.warn(fail_msg)
-            return None
+    #         response.success = False
+    #         response.message = fail_msg
+    #         Logger.warn(fail_msg)
+    #         return None
         
-        getattr(self.state_machine.model, f"{request.trigger_name}")()
+    #     getattr(self.state_machine.model, f"{request.trigger_name}")()
 
-        response.success = True
-        response.message = f"Transition {request.trigger_name} triggered successfully."
+    #     response.success = True
+    #     response.message = f"Transition {request.trigger_name} triggered successfully."
 
-        self.news_feeder.feed(
-            f"Transition {request.trigger_name} triggered successfully."
-        )
+    #     self.news_feeder.feed(
+    #         f"Transition {request.trigger_name} triggered successfully."
+    #     )
 
-    @remote_callable
-    async def startup(self, request: Any, response: Any) -> None:
-        """
-        Start up the entity and initialize its components.
+    # @remote_callable
+    # async def startup(self, request: Any, response: Any) -> None:
+    #     """
+    #     Start up the entity and initialize its components.
 
-        :param request: The request object containing startup parameters.
-        :type request: Any
-        :param response: The response object to update with the result.
-        :type response: Any
-        :raises NotImplementedError: If the method is not implemented in the subclass.
-        :returns: None
-        :rtype: None
-        """
+    #     :param request: The request object containing startup parameters.
+    #     :type request: Any
+    #     :param response: The response object to update with the result.
+    #     :type response: Any
+    #     :raises NotImplementedError: If the method is not implemented in the subclass.
+    #     :returns: None
+    #     :rtype: None
+    #     """
         
-        can_trigger, possible_trigger = self.state_machine.is_transition_possible(
-            'StartUp')
+    #     can_trigger, possible_trigger = self.state_machine.is_transition_possible(
+    #         'StartUp')
 
-        if not can_trigger:
-            fail_msg = (
-                f"<StartUp> not possible in "
-                f"current state {self.state_machine.model.state}."
-                f" Possible transitions are: {possible_trigger}."
-            )
+    #     if not can_trigger:
+    #         fail_msg = (
+    #             f"<StartUp> not possible in "
+    #             f"current state {self.state_machine.model.state}."
+    #             f" Possible transitions are: {possible_trigger}."
+    #         )
             
-            response.success = False
-            response.message = fail_msg
-            Logger.warn(fail_msg)
-            return None
+    #         response.success = False
+    #         response.message = fail_msg
+    #         Logger.warn(fail_msg)
+    #         return None
         
-        getattr(self.state_machine.model, f"StartUp")()
+    #     getattr(self.state_machine.model, f"StartUp")()
 
-        response.success = True
-        response.message = f"<StartUp> triggered successfully."
+    #     response.success = True
+    #     response.message = f"<StartUp> triggered successfully."
 
-        self.news_feeder.feed(
-            f"<StartUp> triggered successfully."
-        )
+    #     self.news_feeder.feed(
+    #         f"<StartUp> triggered successfully."
+    #     )
     
     @remote_callable
     async def get_interface_list(self, request: Any, response: Any) -> Any:
