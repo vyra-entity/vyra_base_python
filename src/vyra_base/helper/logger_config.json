@@ -20,7 +20,7 @@
         "class": "logging.handlers.RotatingFileHandler",
         "level": "DEBUG",
         "formatter": "debug",
-        "filename": "log/vyra/logfile.log",
+        "filename": "log/vyra/vyra_main_stdout.log",
         "mode": "a",
         "maxBytes": 5242880,
         "backupCount": 40,

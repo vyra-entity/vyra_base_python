@@ -120,6 +120,11 @@ class Logger:
 
         logging.config.dictConfig(loaded_log_config)
 
+        root_logger = logging.getLogger()
+        for handler in list(root_logger.handlers):
+            if isinstance(handler, logging.StreamHandler):
+                root_logger.removeHandler(handler)
+
         Logger._LOG_ACTIVE = log_active
         Logger.logger = logging.getLogger(Logger._LOGGER_NAME)
 

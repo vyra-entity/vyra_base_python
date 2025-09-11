@@ -1,5 +1,6 @@
 import configparser
 import os
+import logging
 
 from enum import Enum
 from pathlib import Path
@@ -107,6 +108,17 @@ class DbAccess(Storage):
             self.db_engine: AsyncEngine = self._build_engine()
 
             Logger.add_external('sqlalchemy.engine')
+
+            sqlalchemy_logger = logging.getLogger('sqlalchemy.engine')
+            sqlalchemy_logger.propagate = False  # prevents propagation to root logger
+
+            # Delete StreamHandler (stdout) of SQLAlchemy-Logger
+            for name in ['sqlalchemy', 'sqlalchemy.engine', 'sqlalchemy.pool']:
+                logger = logging.getLogger(name)
+                logger.propagate = False
+                logger.setLevel(logging.WARNING)
+                for handler in list(logger.handlers):
+                    logger.removeHandler(handler)
 
         finally:
             ErrorTraceback.check_error_exist()
