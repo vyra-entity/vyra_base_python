@@ -120,7 +120,12 @@ class VyraPublisher:
         if not self.publisher_info.publisher:
             raise ValueError("Publisher must be created before publishing messages.")
 
-        self.publisher_info.publisher.publish(msg)
+        try:
+            self.publisher_info.publisher.publish(msg)
+        except Exception as e:
+            self._node.get_logger().error(f"Failed to publish message: {msg}")
+            raise e
+        
         self._node.get_logger().info(f"Message published on {self.publisher_info.name}")
         if self.publisher_info.periodic_caller is not None:
             self.publisher_info.periodic_caller.caller = None

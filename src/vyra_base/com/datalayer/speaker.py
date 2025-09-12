@@ -64,8 +64,8 @@ class VyraSpeaker:
         :type message: Any
         """
         if self.publisher_server:
-            self.publisher_server.publish(message)
             Logger.debug(f"{self.name} is shouting: {message}")
+            self.publisher_server.publish(message)
             self.last_send = message
         else:
             raise ValueError("No publisher server available to send the message.")
