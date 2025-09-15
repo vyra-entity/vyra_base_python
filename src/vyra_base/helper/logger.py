@@ -72,6 +72,9 @@ class LogEntry:
         """
         self.mode = LogMode.WARNING
         return self
+    
+    def warning(self):
+        return self.warn(self)
 
 
 class Logger:
