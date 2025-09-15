@@ -223,6 +223,10 @@ class Logger:
         Logger.log(entry)
 
     @classmethod
+    def warning(cls, entry: Union[LogEntry, str]):
+        Logger.warn(entry)
+
+    @classmethod
     def error(cls, entry: Union[LogEntry, str]):
         """
         Log a message in error mode.
