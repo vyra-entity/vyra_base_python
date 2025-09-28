@@ -10,7 +10,6 @@ repository = "https://github.com/vyra-entity/vyra_base_python.git"  # Replace wi
 keywords = ["V.Y.R.A.", "python", "library"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 include = [
