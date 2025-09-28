@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
-## [0.1.4] - 2025-06-11
+## [0.1.0] - 2025-06-11
 
-### Added
-Added \_\_init__ to all folders
+First draft
+
+<!-- ### Added
+Added \_\_init__ to all folders -->
 

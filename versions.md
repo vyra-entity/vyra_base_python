@@ -1,4 +1,4 @@
-Version v1.0.0
+Version v0.1.0
 --------------
 
 * Create base functionalities, constants, structures, types as cpp library

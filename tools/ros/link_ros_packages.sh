@@ -6,6 +6,12 @@ set -e
 # Optional: ROS-Version setzen, falls nicht gesourced
 # source /opt/ros/humble/setup.bash
 
+# Beschreibung (deutsch):
+# Poetry Virtual Environments sind isoliert und haben keinen 
+# Zugriff auf system-weit installierte Pakete wie ROS2. Durch 
+# die Symlinks werden ROS2-Module in der Venv verfügbar, ohne 
+# sie zu kopieren.
+
 echo "🔎 Suche Poetry-Venv..."
 VENV_PATH=$(poetry env info --path)
 PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
