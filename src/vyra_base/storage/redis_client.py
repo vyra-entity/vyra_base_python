@@ -98,7 +98,7 @@ class RedisClient(Storage):
         self.host = redis_section.get('host', 'localhost')
         self.port = int(redis_section.get('port', '6379'))
         self.username = redis_section.get('username', None)
-        self.password = redis_section.get('requirepass', None)
+        self.password = redis_section.get('password', None)
         self.db = 0
         self.use_tls = redis_section.get('use_tls', 'false').lower() == 'true'
         
