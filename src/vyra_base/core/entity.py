@@ -31,7 +31,7 @@ from vyra_base.helper.logger import Logger
 from vyra_base.state.state_machine import StateMachine
 from vyra_base.storage.db_access import DbAccess
 from vyra_base.storage.db_access import DBTYPE
-from vyra_base.storage.redis_access import RedisAccess
+from vyra_base.storage.redis_client import RedisClient
 from vyra_base.storage.storage import Storage
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
@@ -212,7 +212,7 @@ class VyraEntity:
 
         await self.database_access.create_all_tables()
 
-        self.redis_access = RedisAccess(
+        self.redis_access = RedisClient(
             module_name=self.module_entry.name,
             redis_config=transient_config,
         )

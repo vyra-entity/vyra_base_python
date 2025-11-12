@@ -5,6 +5,8 @@
 /temp/
 /gh-pages/
 
+.venv/
+
 *.log
 *.tmp
 *.bak

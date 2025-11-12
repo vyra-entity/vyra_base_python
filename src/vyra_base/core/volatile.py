@@ -4,9 +4,7 @@ from typing import Any, Type
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.speaker import VyraSpeaker
 from vyra_base.helper.error_handler import ErrorTraceback
-from vyra_base.storage.redis_access import RedisAccess
-from vyra_base.storage.redis_manipulator import RedisManipulator
-from vyra_base.storage.redis_manipulator import REDIS_TYPE
+from vyra_base.storage.redis_client import RedisClient, REDIS_TYPE
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.interface_factory import remove_vyra_speaker
 
@@ -38,7 +36,7 @@ class Volatile:
 
     def __init__(
             self, 
-            storage_access_transient: RedisAccess, 
+            storage_access_transient: RedisClient, 
             module_id: str,
             node: VyraNode,
             transient_base_types: dict[str, Any]):
@@ -55,8 +53,7 @@ class Volatile:
             REDIS_TYPE.SET: transient_base_types['VolatileSet']
         }
         
-        self.redis: RedisManipulator = RedisManipulator(
-            storage_access_transient, module_id)
+        self.redis: RedisClient = storage_access_transient
         self._active_shouter: dict[str, VyraSpeaker] = {}
         self._listener: asyncio.Task | None = None
 
@@ -112,11 +109,11 @@ class Volatile:
 
 
     @ErrorTraceback.w_check_error_exist
-    def get_volatile_value(self, key: str) -> Any:
+    async def get_volatile_value(self, key: str) -> Any:
         """
         Get the value of the volatile parameter.
         """
-        return self.redis.get(key)
+        return await self.redis.get(key)
 
     @ErrorTraceback.w_check_error_exist
     async def add_change_event(self, key: str):

@@ -74,7 +74,7 @@ class LogEntry:
         return self
     
     def warning(self):
-        return self.warn(self)
+        return self.warn()
 
 
 class Logger:
