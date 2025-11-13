@@ -557,27 +557,12 @@ class RedisClient(Storage):
     # ======================
     
     @ErrorTraceback.w_check_error_exist
-    async def publish_modulemanager_event(self, event_type: str, data: Dict[str, Any]) -> int:
+    async def subscribe_pattern(self, pattern: str) -> PubSub:
         """
-        Publish event to modulemanager_* channel (convenience method for v2_modulemanager)
+        Subscribe to Redis channel pattern for backend communication
         
         Args:
-            event_type: Event type (register, status, health_check, etc.)
-            data: Event data
-            
-        Returns:
-            Number of clients that received the message
-        """
-        channel = f"modulemanager_{event_type}"
-        return await self.publish_message(channel, data)
-
-    @ErrorTraceback.w_check_error_exist
-    async def subscribe_modulemanager_pattern(self, pattern: str = "modulemanager_*"):
-        """
-        Subscribe to modulemanager_* channel pattern for backend communication
-        
-        Args:
-            pattern: Channel pattern (default: "modulemanager_*")
+            pattern: Channel pattern (e.g., "modulemanager_*", "ros2_*")
             
         Returns:
             PubSub object for listening to messages
@@ -589,75 +574,50 @@ class RedisClient(Storage):
         
         try:
             await self._pubsub.psubscribe(pattern)
-            Logger.debug(f"📥 Subscribed to modulemanager pattern: {pattern}")
+            Logger.debug(f"📥 Subscribed to pattern: {pattern}")
             return self._pubsub
         except Exception as e:
             Logger.error(f"❌ Failed to subscribe to pattern {pattern}: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
-    async def publish_ros2_bridge_event(self, 
-                                      node_name: str, 
-                                      event_type: str, 
-                                      data: Dict[str, Any]) -> int:
+    async def publish_event(self, 
+                          channel: str, 
+                          data: Dict[str, Any],
+                          add_metadata: bool = True) -> int:
         """
-        Publish event for ROS2 node bridge communication
+        Publish event to a Redis channel with optional metadata
         
         Args:
-            node_name: ROS2 node name
-            event_type: Event type (state_change, permission_update, etc.)
+            channel: Channel name (e.g., "modulemanager_register", "ros2_node_state")
             data: Event data
+            add_metadata: Whether to add timestamp and source metadata
             
         Returns:
             Number of clients that received the message
         """
-        channel = f"ros2_{node_name}_{event_type}"
-        
-        # Add metadata for industrial communication
-        enhanced_data = {
-            "timestamp": datetime.now().isoformat(),
-            "source_module": self.module_name,
-            "node_name": node_name,
-            "event_type": event_type,
-            "data": data
-        }
-        
-        return await self.publish_message(channel, enhanced_data)
-
-    @ErrorTraceback.w_check_error_exist
-    async def setup_permission_stream(self, permission_manager_instance) -> None:
-        """
-        Setup Redis stream for permission manager communication (replaces old redis_tls_client)
-        
-        Args:
-            permission_manager_instance: PermissionManager instance for handling messages
-        """
-        default_channels = [
-            "rq_register_new_module_permission",
-            "modulemanager_permission_*",
-            "ros2_permission_*"
-        ]
-        
-        Logger.info("🔐 Setting up permission management Redis stream...")
-        
-        await self.create_stream_listener(
-            channels=default_channels,
-            callback_handler=self._handle_permission_message,
-            module_instance=permission_manager_instance
-        )
+        if add_metadata:
+            enhanced_data = {
+                "timestamp": datetime.now().isoformat(),
+                "source_module": self.module_name,
+                "data": data
+            }
+            return await self.publish_message(channel, enhanced_data)
+        else:
+            return await self.publish_message(channel, data)
 
     @ErrorTraceback.w_check_error_exist
     async def create_stream_listener(self, 
                                    channels: list[str], 
-                                   callback_handler=None,
-                                   module_instance=None) -> None:
+                                   callback_handler,
+                                   callback_context=None) -> None:
         """
-        Create a persistent stream listener for ROS2-Backend communication
+        Create a persistent stream listener for industrial communication
         
         Args:
             channels: List of channels/patterns to listen to
-            callback_handler: Function to handle incoming messages
-            module_instance: Module instance for context (e.g., PermissionManager)
+            callback_handler: Async function to handle incoming messages (signature: async def handler(message, context))
+            callback_context: Optional context object passed to callback (e.g., PermissionManager instance)
         """
         client = await self._ensure_connected()
         
@@ -677,8 +637,8 @@ class RedisClient(Storage):
             Logger.info(f"🎧 Stream listener created for channels: {channels}")
             
             # Start listening loop
-            if callback_handler and module_instance:
-                await self._start_message_loop(callback_handler, module_instance)
+            if callback_handler:
+                await self._start_message_loop(callback_handler, callback_context)
             else:
                 Logger.warning("⚠️ No callback handler provided for stream listener")
                 
@@ -687,13 +647,13 @@ class RedisClient(Storage):
             raise
 
     @ErrorTraceback.w_check_error_exist
-    async def _start_message_loop(self, callback_handler, module_instance):
+    async def _start_message_loop(self, callback_handler, callback_context):
         """
         Start the message processing loop for industrial-grade communication
         
         Args:
-            callback_handler: Function to process messages
-            module_instance: Module context for message handling
+            callback_handler: Async function to process messages
+            callback_context: Optional context object for message handling
         """
         if self._pubsub is None:
             raise RuntimeError("PubSub not available")
@@ -706,9 +666,9 @@ class RedisClient(Storage):
                     try:
                         # Process message through callback
                         if asyncio.iscoroutinefunction(callback_handler):
-                            await callback_handler(message, module_instance)
+                            await callback_handler(message, callback_context)
                         else:
-                            callback_handler(message, module_instance)
+                            callback_handler(message, callback_context)
                             
                         Logger.debug(f"📨 Processed message from {message.get('channel', 'unknown')}")
                         
@@ -721,67 +681,46 @@ class RedisClient(Storage):
             raise
 
     @ErrorTraceback.w_check_error_exist
-    async def _handle_permission_message(self, message: Dict[str, Any], permission_manager):
+    async def parse_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Handle permission-related Redis messages (industrial message processing)
+        Parse and normalize a Redis message for easier processing
         
         Args:
-            message: Redis message
-            permission_manager: PermissionManager instance
+            message: Raw Redis message
+            
+        Returns:
+            Normalized message dictionary with channel, data, and pattern info
         """
         try:
-            channel = message.get("channel", "").decode() if isinstance(message.get("channel"), bytes) else message.get("channel", "")
-            data = message.get("data", "")
+            channel = message.get("channel", "")
+            if isinstance(channel, bytes):
+                channel = channel.decode('utf-8')
             
+            data = message.get("data", "")
             if isinstance(data, bytes):
                 data = data.decode('utf-8')
             
-            # Parse JSON message
+            # Try to parse JSON
+            import json
             try:
-                import json
-                message_data = json.loads(data) if isinstance(data, str) and data.startswith('{') else {"raw_data": data}
+                parsed_data = json.loads(data) if isinstance(data, str) and data.startswith('{') else {"raw_data": data}
             except json.JSONDecodeError:
-                message_data = {"raw_data": data}
+                parsed_data = {"raw_data": data}
             
-            # Ensure message_data is a dict
-            if not isinstance(message_data, dict):
-                message_data = {"data": message_data}
+            # Ensure parsed_data is a dict
+            if not isinstance(parsed_data, dict):
+                parsed_data = {"data": parsed_data}
             
-            Logger.debug(f"🔐 Processing permission message on {channel}")
+            return {
+                "channel": channel,
+                "pattern": message.get("pattern", "").decode('utf-8') if isinstance(message.get("pattern"), bytes) else message.get("pattern", ""),
+                "type": message.get("type", ""),
+                "data": parsed_data
+            }
             
-            # Route message based on channel pattern
-            if "register_new_module_permission" in channel:
-                await self._process_permission_registration(message_data, permission_manager)
-            elif "permission_update" in channel:
-                await self._process_permission_update(message_data, permission_manager)
-            else:
-                Logger.debug(f"📨 Forwarding message to permission manager: {channel}")
-                # Forward to existing handler if available
-                if hasattr(permission_manager, '_handle_redis_message'):
-                    # Create safe message dict
-                    safe_message = {"action": str(data)}
-                    safe_message.update(message_data)
-                    await permission_manager._handle_redis_message(safe_message)
-                    
         except Exception as e:
-            Logger.error(f"❌ Error handling permission message: {e}")
-
-    async def _process_permission_registration(self, message_data: Dict[str, Any], permission_manager):
-        """Process permission registration requests"""
-        try:
-            if hasattr(permission_manager, 'register_permission_update'):
-                await permission_manager.register_permission_update(
-                    module_id=message_data.get('module_id'),
-                    module_name=message_data.get('module_name'),
-                    function_scope=message_data.get('function_scope', [])
-                )
-        except Exception as e:
-            Logger.error(f"❌ Permission registration failed: {e}")
-
-    async def _process_permission_update(self, message_data: Dict[str, Any], permission_manager):
-        """Process permission update requests"""
-        Logger.info(f"🔐 Processing permission update: {message_data}")
-        # Add specific permission update logic here
+            Logger.error(f"❌ Error parsing message: {e}")
+            return {"channel": "unknown", "data": {}, "error": str(e)}
 
 
 # Legacy compatibility wrappers
