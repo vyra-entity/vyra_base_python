@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import logging
 import logging.config
@@ -87,6 +88,7 @@ class Logger:
     _LOGGER_NAME: str = 'vyra_base'
     _LOG_PATH: str = ''
     _LOG_ACTIVE: bool = False
+    _LOG_TAG: str = ''
 
     _ext_logger: list = []
     logger: logging.Logger
@@ -96,9 +98,10 @@ class Logger:
     @classmethod
     def initialize(
         cls, 
-        log_config_path: Path, 
+        log_config_path: Optional[Path]=None, 
         log_active: bool=True,
-        log_config: Optional[dict]=None
+        log_config: Optional[dict]=None,
+        log_tag: Optional[str]=""
     ) -> None:
         """
         Initialize the logger with a configuration file.
@@ -107,7 +110,12 @@ class Logger:
         :type log_config_path: Path
         :param log_active: Whether logging is active.
         :type log_active: bool
+        :param log_tag: Optional tag to add to the logger message as [<log_tag>] <message>.
+        :type log_tag: str
         """
+        if log_config_path is None:
+            log_config_path = Path(__file__).resolve().parent / "logger_config.json"
+
         with Path(log_config_path).open(mode='r+') as content:
             loaded_log_config: dict = json.load(content)
 
@@ -123,17 +131,20 @@ class Logger:
 
         logging.config.dictConfig(loaded_log_config)
 
-        root_logger = logging.getLogger()
-        for handler in list(root_logger.handlers):
-            if isinstance(handler, logging.StreamHandler):
-                root_logger.removeHandler(handler)
+        # Don't remove handlers from root logger - this would break other loggers!
+        # root_logger = logging.getLogger()
+        # for handler in list(root_logger.handlers):
+        #     if isinstance(handler, logging.StreamHandler):
+        #         root_logger.removeHandler(handler)
 
         Logger._LOG_ACTIVE = log_active
         Logger.logger = logging.getLogger(Logger._LOGGER_NAME)
 
+        Logger._LOG_TAG = log_tag if log_tag is not None else ""
+
         for handler in Logger.logger.handlers:
-            
-            if isinstance(handler, logging.handlers.RotatingFileHandler):
+            if isinstance(handler, logging.handlers.RotatingFileHandler) and \
+               Logger._LOG_TAG != "":
                 # Trenner direkt in den Stream schreiben
                 handler.stream.write('\n' + '─' * 91 + '\n')
                 handler.flush()
@@ -142,7 +153,7 @@ class Logger:
         [cls.log(entry) for entry in cls.pre_log_buffer]
 
     @classmethod
-    def log(cls, entry: Union[LogEntry, str, Any]) -> None:
+    def log(cls, entry: Union[LogEntry, str, Any], caller: str=None) -> None:
         """
         Log a message in different modes.
 
@@ -166,6 +177,12 @@ class Logger:
             print(f"WARNING_LOGGER_NOT_ACTIVE: {entry.message}")
             return None
         
+        if caller is not None:
+            Logger.logger = logging.getLogger(caller)
+
+        if Logger._LOG_TAG != "":
+            entry.message = f"[{Logger._LOG_TAG}] {entry.message}"
+
         match entry.mode:
             case LogMode.DEBUG:
                 Logger.logger.debug(entry.message)
@@ -193,12 +210,17 @@ class Logger:
                  Otherwise, the message will be logged according to its mode.
         :rtype: None
         """
+        frame = inspect.currentframe()
+        outer = inspect.getouterframes(frame)[1].frame
+        module = inspect.getmodule(outer)
+        module_name = module.__name__ if module else "_LOGGER_NAME"
+
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.DEBUG)
         else:
             entry.mode = LogMode.DEBUG
         
-        Logger.log(entry)
+        Logger.log(entry, caller=module_name)
 
     @classmethod
     def warn(cls, entry: Union[LogEntry, str]):
@@ -215,12 +237,16 @@ class Logger:
                  Otherwise, the message will be logged according to its mode.
         :rtype: None
         """
+        frame = inspect.currentframe()
+        outer = inspect.getouterframes(frame)[1]
+        caller = f"{outer.filename}.{outer.function}"
+
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.WARNING)
         else:
             entry.mode = LogMode.WARNING
 
-        Logger.log(entry)
+        Logger.log(entry, caller=caller)
 
     @classmethod
     def warning(cls, entry: Union[LogEntry, str]):
@@ -241,12 +267,16 @@ class Logger:
                  Otherwise, the message will be logged according to its mode.
         :rtype: None
         """
+        frame = inspect.currentframe()
+        outer = inspect.getouterframes(frame)[1]
+        caller = f"{outer.filename}.{outer.function}"
+
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.ERROR)
         else:
             entry.mode = LogMode.ERROR
 
-        Logger.log(entry)
+        Logger.log(entry, caller=caller)
 
     @classmethod
     def info(cls, entry: Union[LogEntry, str]):
@@ -263,12 +293,16 @@ class Logger:
                  Otherwise, the message will be logged according to its mode.
         :rtype: None
         """
+        frame = inspect.currentframe()
+        outer = inspect.getouterframes(frame)[1]
+        caller = f"{outer.filename}.{outer.function}"
+
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.INFO)
         else:
             entry.mode = LogMode.INFO
 
-        Logger.log(entry)
+        Logger.log(entry, caller=caller)
 
     @staticmethod
     def logging_on(func):
