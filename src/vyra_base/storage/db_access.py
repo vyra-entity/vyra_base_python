@@ -109,14 +109,13 @@ class DbAccess(Storage):
 
             Logger.add_external('sqlalchemy.engine')
 
-            sqlalchemy_logger = logging.getLogger('sqlalchemy.engine')
-            sqlalchemy_logger.propagate = False  # prevents propagation to root logger
-
-            # Delete StreamHandler (stdout) of SQLAlchemy-Logger
+            # Configure sqlalchemy logger to use application logging format
+            root_logger = logging.getLogger()
             for name in ['sqlalchemy', 'sqlalchemy.engine', 'sqlalchemy.pool']:
                 logger = logging.getLogger(name)
-                logger.propagate = False
-                logger.setLevel(logging.WARNING)
+                logger.setLevel(logging.WARNING)  # Reduce verbosity
+                logger.propagate = True  # Let root logger handle formatting
+                # Remove any default handlers
                 for handler in list(logger.handlers):
                     logger.removeHandler(handler)
 
@@ -138,7 +137,7 @@ class DbAccess(Storage):
         if self.db_type == DBTYPE.SQLITE:
             return create_async_engine(
                 f"sqlite+aiosqlite:///{self._path}{self._database}",
-                echo=True,
+                echo=False,  # Disable echo - use configured logger instead
             )
         elif self.db_type == DBTYPE.MYSQL:
             return create_async_engine(

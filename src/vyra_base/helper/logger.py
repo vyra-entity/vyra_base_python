@@ -238,15 +238,16 @@ class Logger:
         :rtype: None
         """
         frame = inspect.currentframe()
-        outer = inspect.getouterframes(frame)[1]
-        caller = f"{outer.filename}.{outer.function}"
+        outer = inspect.getouterframes(frame)[1].frame
+        module = inspect.getmodule(outer)
+        module_name = module.__name__ if module else cls._LOGGER_NAME
 
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.WARNING)
         else:
             entry.mode = LogMode.WARNING
 
-        Logger.log(entry, caller=caller)
+        Logger.log(entry, caller=module_name)
 
     @classmethod
     def warning(cls, entry: Union[LogEntry, str]):
@@ -268,15 +269,16 @@ class Logger:
         :rtype: None
         """
         frame = inspect.currentframe()
-        outer = inspect.getouterframes(frame)[1]
-        caller = f"{outer.filename}.{outer.function}"
+        outer = inspect.getouterframes(frame)[1].frame
+        module = inspect.getmodule(outer)
+        module_name = module.__name__ if module else cls._LOGGER_NAME
 
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.ERROR)
         else:
             entry.mode = LogMode.ERROR
 
-        Logger.log(entry, caller=caller)
+        Logger.log(entry, caller=module_name)
 
     @classmethod
     def info(cls, entry: Union[LogEntry, str]):
@@ -294,15 +296,16 @@ class Logger:
         :rtype: None
         """
         frame = inspect.currentframe()
-        outer = inspect.getouterframes(frame)[1]
-        caller = f"{outer.filename}.{outer.function}"
+        outer = inspect.getouterframes(frame)[1].frame
+        module = inspect.getmodule(outer)
+        module_name = module.__name__ if module else cls._LOGGER_NAME
 
         if isinstance(entry, str):
             entry = LogEntry(message=entry, mode=LogMode.INFO)
         else:
             entry.mode = LogMode.INFO
 
-        Logger.log(entry, caller=caller)
+        Logger.log(entry, caller=module_name)
 
     @staticmethod
     def logging_on(func):
