@@ -2,7 +2,7 @@
 name = "vyra_base"
 version = "0.1.5"
 description = "Base library for V.Y.R.A. modules written in Python"
-authors = ["Holger Schernews"]
+authors = ["Holger Schernewski"]
 license = "LICENSE"
 readme = "README.md"
 homepage = "https://vyra-entity.github.io/vyra_base_python/"  # Replace with actual URL

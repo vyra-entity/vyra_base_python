@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<policy version="0.2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <enclaves>
+    <enclave path="/template">
+      <profiles>
+        <profile ns="/" node="*">
+          <topics publish="ALLOW" subscribe="ALLOW">
+            <!-- ROS2 internal topics -->
+            <topic>rt/*</topic>
+            <topic>rq/*</topic>
+            <topic>rr/*</topic>
+            <topic>ros_discovery_info</topic>
+          </topics>
+          <services request="ALLOW" reply="ALLOW">
+            <!-- ROS2 action services -->
+            <service>/*/_action/cancel_goal</service>
+            <service>/*/_action/get_result</service>
+            <service>/*/_action/send_goal</service>
+          </services>
+          <actions call="ALLOW" execute="ALLOW">
+            <!-- Default: allow all actions -->
+            <action>/*</action>
+          </actions>
+        </profile>
+      </profiles>
+    </enclave>
+  </enclaves>
+</policy>
