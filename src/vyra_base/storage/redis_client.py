@@ -4,6 +4,7 @@ Combines functionality from redis_access.py and redis_manipulator.py
 with TLS support and streaming capabilities for industrial applications
 """
 
+import json
 import os
 import ssl
 import asyncio
@@ -469,7 +470,6 @@ class RedisClient(Storage):
         
         try:
             if isinstance(message, dict):
-                import json
                 message = json.dumps(message)
             
             result = await client.publish(channel, message)
@@ -553,13 +553,13 @@ class RedisClient(Storage):
             return False
 
     # ======================
-    # STREAMING & INDUSTRIAL COMMUNICATION
+    # PUB/SUB EXTENDED
     # ======================
     
     @ErrorTraceback.w_check_error_exist
     async def subscribe_pattern(self, pattern: str) -> PubSub:
         """
-        Subscribe to Redis channel pattern for backend communication
+        Subscribe to Redis channel pattern (wildcard support)
         
         Args:
             pattern: Channel pattern (e.g., "modulemanager_*", "ros2_*")
@@ -581,12 +581,12 @@ class RedisClient(Storage):
             raise
 
     @ErrorTraceback.w_check_error_exist
-    async def publish_event(self, 
-                          channel: str, 
-                          data: Dict[str, Any],
-                          add_metadata: bool = True) -> int:
+    async def publish_with_metadata(self, 
+                                    channel: str, 
+                                    data: Dict[str, Any],
+                                    add_metadata: bool = True) -> int:
         """
-        Publish event to a Redis channel with optional metadata
+        Publish message to a Redis channel with optional metadata
         
         Args:
             channel: Channel name (e.g., "modulemanager_register", "ros2_node_state")
@@ -607,15 +607,15 @@ class RedisClient(Storage):
             return await self.publish_message(channel, data)
 
     @ErrorTraceback.w_check_error_exist
-    async def create_stream_listener(self, 
-                                   channels: list[str], 
-                                   callback_handler,
-                                   callback_context=None) -> None:
+    async def create_pubsub_listener(self, 
+                                     channels: list[str], 
+                                     callback_handler,
+                                     callback_context=None) -> None:
         """
-        Create a persistent stream listener for industrial communication
+        Create a persistent PubSub listener with callback
         
         Args:
-            channels: List of channels/patterns to listen to
+            channels: List of channels/patterns to listen to (use * for wildcards)
             callback_handler: Async function to handle incoming messages (signature: async def handler(message, context))
             callback_context: Optional context object passed to callback (e.g., PermissionManager instance)
         """
@@ -634,22 +634,22 @@ class RedisClient(Storage):
                     await self._pubsub.subscribe(channel)
                     Logger.debug(f"📥 Channel subscribed: {channel}")
             
-            Logger.info(f"🎧 Stream listener created for channels: {channels}")
+            Logger.info(f"🎧 PubSub listener created for channels: {channels}")
             
             # Start listening loop
             if callback_handler:
-                await self._start_message_loop(callback_handler, callback_context)
+                await self._start_pubsub_loop(callback_handler, callback_context)
             else:
-                Logger.warning("⚠️ No callback handler provided for stream listener")
+                Logger.warning("⚠️ No callback handler provided for PubSub listener")
                 
         except Exception as e:
-            Logger.error(f"❌ Failed to create stream listener: {e}")
+            Logger.error(f"❌ Failed to create PubSub listener: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
-    async def _start_message_loop(self, callback_handler, callback_context):
+    async def _start_pubsub_loop(self, callback_handler, callback_context):
         """
-        Start the message processing loop for industrial-grade communication
+        Start the PubSub message processing loop
         
         Args:
             callback_handler: Async function to process messages
@@ -659,7 +659,7 @@ class RedisClient(Storage):
             raise RuntimeError("PubSub not available")
         
         try:
-            Logger.info("🔄 Starting industrial Redis message loop...")
+            Logger.info("🔄 Starting Redis PubSub message loop...")
             
             async for message in self._pubsub.listen():
                 if message["type"] in ["message", "pmessage"]:
@@ -677,16 +677,16 @@ class RedisClient(Storage):
                         # Continue processing other messages
                         
         except Exception as e:
-            Logger.error(f"❌ Message loop error: {e}")
+            Logger.error(f"❌ PubSub loop error: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
     async def parse_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Parse and normalize a Redis message for easier processing
+        Parse and normalize a Redis PubSub message for easier processing
         
         Args:
-            message: Raw Redis message
+            message: Raw Redis PubSub message
             
         Returns:
             Normalized message dictionary with channel, data, and pattern info
@@ -721,6 +721,329 @@ class RedisClient(Storage):
         except Exception as e:
             Logger.error(f"❌ Error parsing message: {e}")
             return {"channel": "unknown", "data": {}, "error": str(e)}
+
+    # ======================
+    # BACKWARD COMPATIBILITY - PubSub Aliases
+    # ======================
+    
+    async def publish_event(self, channel: str, data: Dict[str, Any], add_metadata: bool = True) -> int:
+        """Alias for publish_with_metadata (backward compatibility)"""
+        return await self.publish_with_metadata(channel, data, add_metadata)
+    
+    async def create_stream_listener(self, channels: list[str], callback_handler, callback_context=None) -> None:
+        """Alias for create_pubsub_listener (backward compatibility)"""
+        return await self.create_pubsub_listener(channels, callback_handler, callback_context)
+
+    # ======================
+    # REDIS STREAMS
+    # ======================
+    
+    @ErrorTraceback.w_check_error_exist
+    async def xadd(self, 
+                   stream: str, 
+                   fields: Dict[str, Any],
+                   message_id: str = "*",
+                   maxlen: Optional[int] = None,
+                   approximate: bool = True) -> str:
+        """
+        Add entry to a Redis Stream
+        
+        Args:
+            stream: Stream name
+            fields: Dictionary of field-value pairs
+            message_id: Message ID (* for auto-generated)
+            maxlen: Optional max stream length (for trimming)
+            approximate: Use approximate trimming (~) for better performance
+            
+        Returns:
+            Message ID of the added entry
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            # Convert all values to strings
+            str_fields = {k: json.dumps(v) if isinstance(v, (dict, list)) else str(v) 
+                         for k, v in fields.items()}
+            
+            if maxlen:
+                result = await client.xadd(
+                    stream, 
+                    str_fields, 
+                    id=message_id,
+                    maxlen=maxlen,
+                    approximate=approximate
+                )
+            else:
+                result = await client.xadd(stream, str_fields, id=message_id)
+            
+            Logger.debug(f"📝 Added entry to stream {stream}: {result}")
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to add entry to stream {stream}: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xread(self,
+                    streams: Dict[str, str],
+                    count: Optional[int] = None,
+                    block: Optional[int] = None) -> List[tuple]:
+        """
+        Read entries from Redis Streams
+        
+        Args:
+            streams: Dictionary of {stream_name: last_id} (use '0' for beginning, '$' for new)
+            count: Max number of entries per stream
+            block: Block for N milliseconds if no data (None = don't block)
+            
+        Returns:
+            List of (stream_name, messages) tuples
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            result = await client.xread(
+                streams=streams,
+                count=count,
+                block=block
+            )
+            
+            Logger.debug(f"📖 Read from streams: {list(streams.keys())}")
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to read from streams: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xreadgroup(self,
+                        groupname: str,
+                        consumername: str,
+                        streams: Dict[str, str],
+                        count: Optional[int] = None,
+                        block: Optional[int] = None,
+                        noack: bool = False) -> List[tuple]:
+        """
+        Read from streams as a consumer group member
+        
+        Args:
+            groupname: Consumer group name
+            consumername: Consumer identifier
+            streams: Dictionary of {stream_name: last_id} (use '>' for new messages)
+            count: Max number of entries
+            block: Block for N milliseconds if no data
+            noack: Don't require ACK (fire-and-forget)
+            
+        Returns:
+            List of (stream_name, messages) tuples
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            result = await client.xreadgroup(
+                groupname=groupname,
+                consumername=consumername,
+                streams=streams,
+                count=count,
+                block=block,
+                noack=noack
+            )
+            
+            Logger.debug(f"📖 Consumer {consumername} read from group {groupname}")
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to read as consumer group: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xack(self,
+                   stream: str,
+                   groupname: str,
+                   *message_ids: str) -> int:
+        """
+        Acknowledge processed messages in a consumer group
+        
+        Args:
+            stream: Stream name
+            groupname: Consumer group name
+            message_ids: Message IDs to acknowledge
+            
+        Returns:
+            Number of messages acknowledged
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            result = await client.xack(stream, groupname, *message_ids)
+            Logger.debug(f"✅ Acknowledged {result} messages in {stream}/{groupname}")
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to acknowledge messages: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xgroup_create(self,
+                           stream: str,
+                           groupname: str,
+                           id: str = "$",
+                           mkstream: bool = True) -> bool:
+        """
+        Create a consumer group
+        
+        Args:
+            stream: Stream name
+            groupname: Consumer group name
+            id: Start reading from this ID ('$' = end, '0' = beginning)
+            mkstream: Create stream if it doesn't exist
+            
+        Returns:
+            True if successful
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            await client.xgroup_create(
+                stream,
+                groupname,
+                id=id,
+                mkstream=mkstream
+            )
+            Logger.info(f"👥 Created consumer group {groupname} on stream {stream}")
+            return True
+            
+        except Exception as e:
+            # Group might already exist
+            if "BUSYGROUP" in str(e):
+                Logger.debug(f"Consumer group {groupname} already exists on {stream}")
+                return True
+            Logger.error(f"❌ Failed to create consumer group: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xgroup_destroy(self, stream: str, groupname: str) -> bool:
+        """
+        Destroy a consumer group
+        
+        Args:
+            stream: Stream name
+            groupname: Consumer group name
+            
+        Returns:
+            True if successful
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            result = await client.xgroup_destroy(stream, groupname)
+            Logger.info(f"🗑️ Destroyed consumer group {groupname} on stream {stream}")
+            return bool(result)
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to destroy consumer group: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xlen(self, stream: str) -> int:
+        """
+        Get the number of entries in a stream
+        
+        Args:
+            stream: Stream name
+            
+        Returns:
+            Number of entries
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            result = await client.xlen(stream)
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to get stream length: {e}")
+            return 0
+
+    @ErrorTraceback.w_check_error_exist
+    async def xtrim(self,
+                    stream: str,
+                    maxlen: int,
+                    approximate: bool = True) -> int:
+        """
+        Trim stream to a maximum length
+        
+        Args:
+            stream: Stream name
+            maxlen: Maximum number of entries to keep
+            approximate: Use approximate trimming (~) for better performance
+            
+        Returns:
+            Number of entries deleted
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            result = await client.xtrim(
+                stream,
+                maxlen=maxlen,
+                approximate=approximate
+            )
+            Logger.debug(f"✂️ Trimmed stream {stream}: removed {result} entries")
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to trim stream: {e}")
+            raise
+
+    @ErrorTraceback.w_check_error_exist
+    async def xpending(self,
+                      stream: str,
+                      groupname: str,
+                      start: str = "-",
+                      end: str = "+",
+                      count: int = 10,
+                      consumername: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        Get pending messages in a consumer group
+        
+        Args:
+            stream: Stream name
+            groupname: Consumer group name
+            start: Start ID (- for minimum)
+            end: End ID (+ for maximum)
+            count: Max messages to return
+            consumername: Filter by specific consumer
+            
+        Returns:
+            List of pending message info
+        """
+        client = await self._ensure_connected()
+        
+        try:
+            if consumername:
+                result = await client.xpending_range(
+                    stream,
+                    groupname,
+                    min=start,
+                    max=end,
+                    count=count,
+                    consumername=consumername
+                )
+            else:
+                result = await client.xpending_range(
+                    stream,
+                    groupname,
+                    min=start,
+                    max=end,
+                    count=count
+                )
+            
+            return result
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to get pending messages: {e}")
+            raise
 
 
 # Legacy compatibility wrappers

@@ -19,7 +19,7 @@ class TypeEnum(str, Enum):
 
 
 class Parameter(Base):
-    __tablename__ = "parameters"
+    __tablename__ = "parameter"
 
     name: Mapped[str] = mapped_column(
         primary_key=True,
