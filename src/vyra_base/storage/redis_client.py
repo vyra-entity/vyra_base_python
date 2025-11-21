@@ -1044,8 +1044,3 @@ class RedisClient(Storage):
         except Exception as e:
             Logger.error(f"❌ Failed to get pending messages: {e}")
             raise
-
-
-# Legacy compatibility wrappers
-RedisAccess = RedisClient
-RedisManipulator = RedisClient
