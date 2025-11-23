@@ -74,6 +74,11 @@ class RedisClient(Storage):
         self._redis_engine: Optional[redis.Redis] = None
         self._pubsub: Optional[PubSub] = None
         self._connected = False
+        
+        # Multi-listener management
+        self._active_channels: set[str] = set()  # Track all subscribed channels/patterns
+        self._listener_task: Optional[asyncio.Task] = None  # Single background task
+        self._listener_running = False
 
     def _load_legacy_config(self, redis_config_path: Optional[str], redis_config: Optional[dict]):
         """Load configuration from legacy format (INI file or dict)."""
@@ -610,14 +615,22 @@ class RedisClient(Storage):
     async def create_pubsub_listener(self, 
                                      channels: list[str], 
                                      callback_handler,
-                                     callback_context=None) -> None:
+                                     callback_context=None,
+                                     start_loop: bool = True) -> None:
         """
-        Create a persistent PubSub listener with callback
+        Create a persistent PubSub listener with callback (supports multiple calls)
         
         Args:
             channels: List of channels/patterns to listen to (use * for wildcards)
             callback_handler: Async function to handle incoming messages (signature: async def handler(message, context))
             callback_context: Optional context object passed to callback (e.g., PermissionManager instance)
+            start_loop: Whether to start the listener loop (default True)
+                       Set to False if you want to add channels first and start loop manually
+        
+        Note:
+            - Can be called multiple times to add more channels
+            - If loop is already running, new channels are automatically subscribed
+            - Only one background task is created regardless of how many times this is called
         """
         client = await self._ensure_connected()
         
@@ -625,21 +638,35 @@ class RedisClient(Storage):
             self._pubsub = client.pubsub()
         
         try:
-            # Subscribe to channels
+            # Subscribe to new channels
+            new_channels = []
             for channel in channels:
-                if "*" in channel:
-                    await self._pubsub.psubscribe(channel)
-                    Logger.debug(f"📥 Pattern subscribed: {channel}")
+                if channel not in self._active_channels:
+                    if "*" in channel:
+                        await self._pubsub.psubscribe(channel)
+                        Logger.debug(f"📥 Pattern subscribed: {channel}")
+                    else:
+                        await self._pubsub.subscribe(channel)
+                        Logger.debug(f"📥 Channel subscribed: {channel}")
+                    
+                    self._active_channels.add(channel)
+                    new_channels.append(channel)
                 else:
-                    await self._pubsub.subscribe(channel)
-                    Logger.debug(f"📥 Channel subscribed: {channel}")
+                    Logger.debug(f"⏭️  Channel already subscribed: {channel}")
             
-            Logger.info(f"🎧 PubSub listener created for channels: {channels}")
+            if new_channels:
+                Logger.info(f"🎧 PubSub listener added channels: {new_channels}")
             
-            # Start listening loop
-            if callback_handler:
-                await self._start_pubsub_loop(callback_handler, callback_context)
-            else:
+            # Start listening loop if not already running and start_loop is True
+            if start_loop and callback_handler and not self._listener_running:
+                self._listener_running = True
+                self._listener_task = asyncio.create_task(
+                    self._start_pubsub_loop(callback_handler, callback_context)
+                )
+                Logger.info(f"🔄 PubSub listener loop started for {len(self._active_channels)} channels")
+            elif self._listener_running:
+                Logger.debug(f"🔄 PubSub loop already running, new channels automatically active")
+            elif not callback_handler:
                 Logger.warning("⚠️ No callback handler provided for PubSub listener")
                 
         except Exception as e:
@@ -649,7 +676,7 @@ class RedisClient(Storage):
     @ErrorTraceback.w_check_error_exist
     async def _start_pubsub_loop(self, callback_handler, callback_context):
         """
-        Start the PubSub message processing loop
+        Start the PubSub message processing loop (runs as background task)
         
         Args:
             callback_handler: Async function to process messages
@@ -659,9 +686,13 @@ class RedisClient(Storage):
             raise RuntimeError("PubSub not available")
         
         try:
-            Logger.info("🔄 Starting Redis PubSub message loop...")
+            Logger.info(f"🔄 Starting Redis PubSub message loop for {len(self._active_channels)} channels...")
             
             async for message in self._pubsub.listen():
+                if not self._listener_running:
+                    Logger.info("⏹️  PubSub loop stopped by flag")
+                    break
+                
                 if message["type"] in ["message", "pmessage"]:
                     try:
                         # Process message through callback
@@ -676,9 +707,15 @@ class RedisClient(Storage):
                         Logger.error(f"❌ Error processing message: {e}")
                         # Continue processing other messages
                         
+        except asyncio.CancelledError:
+            Logger.info("⏹️  PubSub loop cancelled")
+            raise
         except Exception as e:
             Logger.error(f"❌ PubSub loop error: {e}")
             raise
+        finally:
+            self._listener_running = False
+            Logger.info("🛑 PubSub message loop stopped")
 
     @ErrorTraceback.w_check_error_exist
     async def parse_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
@@ -722,6 +759,113 @@ class RedisClient(Storage):
             Logger.error(f"❌ Error parsing message: {e}")
             return {"channel": "unknown", "data": {}, "error": str(e)}
 
+    @ErrorTraceback.w_check_error_exist
+    async def get_active_listeners(self) -> Dict[str, Any]:
+        """
+        Get information about active PubSub listeners
+        
+        Returns:
+            Dictionary with listener status and active channels
+        """
+        return {
+            "listener_running": self._listener_running,
+            "active_channels": list(self._active_channels),
+            "total_channels": len(self._active_channels),
+            "task_status": "running" if self._listener_task and not self._listener_task.done() else "stopped"
+        }
+    
+    @ErrorTraceback.w_check_error_exist
+    async def remove_listener_channels(self, channels: list[str]) -> Dict[str, Any]:
+        """
+        Remove specific channels from the active listeners
+        
+        Args:
+            channels: List of channel names/patterns to unsubscribe
+            
+        Returns:
+            Dictionary with removal status and remaining channels
+        """
+        if self._pubsub is None:
+            Logger.warning("⚠️ No PubSub connection available")
+            return {
+                "success": False,
+                "removed": [],
+                "remaining": [],
+                "error": "No PubSub connection"
+            }
+        
+        removed = []
+        not_found = []
+        
+        try:
+            for channel in channels:
+                if channel in self._active_channels:
+                    # Unsubscribe based on pattern or regular channel
+                    if "*" in channel:
+                        await self._pubsub.punsubscribe(channel)
+                        Logger.debug(f"📤 Pattern unsubscribed: {channel}")
+                    else:
+                        await self._pubsub.unsubscribe(channel)
+                        Logger.debug(f"📤 Channel unsubscribed: {channel}")
+                    
+                    self._active_channels.remove(channel)
+                    removed.append(channel)
+                else:
+                    not_found.append(channel)
+                    Logger.debug(f"⚠️  Channel not found in active listeners: {channel}")
+            
+            remaining = list(self._active_channels)
+            
+            Logger.info(f"🗑️  Removed {len(removed)} channels, {len(remaining)} remaining")
+            
+            return {
+                "success": True,
+                "removed": removed,
+                "not_found": not_found,
+                "remaining": remaining,
+                "total_remaining": len(remaining)
+            }
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to remove listener channels: {e}")
+            return {
+                "success": False,
+                "removed": removed,
+                "error": str(e)
+            }
+    
+    @ErrorTraceback.w_check_error_exist
+    async def stop_pubsub_listener(self) -> bool:
+        """
+        Stop the PubSub listener loop and unsubscribe from all channels
+        
+        Returns:
+            True if stopped successfully
+        """
+        try:
+            self._listener_running = False
+            
+            # Cancel the listener task
+            if self._listener_task and not self._listener_task.done():
+                self._listener_task.cancel()
+                try:
+                    await self._listener_task
+                except asyncio.CancelledError:
+                    pass
+            
+            # Unsubscribe from all channels
+            if self._pubsub and self._active_channels:
+                all_channels = list(self._active_channels)
+                result = await self.remove_listener_channels(all_channels)
+                Logger.info(f"🛑 Stopped PubSub listener and unsubscribed from {len(result['removed'])} channels")
+            
+            self._listener_task = None
+            return True
+            
+        except Exception as e:
+            Logger.error(f"❌ Failed to stop PubSub listener: {e}")
+            return False
+    
     # ======================
     # BACKWARD COMPATIBILITY - PubSub Aliases
     # ======================
