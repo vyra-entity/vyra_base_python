@@ -10,6 +10,18 @@ from vyra_base.storage.tb_base import Base
 
 
 class TypeEnum(str, Enum):
+    """
+    Enumeration of supported parameter data types in VYRA.
+    
+    Defines the types that can be stored and validated in the parameter system.
+    
+    :cvar integer: Integer type.
+    :cvar string: String type.
+    :cvar boolean: Boolean type.
+    :cvar float: Floating point type.
+    :cvar list: List/array type.
+    :cvar dict: Dictionary/object type.
+    """
     integer = "int"
     string = "string"
     boolean = "bool"
@@ -19,6 +31,25 @@ class TypeEnum(str, Enum):
 
 
 class Parameter(Base):
+    """
+    SQLAlchemy model for storing module parameters with metadata.
+    
+    Stores runtime-configurable parameters with type information, constraints,
+    display metadata, and visibility/editability flags. Parameters can be
+    used for module configuration and are accessible via the VYRA API.
+    
+    :ivar name: Unique parameter identifier.
+    :ivar value: Current parameter value (JSON-serialized).
+    :ivar default_value: Default value for reset operations.
+    :ivar type: Parameter data type (TypeEnum).
+    :ivar visible: Whether parameter appears in UI.
+    :ivar editable: Whether parameter can be modified.
+    :ivar displayname: Human-readable display name.
+    :ivar description: Parameter description for documentation.
+    :ivar min_value: Minimum allowed value (for numeric types).
+    :ivar max_value: Maximum allowed value (for numeric types).
+    :ivar range_value: Allowed value range/options (for constrained types).
+    """
     __tablename__ = "parameter"
 
     name: Mapped[str] = mapped_column(

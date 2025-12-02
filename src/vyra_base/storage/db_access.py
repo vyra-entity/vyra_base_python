@@ -32,6 +32,16 @@ meta = MetaData()
 
 
 class DBSTATUS(str, Enum):
+    """
+    Enumeration of database operation status codes.
+    
+    :cvar SUCCESS: Operation completed successfully.
+    :cvar ERROR: An error occurred during the operation.
+    :cvar NOT_FOUND: Requested resource was not found.
+    :cvar NOT_ALLOWED: Operation is not allowed.
+    :cvar NOT_AUTHORIZED: User is not authorized for this operation.
+    :cvar CONFLICT: Operation conflicts with existing data.
+    """
     SUCCESS = "success"
     ERROR = "error"
     NOT_FOUND = "not_found"
@@ -41,12 +51,24 @@ class DBSTATUS(str, Enum):
 
 
 class DBTYPE(str, Enum):
+    """
+    Enumeration of supported database types.
+    
+    :cvar SQLITE: SQLite database engine.
+    :cvar MYSQL: MySQL database engine.
+    :cvar POSTGRESQL: PostgreSQL database engine.
+    """
     SQLITE = "sqlite"
     MYSQL = "mysql"
     POSTGRESQL = "postgresql"
 
 
 class DBMESSAGE:
+    """
+    Collection of standard database error messages.
+    
+    :cvar DEFAULT_ERROR: Generic error message for database operations.
+    """
     DEFAULT_ERROR = 'Something went wrong while processing the query. See the details.'
 
 
@@ -199,6 +221,11 @@ class DbAccess(Storage):
             meta = MetaData()
 
             def load_table(sync_conn):
+                """
+                Load table metadata from database in synchronous context.
+                
+                :param sync_conn: Synchronous database connection.
+                """
                 Table(table_name, meta, autoload_with=sync_conn)
 
             async with self.db_engine.connect() as async_conn:
@@ -236,6 +263,12 @@ class DbAccess(Storage):
 
             async with self.db_engine.connect() as async_conn:
                 def check_and_reflect(sync_conn):
+                    """
+                    Check if table exists and reflect its metadata.
+                    
+                    :param sync_conn: Synchronous database connection.
+                    :return: Table object if exists, None otherwise.
+                    """
                     inspector = inspect(sync_conn)
                     if not inspector.has_table(table_name):
                         return None

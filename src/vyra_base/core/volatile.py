@@ -86,6 +86,12 @@ class Volatile:
     
     @ErrorTraceback.w_check_error_exist
     async def transient_event_listener(self):
+        """
+        Background task listening for Redis pub/sub messages on registered channels.
+        
+        Continuously listens for messages and triggers registered shouter callbacks
+        when messages arrive on subscribed channels.
+        """
         self._listener_active = True
         async for message in self.redis.pubsub.listen():
             if message["type"] == "message":

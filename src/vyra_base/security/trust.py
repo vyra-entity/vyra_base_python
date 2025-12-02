@@ -7,6 +7,14 @@ from vyra_base.helper.logger import Logger
 
 
 class TRUST_LEVEL(int, Enum):
+    """
+    Enumeration defining trust levels for access control.
+    
+    :cvar TRUST_NONE: No trust level set.
+    :cvar TRUST_ONE_RESERVE: Only one entity can be trusted (reserved).
+    :cvar TRUST_ONE_RELATED: One entity with related IDs can be trusted.
+    :cvar TRUST_ALL: All entities are trusted.
+    """
     TRUST_NONE = 0
     TRUST_ONE_RESERVE = 1
     TRUST_ONE_RELATED = 2
@@ -14,6 +22,14 @@ class TRUST_LEVEL(int, Enum):
 
 
 class TRUST_STATUS(int, Enum):
+    """
+    Enumeration representing the status of trust verification.
+    
+    :cvar SUCCEED: Trust verification succeeded.
+    :cvar FAILED: Trust verification failed.
+    :cvar ALREADY_TRUSTED: Entity is already in trusted list.
+    :cvar UNKNOWN: Unknown trust status.
+    """
     SUCCEED = 0
     FAILED = 1
     ALREADY_TRUSTED = 2
@@ -21,6 +37,20 @@ class TRUST_STATUS(int, Enum):
 
 
 class TrustlevelManager:
+    """
+    Manages trust levels and access control for module interactions.
+    
+    This class provides functionality to verify and manage trusted entities
+    based on configurable trust levels. It supports different trust modes:
+    - Trusting all entities
+    - Reserving trust for a single entity
+    - Trusting related entities
+    
+    :ivar level: Current trust level setting.
+    :ivar ENV_PATH: Path to environment configuration.
+    :ivar trusted_ids: List of trusted UUIDs.
+    :ivar related_ids: List of tuples mapping trusted IDs to related IDs.
+    """
     def __init__(self):
         """
         Initialize the TrustlevelManager class.

@@ -858,6 +858,13 @@ def remote_callable(func):
     """
     @wraps(func)
     async def async_wrapper(*args, **kwargs):
+        """
+        Async wrapper for remote callable functions with debug logging.
+        
+        :param args: Positional arguments for wrapped function.
+        :param kwargs: Keyword arguments for wrapped function.
+        :return: Result from async function call.
+        """
         Logger.debug(f"Calling function async: {func.__name__} "
                      f"with args: {args} and kwargs: {kwargs}")
         result = await func(*args, **kwargs)
@@ -865,6 +872,13 @@ def remote_callable(func):
 
     @wraps(func)
     def sync_wrapper(*args, **kwargs):
+        """
+        Sync wrapper for remote callable functions with debug logging.
+        
+        :param args: Positional arguments for wrapped function.
+        :param kwargs: Keyword arguments for wrapped function.
+        :return: Result from function call.
+        """
         Logger.debug(f"Calling function: {func.__name__} "
                      f"with args: {args} and kwargs: {kwargs}")
         result = func(*args, **kwargs)

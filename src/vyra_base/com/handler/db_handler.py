@@ -1,6 +1,6 @@
 import asyncio
 
-from vyra_base.com.communication_handler import CommunicationHandler
+from vyra_base.com.handler.communication_handler import CommunicationHandler
 
 class DBCommunicationHandler(CommunicationHandler):
     """

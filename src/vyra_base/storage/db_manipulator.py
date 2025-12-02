@@ -25,6 +25,19 @@ from vyra_base.helper.error_handler import ErrorTraceback
 
 @dataclass
 class DBReturnValue:
+    """
+    Standardized return value container for database operations.
+    
+    Encapsulates the result of database operations with status, value, and details.
+    Provides convenience methods for setting error/success states.
+    
+    :ivar status: Operation status (see DBSTATUS enum).
+    :type status: Union[str, None]
+    :ivar value: Main return value (data or error message).
+    :type value: Union[bool, str, list, dict]
+    :ivar details: Additional details about the operation.
+    :type details: Union[bool, str, list, dict]
+    """
     status: Union[str, None] = None
     value: Union[bool, str, list, dict] = ''
     details: Union[bool, str, list, dict] = ''

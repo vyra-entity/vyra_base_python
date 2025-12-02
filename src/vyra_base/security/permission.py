@@ -15,6 +15,13 @@ class BaseInterface:
 
     @classmethod
     def add(cls, list_ref: list[str], name: str) -> bool:
+        """
+        Add a name to the registration list if not already present.
+        
+        :param list_ref: Reference to client or server list.
+        :param name: Interface name to register.
+        :return: True if added, False if already exists.
+        """
         if name not in list_ref:
             list_ref.append(name)
             return True
@@ -22,6 +29,13 @@ class BaseInterface:
 
     @classmethod
     def remove(cls, list_ref: list[str], name: str) -> bool:
+        """
+        Remove a name from the registration list if present.
+        
+        :param list_ref: Reference to client or server list.
+        :param name: Interface name to unregister.
+        :return: True if removed, False if not found.
+        """
         if name in list_ref:
             list_ref.remove(name)
             return True
@@ -88,6 +102,17 @@ class BaseInterface:
 
 
 class Speaker(BaseInterface):
+    """
+    Permission manager for ROS2 topic-based communication (pub/sub pattern).
+    
+    Manages client (subscriber) and server (publisher) registrations for
+    SROS2 security policy generation. Tracks topic interfaces that require
+    permission configuration.
+    
+    :cvar client: List of registered subscriber topic names.
+    :cvar server: List of registered publisher topic names.
+    :cvar permission_templates: Templates for generating SROS2 permissions.
+    """
     client: list[str] = []
     server: list[str] = []
     permission_templates: dict = {
@@ -121,6 +146,17 @@ class Speaker(BaseInterface):
 
 
 class Callable(BaseInterface):
+    """
+    Permission manager for ROS2 service-based communication (request/reply pattern).
+    
+    Manages client (service caller) and server (service provider) registrations for
+    SROS2 security policy generation. Tracks service interfaces that require
+    permission configuration.
+    
+    :cvar client: List of registered service client names.
+    :cvar server: List of registered service server names.
+    :cvar permission_templates: Templates for generating SROS2 permissions.
+    """
     client: list[str] = []
     server: list[str] = []
     permission_templates: dict = {
@@ -154,6 +190,18 @@ class Callable(BaseInterface):
 
 
 class Job(BaseInterface):
+    """
+    Permission manager for ROS2 action-based communication (goal/feedback/result pattern).
+    
+    Manages client (action caller) and server (action executor) registrations for
+    SROS2 security policy generation. Actions combine services and topics for
+    long-running operations with feedback.
+    
+    :cvar client: List of registered action client names.
+    :cvar server: List of registered action server names.
+    :cvar permission_templates: Templates for generating SROS2 action permissions
+                                (send_goal, get_result, cancel, feedback, status).
+    """
     client: list[str] = []  # Jede Klasse braucht ihre eigene REG Liste
     server: list[str] = []
     permission_templates: dict = {
@@ -195,6 +243,12 @@ class Job(BaseInterface):
 
 
 def prev_test():
+    """
+    Test function demonstrating permission manager registration API.
+    
+    Shows examples of adding clients/servers for Speaker (topics),
+    Callable (services), and Job (actions) interfaces.
+    """
     print("Add speaker_client: " + str(Speaker.add_client("my_speaker_client")))  # True
     print("Add speaker_server: " + str(Speaker.add_server("my_speaker_server")))  # True
     print("Add service_client: " + str(Callable.add_client("my_service_client")))  # True

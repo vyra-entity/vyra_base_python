@@ -75,6 +75,12 @@ class LogEntry:
         return self
     
     def warning(self):
+        """
+        Alias for warn() method to match Python logging convention.
+        
+        :return: Self with warning level set.
+        :rtype: LogEntry
+        """
         return self.warn()
 
 
@@ -251,6 +257,12 @@ class Logger:
 
     @classmethod
     def warning(cls, entry: Union[LogEntry, str]):
+        """
+        Alias for warn() to match Python logging convention.
+        
+        :param entry: Message to log as warning.
+        :type entry: Union[LogEntry, str]
+        """
         Logger.warn(entry)
 
     @classmethod
@@ -323,6 +335,13 @@ class Logger:
         track_str = ''
         if asyncio.iscoroutinefunction(func):
             async def async_wrapper(*args, **kwargs):
+                """
+                Async wrapper that logs function entry/exit with timing.
+                
+                :param args: Positional arguments passed to wrapped function.
+                :param kwargs: Keyword arguments passed to wrapped function.
+                :return: Return value of wrapped async function.
+                """
                 Logger.log(
                     LogEntry(
                         message=f'Call {func_str}{track_str}({args} {kwargs})')
@@ -340,6 +359,13 @@ class Logger:
             return async_wrapper
         else:
             def wrapper(*args, **kwargs):
+                """
+                Sync wrapper that logs function entry/exit with timing.
+                
+                :param args: Positional arguments passed to wrapped function.
+                :param kwargs: Keyword arguments passed to wrapped function.
+                :return: Return value of wrapped function.
+                """
                 Logger.log(
                     LogEntry(f'Call {func_str}{track_str}')
                     .debug()

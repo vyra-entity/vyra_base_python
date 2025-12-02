@@ -28,6 +28,13 @@ class IntEnum(TypeDecorator):
         self._enumtype = enumtype
 
     def process_bind_param(self, value, dialect):
+        """
+        Convert Python enum to database value before storing.
+        
+        :param value: Python enum value to convert.
+        :param dialect: SQLAlchemy dialect.
+        :return: Integer value for database storage.
+        """
         if value is None:
             return None
         if isinstance(value, int):
@@ -35,6 +42,13 @@ class IntEnum(TypeDecorator):
         return value.value
 
     def process_result_value(self, value, dialect):
+        """
+        Convert database value back to Python enum after retrieval.
+        
+        :param value: Database integer value.
+        :param dialect: SQLAlchemy dialect.
+        :return: Python enum instance.
+        """
         if value is None:
             return None
         return self._enumtype(value)

@@ -45,6 +45,15 @@ class ROS2Handler(CommunicationHandler):
         super().__init__()
 
     def emit(self, record: LogRecord):
+        """
+        Emit a log record by publishing it as a ROS2 message.
+        
+        Converts Python log records to ROS2 message format and publishes
+        to configured topic. Maps fields from log record to ROS2 message type.
+        
+        :param record: Python log record to publish.
+        :type record: LogRecord
+        """
         try:
             Logger.debug(
                 f"{self._initiator} instruct {ROS2Handler.__handlerName__} "

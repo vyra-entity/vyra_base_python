@@ -162,7 +162,20 @@ class VyraServiceServer:
         return response
     
     def run_async_in_thread(self, coro, timeout=None):
+        """
+        Execute an async coroutine in a separate thread with its own event loop.
+        
+        Creates a new thread with a dedicated asyncio event loop to run
+        async code from synchronous ROS2 service callbacks.
+        
+        :param coro: Coroutine to execute.
+        :param timeout: Optional timeout in seconds.
+        :return: Result from coroutine execution.
+        """
         def target():
+            """
+            Thread target function that creates and manages the event loop.
+            """
             # Prüfe ob bereits ein Loop im aktuellen Thread existiert
             try:
                 existing_loop = asyncio.get_running_loop()

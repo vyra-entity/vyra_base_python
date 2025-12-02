@@ -61,7 +61,18 @@ class FunctionConfigParamTypes(Enum):
 
 @dataclass(slots=True)
 class DCBase:
+    """
+    Base dataclass providing utility methods for all VYRA dataclass entries.
+    
+    Provides common functionality like dict conversion for dataclass instances.
+    """
     def asdict(self):
+        """
+        Convert the dataclass instance to a dictionary.
+        
+        :return: Dictionary representation of the dataclass.
+        :rtype: dict
+        """
         return asdict(self)
 
 class FunctionConfigBaseTypes(Enum):
@@ -145,6 +156,12 @@ class FunctionConfigPeriodicSpeaker(DCBase):
             raise ValueError(f"speed {self.interval} out of bounds (0.01–10.0)")
 
     def asdict(self):
+        """
+        Convert periodic speaker config to dictionary, replacing callable with name.
+        
+        :return: Dictionary with caller function name instead of reference.
+        :rtype: dict
+        """
         result = {}
         for f in fields(self):
             if f.name == "caller":
@@ -201,6 +218,15 @@ class FunctionConfigEntry(DCBase):
     periodic: Union[FunctionConfigPeriodicSpeaker, None] = None
 
     def asdict(self):
+        """
+        Convert FunctionConfigEntry to dictionary with special handling for callable fields.
+        
+        Converts callable references and ROS2 types to their string names for
+        serialization. Nested dataclasses are recursively converted.
+        
+        :return: Dictionary representation with serializable values.
+        :rtype: dict
+        """
         result = {}
         for f in fields(self):
             if f.name == "callback":
