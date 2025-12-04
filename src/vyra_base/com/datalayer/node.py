@@ -51,9 +51,15 @@ class VyraNode(Node):
 class CheckerNode(Node):
     """
     Node to check the availability of other nodes.
+    
+    Note: Uses enable_rosout_logger=False to avoid SROS2 permission issues
+    with the /rosout topic during node availability checks.
     """
     def __init__(self):
-        super().__init__('checker_node')
+        super().__init__(
+            'checker_node',
+            enable_rosout_logger=False  # Disable rosout for SROS2 compatibility
+        )
 
     def is_node_available(self, node_name: str) -> bool:
         """
