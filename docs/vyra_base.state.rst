@@ -13,7 +13,7 @@ vyra\_base.state.health\_layer module
    :undoc-members:
 
 vyra\_base.state.lifecycle\_layer module
--------------------------------------
+----------------------------------------
 
 .. automodule:: vyra_base.state.lifecycle_layer
    :members:
@@ -21,7 +21,7 @@ vyra\_base.state.lifecycle\_layer module
    :undoc-members:
 
 vyra\_base.state.operational\_layer module
--------------------------------------
+------------------------------------------
 
 .. automodule:: vyra_base.state.operational_layer
    :members:
@@ -45,7 +45,7 @@ vyra\_base.state.state\_machine module
    :undoc-members:
 
 vyra\_base.state.state\_types module
---------------------------------------
+------------------------------------
 
 .. automodule:: vyra_base.state.state_types
    :members:
@@ -53,7 +53,7 @@ vyra\_base.state.state\_types module
    :undoc-members:
 
 vyra\_base.state.unified module
---------------------------------------
+-------------------------------
 
 .. automodule:: vyra_base.state.unified
    :members:
