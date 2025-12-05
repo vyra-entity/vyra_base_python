@@ -1,422 +1,537 @@
+"""
+Test Suite for 3-Layer State Machine - Core Engine
+
+Tests StateMachine class, state transitions, and layer interactions.
+"""
+
 import pytest
-from unittest.mock import MagicMock, patch
-from datetime import datetime
-
-from vyra_base.state.state_machine import StateMachine, StateModel
-from vyra_base.state.state_config import Vyra_STATES, config_collection
-
-# Dummy-Objekte für die Abhängigkeiten
-class DummyStateFeeder:
-    def __init__(self):
-        self.feed = MagicMock()
-
-class DummyModuleEntry:
-    def __init__(self):
-        self.uuid = "test-uuid"
-        self.name = "test-module"
-
-class DummyStateEntry:
-    def __init__(self, previous, trigger, current, module_id, module_name, timestamp, _type):
-        self.previous = previous
-        self.trigger = trigger
-        self.current = current
-        self.module_id = module_id
-        self.module_name = module_name
-        self.timestamp = timestamp
-        self._type = _type
-
-@pytest.fixture
-def dummy_state_feeder():
-    return DummyStateFeeder()
-
-@pytest.fixture
-def dummy_module_entry():
-    return DummyModuleEntry()
-
-@pytest.fixture
-def dummy_state_type():
-    return "dummy_type"
+import threading
+import time
+from vyra_base.state.state_machine import (
+    StateMachine,
+    StateMachineConfig,
+    StateMachineError,
+    InvalidTransitionError,
+    LayerViolationError,
+    StateTransition,
+)
+from vyra_base.state.state_types import (
+    LifecycleState,
+    OperationalState,
+    HealthState,
+)
+from vyra_base.state.state_events import StateEvent, EventType
 
 
-@pytest.fixture
-def state_machine(dummy_state_feeder, dummy_state_type, dummy_module_entry):
-    # Patch StateEntry, config_collection, Vyra_STATES, Machine
-    with patch("vyra_base.state.state_machine.StateEntry") as MockStateEntry, \
-         patch("vyra_base.state.state_machine.config_collection", config_collection), \
-         patch("vyra_base.state.state_machine.Vyra_STATES", Vyra_STATES), \
-         patch("vyra_base.state.state_machine.Machine") as MockMachine:
-        MockStateEntry.return_value = DummyStateEntry(
-            previous="__CircleOfEternity__",
-            trigger="__toBeBorn__",
-            current=Vyra_STATES.Resting,
-            module_id="test-uuid",
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="dummy_type"
+class TestStateMachineInitialization:
+    """Test StateMachine initialization and configuration."""
+    
+    def test_default_initialization(self):
+        """Test state machine with default config."""
+        fsm = StateMachine()
+        
+        assert fsm.get_lifecycle_state() == LifecycleState.UNINITIALIZED
+        assert fsm.get_operational_state() == OperationalState.IDLE
+        assert fsm.get_health_state() == HealthState.OK
+    
+    def test_custom_initial_states(self):
+        """Test state machine with custom initial states."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.READY,
+            initial_health=HealthState.WARNING,
         )
-        mock_machine_instance = MagicMock()
-        mock_machine_instance.get_triggers.return_value = [
-            t["trigger"] for t in config_collection["transitions"]
-        ]
-        MockMachine.return_value = mock_machine_instance
+        fsm = StateMachine(config)
+        
+        assert fsm.get_lifecycle_state() == LifecycleState.ACTIVE
+        assert fsm.get_operational_state() == OperationalState.READY
+        assert fsm.get_health_state() == HealthState.WARNING
+    
+    def test_config_strict_mode(self):
+        """Test strict mode configuration."""
+        config_strict = StateMachineConfig(strict_mode=True)
+        config_lenient = StateMachineConfig(strict_mode=False)
+        
+        fsm_strict = StateMachine(config_strict)
+        fsm_lenient = StateMachine(config_lenient)
+        
+        # Try invalid transition
+        invalid_event = StateEvent(EventType.SHUTDOWN)  # Can't shutdown from Uninitialized
+        
+        # Strict mode should raise error
+        with pytest.raises(InvalidTransitionError):
+            fsm_strict.send_event(invalid_event)
+        
+        # Lenient mode should not raise (just log warning)
+        fsm_lenient.send_event(invalid_event)  # Should not raise
 
-        sm = StateMachine(dummy_state_feeder, dummy_state_type, dummy_module_entry)
-        sm.initialize()
-        # Ensure the model has the required state attribute
-        if hasattr(sm, 'model'):
-            sm.model.state = Vyra_STATES.Resting
-        return sm
 
-def test_initial_state(state_machine):
-    assert state_machine.current_state == Vyra_STATES.Resting
+class TestLifecycleTransitions:
+    """Test lifecycle layer transitions."""
+    
+    def test_standard_startup_sequence(self):
+        """Test standard module startup."""
+        fsm = StateMachine()
+        
+        # Start initialization
+        fsm.send_event(StateEvent(EventType.START))
+        assert fsm.get_lifecycle_state() == LifecycleState.INITIALIZING
+        
+        # Complete initialization
+        fsm.send_event(StateEvent(EventType.INIT_SUCCESS))
+        assert fsm.get_lifecycle_state() == LifecycleState.ACTIVE
+        assert fsm.is_active()
+    
+    def test_initialization_failure(self):
+        """Test failed initialization recovery."""
+        fsm = StateMachine()
+        
+        fsm.send_event(StateEvent(EventType.START))
+        assert fsm.get_lifecycle_state() == LifecycleState.INITIALIZING
+        
+        # Fail initialization
+        fsm.send_event(StateEvent(EventType.INIT_FAILURE))
+        assert fsm.get_lifecycle_state() == LifecycleState.RECOVERING
+    
+    def test_shutdown_sequence(self):
+        """Test controlled shutdown."""
+        config = StateMachineConfig(initial_lifecycle=LifecycleState.ACTIVE)
+        fsm = StateMachine(config)
+        
+        # Begin shutdown
+        fsm.send_event(StateEvent(EventType.SHUTDOWN))
+        assert fsm.get_lifecycle_state() == LifecycleState.SHUTTING_DOWN
+        
+        # Complete shutdown
+        fsm.send_event(StateEvent(EventType.FINISHED))
+        assert fsm.get_lifecycle_state() == LifecycleState.DEACTIVATED
+    
+    def test_recovery_success(self):
+        """Test successful recovery from fault."""
+        config = StateMachineConfig(initial_lifecycle=LifecycleState.RECOVERING)
+        fsm = StateMachine(config)
+        
+        fsm.send_event(StateEvent(EventType.RECOVERY_SUCCESS))
+        assert fsm.get_lifecycle_state() == LifecycleState.ACTIVE
+    
+    def test_recovery_failure(self):
+        """Test failed recovery leads to deactivation."""
+        config = StateMachineConfig(initial_lifecycle=LifecycleState.RECOVERING)
+        fsm = StateMachine(config)
+        
+        fsm.send_event(StateEvent(EventType.RECOVERY_FAILED))
+        assert fsm.get_lifecycle_state() == LifecycleState.DEACTIVATED
 
-def test_all_transitions(state_machine):
-    transitions = state_machine.all_transitions
-    assert isinstance(transitions, list)
-    assert transitions[0]["trigger"] == config_collection["transitions"][0]["trigger"]
-    assert transitions[0]["source"] == config_collection["transitions"][0]["source"]
-    assert transitions[0]["dest"] == config_collection["transitions"][0]["dest"]
 
-def test_is_transition_possible_true(state_machine):
-    trigger = config_collection["transitions"][0]["trigger"]
-    possible, triggers = state_machine.is_transition_possible(trigger)
-    assert possible is True
-    assert trigger in triggers
-
-def test_is_transition_possible_false(state_machine):
-    possible, triggers = state_machine.is_transition_possible("invalid_trigger")
-    assert possible is False
-    assert config_collection["transitions"][0]["trigger"] in triggers
-
-def test_state_model_base_enter_updates_state(monkeypatch):
-    with patch("vyra_base.state.state_machine.Logger"), \
-         patch("vyra_base.state.state_machine.ErrorTraceback"):
-        class DummyEvent:
-            class Event:
-                name = "ReadyForInput"
-            event = Event()
-        state_entry = DummyStateEntry(
-            previous=Vyra_STATES.Awakening,
-            trigger="StartUp",
-            current=Vyra_STATES.Awakening,
-            module_id="test-uuid",
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="dummy_type"
+class TestOperationalTransitions:
+    """Test operational layer transitions."""
+    
+    def test_task_execution_cycle(self):
+        """Test complete task execution cycle."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.IDLE,
         )
-        state_feed = DummyStateFeeder()
-        module_entry = DummyModuleEntry()
-        model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
-        model.state = Vyra_STATES.Attentive
-        model.base_enter(DummyEvent())
-        assert state_entry.previous == Vyra_STATES.Awakening
-        assert state_entry.current == Vyra_STATES.Attentive
-        assert state_entry.trigger == "ReadyForInput"
-        state_feed.feed.assert_called_with(state_entry)
-
-@pytest.mark.parametrize("state_method", [
-    "on_enter_Resting", "on_enter_Awakening", "on_enter_Attentive", "on_enter_Active",
-    "on_enter_Reflecting", "on_enter_Learning", "on_enter_Alert", "on_enter_Delegating",
-    "on_enter_Recovering", "on_enter_Overloaded", "on_enter_ShuttingDown", "on_enter_Interrupting"
-])
-def test_state_model_on_enter_methods(state_method):
-    with patch("vyra_base.state.state_machine.Logger"), \
-         patch("vyra_base.state.state_machine.ErrorTraceback"):
-        class DummyEvent:
-            class Event:
-                name = "dummy"
-            event = Event()
-        state_entry = DummyStateEntry(
-            previous=Vyra_STATES.Resting,
-            trigger="dummy",
-            current=Vyra_STATES.Resting,
-            module_id="test-uuid",
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="dummy_type"
+        fsm = StateMachine(config)
+        
+        # Ready for tasks
+        fsm.send_event(StateEvent(EventType.READY))
+        assert fsm.get_operational_state() == OperationalState.READY
+        
+        # Start task
+        fsm.send_event(StateEvent(EventType.TASK_START))
+        assert fsm.get_operational_state() == OperationalState.RUNNING
+        
+        # Complete task
+        fsm.send_event(StateEvent(EventType.TASK_COMPLETE))
+        assert fsm.get_operational_state() == OperationalState.COMPLETED
+        
+        # Reset to ready
+        fsm.send_event(StateEvent(EventType.AUTO_RESET))
+        assert fsm.get_operational_state() == OperationalState.READY
+    
+    def test_pause_resume(self):
+        """Test task pause and resume."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
         )
-        state_feed = DummyStateFeeder()
-        module_entry = DummyModuleEntry()
-        model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
-        # Set the required state attribute
-        model.state = Vyra_STATES.Resting
-        getattr(model, state_method)(DummyEvent())
-        # Test besteht, wenn keine Exception geworfen wird
-
-def test_state_model_state_entry_property():
-    state_entry = DummyStateEntry(
-        previous=Vyra_STATES.Resting,
-        trigger="sleep",
-        current=Vyra_STATES.Resting,
-        module_id="test-uuid",
-        module_name="test-module",
-        timestamp=datetime.now(),
-        _type="dummy_type"
-    )
-    state_feed = DummyStateFeeder()
-    module_entry = DummyModuleEntry()
-    model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
-    assert model.state_entry == state_entry
-
-def test_state_machine_initialization():
-    """Test StateMachine initialization without fixture"""
-    state_feed = DummyStateFeeder()
-    state_type = "test_type"
-    module_entry = DummyModuleEntry()
-    
-    with patch("vyra_base.state.state_machine.StateEntry") as MockStateEntry, \
-         patch("vyra_base.state.state_machine.config_collection", config_collection), \
-         patch("vyra_base.state.state_machine.Machine") as MockMachine:
+        fsm = StateMachine(config)
         
-        MockStateEntry.return_value = DummyStateEntry(
-            previous="__CircleOfEternity__",
-            trigger="__toBeBorn__",
-            current=Vyra_STATES.Resting,
-            module_id="test-uuid",
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="test_type"
+        # Pause
+        fsm.send_event(StateEvent(EventType.TASK_PAUSE))
+        assert fsm.get_operational_state() == OperationalState.PAUSED
+        
+        # Resume
+        fsm.send_event(StateEvent(EventType.TASK_RESUME))
+        assert fsm.get_operational_state() == OperationalState.RUNNING
+    
+    def test_background_processing(self):
+        """Test background processing state."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
         )
+        fsm = StateMachine(config)
         
-        MockMachine.return_value = MagicMock()
+        # Enter processing
+        fsm.send_event(StateEvent(EventType.BACKGROUND_PROCESSING))
+        assert fsm.get_operational_state() == OperationalState.PROCESSING
         
-        sm = StateMachine(state_feed, state_type, module_entry) # pyright: ignore[reportArgumentType]
-        
-        assert sm.state_feed == state_feed
-        assert sm.state_type == state_type
-        assert sm.module_config == module_entry
-        
-        # Test initialization
-        sm.initialize()
-        
-        # Verify StateEntry was called with correct parameters
-        MockStateEntry.assert_called_once()
-        call_args = MockStateEntry.call_args[1]  # keyword arguments
-        assert call_args['previous'] == '__CircleOfEternity__'
-        assert call_args['trigger'] == '__toBeBorn__'
-        assert call_args['current'] == Vyra_STATES.Resting
-        assert call_args['module_id'] == module_entry.uuid
-        assert call_args['module_name'] == module_entry.name
-        assert call_args['_type'] == state_type
-
-def test_state_machine_properties(state_machine):
-    """Test StateMachine property access"""
-    # Test current_state property
-    assert state_machine.current_state == Vyra_STATES.Resting
+        # Complete processing
+        fsm.send_event(StateEvent(EventType.PROCESSING_DONE))
+        assert fsm.get_operational_state() == OperationalState.RUNNING
     
-    # Test all_transitions property
-    transitions = state_machine.all_transitions
-    assert transitions == config_collection['transitions']
-    assert isinstance(transitions, list)
-
-def test_state_machine_trigger_filtering(state_machine):
-    """Test trigger filtering in is_transition_possible"""
-    # Mock get_triggers to return triggers including 'to_' prefixed ones
-    state_machine._machine.get_triggers.return_value = [
-        'StartUp', 'to_Awakening', 'ReadyForInput', 'to_Attentive'
-    ]
-    
-    possible, triggers = state_machine.is_transition_possible('StartUp')
-    
-    # Should filter out 'to_' prefixed triggers
-    assert 'to_Awakening' not in triggers
-    assert 'to_Attentive' not in triggers
-    assert 'StartUp' in triggers
-    assert 'ReadyForInput' in triggers
-
-def test_state_model_initialization():
-    """Test StateModel initialization"""
-    state_entry = DummyStateEntry(
-        previous=Vyra_STATES.Resting,
-        trigger="test",
-        current=Vyra_STATES.Resting,
-        module_id="test-uuid",
-        module_name="test-module",
-        timestamp=datetime.now(),
-        _type="test_type"
-    )
-    state_feed = DummyStateFeeder()
-    module_entry = DummyModuleEntry()
-    
-    model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
-    
-    assert model.state_entry == state_entry
-    assert model._state_feed == state_feed
-    assert model._module_config == module_entry
-
-def test_state_model_base_enter_with_different_states():
-    """Test base_enter method with different state transitions"""
-    with patch("vyra_base.state.state_machine.Logger") as MockLogger, \
-         patch("vyra_base.state.state_machine.ErrorTraceback") as MockErrorTraceback:
-        
-        class DummyEvent:
-            class Event:
-                name = "TestTransition"
-            event = Event()
-        
-        state_entry = DummyStateEntry(
-            previous=Vyra_STATES.Resting,
-            trigger="initial",
-            current=Vyra_STATES.Resting,
-            module_id="test-uuid",
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="test_type"
+    def test_delegation(self):
+        """Test task delegation."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
         )
+        fsm = StateMachine(config)
         
-        state_feed = DummyStateFeeder()
-        module_entry = DummyModuleEntry()
-        model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
+        # Delegate
+        fsm.send_event(StateEvent(EventType.DELEGATE_TO_OTHER))
+        assert fsm.get_operational_state() == OperationalState.DELEGATING
         
-        # Test transition to different state
-        model.state = Vyra_STATES.Active
-        model.base_enter(DummyEvent())
-        
-        assert state_entry.previous == Vyra_STATES.Resting
-        assert state_entry.current == Vyra_STATES.Active
-        assert state_entry.trigger == "TestTransition"
-        
-        # Verify state feed was called
-        state_feed.feed.assert_called_with(state_entry)
-
-def test_state_model_all_state_transitions():
-    """Test all possible state transitions"""
-    states_to_test = [
-        Vyra_STATES.Resting, Vyra_STATES.Awakening, Vyra_STATES.Attentive,
-        Vyra_STATES.Active, Vyra_STATES.Reflecting, Vyra_STATES.Learning,
-        Vyra_STATES.Alert, Vyra_STATES.Delegating, Vyra_STATES.Recovering,
-        Vyra_STATES.Overloaded, Vyra_STATES.ShuttingDown, Vyra_STATES.Interrupting
-    ]
+        # Complete delegation
+        fsm.send_event(StateEvent(EventType.DELEGATE_DONE))
+        assert fsm.get_operational_state() == OperationalState.RUNNING
     
-    with patch("vyra_base.state.state_machine.Logger"), \
-         patch("vyra_base.state.state_machine.ErrorTraceback"):
-        
-        for target_state in states_to_test:
-            class DummyEvent:
-                class Event:
-                    name = f"TransitionTo{target_state}"
-                event = Event()
-            
-            state_entry = DummyStateEntry(
-                previous=Vyra_STATES.Resting,
-                trigger="initial",
-                current=Vyra_STATES.Resting,
-                module_id="test-uuid",
-                module_name="test-module",
-                timestamp=datetime.now(),
-                _type="test_type"
-            )
-            
-            state_feed = DummyStateFeeder()
-            module_entry = DummyModuleEntry()
-            model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
-            model.state = target_state
-            
-            # Test that base_enter works for this state
-            model.base_enter(DummyEvent())
-            
-            assert state_entry.current == target_state
-            assert state_entry.trigger == f"TransitionTo{target_state}"
-
-def test_state_model_error_handling():
-    """Test error handling in StateModel during base_enter"""
-    with patch("vyra_base.state.state_machine.Logger") as MockLogger, \
-         patch("vyra_base.state.state_machine.ErrorTraceback") as MockErrorTraceback:
-        
-        class DummyEvent:
-            class Event:
-                name = "ErrorTest"
-            event = Event()
-        
-        state_entry = DummyStateEntry(
-            previous=Vyra_STATES.Resting,
-            trigger="test",
-            current=Vyra_STATES.Resting,
-            module_id="test-uuid",
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="test_type"
+    def test_blocking(self):
+        """Test operational blocking."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
         )
+        fsm = StateMachine(config)
         
-        # Create a normal state_feed first
-        state_feed = DummyStateFeeder()
-        module_entry = DummyModuleEntry()
-        model = StateModel(state_entry, state_feed, module_entry) # pyright: ignore[reportArgumentType]
+        # Block
+        fsm.send_event(StateEvent(EventType.BLOCK_DETECTED))
+        assert fsm.get_operational_state() == OperationalState.BLOCKED
         
-        # Now make feed raise an exception for the next call
-        state_feed.feed.side_effect = Exception("Test exception")
-        model.state = Vyra_STATES.Active
-        
-        # Should not raise exception, but handle it internally
-        try:
-            model.base_enter(DummyEvent())
-        except Exception:
-            # If an exception occurs, that's expected behavior
-            pass
-        
-        # The test passes if we reach this point without unhandled exceptions
+        # Unblock
+        fsm.send_event(StateEvent(EventType.UNBLOCK))
+        assert fsm.get_operational_state() == OperationalState.RUNNING
 
-def test_state_machine_with_real_config():
-    """Test StateMachine with actual config_collection"""
-    state_feed = DummyStateFeeder()
-    state_type = "integration_test"
-    module_entry = DummyModuleEntry()
+
+class TestHealthTransitions:
+    """Test health layer transitions."""
     
-    with patch("vyra_base.state.state_machine.StateEntry") as MockStateEntry, \
-         patch("vyra_base.state.state_machine.Machine") as MockMachine:
+    def test_warning_sequence(self):
+        """Test warning detection and clearance."""
+        fsm = StateMachine()
         
-        MockStateEntry.return_value = DummyStateEntry(
-            previous="__CircleOfEternity__",
-            trigger="__toBeBorn__",
-            current=Vyra_STATES.Resting,
-            module_id="test-uuid", 
-            module_name="test-module",
-            timestamp=datetime.now(),
-            _type="integration_test"
+        # Report warning
+        fsm.send_event(StateEvent(EventType.WARN))
+        assert fsm.get_health_state() == HealthState.WARNING
+        assert not fsm.is_healthy()
+        
+        # Clear warning
+        fsm.send_event(StateEvent(EventType.CLEAR_WARNING))
+        assert fsm.get_health_state() == HealthState.OK
+        assert fsm.is_healthy()
+    
+    def test_overload_sequence(self):
+        """Test overload detection and recovery."""
+        config = StateMachineConfig(initial_health=HealthState.WARNING)
+        fsm = StateMachine(config)
+        
+        # Report overload
+        fsm.send_event(StateEvent(EventType.OVERLOAD))
+        assert fsm.get_health_state() == HealthState.OVERLOADED
+        
+        # Reduce load
+        fsm.send_event(StateEvent(EventType.LOAD_REDUCED))
+        assert fsm.get_health_state() == HealthState.WARNING
+    
+    def test_fault_escalation(self):
+        """Test fault detection and escalation."""
+        config = StateMachineConfig(initial_health=HealthState.WARNING)
+        fsm = StateMachine(config)
+        
+        # Report fault
+        fsm.send_event(StateEvent(EventType.FAULT))
+        assert fsm.get_health_state() == HealthState.FAULTED
+        
+        # Escalate to critical
+        fsm.send_event(StateEvent(EventType.ESCALATE))
+        assert fsm.get_health_state() == HealthState.CRITICAL
+    
+    def test_fault_recovery(self):
+        """Test recovery from faulted state."""
+        config = StateMachineConfig(initial_health=HealthState.FAULTED)
+        fsm = StateMachine(config)
+        
+        # Recover
+        fsm.send_event(StateEvent(EventType.RECOVER))
+        assert fsm.get_health_state() == HealthState.OK
+
+
+class TestLayerInteractions:
+    """Test interactions between layers."""
+    
+    def test_health_escalates_lifecycle(self):
+        """Test health faults escalate to lifecycle recovery."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_health=HealthState.WARNING,
         )
+        fsm = StateMachine(config)
         
-        mock_machine = MagicMock()
-        MockMachine.return_value = mock_machine
-        
-        sm = StateMachine(state_feed, state_type, module_entry) # pyright: ignore[reportArgumentType]
-        sm.initialize()
-        
-        # Verify Machine was called with correct config
-        MockMachine.assert_called_once()
-        call_kwargs = MockMachine.call_args[1]
-        
-        # Check that config_collection keys are present
-        assert 'send_event' in call_kwargs
-        assert call_kwargs['send_event'] is True
-        assert 'model' in call_kwargs
-        assert call_kwargs['model'] == sm.model
-
-def test_trigger_name_validation():
-    """Test various trigger name scenarios"""
-    state_feed = DummyStateFeeder()
-    state_type = "validation_test"
-    module_entry = DummyModuleEntry()
+        # Health fault should trigger lifecycle recovery
+        fsm.send_event(StateEvent(EventType.FAULT))
+        assert fsm.get_health_state() == HealthState.FAULTED
+        assert fsm.get_lifecycle_state() == LifecycleState.RECOVERING
     
-    with patch("vyra_base.state.state_machine.StateEntry"), \
-         patch("vyra_base.state.state_machine.config_collection", config_collection), \
-         patch("vyra_base.state.state_machine.Machine") as MockMachine:
+    def test_critical_health_forces_shutdown(self):
+        """Test critical health forces lifecycle shutdown."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_health=HealthState.FAULTED,
+        )
+        fsm = StateMachine(config)
         
-        mock_machine = MagicMock()
-        mock_machine.get_triggers.return_value = ["ValidTrigger", "to_SomeState", "AnotherTrigger"]
-        MockMachine.return_value = mock_machine
+        # Escalate to critical
+        fsm.send_event(StateEvent(EventType.ESCALATE))
+        assert fsm.get_health_state() == HealthState.CRITICAL
+        assert fsm.get_lifecycle_state() == LifecycleState.SHUTTING_DOWN
+    
+    def test_lifecycle_controls_operational(self):
+        """Test lifecycle states control operational capabilities."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
+        )
+        fsm = StateMachine(config)
         
-        sm = StateMachine(state_feed, state_type, module_entry) # pyright: ignore[reportArgumentType]
-        sm.initialize()
-        sm.model.state = Vyra_STATES.Resting
+        # Shutdown lifecycle
+        fsm.send_event(StateEvent(EventType.SHUTDOWN))
+        assert fsm.get_lifecycle_state() == LifecycleState.SHUTTING_DOWN
+        # Operational should be paused
+        assert fsm.get_operational_state() == OperationalState.PAUSED
+    
+    def test_overload_pauses_operational(self):
+        """Test overload health pauses operational."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
+            initial_health=HealthState.WARNING,
+        )
+        fsm = StateMachine(config)
         
-        # Test valid trigger
-        possible, triggers = sm.is_transition_possible("ValidTrigger")
-        assert possible is True
-        assert "ValidTrigger" in triggers
-        assert "to_SomeState" not in triggers  # Should be filtered out
+        # Report overload
+        fsm.send_event(StateEvent(EventType.OVERLOAD))
+        assert fsm.get_health_state() == HealthState.OVERLOADED
+        assert fsm.get_operational_state() == OperationalState.PAUSED
+
+
+class TestInterruptEvents:
+    """Test interrupt event handling."""
+    
+    def test_emergency_stop(self):
+        """Test emergency stop affects all layers."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
+            initial_health=HealthState.OK,
+        )
+        fsm = StateMachine(config)
         
-        # Test invalid trigger
-        possible, triggers = sm.is_transition_possible("InvalidTrigger")
-        assert possible is False
-        assert "ValidTrigger" in triggers
-        assert "AnotherTrigger" in triggers
+        # Emergency stop
+        fsm.send_event(StateEvent(EventType.EMERGENCY_STOP))
+        
+        # All layers should be affected
+        assert fsm.get_lifecycle_state() == LifecycleState.DEACTIVATED
+        assert fsm.get_operational_state() == OperationalState.IDLE
+        assert fsm.get_health_state() == HealthState.FAULTED
+    
+    def test_interrupt_pauses_running(self):
+        """Test interrupt pauses running task."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_operational=OperationalState.RUNNING,
+        )
+        fsm = StateMachine(config)
+        
+        # Interrupt
+        fsm.send_event(StateEvent(EventType.INTERRUPT))
+        assert fsm.get_operational_state() == OperationalState.PAUSED
+
+
+class TestCallbacks:
+    """Test callback subscription and notification."""
+    
+    def test_lifecycle_callback(self):
+        """Test lifecycle state change callback."""
+        fsm = StateMachine()
+        
+        callback_data = []
+        def callback(layer, old_state, new_state):
+            callback_data.append((layer, old_state, new_state))
+        
+        fsm.subscribe("lifecycle", callback)
+        
+        # Trigger transition
+        fsm.send_event(StateEvent(EventType.START))
+        
+        assert len(callback_data) == 1
+        assert callback_data[0][0] == "lifecycle"
+        assert callback_data[0][1] == "Uninitialized"
+        assert callback_data[0][2] == "Initializing"
+    
+    def test_multiple_callbacks(self):
+        """Test multiple callbacks on same layer."""
+        fsm = StateMachine()
+        
+        calls1 = []
+        calls2 = []
+        
+        fsm.subscribe("lifecycle", lambda l, o, n: calls1.append(n))
+        fsm.subscribe("lifecycle", lambda l, o, n: calls2.append(n))
+        
+        fsm.send_event(StateEvent(EventType.START))
+        
+        assert len(calls1) == 1
+        assert len(calls2) == 1
+    
+    def test_callback_priority(self):
+        """Test callback execution order by priority."""
+        fsm = StateMachine()
+        
+        call_order = []
+        
+        fsm.subscribe("lifecycle", lambda l, o, n: call_order.append("low"), priority=0)
+        fsm.subscribe("lifecycle", lambda l, o, n: call_order.append("high"), priority=10)
+        fsm.subscribe("lifecycle", lambda l, o, n: call_order.append("medium"), priority=5)
+        
+        fsm.send_event(StateEvent(EventType.START))
+        
+        # Should be called in priority order (high to low)
+        assert call_order == ["high", "medium", "low"]
+    
+    def test_global_callback(self):
+        """Test global callback receives all state changes."""
+        fsm = StateMachine()
+        
+        callbacks = []
+        fsm.subscribe("any", lambda l, o, n: callbacks.append(l))
+        
+        # Trigger different layer changes
+        fsm.send_event(StateEvent(EventType.START))  # lifecycle
+        fsm.send_event(StateEvent(EventType.WARN))  # health
+        
+        assert "lifecycle" in callbacks
+        assert "health" in callbacks
+
+
+class TestHistory:
+    """Test state transition history."""
+    
+    def test_history_recording(self):
+        """Test transitions are recorded in history."""
+        fsm = StateMachine()
+        
+        fsm.send_event(StateEvent(EventType.START))
+        history = fsm.get_history()
+        
+        assert len(history) > 0
+        assert isinstance(history[0], StateTransition)
+    
+    def test_history_limit(self):
+        """Test history size limit."""
+        config = StateMachineConfig(max_history_size=5)
+        fsm = StateMachine(config)
+        
+        # Generate more transitions than limit
+        for _ in range(10):
+            fsm.send_event(StateEvent(EventType.WARN))
+            fsm.send_event(StateEvent(EventType.CLEAR_WARNING))
+        
+        history = fsm.get_history()
+        assert len(history) <= 5
+    
+    def test_history_clear(self):
+        """Test clearing history."""
+        fsm = StateMachine()
+        
+        fsm.send_event(StateEvent(EventType.START))
+        assert len(fsm.get_history()) > 0
+        
+        fsm.clear_history()
+        assert len(fsm.get_history()) == 0
+
+
+class TestThreadSafety:
+    """Test thread-safe operation."""
+    
+    def test_concurrent_state_queries(self):
+        """Test concurrent state queries are safe."""
+        fsm = StateMachine()
+        results = []
+        
+        def query_state():
+            for _ in range(100):
+                state = fsm.get_current_state()
+                results.append(state)
+        
+        threads = [threading.Thread(target=query_state) for _ in range(5)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        
+        # All queries should succeed
+        assert len(results) == 500
+    
+    def test_concurrent_transitions(self):
+        """Test concurrent event sending is safe."""
+        config = StateMachineConfig(initial_lifecycle=LifecycleState.ACTIVE)
+        fsm = StateMachine(config)
+        
+        def send_events():
+            for _ in range(10):
+                fsm.send_event(StateEvent(EventType.WARN))
+                time.sleep(0.001)
+                fsm.send_event(StateEvent(EventType.CLEAR_WARNING))
+        
+        threads = [threading.Thread(target=send_events) for _ in range(3)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        
+        # Final state should be valid
+        state = fsm.get_health_state()
+        assert state in (HealthState.OK, HealthState.WARNING)
+
+
+class TestDiagnostics:
+    """Test diagnostic information."""
+    
+    def test_diagnostic_info(self):
+        """Test get_diagnostic_info returns complete information."""
+        fsm = StateMachine()
+        
+        info = fsm.get_diagnostic_info()
+        
+        assert "current_state" in info
+        assert "is_active" in info
+        assert "is_operational" in info
+        assert "is_healthy" in info
+        assert "config" in info
+        assert "callbacks" in info
+    
+    def test_is_operational(self):
+        """Test is_operational checks lifecycle and health."""
+        config = StateMachineConfig(
+            initial_lifecycle=LifecycleState.ACTIVE,
+            initial_health=HealthState.OK,
+        )
+        fsm = StateMachine(config)
+        
+        assert fsm.is_operational()
+        
+        # Degrade health
+        fsm.send_event(StateEvent(EventType.FAULT))
+        assert not fsm.is_operational()

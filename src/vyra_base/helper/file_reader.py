@@ -8,7 +8,12 @@ from typing import Any, Optional, Union
 from dotenv import load_dotenv
 
 from vyra_base.helper._aiopath import AsyncPath
-from vyra_base.helper.file_lock import get_lock_for_file, release_lock_for_file
+from vyra_base.helper.file_lock import (
+    get_lock_for_file, 
+    release_lock_for_file,
+    get_lock_for_file_sync,
+    release_lock_for_file_sync
+)
 
 class FileReader:
     """File reader.
@@ -49,16 +54,19 @@ class FileReader:
                                     .open(mode='r', encoding='utf-8-sig') as file:
                             await AsyncPath(str(config_file)).write_text(str(file))
                         return json.loads(await file.read())
-            release_lock_for_file(config_file)
-        except (IOError, UnicodeDecodeError, json.decoder.JSONDecodeError, 
-                 TypeError, FileNotFoundError) as error:
-                if error == IOError():
+        except FileNotFoundError:
+            raise FileNotFoundError(f"File not found: {config_file}")
+        except json.decoder.JSONDecodeError as error:
+            raise json.decoder.JSONDecodeError('JSON decoding error:', error.doc, error.pos)
+        except (IOError, UnicodeDecodeError, TypeError) as error:
+                if isinstance(error, IOError):
                     raise IOError('An unexpected io error occured!')
-                if error == UnicodeDecodeError('', b'', 0, 0, ''):  
+                if isinstance(error, UnicodeDecodeError):
                     raise UnicodeDecodeError(
                         'utf-8', b'', 0, 0, 'A decoding error occured!') # type: ignore
-                if error == json.decoder.JSONDecodeError('', '', 0): 
-                    raise json.decoder.JSONDecodeError('JSON decoding error:', '', 0)
+                raise
+        finally:
+            await release_lock_for_file(config_file)
 
     @classmethod    
     async def open_markdown_file(cls, config_file: Path, config_default='') -> Any:
@@ -215,3 +223,187 @@ class FileReader:
                     return yaml_content
         finally:
             await release_lock_for_file(config_file)
+
+
+    # ========================================================================
+    # SYNC METHODS
+    # ========================================================================
+
+    @classmethod
+    def open_json_file_sync(
+        cls, config_file: Path, config_default: Path = Path('')) -> Any:
+        """Reads a JSON file (synchronous).
+
+        :param config_file: JSON formatted file.
+        :type config_file: Path
+        :param config_default: JSON file as a default configuration for the module.
+        :type config_default: Path
+        :returns: Parsed JSON content.
+        :rtype: Any
+        :raises IOError: If an unexpected IO error occurs.
+        :raises UnicodeDecodeError: If a decoding error occurs.
+        :raises json.decoder.JSONDecodeError: If a JSON decoding error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            lock = get_lock_for_file_sync(config_file)
+            with lock:
+                with open(config_file, mode='r', encoding='utf-8') as file:
+                    json_content = json.loads(file.read())
+                    if json_content:
+                        return json_content
+                    else:
+                        with open(config_default, mode='r', encoding='utf-8-sig') as default_file:
+                            Path(config_file).write_text(default_file.read())
+                        with open(config_file, mode='r', encoding='utf-8') as file:
+                            return json.loads(file.read())
+        except FileNotFoundError:
+            raise FileNotFoundError(f"File not found: {config_file}")
+        except json.decoder.JSONDecodeError as error:
+            raise json.decoder.JSONDecodeError('JSON decoding error:', error.doc, error.pos)
+        except (IOError, UnicodeDecodeError, TypeError) as error:
+            if isinstance(error, IOError):
+                raise IOError('An unexpected io error occured!')
+            if isinstance(error, UnicodeDecodeError):
+                raise UnicodeDecodeError('utf-8', b'', 0, 0, 'A decoding error occured!')
+            raise
+        finally:
+            release_lock_for_file_sync(config_file)
+
+    @classmethod
+    def open_markdown_file_sync(cls, config_file: Path, config_default: str = '') -> Any:
+        """Reads a markdown file (synchronous).
+
+        :param config_file: Markdown formatted file.
+        :type config_file: Path
+        :param config_default: Markdown file as a default configuration for the module.
+        :type config_default: str
+        :returns: File content.
+        :rtype: Any
+        :raises IOError: If an unexpected IO error occurs.
+        :raises UnicodeDecodeError: If a decoding error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            lock = get_lock_for_file_sync(config_file)
+            with lock:
+                with open(config_file, mode='r', encoding='utf-8') as file:
+                    content = file.read()
+                    if content:
+                        return content
+                    else:
+                        with open(config_default, mode='r', encoding='utf-8-sig') as default_file:
+                            Path(config_file).write_text(default_file.read())
+                        with open(config_file, mode='r', encoding='utf-8') as file:
+                            return file.read()
+        except (IOError, UnicodeDecodeError, TypeError, FileNotFoundError) as error:
+            if isinstance(error, UnicodeDecodeError):
+                raise UnicodeDecodeError('utf-8', b'', 0, 0, 'A decoding error occured!')
+            raise
+        finally:
+            release_lock_for_file_sync(config_file)
+
+    @classmethod
+    def open_env_file_sync(cls, env_path: Path) -> Optional[dict]:
+        """Reads an environment (.env) file (synchronous).
+
+        :param env_path: Path to the directory containing the .env file.
+        :type env_path: Path
+        :returns: Dictionary of environment variables.
+        :rtype: dict
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            lock = get_lock_for_file_sync(env_path / '.env')
+            with lock:
+                load_dotenv(dotenv_path=env_path)
+                env_vars: dict = dict(os.environ)
+                return env_vars
+        finally:
+            release_lock_for_file_sync(env_path / '.env')
+
+    @classmethod
+    def open_toml_file_sync(cls, config_file: Path) -> Optional[Any]:
+        """Reads a TOML file (synchronous).
+
+        :param config_file: TOML formatted file.
+        :type config_file: Path
+        :returns: Parsed TOML content as a dictionary.
+        :rtype: dict[str, Any]
+        :raises ImportError: If tomli is not installed for Python < 3.11.
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            if sys.version_info >= (3, 11):
+                import tomllib
+            else:
+                try:
+                    import tomli as tomllib
+                except ImportError:
+                    raise ImportError(
+                        "Python < 3.11 benötigt das Paket 'tomli' zum Parsen "
+                        "von TOML-Dateien. Installiere es mit: pip install tomli"
+                    )
+
+            lock = get_lock_for_file_sync(config_file)
+            with lock:
+                with open(config_file, mode='rb') as file:
+                    toml_content = tomllib.load(file)
+                return toml_content
+        finally:
+            release_lock_for_file_sync(config_file)
+
+    @classmethod
+    def open_ini_file_sync(cls, config_file: Path) -> Optional[Any]:
+        """Reads an INI file (synchronous).
+
+        :param config_file: INI formatted file.
+        :type config_file: Path
+        :returns: Parsed INI content as a dictionary.
+        :rtype: dict[str, Any]
+        :raises ImportError: If configparser is not available.
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            import configparser
+
+            lock = get_lock_for_file_sync(config_file)
+            with lock:
+                config = configparser.ConfigParser()
+                config.read(str(config_file))
+
+            return {s: dict(config.items(s)) for s in config.sections()}
+        finally:
+            release_lock_for_file_sync(config_file)
+
+    @classmethod
+    def open_yaml_file_sync(cls, config_file: Path) -> Optional[Any]:
+        """Reads a YAML file (synchronous).
+
+        :param config_file: YAML formatted file.
+        :type config_file: Path
+        :returns: Parsed YAML content as a dictionary.
+        :rtype: dict[str, Any]
+        :raises ImportError: If PyYAML is not installed.
+        :raises IOError: If an unexpected IO error occurs.
+        :raises TypeError: If an unexpected type error occurs.
+        :raises FileNotFoundError: If the file is not found.
+        """
+        try:
+            import yaml
+
+            lock = get_lock_for_file_sync(config_file)
+            with lock:
+                with open(config_file, mode='r', encoding='utf-8-sig') as file:
+                    yaml_content = yaml.safe_load(file.read())
+                    return yaml_content
+        finally:
+            release_lock_for_file_sync(config_file)
