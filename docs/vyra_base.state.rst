@@ -36,10 +36,18 @@ vyra\_base.state.state\_events module
    :show-inheritance:
    :undoc-members:
 
-vyra\_base.state.state\_machine module
---------------------------------------
+.. currentmodule:: vyra_base.state
+
+.. _state_machine:
 
 .. automodule:: vyra_base.state.state_machine
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+.. _invalid_transition_error:
+
+.. automodule:: vyra_base.state.state_machine.InvalidTransitionError
    :members:
    :show-inheritance:
    :undoc-members:
