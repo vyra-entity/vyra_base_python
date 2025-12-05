@@ -52,13 +52,15 @@ class CheckerNode(Node):
     """
     Node to check the availability of other nodes.
     
-    Note: Uses enable_rosout_logger=False to avoid SROS2 permission issues
+    Note: Uses enable_rosout=False to avoid SROS2 permission issues
     with the /rosout topic during node availability checks.
+    :param enable_rosout: Whether to enable the rosout logger.
+    :type enable_rosout: bool
     """
-    def __init__(self):
+    def __init__(self, enable_rosout: bool = False) -> None:
         super().__init__(
             'checker_node',
-            enable_rosout_logger=False  # Disable rosout for SROS2 compatibility
+            enable_rosout=enable_rosout  # Disable rosout for SROS2 compatibility
         )
 
     def is_node_available(self, node_name: str) -> bool:

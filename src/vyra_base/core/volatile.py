@@ -74,30 +74,37 @@ class Volatile:
         self._active_shouter.clear()
 
     @ErrorTraceback.w_check_error_exist
-    async def activate_listener(self):
+    async def activate_listener(self, channel):
         """
         Activate the listener for transient events.
         This method starts listening for changes on volatile parameters.
         It will create a speaker for each volatile parameter and subscribe to it.
         """
         # Start listening for transient events
-        self._listener = asyncio.create_task(
-            self.transient_event_listener())
+        active_listener = (await self.redis.get_active_listeners())['active_channels']
+        
+        new_listener = [li for li in self._active_shouter.keys() if li not in active_listener]
+        
+        await self.redis.create_pubsub_listener(
+            channels=new_listener,
+            callback_handler=self.transient_event_callback
+        )
+        # self._listener = asyncio.create_task(
+        #     self.transient_event_callback())
     
     @ErrorTraceback.w_check_error_exist
-    async def transient_event_listener(self):
+    async def transient_event_callback(self, message: dict, callback_context):
         """
         Background task listening for Redis pub/sub messages on registered channels.
         
         Continuously listens for messages and triggers registered shouter callbacks
         when messages arrive on subscribed channels.
         """
-        self._listener_active = True
-        async for message in self.redis.pubsub.listen():
-            if message["type"] == "message":
-                channel = message["channel"]
-                if channel in self._active_shouter:
-                    self._active_shouter[channel].shout(message["data"])
+        type = message.get("type", None)
+        channel = message.get("channel", None)
+
+        if type == "message" and channel in self._active_shouter:
+            self._active_shouter[channel].shout(message["data"])
 
     @ErrorTraceback.w_check_error_exist
     async def read_all_volatile_names(self) -> list:
@@ -122,18 +129,18 @@ class Volatile:
         return await self.redis.get(key)
 
     @ErrorTraceback.w_check_error_exist
-    async def add_change_event(self, key: str):
+    async def add_change_event(self, channel: str):
         """
         Publish a change event for the volatile parameter. 
-        :param key: The key of the volatile parameter. Used to identify the parameter.
+        :param channel: The channel of the volatile parameter. Used to identify the parameter.
         """
-        if not await self.redis.exists(key):
-            raise KeyError(f"Key '{key}' does not exist in the transient storage.")
+        if not await self.redis.exists(channel):
+            raise KeyError(f"Key '{channel}' does not exist in the transient storage.")
 
-        get_type: REDIS_TYPE | None = await self.redis.get_type(key)
+        get_type: REDIS_TYPE | None = await self.redis.get_type(channel)
 
         if get_type is None:
-            raise KeyError(f"Key '{key}' does not exist in the transient storage.")
+            raise KeyError(f"Key '{channel}' does not exist in the transient storage.")
 
         if get_type not in self.REDIS_TYPE_MAP:
             raise ValueError(
@@ -143,12 +150,12 @@ class Volatile:
         speaker: VyraSpeaker = create_vyra_speaker(
             type=self.REDIS_TYPE_MAP[get_type],
             node=self.communication_node,
-            description="Volatile parameter changes: " + key,
+            description="Volatile parameter changes: " + channel,
             ident_name="volatile"
         )
-        self._active_shouter[key] = speaker
+        self._active_shouter[channel] = speaker
         
-        await self.redis.subscribe_to_key(key)
+        await self.redis.subscribe_to_key(channel)
 
     @ErrorTraceback.w_check_error_exist
     async def remove_change_event(self, key: str):
