@@ -335,7 +335,7 @@ class DataSpace:
 
             return cls.callables_executor[index].merge(obj)
         else:
-            Logger.debug(f"{cls}Adding new callable {obj.name}.")
+            Logger.debug(f"{cls}Adding new callable executor {obj.name}.")
             cls.callables_executor.append(obj)
             return obj
     
@@ -796,7 +796,7 @@ async def execute_vyra_callable(
                 f"creation of the callable executor: {name}."
             )
     
-        executor.service_client.create_service_caller()
+        await executor.service_client.create_service_caller()
 
         Logger.log(f'VyraCallable executor created: {name}')
 

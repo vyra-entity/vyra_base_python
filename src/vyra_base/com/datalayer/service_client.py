@@ -3,6 +3,7 @@ from http import client
 from datetime import datetime
 from socket import timeout
 from typing import Any, Callable, NoReturn, Union
+import asyncio
 
 import rclpy
 from rclpy.client import Client
@@ -71,7 +72,7 @@ class VyraServiceClient:
         self._service_info: ServiceClientInfo = serviceInfo
         self._node: VyraNode = node
     
-    def create_service_caller(self) -> None:
+    async def create_service_caller(self) -> None:
         """
         Create a service caller in the ROS2 node.
 
@@ -81,8 +82,10 @@ class VyraServiceClient:
         ------
         ValueError
             If the service type or name is not provided.
+        TimeoutError
+            If the service is not available within the timeout period.
         """
-        self._node.get_logger().info(f"Creating service: {self._service_info.name}")
+        self._node.get_logger().info(f"Creating service client: {self._service_info.name}")
         if not self._service_info.type:
             raise ValueError("Service type must be provided.")
         
@@ -94,14 +97,29 @@ class VyraServiceClient:
             self._service_info.name
         )
 
-        while not self._service_info.client.wait_for_service(
-            timeout_sec=self._service_info.timeout):
-    
-            Logger.error(
-                f'service <{self._service_info.name}> not available, timeout...')
+        Logger.debug(f"🔍 Waiting for service <{self._service_info.name}> to become available (timeout: {self._service_info.timeout}s)...")
+        
+        # Use async loop to avoid blocking the event loop
+        start_time = asyncio.get_event_loop().time()
+        check_interval = 0.1  # Check every 100ms
+        
+        while True:
+            # Non-blocking check with short timeout
+            if self._service_info.client.wait_for_service(timeout_sec=0):
+                Logger.info(f'✅ Service <{self._service_info.name}> is now available!')
+                break
             
-            raise TimeoutError(
-                f'Service <{self._service_info.name}> not available, timeout...') 
+            # Check if total timeout exceeded
+            elapsed = asyncio.get_event_loop().time() - start_time
+            if self._service_info.timeout and elapsed >= self._service_info.timeout:
+                Logger.error(
+                    f'❌ Service <{self._service_info.name}> not available after {elapsed:.1f}s timeout')
+                raise TimeoutError(
+                    f'Service <{self._service_info.name}> not available, timeout after {elapsed:.1f}s')
+            
+            # Yield control to event loop to allow spinner to run
+            Logger.debug(f"⏳ Service <{self._service_info.name}> not ready yet (elapsed: {elapsed:.1f}s), yielding to event loop...")
+            await asyncio.sleep(check_interval)
 
         self._service_info.request = self._service_info.type.Request()
 
