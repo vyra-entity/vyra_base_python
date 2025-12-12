@@ -1,0 +1,1092 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="vyra_base.state package" href="vyra_base.state.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>vyra_base.storage package - vyra_base 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #336790;
+  --color-brand-content: #336790;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">vyra_base 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">vyra_base 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">quickstart</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">vyra_base</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of vyra_base</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="vyra_base.html">vyra_base package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vyra_base package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="vyra_base.com.html">vyra_base.com package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of vyra_base.com package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html">vyra_base.com.datalayer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html">vyra_base.com.feeder package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.core.html">vyra_base.core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html">vyra_base.defaults package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html">vyra_base.helper package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html">vyra_base.state package</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">vyra_base.storage package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/vyra_base.storage.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="vyra-base-storage-package">
+<h1>vyra_base.storage package<a class="headerlink" href="#vyra-base-storage-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-vyra_base.storage.db_access">
+<span id="vyra-base-storage-db-access-module"></span><h2>vyra_base.storage.db_access module<a class="headerlink" href="#module-vyra_base.storage.db_access" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.db_access.</span></span><span class="sig-name descname"><span class="pre">DBSTATUS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DBSTATUS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Enumeration of database operation status codes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>SUCCESS</strong> – Operation completed successfully.</p></li>
+<li><p><strong>ERROR</strong> – An error occurred during the operation.</p></li>
+<li><p><strong>NOT_FOUND</strong> – Requested resource was not found.</p></li>
+<li><p><strong>NOT_ALLOWED</strong> – Operation is not allowed.</p></li>
+<li><p><strong>NOT_AUTHORIZED</strong> – User is not authorized for this operation.</p></li>
+<li><p><strong>CONFLICT</strong> – Operation conflicts with existing data.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS.SUCCESS">
+<span class="sig-name descname"><span class="pre">SUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'success'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS.SUCCESS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS.ERROR">
+<span class="sig-name descname"><span class="pre">ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'error'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS.ERROR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS.NOT_FOUND">
+<span class="sig-name descname"><span class="pre">NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not_found'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS.NOT_FOUND" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS.NOT_ALLOWED">
+<span class="sig-name descname"><span class="pre">NOT_ALLOWED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not_allowed'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS.NOT_ALLOWED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS.NOT_AUTHORIZED">
+<span class="sig-name descname"><span class="pre">NOT_AUTHORIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not_authorized'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS.NOT_AUTHORIZED" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBSTATUS.CONFLICT">
+<span class="sig-name descname"><span class="pre">CONFLICT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'conflict'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBSTATUS.CONFLICT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBTYPE">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.db_access.</span></span><span class="sig-name descname"><span class="pre">DBTYPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DBTYPE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DBTYPE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Enumeration of supported database types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>SQLITE</strong> – SQLite database engine.</p></li>
+<li><p><strong>MYSQL</strong> – MySQL database engine.</p></li>
+<li><p><strong>POSTGRESQL</strong> – PostgreSQL database engine.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBTYPE.SQLITE">
+<span class="sig-name descname"><span class="pre">SQLITE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sqlite'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBTYPE.SQLITE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBTYPE.MYSQL">
+<span class="sig-name descname"><span class="pre">MYSQL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mysql'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBTYPE.MYSQL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBTYPE.POSTGRESQL">
+<span class="sig-name descname"><span class="pre">POSTGRESQL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'postgresql'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBTYPE.POSTGRESQL" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBMESSAGE">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.db_access.</span></span><span class="sig-name descname"><span class="pre">DBMESSAGE</span></span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DBMESSAGE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DBMESSAGE" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Collection of standard database error messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>DEFAULT_ERROR</strong> – Generic error message for database operations.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DBMESSAGE.DEFAULT_ERROR">
+<span class="sig-name descname"><span class="pre">DEFAULT_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Something</span> <span class="pre">went</span> <span class="pre">wrong</span> <span class="pre">while</span> <span class="pre">processing</span> <span class="pre">the</span> <span class="pre">query.</span> <span class="pre">See</span> <span class="pre">the</span> <span class="pre">details.'</span></em><a class="headerlink" href="#vyra_base.storage.db_access.DBMESSAGE.DEFAULT_ERROR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.db_access.</span></span><span class="sig-name descname"><span class="pre">DbAccess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DBTYPE.SQLITE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vyra_base.storage.storage.Storage" title="vyra_base.storage.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a></p>
+<p>Baseclass for database access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>db_config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>db_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>)</p></li>
+<li><p><strong>db_type</strong> (<a class="reference internal" href="#vyra_base.storage.db_access.DBTYPE" title="vyra_base.storage.db_access.DBTYPE"><em>DBTYPE</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DBTYPE.SQLITE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize database object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The id of the V.Y.R.A. module.</p></li>
+<li><p><strong>db_config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Path to the ini file of your sqlalchemy config.
+Defaults to WORKING_PATH+PATH_DB_CONFIG.</p></li>
+<li><p><strong>db_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary with database configuration.</p></li>
+<li><p><strong>db_type</strong> (<a class="reference internal" href="#vyra_base.storage.db_access.DBTYPE" title="vyra_base.storage.db_access.DBTYPE"><em>DBTYPE</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If neither db_config_path nor db_config is provided,
+or if db_config is not a dict.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess.session">
+<span class="sig-name descname"><span class="pre">session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess.session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess.session" title="Link to this definition">¶</a></dt>
+<dd><p>Create a session for the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A session object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>sessionmaker or async_sessionmaker</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess.create_all_tables">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_all_tables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess.create_all_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess.create_all_tables" title="Link to this definition">¶</a></dt>
+<dd><p>Create all database tables that are children of the SQLAlchemy Base class.</p>
+<p>This method will create all tables that are defined in the SQLAlchemy Base class.
+It will also create the tables if they do not exist.
+This method will not create the tables if they already exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Status of the operation.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> (see DBSTATUS class)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess.create_selected_table">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_selected_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_structs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess.create_selected_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess.create_selected_table" title="Link to this definition">¶</a></dt>
+<dd><p>Create new database table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>table_structs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference internal" href="#vyra_base.storage.tb_base.Base" title="vyra_base.storage.tb_base.Base"><em>Base</em></a><em>]</em>) – Table configurations as python classes (SQLAlchemy declarative base style).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Status of the operation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> (see DBSTATUS class)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess.drop_table">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">drop_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess.drop_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess.drop_table" title="Link to this definition">¶</a></dt>
+<dd><p>Delete table from database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>table</strong> (<a class="reference internal" href="#vyra_base.storage.tb_base.Base" title="vyra_base.storage.tb_base.Base"><em>Base</em></a>) – Table class (SQLAlchemy declarative base).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Status of the operation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a> (see DBSTATUS class)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_access.DbAccess.check_table_exists">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_table_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_access.html#DbAccess.check_table_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_access.DbAccess.check_table_exists" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a table exists in the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>table</strong> (<a class="reference internal" href="#vyra_base.storage.tb_base.Base" title="vyra_base.storage.tb_base.Base"><em>Base</em></a>) – Table class (SQLAlchemy declarative base).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the table exists, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-vyra_base.storage.db_manipulator">
+<span id="vyra-base-storage-db-manipulator-module"></span><h2>vyra_base.storage.db_manipulator module<a class="headerlink" href="#module-vyra_base.storage.db_manipulator" title="Link to this heading">¶</a></h2>
+<p>Handling database datatables</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.db_manipulator.</span></span><span class="sig-name descname"><span class="pre">DBReturnValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DBReturnValue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Standardized return value container for database operations.</p>
+<p>Encapsulates the result of database operations with status, value, and details.
+Provides convenience methods for setting error/success states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> – Operation status (see DBSTATUS enum).</p></li>
+<li><p><strong>value</strong> – Main return value (data or error message).</p></li>
+<li><p><strong>details</strong> – Additional details about the operation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>status</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>None</em><em>]</em>)</p></li>
+<li><p><strong>value</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>]</em>)</p></li>
+<li><p><strong>details</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DBReturnValue.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue.__init__" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<em>None</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>)</p></li>
+<li><p><strong>details</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue.status" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue.value" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue.details">
+<span class="sig-name descname"><span class="pre">details</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue.details" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue.error_return">
+<span class="sig-name descname"><span class="pre">error_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DBReturnValue.error_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue.error_return" title="Link to this definition">¶</a></dt>
+<dd><p>Set the return value to error status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>details</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>]</em>) – Additional error details.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Self with error status set.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DBReturnValue.success_return">
+<span class="sig-name descname"><span class="pre">success_return</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DBReturnValue.success_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DBReturnValue.success_return" title="Link to this definition">¶</a></dt>
+<dd><p>Set the return value to success status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Self with success status set.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.db_manipulator.</span></span><span class="sig-name descname"><span class="pre">DbManipulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Datatable class manipulator</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Wrapper for synchronous functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – Positional arguments.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Result of the wrapped function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.get_table_structure">
+<span class="sig-name descname"><span class="pre">get_table_structure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.get_table_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.get_table_structure" title="Link to this definition">¶</a></dt>
+<dd><p>Read the datatable structure from the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Table structure information.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.get_by_id">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.get_by_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.get_by_id" title="Link to this definition">¶</a></dt>
+<dd><p>Read line from datatable of database by ‘id’.</p>
+<p>If the id is -1 or None, the last line will be read.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.14)"><em>uuid.UUID</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Private key of the table element to select the row to be read.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Row data or not found status.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.get_all">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.get_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.get_all" title="Link to this definition">¶</a></dt>
+<dd><p>Read all lines from datatable of database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Filter elements to identify the rows to be read.</p></li>
+<li><p><strong>order_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Column name to order the result.</p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Number of lines to be read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of rows or not found status.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.update">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.update" title="Link to this definition">¶</a></dt>
+<dd><p>Update a line in a datatable of database by given data.</p>
+<p>If the table config has a field ‘max_lines’ and the number of lines are greater than this field,
+the lowest ‘id’ value will be deleted and the new entry will be added by a incremented ‘id’ value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Update data in an existing entry.</p></li>
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – Filter to select the row to be updated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Update status.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.add">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.add" title="Link to this definition">¶</a></dt>
+<dd><p>Add a new a row in a datatable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Content of the new entry to be added to the table.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Add status and details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.delete">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.delete" title="Link to this definition">¶</a></dt>
+<dd><p>Update a line in a datatable of database by a given ‘id’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>Any</em>) – Private key of the table element to select the row to be deleted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Delete status and details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.bulk_add">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bulk_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.bulk_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.bulk_add" title="Link to this definition">¶</a></dt>
+<dd><p>Add multiple rows to a datatable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>]</em>) – Data list to be added to the table.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bulk add status and details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.bulk_delete">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bulk_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.bulk_delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.bulk_delete" title="Link to this definition">¶</a></dt>
+<dd><p>Delete multiple rows in a datatable by given filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Filter elements to identify the rows to be deleted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bulk delete status and details.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.exists">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.exists" title="Link to this definition">¶</a></dt>
+<dd><p>Check if a row exists in the datatable by a given ‘id’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Private key of the table element to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Existence status.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.count">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.count" title="Link to this definition">¶</a></dt>
+<dd><p>Count the number of rows in a datatable matching given filters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Filter elements to identify the rows to be counted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of matching rows.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue" title="vyra_base.storage.db_manipulator.DBReturnValue">DBReturnValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.db_manipulator.DbManipulator.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/db_manipulator.html#DbManipulator.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.db_manipulator.DbManipulator.to_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a SQLAlchemy model instance to a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference internal" href="#vyra_base.storage.tb_base.Base" title="vyra_base.storage.tb_base.Base"><em>Base</em></a>) – SQLAlchemy model instance.</p></li>
+<li><p><strong>exclude</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><em>optional</em>) – List of column names to exclude.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary representation of the object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-vyra_base.storage.storage">
+<span id="vyra-base-storage-storage-module"></span><h2>vyra_base.storage.storage module<a class="headerlink" href="#module-vyra_base.storage.storage" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.storage.Storage">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.storage.</span></span><span class="sig-name descname"><span class="pre">Storage</span></span><a class="reference internal" href="_modules/vyra_base/storage/storage.html#Storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.storage.Storage" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for storage access.</p>
+<p>This class provides a common interface for different storage backends.</p>
+<p>It can be used to access different storage backends like databases, files, etc.</p>
+</dd></dl>
+
+</section>
+<section id="module-vyra_base.storage.tb_base">
+<span id="vyra-base-storage-tb-base-module"></span><h2>vyra_base.storage.tb_base module<a class="headerlink" href="#module-vyra_base.storage.tb_base" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.Base">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.tb_base.</span></span><span class="sig-name descname"><span class="pre">Base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/tb_base.html#Base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.tb_base.Base" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncAttrs" title="(in SQLAlchemy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncAttrs</span></code></a>, <a class="reference external" href="https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.DeclarativeBase" title="(in SQLAlchemy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeclarativeBase</span></code></a></p>
+<p>Base class for all SQLAlchemy models in the application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<em>Any</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.Base.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vyra_base.storage.tb_base.Base.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>A simple constructor that allows initialization from kwargs.</p>
+<p>Sets attributes on the constructed instance using the names and
+values in <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>.</p>
+<p>Only keys that are present as
+attributes of the instance’s class are allowed. These could be,
+for example, any mapped columns or relationships.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.Base.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[MetaData]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">MetaData()</span></em><a class="headerlink" href="#vyra_base.storage.tb_base.Base.metadata" title="Link to this definition">¶</a></dt>
+<dd><p>Refers to the <code class="xref py py-class docutils literal notranslate"><span class="pre">_schema.MetaData</span></code> collection that will be used
+for new <code class="xref py py-class docutils literal notranslate"><span class="pre">_schema.Table</span></code> objects.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-metadata" title="(in SQLAlchemy v2.0)"><span>Accessing Table and Metadata</span></a></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.Base.registry">
+<span class="sig-name descname"><span class="pre">registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[_RegistryType]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;sqlalchemy.orm.decl_api.registry</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#vyra_base.storage.tb_base.Base.registry" title="Link to this definition">¶</a></dt>
+<dd><p>Refers to the <code class="xref py py-class docutils literal notranslate"><span class="pre">_orm.registry</span></code> in use where new
+<code class="xref py py-class docutils literal notranslate"><span class="pre">_orm.Mapper</span></code> objects will be associated.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.IntEnum">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vyra_base.storage.tb_base.</span></span><span class="sig-name descname"><span class="pre">IntEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enumtype</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/tb_base.html#IntEnum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.tb_base.IntEnum" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.sqlalchemy.org/en/20/core/custom_types.html#sqlalchemy.types.TypeDecorator" title="(in SQLAlchemy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeDecorator</span></code></a></p>
+<p>A SQLAlchemy TypeDecorator for storing Python IntEnum values as integers in the database.</p>
+<p>This class allows seamless conversion between Python IntEnum members and their integer
+representation in the database. When binding parameters, it converts IntEnum members
+to their integer values. When retrieving results, it converts integers back to the
+corresponding IntEnum members.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enumtype</strong> (<em>Type</em><em>[</em><a class="reference internal" href="#vyra_base.storage.tb_base.IntEnum" title="vyra_base.storage.tb_base.IntEnum"><em>IntEnum</em></a><em>]</em>) – The IntEnum class to use for conversion.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.IntEnum.impl">
+<span class="sig-name descname"><span class="pre">impl</span></span><a class="headerlink" href="#vyra_base.storage.tb_base.IntEnum.impl" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.sqlalchemy.org/en/20/core/type_basics.html#sqlalchemy.types.Integer" title="(in SQLAlchemy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Integer</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.IntEnum.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enumtype</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/tb_base.html#IntEnum.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.tb_base.IntEnum.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Construct a <code class="xref py py-class docutils literal notranslate"><span class="pre">TypeDecorator</span></code>.</p>
+<p>Arguments sent here are passed to the constructor
+of the class assigned to the <code class="docutils literal notranslate"><span class="pre">impl</span></code> class level attribute,
+assuming the <code class="docutils literal notranslate"><span class="pre">impl</span></code> is a callable, and the resulting
+object is assigned to the <code class="docutils literal notranslate"><span class="pre">self.impl</span></code> instance attribute
+(thus overriding the class attribute of the same name).</p>
+<p>If the class level <code class="docutils literal notranslate"><span class="pre">impl</span></code> is not a callable (the unusual case),
+it will be assigned to the same instance attribute ‘as-is’,
+ignoring those arguments passed to the constructor.</p>
+<p>Subclasses can override this to customize the generation
+of <code class="docutils literal notranslate"><span class="pre">self.impl</span></code> entirely.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.IntEnum.process_bind_param">
+<span class="sig-name descname"><span class="pre">process_bind_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/tb_base.html#IntEnum.process_bind_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.tb_base.IntEnum.process_bind_param" title="Link to this definition">¶</a></dt>
+<dd><p>Convert Python enum to database value before storing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Python enum value to convert.</p></li>
+<li><p><strong>dialect</strong> – SQLAlchemy dialect.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Integer value for database storage.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vyra_base.storage.tb_base.IntEnum.process_result_value">
+<span class="sig-name descname"><span class="pre">process_result_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base/storage/tb_base.html#IntEnum.process_result_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.storage.tb_base.IntEnum.process_result_value" title="Link to this definition">¶</a></dt>
+<dd><p>Convert database value back to Python enum after retrieval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – Database integer value.</p></li>
+<li><p><strong>dialect</strong> – SQLAlchemy dialect.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Python enum instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-vyra_base.storage">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vyra_base.storage" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="vyra_base.state.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">vyra_base.state package</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Holger Schernewski
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">vyra_base.storage package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-vyra_base.storage.db_access">vyra_base.storage.db_access module</a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS"><code class="docutils literal notranslate"><span class="pre">DBSTATUS</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS.SUCCESS"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.SUCCESS</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS.ERROR"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.ERROR</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS.NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.NOT_FOUND</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS.NOT_ALLOWED"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.NOT_ALLOWED</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS.NOT_AUTHORIZED"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.NOT_AUTHORIZED</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBSTATUS.CONFLICT"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.CONFLICT</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBTYPE"><code class="docutils literal notranslate"><span class="pre">DBTYPE</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBTYPE.SQLITE"><code class="docutils literal notranslate"><span class="pre">DBTYPE.SQLITE</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBTYPE.MYSQL"><code class="docutils literal notranslate"><span class="pre">DBTYPE.MYSQL</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBTYPE.POSTGRESQL"><code class="docutils literal notranslate"><span class="pre">DBTYPE.POSTGRESQL</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBMESSAGE"><code class="docutils literal notranslate"><span class="pre">DBMESSAGE</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DBMESSAGE.DEFAULT_ERROR"><code class="docutils literal notranslate"><span class="pre">DBMESSAGE.DEFAULT_ERROR</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess"><code class="docutils literal notranslate"><span class="pre">DbAccess</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess.__init__"><code class="docutils literal notranslate"><span class="pre">DbAccess.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess.session"><code class="docutils literal notranslate"><span class="pre">DbAccess.session()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess.create_all_tables"><code class="docutils literal notranslate"><span class="pre">DbAccess.create_all_tables()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess.create_selected_table"><code class="docutils literal notranslate"><span class="pre">DbAccess.create_selected_table()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess.drop_table"><code class="docutils literal notranslate"><span class="pre">DbAccess.drop_table()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_access.DbAccess.check_table_exists"><code class="docutils literal notranslate"><span class="pre">DbAccess.check_table_exists()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-vyra_base.storage.db_manipulator">vyra_base.storage.db_manipulator module</a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue"><code class="docutils literal notranslate"><span class="pre">DBReturnValue</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue.__init__"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue.status"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.status</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue.value"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.value</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue.details"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.details</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue.error_return"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.error_return()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DBReturnValue.success_return"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.success_return()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator"><code class="docutils literal notranslate"><span class="pre">DbManipulator</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.__init__"><code class="docutils literal notranslate"><span class="pre">DbManipulator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.get_table_structure"><code class="docutils literal notranslate"><span class="pre">DbManipulator.get_table_structure()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.get_by_id"><code class="docutils literal notranslate"><span class="pre">DbManipulator.get_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.get_all"><code class="docutils literal notranslate"><span class="pre">DbManipulator.get_all()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.update"><code class="docutils literal notranslate"><span class="pre">DbManipulator.update()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.add"><code class="docutils literal notranslate"><span class="pre">DbManipulator.add()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.delete"><code class="docutils literal notranslate"><span class="pre">DbManipulator.delete()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.bulk_add"><code class="docutils literal notranslate"><span class="pre">DbManipulator.bulk_add()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.bulk_delete"><code class="docutils literal notranslate"><span class="pre">DbManipulator.bulk_delete()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.exists"><code class="docutils literal notranslate"><span class="pre">DbManipulator.exists()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.count"><code class="docutils literal notranslate"><span class="pre">DbManipulator.count()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.db_manipulator.DbManipulator.to_dict"><code class="docutils literal notranslate"><span class="pre">DbManipulator.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-vyra_base.storage.storage">vyra_base.storage.storage module</a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.storage.Storage"><code class="docutils literal notranslate"><span class="pre">Storage</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-vyra_base.storage.tb_base">vyra_base.storage.tb_base module</a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.Base.__init__"><code class="docutils literal notranslate"><span class="pre">Base.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.Base.metadata"><code class="docutils literal notranslate"><span class="pre">Base.metadata</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.Base.registry"><code class="docutils literal notranslate"><span class="pre">Base.registry</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.IntEnum"><code class="docutils literal notranslate"><span class="pre">IntEnum</span></code></a><ul>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.IntEnum.impl"><code class="docutils literal notranslate"><span class="pre">IntEnum.impl</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.IntEnum.__init__"><code class="docutils literal notranslate"><span class="pre">IntEnum.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.IntEnum.process_bind_param"><code class="docutils literal notranslate"><span class="pre">IntEnum.process_bind_param()</span></code></a></li>
+<li><a class="reference internal" href="#vyra_base.storage.tb_base.IntEnum.process_result_value"><code class="docutils literal notranslate"><span class="pre">IntEnum.process_result_value()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-vyra_base.storage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>
