@@ -104,7 +104,7 @@ class VyraServiceServer:
         )
 
         self._node.get_logger().info(
-            f"Service {self.service_info.name} created with "
+            f"ROS2 Service {self.service_info.name} created with "
             f"type {self.service_info.type} and "
             f"callback {callback}.")
 
