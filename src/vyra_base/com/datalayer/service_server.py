@@ -81,6 +81,8 @@ class VyraServiceServer:
         :raises TypeError: If the callback is not callable.
         :raises ValueError: If the service type or name is not provided.
         """
+        Logger.info(f"Creating service: {self.service_info.name}")
+        
         self.service_info.callback = callback
         
         if not callable(callback):
@@ -89,7 +91,7 @@ class VyraServiceServer:
         if async_loop is not None:
             self._async_loop = async_loop
 
-        self._node.get_logger().info(f"Creating service: {self.service_info.name}")
+        
         
         if not self.service_info.type:
             raise ValueError("Service type must be provided.")
@@ -103,7 +105,7 @@ class VyraServiceServer:
             self._service_callback
         )
 
-        self._node.get_logger().info(
+        Logger.info(
             f"ROS2 Service {self.service_info.name} created with "
             f"type {self.service_info.type} and "
             f"callback {callback}.")
@@ -117,7 +119,7 @@ class VyraServiceServer:
         if self.service_info.service:
             self._node.destroy_service(self.service_info.service)
             self.service_info.service = None
-            self._node.get_logger().info(f"Service '{self.service_info.name}' destroyed.")
+            Logger.info(f"Service '{self.service_info.name}' destroyed.")
 
     @ErrorTraceback.w_check_error_exist
     def _service_callback(self, request, response) -> None:

@@ -53,11 +53,11 @@ class VyraCallable:
         :return: A new Callable instance with merged attributes.
         :rtype: VyraCallable
         """
-        import sys
-        sys.stderr.write(f"[MERGE DEBUG] Starting merge for callable: {self.name}\n")
-        sys.stderr.write(f"[MERGE DEBUG] self.service_server BEFORE: {self.service_server}\n")
-        sys.stderr.write(f"[MERGE DEBUG] other.service_server BEFORE: {other.service_server}\n")
-        sys.stderr.flush()
+        
+        Logger.debug(f"[MERGE DEBUG] Starting merge for callable: {self.name}\n")
+        Logger.debug(f"[MERGE DEBUG] self.service_server BEFORE: {self.service_server}")
+        Logger.debug(f"[MERGE DEBUG] other.service_server BEFORE: {other.service_server}")
+        
         
         self.name = other.name or self.name
         self.type = other.type or self.type
@@ -67,20 +67,18 @@ class VyraCallable:
         # Transfer service_server if self doesn't have one
         if other.service_server:
             if not self.service_server:
-                sys.stderr.write(f"[MERGE DEBUG] Transferring service_server from other to self\n")
-                sys.stderr.flush()
+                Logger.debug(f"[MERGE DEBUG] Transferring service_server from other to self")
+                
                 self.service_server = other.service_server
             else:
-                sys.stderr.write(f"[MERGE DEBUG] self already has service_server, NOT transferring\n")
-                sys.stderr.flush()
+                Logger.debug(f"[MERGE DEBUG] self already has service_server, NOT transferring")
+                
             # Clear reference from 'other' to prevent __del__ from destroying it
-            sys.stderr.write(f"[MERGE DEBUG] Clearing other.service_server\n")
-            sys.stderr.flush()
+            Logger.debug(f"[MERGE DEBUG] Clearing other.service_server")
             other.service_server = None
         
-        sys.stderr.write(f"[MERGE DEBUG] self.service_server AFTER: {self.service_server}\n")
-        sys.stderr.write(f"[MERGE DEBUG] other.service_server AFTER: {other.service_server}\n")
-        sys.stderr.flush()
+        Logger.debug(f"[MERGE DEBUG] self.service_server AFTER: {self.service_server}")
+        Logger.debug(f"[MERGE DEBUG] other.service_server AFTER: {other.service_server}")
         
         self.connected_callback = other.connected_callback or self.connected_callback
 
@@ -91,18 +89,18 @@ class VyraCallable:
         Destructor to clean up the callable.
         If the callable has a service server, it will be destroyed.
         """
-        import sys
-        sys.stderr.write(f"[DEL DEBUG] __del__ called for callable: {self.name}\n")
-        sys.stderr.write(f"[DEL DEBUG] service_server value: {self.service_server}\n")
-        sys.stderr.flush()
+        
+        Logger.debug(f"[DEL DEBUG] __del__ called for callable: {self.name}")
+        Logger.debug(f"[DEL DEBUG] service_server value: {self.service_server}")
+        
         if self.service_server:
-            sys.stderr.write(f"[DEL DEBUG] DESTROYING service for: {self.name}\n")
-            sys.stderr.flush()
+            Logger.debug(f"[DEL DEBUG] DESTROYING service for: {self.name}")
+            
             self.service_server.destroy_service()
             self.service_server = None
         else:
-            sys.stderr.write(f"[DEL DEBUG] NO service_server to destroy for: {self.name}\n")
-            sys.stderr.flush()
+            Logger.debug(f"[DEL DEBUG] NO service_server to destroy for: {self.name}")
+            
 
 @dataclass
 class VyraCallableExecutor:
