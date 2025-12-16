@@ -15,12 +15,12 @@ class LifecycleState(Enum):
     
     Similar to ROS2 Lifecycle nodes and IEC 61131-3 PLC states.
     """
-    UNINITIALIZED = "Uninitialized"  # Module exists but not configured
     INITIALIZING = "Initializing"     # Startup/configuration in progress
     ACTIVE = "Active"                 # Fully operational
-    RECOVERING = "Recovering"         # Error recovery/reset in progress
+    RECOVERING = "Recovering"         # Error recovery/restart in progress
+    SUSPENDED = "Suspended"           # Temporarily paused
     SHUTTING_DOWN = "ShuttingDown"    # Controlled shutdown
-    DEACTIVATED = "Deactivated"       # Module is stopped/offline
+    OFFLINE = "Offline"       # Module is stopped/offline
 
 
 class OperationalState(Enum):
@@ -32,11 +32,9 @@ class OperationalState(Enum):
     IDLE = "Idle"                     # Inactive, waiting for work (Resting)
     READY = "Ready"                   # Prepared to accept tasks (Attentive)
     RUNNING = "Running"               # Actively executing a task (Active)
-    PROCESSING = "Processing"         # Background processing (Reflecting)
-    DELEGATING = "Delegating"         # Waiting for other modules
+    BACKGROUND_RUNNING = "BackgroundRunning"  # Running background tasks
     PAUSED = "Paused"                 # Task suspended, can resume
-    BLOCKED = "Blocked"               # Waiting for resources/locks
-    COMPLETED = "Completed"           # Task finished successfully
+    STOPPED = "Stopped"               # Process stopped, need to reset and reinitialize
 
 
 class HealthState(Enum):
@@ -45,79 +43,66 @@ class HealthState(Enum):
     
     Follows safety integrity levels (SIL) from IEC 61508.
     """
-    OK = "OK"                         # All systems nominal
+    HEALTHY = "Healthy"               # All systems nominal
     WARNING = "Warning"               # Minor issues detected (Alert)
-    OVERLOADED = "Overloaded"        # Resource constraints active
-    FAULTED = "Faulted"              # Error state, operation impaired
     CRITICAL = "Critical"             # Severe error, immediate action required
 
 
 # Valid state transitions for each layer (from -> to)
 LIFECYCLE_TRANSITIONS = {
-    (LifecycleState.UNINITIALIZED, LifecycleState.INITIALIZING),
     (LifecycleState.INITIALIZING, LifecycleState.ACTIVE),
     (LifecycleState.INITIALIZING, LifecycleState.RECOVERING),
     (LifecycleState.ACTIVE, LifecycleState.SHUTTING_DOWN),
     (LifecycleState.ACTIVE, LifecycleState.RECOVERING),
     (LifecycleState.RECOVERING, LifecycleState.ACTIVE),
-    (LifecycleState.RECOVERING, LifecycleState.DEACTIVATED),
-    (LifecycleState.SHUTTING_DOWN, LifecycleState.DEACTIVATED),
+    (LifecycleState.RECOVERING, LifecycleState.OFFLINE),
+    (LifecycleState.SHUTTING_DOWN, LifecycleState.OFFLINE)
 }
 
 OPERATIONAL_TRANSITIONS = {
     (OperationalState.IDLE, OperationalState.READY),
     (OperationalState.READY, OperationalState.RUNNING),
     (OperationalState.RUNNING, OperationalState.PAUSED),
-    (OperationalState.RUNNING, OperationalState.BLOCKED),
-    (OperationalState.RUNNING, OperationalState.DELEGATING),
-    (OperationalState.RUNNING, OperationalState.PROCESSING),
-    (OperationalState.RUNNING, OperationalState.COMPLETED),
-    (OperationalState.PROCESSING, OperationalState.RUNNING),
-    (OperationalState.DELEGATING, OperationalState.RUNNING),
-    (OperationalState.DELEGATING, OperationalState.COMPLETED),
-    (OperationalState.PAUSED, OperationalState.RUNNING),
-    (OperationalState.BLOCKED, OperationalState.RUNNING),
-    (OperationalState.COMPLETED, OperationalState.READY),
-    (OperationalState.COMPLETED, OperationalState.IDLE),
+    (OperationalState.RUNNING, OperationalState.STOPPED),
+    (OperationalState.RUNNING, OperationalState.BACKGROUND_RUNNING),
+    (OperationalState.BACKGROUND_RUNNING, OperationalState.RUNNING),
+    (OperationalState.BACKGROUND_RUNNING, OperationalState.PAUSED),
+    (OperationalState.BACKGROUND_RUNNING, OperationalState.STOPPED),
+    (OperationalState.PAUSED, OperationalState.READY),
+    (OperationalState.STOPPED, OperationalState.IDLE)
 }
 
 HEALTH_TRANSITIONS = {
-    (HealthState.OK, HealthState.WARNING),
-    (HealthState.WARNING, HealthState.OK),
-    (HealthState.WARNING, HealthState.OVERLOADED),
-    (HealthState.WARNING, HealthState.FAULTED),
-    (HealthState.OVERLOADED, HealthState.WARNING),
-    (HealthState.OVERLOADED, HealthState.FAULTED),
-    (HealthState.FAULTED, HealthState.OK),
-    (HealthState.FAULTED, HealthState.CRITICAL),
-    (HealthState.CRITICAL, HealthState.FAULTED),
+    (HealthState.HEALTHY, HealthState.WARNING),
+    (HealthState.HEALTHY, HealthState.CRITICAL),
+    (HealthState.WARNING, HealthState.HEALTHY),
+    (HealthState.WARNING, HealthState.CRITICAL),
+    (HealthState.CRITICAL, HealthState.HEALTHY),
+    (HealthState.CRITICAL, HealthState.WARNING),
 }
 
 # Operational states allowed per lifecycle state
 LIFECYCLE_OPERATIONAL_RULES = {
-    LifecycleState.UNINITIALIZED: set(),  # No operational activity
     LifecycleState.INITIALIZING: set(),   # Operational FSM locked
     LifecycleState.ACTIVE: {              # Full operational capability
         OperationalState.IDLE,
         OperationalState.READY,
         OperationalState.RUNNING,
-        OperationalState.PROCESSING,
-        OperationalState.DELEGATING,
+        OperationalState.BACKGROUND_RUNNING,
         OperationalState.PAUSED,
-        OperationalState.BLOCKED,
-        OperationalState.COMPLETED,
+        OperationalState.STOPPED
     },
     LifecycleState.RECOVERING: {          # Limited operational states
         OperationalState.IDLE,
         OperationalState.PAUSED,
-        OperationalState.BLOCKED,
+        OperationalState.STOPPED,
     },
     LifecycleState.SHUTTING_DOWN: {       # Freezing operational state
-        OperationalState.PAUSED,
-        OperationalState.IDLE,
+        OperationalState.IDLE
     },
-    LifecycleState.DEACTIVATED: {         # Only idle when deactivated
+    LifecycleState.OFFLINE: {         # Only idle when offline
         OperationalState.IDLE,
+        OperationalState.STOPPED
     },
 }
 

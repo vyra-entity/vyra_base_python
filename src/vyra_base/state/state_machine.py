@@ -31,9 +31,7 @@ from .state_types import (
     is_operational_allowed_in_lifecycle,
 )
 from .state_events import StateEvent, EventType, get_event_target_layer, is_interrupt_event
-
-
-logger = logging.getLogger(__name__)
+from vyra_base.helper.logger import Logger
 
 
 class StateMachineError(Exception):
@@ -80,15 +78,23 @@ class StateMachineConfig:
     """Configuration for state machine behavior."""
     
     # Initial states
-    initial_lifecycle: LifecycleState = LifecycleState.UNINITIALIZED
+    initial_lifecycle: LifecycleState = LifecycleState.OFFLINE
     initial_operational: OperationalState = OperationalState.IDLE
-    initial_health: HealthState = HealthState.OK
+    initial_health: HealthState = HealthState.HEALTHY
     
     # Operational state when entering Recovering lifecycle
-    operational_on_recovery: OperationalState = OperationalState.PAUSED
+    def operational_on_recovery(current_operational: OperationalState) -> OperationalState:
+        if current_operational in [OperationalState.READY, OperationalState.RUNNING]:
+            return OperationalState.STOPPED
+        else:
+            return current_operational
     
     # Operational state when entering ShuttingDown
-    operational_on_shutdown: OperationalState = OperationalState.PAUSED
+    def operational_on_shutdown(current_operational: OperationalState) -> OperationalState:
+        if current_operational in [OperationalState.READY, OperationalState.RUNNING]:
+            return OperationalState.STOPPED
+        else:
+            return current_operational
     
     # Enable detailed logging
     enable_transition_log: bool = True
@@ -105,9 +111,9 @@ class StateMachine:
     Professional 3-layer state machine for industrial automation.
     
     Architecture:
-    - **Lifecycle Layer**: Controls module existence (startup/shutdown)
+    - **Lifecycle Layer**: Controls module existence (startup/lifetime/shutdown)
     - **Operational Layer**: Manages runtime activity (tasks/processing)
-    - **Health Layer**: Monitors system integrity (errors/warnings)
+    - **Health Layer**: Monitors system integrity (health/warnings/errors)
     
     Layer Interaction Rules:
     1. Lifecycle → Operational: Controls allowed states
@@ -154,7 +160,7 @@ class StateMachine:
             "any": [],
         }
         
-        logger.info(f"StateMachine initialized: lifecycle={self._lifecycle.value}, "
+        Logger.info(f"StateMachine initialized: lifecycle={self._lifecycle.value}, "
                    f"operational={self._operational.value}, health={self._health.value}")
     
     # -------------------------------------------------------------------------
@@ -222,7 +228,7 @@ class StateMachine:
             LayerViolationError: If layer rules are violated
         """
         with self._lock:
-            logger.debug(f"Processing event: {event}")
+            Logger.debug(f"Processing event: {event}")
             
             try:
                 # Handle interrupt events first (highest priority)
@@ -241,12 +247,12 @@ class StateMachine:
                 elif target_layer == "operational":
                     self._handle_operational_event(event)
                 else:
-                    logger.warning(f"Unknown event target layer: {target_layer}")
+                    Logger.warning(f"Unknown event target layer: {target_layer}")
                 
                 return self.get_current_state()
                 
             except Exception as e:
-                logger.error(f"Error processing event {event}: {e}")
+                Logger.error(f"Error processing event {event}: {e}")
                 if self.config.strict_mode:
                     raise
                 return self.get_current_state()
@@ -277,7 +283,7 @@ class StateMachine:
             # Sort by priority (descending)
             self._callbacks[layer].sort(key=lambda x: x[1], reverse=True)
             
-            logger.debug(f"Subscribed callback to {layer} layer with priority {priority}")
+            Logger.debug(f"Subscribed callback to {layer} layer with priority {priority}")
     
     def unsubscribe(self, layer: str, callback: Callable):
         """Remove a callback subscription."""
@@ -309,7 +315,7 @@ class StateMachine:
         """Clear transition history."""
         with self._lock:
             self._history.clear()
-            logger.info("State machine history cleared")
+            Logger.info("State machine history cleared")
     
     def get_diagnostic_info(self) -> Dict[str, Any]:
         """
@@ -345,7 +351,7 @@ class StateMachine:
         new_state = self._get_lifecycle_target(current, event.event_type)
         
         if new_state is None:
-            logger.debug(f"No lifecycle transition for event {event.event_type} in state {current}")
+            Logger.debug(f"No lifecycle transition for event {event.event_type} in state {current}")
             return
         
         # Validate transition
@@ -353,7 +359,7 @@ class StateMachine:
             msg = f"Invalid lifecycle transition: {current.value} -> {new_state.value}"
             if self.config.strict_mode:
                 raise InvalidTransitionError(msg)
-            logger.warning(msg)
+            Logger.warning(msg)
             return
         
         # Execute transition
@@ -361,7 +367,7 @@ class StateMachine:
         self._record_transition("lifecycle", current.value, new_state.value, event, True)
         self._notify_callbacks("lifecycle", current.value, new_state.value)
         
-        logger.info(f"Lifecycle: {current.value} -> {new_state.value}")
+        Logger.info(f"Lifecycle: {current.value} -> {new_state.value}")
         
         # Apply lifecycle → operational rules
         self._apply_lifecycle_to_operational_rules(new_state, event)
@@ -372,7 +378,7 @@ class StateMachine:
         new_state = self._get_operational_target(current, event.event_type)
         
         if new_state is None:
-            logger.debug(f"No operational transition for event {event.event_type} in state {current}")
+            Logger.debug(f"No operational transition for event {event.event_type} in state {current}")
             return
         
         # Validate transition
@@ -380,7 +386,7 @@ class StateMachine:
             msg = f"Invalid operational transition: {current.value} -> {new_state.value}"
             if self.config.strict_mode:
                 raise InvalidTransitionError(msg)
-            logger.warning(msg)
+            Logger.warning(msg)
             return
         
         # Check if lifecycle allows this operational state
@@ -388,7 +394,7 @@ class StateMachine:
             msg = f"Operational state {new_state.value} not allowed in lifecycle {self._lifecycle.value}"
             if self.config.strict_mode:
                 raise LayerViolationError(msg)
-            logger.warning(msg)
+            Logger.warning(msg)
             # Force to safe state
             new_state = OperationalState.IDLE
         
@@ -397,7 +403,7 @@ class StateMachine:
         self._record_transition("operational", current.value, new_state.value, event, True)
         self._notify_callbacks("operational", current.value, new_state.value)
         
-        logger.info(f"Operational: {current.value} -> {new_state.value}")
+        Logger.info(f"Operational: {current.value} -> {new_state.value}")
     
     def _handle_health_event(self, event: StateEvent):
         """Handle events targeting health layer."""
@@ -405,7 +411,7 @@ class StateMachine:
         new_state = self._get_health_target(current, event.event_type)
         
         if new_state is None:
-            logger.debug(f"No health transition for event {event.event_type} in state {current}")
+            Logger.debug(f"No health transition for event {event.event_type} in state {current}")
             return
         
         # Validate transition
@@ -413,7 +419,7 @@ class StateMachine:
             msg = f"Invalid health transition: {current.value} -> {new_state.value}"
             if self.config.strict_mode:
                 raise InvalidTransitionError(msg)
-            logger.warning(msg)
+            Logger.warning(msg)
             return
         
         # Execute transition
@@ -421,14 +427,14 @@ class StateMachine:
         self._record_transition("health", current.value, new_state.value, event, True)
         self._notify_callbacks("health", current.value, new_state.value)
         
-        logger.info(f"Health: {current.value} -> {new_state.value}")
+        Logger.info(f"Health: {current.value} -> {new_state.value}")
         
         # Apply health escalation rules
         self._apply_health_escalation_rules(current, new_state, event)
     
     def _handle_interrupt(self, event: StateEvent):
         """Handle system interrupt events."""
-        logger.warning(f"Processing interrupt: {event.event_type}")
+        Logger.warning(f"Processing interrupt: {event.event_type}")
         
         if event.event_type == EventType.EMERGENCY_STOP:
             # Emergency stop: immediately deactivate
@@ -436,9 +442,20 @@ class StateMachine:
             old_operational = self._operational
             old_health = self._health
             
-            self._lifecycle = LifecycleState.DEACTIVATED
-            self._operational = OperationalState.IDLE
-            self._health = HealthState.FAULTED
+            if self._lifecycle != LifecycleState.ACTIVE:
+                Logger.info(
+                    f"Lifecycle state is not ACTIVE during emergency "
+                    f"stop: {self._lifecycle.value}"
+                )
+
+            if self._operational in [
+                    OperationalState.RUNNING, 
+                    OperationalState.PAUSED, 
+                    OperationalState.READY]:
+                self._operational = OperationalState.STOPPED
+            
+            if self._health == HealthState.HEALTHY:
+                self._health = HealthState.WARNING
             
             self._record_transition("lifecycle", old_lifecycle.value, self._lifecycle.value, event, True)
             self._record_transition("operational", old_operational.value, self._operational.value, event, True)
@@ -463,47 +480,39 @@ class StateMachine:
     def _get_lifecycle_target(self, current: LifecycleState, event_type: EventType) -> Optional[LifecycleState]:
         """Determine target lifecycle state for given event."""
         transitions = {
-            (LifecycleState.UNINITIALIZED, EventType.START): LifecycleState.INITIALIZING,
+            (LifecycleState.OFFLINE, EventType.START): LifecycleState.INITIALIZING,
             (LifecycleState.INITIALIZING, EventType.INIT_SUCCESS): LifecycleState.ACTIVE,
             (LifecycleState.INITIALIZING, EventType.INIT_FAILURE): LifecycleState.RECOVERING,
             (LifecycleState.ACTIVE, EventType.SHUTDOWN): LifecycleState.SHUTTING_DOWN,
             (LifecycleState.ACTIVE, EventType.FAULT_DETECTED): LifecycleState.RECOVERING,
             (LifecycleState.RECOVERING, EventType.RECOVERY_SUCCESS): LifecycleState.ACTIVE,
-            (LifecycleState.RECOVERING, EventType.RECOVERY_FAILED): LifecycleState.DEACTIVATED,
-            (LifecycleState.SHUTTING_DOWN, EventType.FINISHED): LifecycleState.DEACTIVATED,
+            (LifecycleState.RECOVERING, EventType.RECOVERY_FAILED): LifecycleState.OFFLINE,
+            (LifecycleState.SHUTTING_DOWN, EventType.FINISHED): LifecycleState.OFFLINE,
         }
         return transitions.get((current, event_type))
     
     def _get_operational_target(self, current: OperationalState, event_type: EventType) -> Optional[OperationalState]:
         """Determine target operational state for given event."""
         transitions = {
-            (OperationalState.IDLE, EventType.READY): OperationalState.READY,
+            (OperationalState.IDLE, EventType.SET_READY): OperationalState.READY,
             (OperationalState.READY, EventType.TASK_START): OperationalState.RUNNING,
+            (OperationalState.RUNNING, EventType.TASK_START): OperationalState.RUNNING,
             (OperationalState.RUNNING, EventType.TASK_PAUSE): OperationalState.PAUSED,
-            (OperationalState.RUNNING, EventType.BLOCK_DETECTED): OperationalState.BLOCKED,
-            (OperationalState.RUNNING, EventType.DELEGATE_TO_OTHER): OperationalState.DELEGATING,
-            (OperationalState.RUNNING, EventType.BACKGROUND_PROCESSING): OperationalState.PROCESSING,
-            (OperationalState.RUNNING, EventType.TASK_COMPLETE): OperationalState.COMPLETED,
-            (OperationalState.PROCESSING, EventType.PROCESSING_DONE): OperationalState.RUNNING,
-            (OperationalState.DELEGATING, EventType.DELEGATE_DONE): OperationalState.RUNNING,
+            (OperationalState.RUNNING, EventType.TASK_STOP): OperationalState.STOPPED,
             (OperationalState.PAUSED, EventType.TASK_RESUME): OperationalState.RUNNING,
-            (OperationalState.BLOCKED, EventType.UNBLOCK): OperationalState.RUNNING,
-            (OperationalState.COMPLETED, EventType.AUTO_RESET): OperationalState.READY,
+            (OperationalState.STOPPED, EventType.TASK_RESET): OperationalState.IDLE,
         }
         return transitions.get((current, event_type))
     
     def _get_health_target(self, current: HealthState, event_type: EventType) -> Optional[HealthState]:
         """Determine target health state for given event."""
         transitions = {
-            (HealthState.OK, EventType.WARN): HealthState.WARNING,
-            (HealthState.WARNING, EventType.CLEAR_WARNING): HealthState.OK,
-            (HealthState.WARNING, EventType.OVERLOAD): HealthState.OVERLOADED,
-            (HealthState.WARNING, EventType.FAULT): HealthState.FAULTED,
-            (HealthState.OVERLOADED, EventType.LOAD_REDUCED): HealthState.WARNING,
-            (HealthState.OVERLOADED, EventType.FAULT): HealthState.FAULTED,
-            (HealthState.FAULTED, EventType.RECOVER): HealthState.OK,
-            (HealthState.FAULTED, EventType.ESCALATE): HealthState.CRITICAL,
-            (HealthState.CRITICAL, EventType.RESET): HealthState.FAULTED,
+            (HealthState.HEALTHY, EventType.WARN): HealthState.WARNING,
+            (HealthState.HEALTHY, EventType.FAULT): HealthState.CRITICAL,
+            (HealthState.WARNING, EventType.CLEAR_WARNING): HealthState.HEALTHY,
+            (HealthState.WARNING, EventType.FAULT): HealthState.CRITICAL,
+            (HealthState.CRITICAL, EventType.RESET): HealthState.WARNING,
+            (HealthState.CRITICAL, EventType.FAULT): HealthState.CRITICAL
         }
         return transitions.get((current, event_type))
     
@@ -516,30 +525,25 @@ class StateMachine:
         if new_lifecycle == LifecycleState.RECOVERING:
             # Force operational to recovery state
             old = self._operational
-            self._operational = self.config.operational_on_recovery
-            if old != self._operational:
-                self._record_transition("operational", old.value, self._operational.value, event, True)
-                self._notify_callbacks("operational", old.value, self._operational.value)
-                
+            self._operational = self.config.operational_on_recovery(self._operational)
+
         elif new_lifecycle == LifecycleState.SHUTTING_DOWN:
             # Freeze operational
             old = self._operational
-            self._operational = self.config.operational_on_shutdown
-            if old != self._operational:
-                self._record_transition("operational", old.value, self._operational.value, event, True)
-                self._notify_callbacks("operational", old.value, self._operational.value)
-                
-        elif new_lifecycle == LifecycleState.DEACTIVATED:
+            self._operational = self.config.operational_on_shutdown(self._operational)
+
+        elif new_lifecycle == LifecycleState.OFFLINE:
             # Disable operational
             old = self._operational
             self._operational = OperationalState.IDLE
-            if old != self._operational:
-                self._record_transition("operational", old.value, self._operational.value, event, True)
-                self._notify_callbacks("operational", old.value, self._operational.value)
+
+        if old != self._operational:
+            self._record_transition("operational", old.value, self._operational.value, event, True)
+            self._notify_callbacks("operational", old.value, self._operational.value)
     
     def _apply_health_escalation_rules(self, old_health: HealthState, new_health: HealthState, event: StateEvent):
         """Apply health → lifecycle/operational escalation rules."""
-        if new_health == HealthState.FAULTED and self._lifecycle == LifecycleState.ACTIVE:
+        if new_health == HealthState.CRITICAL and self._lifecycle == LifecycleState.ACTIVE:
             # Escalate to Recovering
             old = self._lifecycle
             self._lifecycle = LifecycleState.RECOVERING
@@ -555,21 +559,6 @@ class StateMachine:
                 self._record_transition("lifecycle", old.value, self._lifecycle.value, event, True)
                 self._notify_callbacks("lifecycle", old.value, self._lifecycle.value)
                 self._apply_lifecycle_to_operational_rules(self._lifecycle, event)
-            
-            # Block operational
-            if self._operational != OperationalState.BLOCKED:
-                old = self._operational
-                self._operational = OperationalState.BLOCKED
-                self._record_transition("operational", old.value, self._operational.value, event, True)
-                self._notify_callbacks("operational", old.value, self._operational.value)
-                
-        elif new_health == HealthState.OVERLOADED:
-            # Overloaded: pause operational if running
-            if self._operational == OperationalState.RUNNING:
-                old = self._operational
-                self._operational = OperationalState.PAUSED
-                self._record_transition("operational", old.value, self._operational.value, event, True)
-                self._notify_callbacks("operational", old.value, self._operational.value)
     
     # -------------------------------------------------------------------------
     # Internal - Utilities
@@ -594,14 +583,14 @@ class StateMachine:
             try:
                 callback(layer, old_state, new_state)
             except Exception as e:
-                logger.error(f"Callback error on {layer}: {e}")
+                Logger.error(f"Callback error on {layer}: {e}")
         
         # Notify global callbacks
         for callback, _ in self._callbacks.get("any", []):
             try:
                 callback(layer, old_state, new_state)
             except Exception as e:
-                logger.error(f"Global callback error: {e}")
+                Logger.error(f"Global callback error: {e}")
     
     def __repr__(self) -> str:
         """String representation for debugging."""

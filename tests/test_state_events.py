@@ -36,18 +36,12 @@ class TestEventType:
     def test_operational_events_exist(self):
         """Verify all operational events are defined."""
         operational_events = {
-            EventType.READY,
+            EventType.SET_READY,
             EventType.TASK_START,
             EventType.TASK_PAUSE,
             EventType.TASK_RESUME,
-            EventType.TASK_COMPLETE,
-            EventType.BACKGROUND_PROCESSING,
-            EventType.PROCESSING_DONE,
-            EventType.DELEGATE_TO_OTHER,
-            EventType.DELEGATE_DONE,
-            EventType.BLOCK_DETECTED,
-            EventType.UNBLOCK,
-            EventType.AUTO_RESET,
+            EventType.TASK_STOP,
+            EventType.TASK_RESET
         }
         for event in operational_events:
             assert isinstance(event, EventType)
@@ -57,11 +51,8 @@ class TestEventType:
         health_events = {
             EventType.WARN,
             EventType.CLEAR_WARNING,
-            EventType.OVERLOAD,
-            EventType.LOAD_REDUCED,
             EventType.FAULT,
             EventType.RECOVER,
-            EventType.ESCALATE,
             EventType.RESET,
         }
         for event in health_events:

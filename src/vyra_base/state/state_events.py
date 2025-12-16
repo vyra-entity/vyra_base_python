@@ -25,27 +25,20 @@ class EventType(Enum):
     RECOVERY_FAILED = "recovery_failed"
     
     # Operational events
-    READY = "ready"
+    SET_READY = "set_ready"
     TASK_START = "task_start"
+    SET_BACKGROUND = "set_background"
     TASK_PAUSE = "task_pause"
-    TASK_RESUME = "resume"
+    TASK_RESUME = "task_resume"
     TASK_COMPLETE = "task_complete"
-    BLOCK_DETECTED = "block_detected"
-    UNBLOCK = "unblock"
-    DELEGATE_TO_OTHER = "delegate_to_other"
-    DELEGATE_DONE = "delegate_done"
-    BACKGROUND_PROCESSING = "background_processing"
-    PROCESSING_DONE = "processing_done"
-    AUTO_RESET = "auto_reset"
+    TASK_STOP = "task_stop"
+    TASK_RESET = "task_reset"
     
     # Health events
     WARN = "warn"
     CLEAR_WARNING = "clear_warning"
-    OVERLOAD = "overload"
-    LOAD_REDUCED = "load_reduced"
     FAULT = "fault"
     RECOVER = "recover"
-    ESCALATE = "escalate"
     RESET = "reset"
     
     # Special interrupt events
@@ -103,27 +96,19 @@ EVENT_LAYER_MAP = {
     EventType.RECOVERY_FAILED: "lifecycle",
     
     # Operational events
-    EventType.READY: "operational",
+    EventType.SET_READY: "operational",
     EventType.TASK_START: "operational",
+    EventType.SET_BACKGROUND: "operational",
     EventType.TASK_PAUSE: "operational",
     EventType.TASK_RESUME: "operational",
-    EventType.TASK_COMPLETE: "operational",
-    EventType.BLOCK_DETECTED: "operational",
-    EventType.UNBLOCK: "operational",
-    EventType.DELEGATE_TO_OTHER: "operational",
-    EventType.DELEGATE_DONE: "operational",
-    EventType.BACKGROUND_PROCESSING: "operational",
-    EventType.PROCESSING_DONE: "operational",
-    EventType.AUTO_RESET: "operational",
+    EventType.TASK_STOP: "operational",
+    EventType.TASK_RESET: "operational",
     
     # Health events
     EventType.WARN: "health",
     EventType.CLEAR_WARNING: "health",
-    EventType.OVERLOAD: "health",
-    EventType.LOAD_REDUCED: "health",
     EventType.FAULT: "health",
     EventType.RECOVER: "health",
-    EventType.ESCALATE: "health",
     EventType.RESET: "health",
     
     # Interrupt events (cross-layer)

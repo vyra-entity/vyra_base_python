@@ -28,8 +28,6 @@ class HealthLayer:
     
     Provides intuitive methods for health monitoring:
     - report_warning() - Report non-critical issues
-    - report_fault() - Report critical faults
-    - report_overload() - Report resource overload
     - recover() - Attempt recovery
     - escalate() - Escalate to critical state
     
@@ -63,21 +61,13 @@ class HealthLayer:
         """Get current health state as string."""
         return self.get_state().value
     
-    def is_ok(self) -> bool:
+    def is_health(self) -> bool:
         """Check if health is OK."""
-        return self.get_state() == HealthState.OK
+        return self.get_state() == HealthState.HEALTHY
     
     def is_warning(self) -> bool:
         """Check if there are warnings."""
         return self.get_state() == HealthState.WARNING
-    
-    def is_overloaded(self) -> bool:
-        """Check if system is overloaded."""
-        return self.get_state() == HealthState.OVERLOADED
-    
-    def is_faulted(self) -> bool:
-        """Check if system has faults."""
-        return self.get_state() == HealthState.FAULTED
     
     def is_critical(self) -> bool:
         """Check if health is critical."""
@@ -87,14 +77,12 @@ class HealthLayer:
         """Check if health is degraded (warning or worse)."""
         return self.get_state() in (
             HealthState.WARNING,
-            HealthState.OVERLOADED,
-            HealthState.FAULTED,
-            HealthState.CRITICAL,
+            HealthState.CRITICAL
         )
     
     def is_operational_safe(self) -> bool:
         """Check if safe for operational tasks."""
-        return self.get_state() in (HealthState.OK, HealthState.WARNING)
+        return self.get_state() in (HealthState.HEALTHY, HealthState.WARNING)
     
     # -------------------------------------------------------------------------
     # Health Reporting
@@ -134,115 +122,6 @@ class HealthLayer:
         logger.info(f"Warning cleared: {clearance_info}")
         return self.get_state()
     
-    def report_overload(self, load_info: Optional[Dict[str, Any]] = None) -> HealthState:
-        """
-        Report resource overload.
-        
-        Transitions: Warning → Overloaded
-        
-        Args:
-            load_info: Resource usage details (CPU, memory, etc.)
-            
-        Returns:
-            New health state
-        """
-        event = StateEvent(EventType.OVERLOAD, payload=load_info, origin_layer="health")
-        self.fsm.send_event(event)
-        logger.warning(f"Overload reported: {load_info}")
-        return self.get_state()
-    
-    def reduce_load(self, reduction_info: Optional[Dict[str, Any]] = None) -> HealthState:
-        """
-        Report load reduction.
-        
-        Transitions: Overloaded → Warning
-        
-        Args:
-            reduction_info: Load reduction details
-            
-        Returns:
-            New health state
-        """
-        event = StateEvent(EventType.LOAD_REDUCED, payload=reduction_info, origin_layer="health")
-        self.fsm.send_event(event)
-        logger.info(f"Load reduced: {reduction_info}")
-        return self.get_state()
-    
-    def report_fault(self, fault_info: Optional[Dict[str, Any]] = None) -> HealthState:
-        """
-        Report critical fault.
-        
-        Transitions: Warning/Overloaded → Faulted
-        Note: Triggers lifecycle escalation to Recovering state
-        
-        Args:
-            fault_info: Fault details and diagnostics
-            
-        Returns:
-            New health state
-        """
-        event = StateEvent(EventType.FAULT, payload=fault_info, origin_layer="health")
-        self.fsm.send_event(event)
-        logger.error(f"Fault reported: {fault_info}")
-        return self.get_state()
-    
-    # -------------------------------------------------------------------------
-    # Recovery and Escalation
-    # -------------------------------------------------------------------------
-    
-    def recover(self, recovery_info: Optional[Dict[str, Any]] = None) -> HealthState:
-        """
-        Attempt recovery from faulted state.
-        
-        Transitions: Faulted → OK
-        
-        Args:
-            recovery_info: Recovery actions taken
-            
-        Returns:
-            New health state
-        """
-        event = StateEvent(EventType.RECOVER, payload=recovery_info, origin_layer="health")
-        self.fsm.send_event(event)
-        logger.info(f"Recovery successful: {recovery_info}")
-        return self.get_state()
-    
-    def escalate(self, escalation_reason: Optional[str] = None) -> HealthState:
-        """
-        Escalate fault to critical state.
-        
-        Transitions: Faulted → Critical
-        Note: Triggers lifecycle shutdown
-        
-        Args:
-            escalation_reason: Reason for escalation
-            
-        Returns:
-            New health state
-        """
-        event = StateEvent(
-            EventType.ESCALATE,
-            payload={"reason": escalation_reason},
-            origin_layer="health"
-        )
-        self.fsm.send_event(event)
-        logger.critical(f"Health escalated to critical: {escalation_reason}")
-        return self.get_state()
-    
-    def reset_from_critical(self) -> HealthState:
-        """
-        Reset from critical to faulted state.
-        
-        Transitions: Critical → Faulted
-        
-        Returns:
-            New health state
-        """
-        event = StateEvent(EventType.RESET, origin_layer="health")
-        self.fsm.send_event(event)
-        logger.info("Critical state reset to faulted")
-        return self.get_state()
-    
     # -------------------------------------------------------------------------
     # Convenience Methods
     # -------------------------------------------------------------------------
@@ -250,9 +129,7 @@ class HealthLayer:
     def check_and_report(
         self,
         metrics: Dict[str, Any],
-        warning_threshold: Optional[float] = None,
-        overload_threshold: Optional[float] = None,
-        fault_threshold: Optional[float] = None,
+        warning_threshold: Optional[float] = None
     ) -> HealthState:
         """
         Check metrics and automatically report appropriate health state.
@@ -260,8 +137,6 @@ class HealthLayer:
         Args:
             metrics: System metrics to evaluate
             warning_threshold: Threshold for warning state
-            overload_threshold: Threshold for overload state
-            fault_threshold: Threshold for fault state
             
         Returns:
             New health state after evaluation
@@ -280,11 +155,7 @@ class HealthLayer:
             logger.debug("No numeric metrics for threshold check")
             return self.get_state()
         
-        if fault_threshold and value >= fault_threshold:
-            return self.report_fault(metrics)
-        elif overload_threshold and value >= overload_threshold:
-            return self.report_overload(metrics)
-        elif warning_threshold and value >= warning_threshold:
+        if warning_threshold and value >= warning_threshold:
             return self.report_warning(metrics)
         elif self.is_warning():
             # Metrics below warning threshold - clear if currently warning
@@ -299,7 +170,7 @@ class HealthLayer:
         This is an interrupt event that immediately:
         - Sets lifecycle to Deactivated
         - Sets operational to Idle
-        - Sets health to Faulted
+        - Sets health to Warning
         
         Args:
             reason: Emergency stop reason
@@ -341,7 +212,7 @@ class HealthLayer:
         """
         return {
             "state": self.get_state_name(),
-            "is_ok": self.is_ok(),
+            "is_healthy": self.is_healthy(),
             "is_degraded": self.is_degraded(),
             "is_operational_safe": self.is_operational_safe(),
             "lifecycle_state": self.fsm.get_lifecycle_state().value,
@@ -352,14 +223,12 @@ class HealthLayer:
         Get health severity as numeric level.
         
         Returns:
-            0 = OK, 1 = Warning, 2 = Overloaded, 3 = Faulted, 4 = Critical
+            0 = HEALTHY, 1 = Warning, 2 = Critical
         """
         severity_map = {
-            HealthState.OK: 0,
+            HealthState.HEALTHY: 0,
             HealthState.WARNING: 1,
-            HealthState.OVERLOADED: 2,
-            HealthState.FAULTED: 3,
-            HealthState.CRITICAL: 4,
+            HealthState.CRITICAL: 2,
         }
         return severity_map.get(self.get_state(), 0)
     
