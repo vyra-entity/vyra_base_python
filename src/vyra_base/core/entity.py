@@ -305,15 +305,9 @@ class VyraEntity:
         # Create configuration for state machine
         config = StateMachineConfig(
             # Initial states (module starts uninitialized)
-            initial_lifecycle=LifecycleState.UNINITIALIZED,
+            initial_lifecycle=LifecycleState.INITIALIZING,
             initial_operational=OperationalState.IDLE,
-            initial_health=HealthState.OK,
-            
-            # Operational state during recovery
-            operational_on_recovery=OperationalState.PAUSED,
-            
-            # Operational state during shutdown
-            operational_on_shutdown=OperationalState.PAUSED,
+            initial_health=HealthState.HEALTHY,
             
             # Enable detailed transition logging
             enable_transition_log=True,
@@ -470,7 +464,7 @@ class VyraEntity:
             })
             
             # Step 4: Set operational ready
-            self.state_machine.ready(metadata={
+            self.state_machine.set_ready(metadata={
                 "capabilities": "full",
                 "ready_for_tasks": True
             })

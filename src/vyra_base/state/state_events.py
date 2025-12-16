@@ -16,18 +16,19 @@ class EventType(Enum):
     
     # Lifecycle events
     START = "start"
-    INIT_SUCCESS = "init_success"
-    INIT_FAILURE = "init_failure"
-    SHUTDOWN = "shutdown"
-    FINISHED = "finished"
-    FAULT_DETECTED = "fault_detected"
-    RECOVERY_SUCCESS = "recovery_success"
-    RECOVERY_FAILED = "recovery_failed"
+    INIT_SUCCESS = "init_success"           # Initialization successful. Going to Active
+    INIT_FAILURE = "init_failure"           # Initialization failed. Going to Recovering
+    SHUTDOWN = "shutdown"                   # Begin shutdown
+    FINISHED = "finished"                   # Going offline
+    FAULT_DETECTED = "fault_detected"       # Fault detected, go to Recovering
+    RECOVERY_SUCCESS = "recovery_success"   # Recovery successful going to Active
+    RECOVERY_FAILED = "recovery_failed"     # Recovery failed, going to Shutdown
     
     # Operational events
     SET_READY = "set_ready"
     TASK_START = "task_start"
     SET_BACKGROUND = "set_background"
+    SET_FOREGROUND = "set_foreground"
     TASK_PAUSE = "task_pause"
     TASK_RESUME = "task_resume"
     TASK_COMPLETE = "task_complete"

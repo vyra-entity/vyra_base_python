@@ -61,7 +61,7 @@ class HealthLayer:
         """Get current health state as string."""
         return self.get_state().value
     
-    def is_health(self) -> bool:
+    def is_healthy(self) -> bool:
         """Check if health is OK."""
         return self.get_state() == HealthState.HEALTHY
     
@@ -120,6 +120,39 @@ class HealthLayer:
         event = StateEvent(EventType.CLEAR_WARNING, payload=clearance_info, origin_layer="health")
         self.fsm.send_event(event)
         logger.info(f"Warning cleared: {clearance_info}")
+        return self.get_state()
+    
+    def report_fault(self, fault_info: Optional[Dict[str, Any]] = None) -> HealthState:
+        """
+        Report critical fault.
+        
+        Transitions: OK/Warning → Critical
+        
+        Args:
+            fault_info: Fault details
+            
+        Returns:
+            New health state
+        """
+        event = StateEvent(EventType.FAULT, payload=fault_info, origin_layer="health")
+        self.fsm.send_event(event)
+        logger.error(f"Fault reported: {fault_info}")
+        return self.get_state()
+    
+    def recover(self, recovery_info: Optional[Dict[str, Any]] = None) -> HealthState:
+        """
+        Attempt recovery from fault.
+        
+        Transitions: Critical → OK/Warning
+        
+        Args:
+            recovery_info: Recovery details
+        Returns:
+            New health state
+        """
+        event = StateEvent(EventType.RECOVER, payload=recovery_info, origin_layer="health")
+        self.fsm.send_event(event)
+        logger.info(f"Recovery attempted: {recovery_info}")
         return self.get_state()
     
     # -------------------------------------------------------------------------

@@ -83,14 +83,16 @@ class StateMachineConfig:
     initial_health: HealthState = HealthState.HEALTHY
     
     # Operational state when entering Recovering lifecycle
-    def operational_on_recovery(current_operational: OperationalState) -> OperationalState:
+    def operational_on_recovery(
+            self, current_operational: OperationalState = OperationalState.IDLE) -> OperationalState:
         if current_operational in [OperationalState.READY, OperationalState.RUNNING]:
             return OperationalState.STOPPED
         else:
             return current_operational
     
     # Operational state when entering ShuttingDown
-    def operational_on_shutdown(current_operational: OperationalState) -> OperationalState:
+    def operational_on_shutdown(
+            self, current_operational: OperationalState = OperationalState.IDLE) -> OperationalState:
         if current_operational in [OperationalState.READY, OperationalState.RUNNING]:
             return OperationalState.STOPPED
         else:
@@ -203,11 +205,11 @@ class StateMachine:
     def is_operational(self) -> bool:
         """Check if module can accept operational tasks."""
         lifecycle = self.get_lifecycle_state()
-        return lifecycle == LifecycleState.ACTIVE and self._health in (HealthState.OK, HealthState.WARNING)
+        return lifecycle == LifecycleState.ACTIVE and self._health in (HealthState.HEALTHY, HealthState.WARNING)
     
     def is_healthy(self) -> bool:
         """Check if module health is OK."""
-        return self.get_health_state() == HealthState.OK
+        return self.get_health_state() == HealthState.HEALTHY
     
     # -------------------------------------------------------------------------
     # Public API - Event Sending
@@ -486,7 +488,7 @@ class StateMachine:
             (LifecycleState.ACTIVE, EventType.SHUTDOWN): LifecycleState.SHUTTING_DOWN,
             (LifecycleState.ACTIVE, EventType.FAULT_DETECTED): LifecycleState.RECOVERING,
             (LifecycleState.RECOVERING, EventType.RECOVERY_SUCCESS): LifecycleState.ACTIVE,
-            (LifecycleState.RECOVERING, EventType.RECOVERY_FAILED): LifecycleState.OFFLINE,
+            (LifecycleState.RECOVERING, EventType.RECOVERY_FAILED): LifecycleState.SHUTTING_DOWN,
             (LifecycleState.SHUTTING_DOWN, EventType.FINISHED): LifecycleState.OFFLINE,
         }
         return transitions.get((current, event_type))
@@ -501,6 +503,9 @@ class StateMachine:
             (OperationalState.RUNNING, EventType.TASK_STOP): OperationalState.STOPPED,
             (OperationalState.PAUSED, EventType.TASK_RESUME): OperationalState.RUNNING,
             (OperationalState.STOPPED, EventType.TASK_RESET): OperationalState.IDLE,
+            (OperationalState.RUNNING, EventType.SET_BACKGROUND): OperationalState.BACKGROUND_RUNNING,
+            (OperationalState.READY, EventType.SET_BACKGROUND): OperationalState.BACKGROUND_RUNNING,
+            (OperationalState.BACKGROUND_RUNNING, EventType.SET_FOREGROUND): OperationalState.READY,
         }
         return transitions.get((current, event_type))
     
@@ -511,8 +516,8 @@ class StateMachine:
             (HealthState.HEALTHY, EventType.FAULT): HealthState.CRITICAL,
             (HealthState.WARNING, EventType.CLEAR_WARNING): HealthState.HEALTHY,
             (HealthState.WARNING, EventType.FAULT): HealthState.CRITICAL,
-            (HealthState.CRITICAL, EventType.RESET): HealthState.WARNING,
-            (HealthState.CRITICAL, EventType.FAULT): HealthState.CRITICAL
+            (HealthState.CRITICAL, EventType.FAULT): HealthState.CRITICAL,
+            (HealthState.CRITICAL, EventType.RECOVER): HealthState.HEALTHY,
         }
         return transitions.get((current, event_type))
     
@@ -543,19 +548,11 @@ class StateMachine:
     
     def _apply_health_escalation_rules(self, old_health: HealthState, new_health: HealthState, event: StateEvent):
         """Apply health → lifecycle/operational escalation rules."""
-        if new_health == HealthState.CRITICAL and self._lifecycle == LifecycleState.ACTIVE:
-            # Escalate to Recovering
-            old = self._lifecycle
-            self._lifecycle = LifecycleState.RECOVERING
-            self._record_transition("lifecycle", old.value, self._lifecycle.value, event, True)
-            self._notify_callbacks("lifecycle", old.value, self._lifecycle.value)
-            self._apply_lifecycle_to_operational_rules(self._lifecycle, event)
-            
-        elif new_health == HealthState.CRITICAL:
+        if new_health == HealthState.CRITICAL:
             # Critical health: force shutdown
-            if self._lifecycle != LifecycleState.SHUTTING_DOWN:
+            if self._lifecycle not in (LifecycleState.SHUTTING_DOWN, LifecycleState.OFFLINE):
                 old = self._lifecycle
-                self._lifecycle = LifecycleState.SHUTTING_DOWN
+                self._lifecycle = LifecycleState.RECOVERING
                 self._record_transition("lifecycle", old.value, self._lifecycle.value, event, True)
                 self._notify_callbacks("lifecycle", old.value, self._lifecycle.value)
                 self._apply_lifecycle_to_operational_rules(self._lifecycle, event)

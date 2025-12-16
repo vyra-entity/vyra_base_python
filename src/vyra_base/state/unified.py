@@ -109,9 +109,9 @@ class UnifiedStateMachine:
     # Operational Methods (delegated)
     # -------------------------------------------------------------------------
     
-    def ready(self, metadata: Optional[Dict[str, Any]] = None) -> OperationalState:
+    def set_ready(self, metadata: Optional[Dict[str, Any]] = None) -> OperationalState:
         """Signal readiness for tasks."""
-        return self.operational.ready(metadata)
+        return self.operational.set_ready(metadata)
     
     def start_task(self, task_info: Optional[Dict[str, Any]] = None) -> OperationalState:
         """Start task execution."""
@@ -125,9 +125,13 @@ class UnifiedStateMachine:
         """Resume paused task."""
         return self.operational.resume()
     
-    def complete(self, result: Optional[Dict[str, Any]] = None) -> OperationalState:
+    def stop(self, result: Optional[Dict[str, Any]] = None) -> OperationalState:
         """Mark task as completed."""
-        return self.operational.complete(result)
+        return self.operational.stop(result)
+    
+    def reset(self) -> OperationalState:
+        """Reset operational state to Idle."""
+        return self.operational.reset()
     
     # -------------------------------------------------------------------------
     # Health Methods (delegated)
@@ -140,10 +144,6 @@ class UnifiedStateMachine:
     def report_fault(self, fault_info: Optional[Dict[str, Any]] = None) -> HealthState:
         """Report critical fault."""
         return self.health.report_fault(fault_info)
-    
-    def report_overload(self, load_info: Optional[Dict[str, Any]] = None) -> HealthState:
-        """Report resource overload."""
-        return self.health.report_overload(load_info)
     
     def recover(self, recovery_info: Optional[Dict[str, Any]] = None) -> HealthState:
         """Attempt recovery from fault."""
@@ -221,7 +221,7 @@ class UnifiedStateMachine:
             self.complete_initialization()
             logger.info("Startup: Initialization complete")
             
-            self.ready()
+            self.set_ready()
             logger.info("Startup: Ready for tasks")
             
             return True

@@ -73,25 +73,29 @@ class OperationalLayer:
         """Check if task is running."""
         return self.get_state() == OperationalState.RUNNING
     
-    def is_processing(self) -> bool:
-        """Check if background processing active."""
-        return self.get_state() == OperationalState.PROCESSING
+    # def is_processing(self) -> bool:
+    #     """Check if background processing active."""
+    #     return self.get_state() == OperationalState.PROCESSING
     
-    def is_delegating(self) -> bool:
-        """Check if delegating to other module."""
-        return self.get_state() == OperationalState.DELEGATING
+    # def is_delegating(self) -> bool:
+    #     """Check if delegating to other module."""
+    #     return self.get_state() == OperationalState.DELEGATING
     
     def is_paused(self) -> bool:
         """Check if task is paused."""
         return self.get_state() == OperationalState.PAUSED
     
-    def is_blocked(self) -> bool:
-        """Check if operational is blocked."""
-        return self.get_state() == OperationalState.BLOCKED
+    def is_stopped(self) -> bool:
+        """Check if task is stopped."""
+        return self.get_state() == OperationalState.STOPPED
     
-    def is_completed(self) -> bool:
-        """Check if task is completed."""
-        return self.get_state() == OperationalState.COMPLETED
+    # def is_blocked(self) -> bool:
+    #     """Check if operational is blocked."""
+    #     return self.get_state() == OperationalState.BLOCKED
+    
+    # def is_completed(self) -> bool:
+    #     """Check if task is completed."""
+    #     return self.get_state() == OperationalState.COMPLETED
     
     def can_start_task(self) -> bool:
         """Check if new task can be started."""
@@ -101,15 +105,13 @@ class OperationalLayer:
         """Check if actively working (running, processing, delegating)."""
         return self.get_state() in (
             OperationalState.RUNNING,
-            OperationalState.PROCESSING,
-            OperationalState.DELEGATING,
         )
     
     # -------------------------------------------------------------------------
     # Task Lifecycle
     # -------------------------------------------------------------------------
     
-    def ready(self, metadata: Optional[Dict[str, Any]] = None) -> OperationalState:
+    def set_ready(self, metadata: Optional[Dict[str, Any]] = None) -> OperationalState:
         """
         Signal readiness for task execution.
         
@@ -121,7 +123,7 @@ class OperationalLayer:
         Returns:
             New operational state
         """
-        event = StateEvent(EventType.READY, payload=metadata, origin_layer="operational")
+        event = StateEvent(EventType.SET_READY, payload=metadata, origin_layer="operational")
         self.fsm.send_event(event)
         logger.info("Operational ready for tasks")
         return self.get_state()
@@ -174,7 +176,7 @@ class OperationalLayer:
         logger.info("Task resumed")
         return self.get_state()
     
-    def complete(self, result: Optional[Dict[str, Any]] = None) -> OperationalState:
+    def stop(self, result: Optional[Dict[str, Any]] = None) -> OperationalState:
         """
         Mark task as completed.
         
@@ -186,9 +188,9 @@ class OperationalLayer:
         Returns:
             New operational state
         """
-        event = StateEvent(EventType.TASK_COMPLETE, payload=result, origin_layer="operational")
+        event = StateEvent(EventType.TASK_STOP, payload=result, origin_layer="operational")
         self.fsm.send_event(event)
-        logger.info(f"Task completed: {result}")
+        logger.info(f"Task stopped: {result}")
         return self.get_state()
     
     def reset(self) -> OperationalState:
@@ -200,7 +202,7 @@ class OperationalLayer:
         Returns:
             New operational state
         """
-        event = StateEvent(EventType.AUTO_RESET, origin_layer="operational")
+        event = StateEvent(EventType.TASK_RESET, origin_layer="operational")
         self.fsm.send_event(event)
         logger.info("Operational reset to ready")
         return self.get_state()
@@ -221,12 +223,12 @@ class OperationalLayer:
         Returns:
             New operational state
         """
-        event = StateEvent(EventType.BACKGROUND_PROCESSING, payload=process_info, origin_layer="operational")
+        event = StateEvent(EventType.SET_BACKGROUND, payload=process_info, origin_layer="operational")
         self.fsm.send_event(event)
         logger.info(f"Background processing started: {process_info}")
         return self.get_state()
     
-    def complete_processing(self) -> OperationalState:
+    def return_to_foreground(self) -> OperationalState:
         """
         Complete background processing.
         
@@ -235,75 +237,75 @@ class OperationalLayer:
         Returns:
             New operational state
         """
-        event = StateEvent(EventType.PROCESSING_DONE, origin_layer="operational")
+        event = StateEvent(EventType.SET_FOREGROUND, origin_layer="operational")
         self.fsm.send_event(event)
         logger.info("Background processing completed")
         return self.get_state()
     
-    def delegate_to_other(self, delegation_info: Optional[Dict[str, Any]] = None) -> OperationalState:
-        """
-        Delegate task to another module.
+    # def delegate_to_other(self, delegation_info: Optional[Dict[str, Any]] = None) -> OperationalState:
+    #     """
+    #     Delegate task to another module.
         
-        Transitions: Running → Delegating
+    #     Transitions: Running → Delegating
         
-        Args:
-            delegation_info: Target module and task details
+    #     Args:
+    #         delegation_info: Target module and task details
             
-        Returns:
-            New operational state
-        """
-        event = StateEvent(EventType.DELEGATE_TO_OTHER, payload=delegation_info, origin_layer="operational")
-        self.fsm.send_event(event)
-        logger.info(f"Task delegated: {delegation_info}")
-        return self.get_state()
+    #     Returns:
+    #         New operational state
+    #     """
+    #     event = StateEvent(EventType.DELEGATE_TO_OTHER, payload=delegation_info, origin_layer="operational")
+    #     self.fsm.send_event(event)
+    #     logger.info(f"Task delegated: {delegation_info}")
+    #     return self.get_state()
     
-    def complete_delegation(self, result: Optional[Dict[str, Any]] = None) -> OperationalState:
-        """
-        Complete task delegation.
+    # def complete_delegation(self, result: Optional[Dict[str, Any]] = None) -> OperationalState:
+    #     """
+    #     Complete task delegation.
         
-        Transitions: Delegating → Running
+    #     Transitions: Delegating → Running
         
-        Args:
-            result: Delegation results
+    #     Args:
+    #         result: Delegation results
             
-        Returns:
-            New operational state
-        """
-        event = StateEvent(EventType.DELEGATE_DONE, payload=result, origin_layer="operational")
-        self.fsm.send_event(event)
-        logger.info(f"Delegation completed: {result}")
-        return self.get_state()
+    #     Returns:
+    #         New operational state
+    #     """
+    #     event = StateEvent(EventType.DELEGATE_DONE, payload=result, origin_layer="operational")
+    #     self.fsm.send_event(event)
+    #     logger.info(f"Delegation completed: {result}")
+    #     return self.get_state()
     
-    def block(self, block_reason: Optional[str] = None) -> OperationalState:
-        """
-        Block operational execution.
+    # def block(self, block_reason: Optional[str] = None) -> OperationalState:
+    #     """
+    #     Block operational execution.
         
-        Transitions: Running → Blocked
+    #     Transitions: Running → Blocked
         
-        Args:
-            block_reason: Reason for blocking
+    #     Args:
+    #         block_reason: Reason for blocking
             
-        Returns:
-            New operational state
-        """
-        event = StateEvent(EventType.BLOCK_DETECTED, payload={"reason": block_reason}, origin_layer="operational")
-        self.fsm.send_event(event)
-        logger.warning(f"Operational blocked: {block_reason}")
-        return self.get_state()
+    #     Returns:
+    #         New operational state
+    #     """
+    #     event = StateEvent(EventType.BLOCK_DETECTED, payload={"reason": block_reason}, origin_layer="operational")
+    #     self.fsm.send_event(event)
+    #     logger.warning(f"Operational blocked: {block_reason}")
+    #     return self.get_state()
     
-    def unblock(self) -> OperationalState:
-        """
-        Unblock operational execution.
+    # def unblock(self) -> OperationalState:
+    #     """
+    #     Unblock operational execution.
         
-        Transitions: Blocked → Running
+    #     Transitions: Blocked → Running
         
-        Returns:
-            New operational state
-        """
-        event = StateEvent(EventType.UNBLOCK, origin_layer="operational")
-        self.fsm.send_event(event)
-        logger.info("Operational unblocked")
-        return self.get_state()
+    #     Returns:
+    #         New operational state
+    #     """
+    #     event = StateEvent(EventType.UNBLOCK, origin_layer="operational")
+    #     self.fsm.send_event(event)
+    #     logger.info("Operational unblocked")
+    #     return self.get_state()
     
     # -------------------------------------------------------------------------
     # Callbacks

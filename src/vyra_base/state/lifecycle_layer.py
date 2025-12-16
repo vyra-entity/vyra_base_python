@@ -61,9 +61,9 @@ class LifecycleLayer:
         """Get current lifecycle state as string."""
         return self.get_state().value
     
-    def is_uninitialized(self) -> bool:
-        """Check if module is uninitialized."""
-        return self.get_state() == LifecycleState.UNINITIALIZED
+    # def is_uninitialized(self) -> bool:
+    #     """Check if module is uninitialized."""
+    #     return self.get_state() == LifecycleState.UNINITIALIZED
     
     def is_initializing(self) -> bool:
         """Check if module is initializing."""
@@ -81,9 +81,9 @@ class LifecycleLayer:
         """Check if module is shutting down."""
         return self.get_state() == LifecycleState.SHUTTING_DOWN
     
-    def is_deactivated(self) -> bool:
-        """Check if module is deactivated."""
-        return self.get_state() == LifecycleState.DEACTIVATED
+    def is_offline(self) -> bool:
+        """Check if module is offline."""
+        return self.get_state() == LifecycleState.OFFLINE
     
     def can_accept_tasks(self) -> bool:
         """Check if module can accept operational tasks."""
@@ -97,7 +97,7 @@ class LifecycleLayer:
         """
         Start module initialization.
         
-        Transitions: Uninitialized → Initializing
+        Transitions: Offline → Initializing
         
         Args:
             metadata: Optional initialization parameters
@@ -106,7 +106,7 @@ class LifecycleLayer:
             New lifecycle state
             
         Raises:
-            InvalidTransitionError: If not in Uninitialized state
+            InvalidTransitionError: If not in Offline state
         """
         event = StateEvent(EventType.START, payload=metadata)
         self.fsm.send_event(event)
@@ -168,7 +168,7 @@ class LifecycleLayer:
         """
         Complete shutdown process.
         
-        Transitions: ShuttingDown → Deactivated
+        Transitions: ShuttingDown → Offline
         
         Returns:
             New lifecycle state
