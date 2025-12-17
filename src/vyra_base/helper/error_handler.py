@@ -11,7 +11,7 @@ class ErrorTraceback:
     """
 
     @staticmethod
-    def check_error_exist(error_details: list = []) -> bool:
+    def check_error_exist(error_details: list = [], log_print: bool=False) -> bool:
         """
         Check if an error occurred and log it.
 
@@ -27,15 +27,18 @@ class ErrorTraceback:
             else:
                 error_details.append(traceback.format_exc())
 
-                Logger.log(LogEntry(
-                    f'{exc_type}|{exc_obj}|').error())
+                if log_print:
+                    Logger.log(LogEntry(
+                        f'{exc_type}|{exc_obj}|').error())
+                    
                 tb_lines: list = []
 
                 for line in traceback.format_tb(exc_tb):
                     tb_lines.append(line)
 
-                Logger.log(LogEntry(
-                    '\n'.join(tb_lines)).error())
+                if log_print:
+                    Logger.log(LogEntry(
+                        '\n'.join(tb_lines)).error())
                 return True
 
         return False

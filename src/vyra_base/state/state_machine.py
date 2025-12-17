@@ -527,19 +527,18 @@ class StateMachine:
     
     def _apply_lifecycle_to_operational_rules(self, new_lifecycle: LifecycleState, event: StateEvent):
         """Apply lifecycle → operational control rules."""
+        old: OperationalState = self._operational
+
         if new_lifecycle == LifecycleState.RECOVERING:
-            # Force operational to recovery state
-            old = self._operational
+            # Force operational to recovery state    
             self._operational = self.config.operational_on_recovery(self._operational)
 
         elif new_lifecycle == LifecycleState.SHUTTING_DOWN:
             # Freeze operational
-            old = self._operational
             self._operational = self.config.operational_on_shutdown(self._operational)
 
         elif new_lifecycle == LifecycleState.OFFLINE:
             # Disable operational
-            old = self._operational
             self._operational = OperationalState.IDLE
 
         if old != self._operational:

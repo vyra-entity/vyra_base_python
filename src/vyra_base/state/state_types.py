@@ -50,6 +50,7 @@ class HealthState(Enum):
 
 # Valid state transitions for each layer (from -> to)
 LIFECYCLE_TRANSITIONS = {
+    (LifecycleState.OFFLINE, LifecycleState.INITIALIZING),
     (LifecycleState.INITIALIZING, LifecycleState.ACTIVE),
     (LifecycleState.INITIALIZING, LifecycleState.RECOVERING),
     (LifecycleState.ACTIVE, LifecycleState.SHUTTING_DOWN),
