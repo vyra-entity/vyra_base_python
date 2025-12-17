@@ -29,7 +29,7 @@ class UnifiedStateMachine:
         >>> usm = UnifiedStateMachine()
         >>> usm.start()  # Lifecycle
         >>> usm.complete_initialization()
-        >>> usm.ready()  # Operational
+        >>> usm.set_ready()  # Operational
         >>> usm.start_task({'task_id': '123'})
         >>> usm.report_warning({'cpu': '85%'})  # Health
         >>> usm.get_all_states()
