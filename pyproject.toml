@@ -26,6 +26,8 @@ python-dotenv = "^1.0.0"
 tomli = "^2.0.1"
 redis-om = "^0.3.0"
 PyYAML = "^6.0.0"
+grpcio = "^1.60.0"
+grpcio-tools = "^1.60.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.0"

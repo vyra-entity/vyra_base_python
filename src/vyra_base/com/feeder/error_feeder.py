@@ -5,7 +5,7 @@ from typing import Any, Union
 
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
-from vyra_base.com.handler.ros2_handler import ROS2Handler
+from vyra_base.com.handler.ros2 import ROS2Handler
 from vyra_base.defaults.entries import ErrorEntry, ModuleEntry
 from vyra_base.defaults.exceptions import FeederException
 

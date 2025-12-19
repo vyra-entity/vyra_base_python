@@ -3,7 +3,7 @@ from typing import Any
 
 from rclpy.node import Node
 
-from vyra_base.com.handler.communication_handler import CommunicationHandler
+from vyra_base.com.handler.communication import CommunicationHandler
 from vyra_base.com.datalayer.speaker import VyraSpeaker
 from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback

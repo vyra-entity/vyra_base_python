@@ -10,7 +10,7 @@ from rclpy.qos import (
     QoSDurabilityPolicy,
 )
 
-from vyra_base.com.handler.communication_handler import CommunicationHandler
+from vyra_base.com.handler.communication import CommunicationHandler
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.node import VyraNode
 from vyra_base.com.datalayer.speaker import VyraSpeaker

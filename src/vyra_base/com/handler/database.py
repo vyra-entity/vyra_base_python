@@ -1,6 +1,6 @@
 import asyncio
 
-from vyra_base.com.handler.communication_handler import CommunicationHandler
+from vyra_base.com.handler.communication import CommunicationHandler
 
 class DBCommunicationHandler(CommunicationHandler):
     """
@@ -24,7 +24,7 @@ class DBCommunicationHandler(CommunicationHandler):
         """
         super().__init__()
         self.database = database
-        self._feedLogger = FeedLogger(db_access=database)
+        # self._feedLogger = FeedLogger(db_access=database)
         self.loop = asyncio.get_event_loop()
 
     def emit(self, record):
@@ -44,4 +44,6 @@ class DBCommunicationHandler(CommunicationHandler):
 
         :param record: The log record to emit.
         """
-        await self._feedLogger.add(record)
+        # await self._feedLogger.add(record)
+        # tbd
+        pass
