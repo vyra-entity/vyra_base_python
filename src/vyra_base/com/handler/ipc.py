@@ -83,8 +83,8 @@ class GrpcUdsServer(GrpcUdsBase):
     
     Supports registering servicers for handling different RPC patterns.
     
-    Example:
-        ```python
+    Example::
+    
         class MyServiceServicer(my_service_pb2_grpc.MyServiceServicer):
             async def UnaryMethod(self, request, context):
                 return MyResponse(result="success")
@@ -99,7 +99,6 @@ class GrpcUdsServer(GrpcUdsBase):
             MyServiceServicer()
         )
         await server.start()
-        ```
     """
     
     def __init__(
@@ -209,8 +208,8 @@ class GrpcUdsClient(GrpcUdsBase):
     - call_client_streaming(): Client-side streaming
     - call_bidirectional_streaming(): Bidirectional streaming
     
-    Example:
-        ```python
+    Example::
+    
         client = GrpcUdsClient("/tmp/my_service.sock")
         await client.connect()
         
@@ -226,7 +225,6 @@ class GrpcUdsClient(GrpcUdsBase):
             MyRequest(data="test")
         ):
             print(response)
-        ```
     """
     
     def __init__(
@@ -310,15 +308,14 @@ class GrpcUdsClient(GrpcUdsBase):
         Returns:
             Response message
             
-        Example:
-            ```python
+        Example::
+        
             stub = MyServiceStub(client.channel)
             response = await client.call_unary(
                 stub.GetData,
                 GetDataRequest(id="123"),
                 timeout=5.0
             )
-            ```
         """
         try:
             response = await method(request, timeout=timeout)
@@ -344,15 +341,14 @@ class GrpcUdsClient(GrpcUdsBase):
         Yields:
             Response messages
             
-        Example:
-            ```python
+        Example::
+        
             stub = MyServiceStub(client.channel)
             async for response in client.call_server_streaming(
                 stub.StreamData,
-                StreamDataRequest(count=10)
+                StreamRequest(count=10)
             ):
                 print(response)
-            ```
         """
         try:
             call = method(request, timeout=timeout)
@@ -377,20 +373,19 @@ class GrpcUdsClient(GrpcUdsBase):
             timeout: Optional timeout in seconds
             
         Returns:
-            Response message
+            Final response message
             
-        Example:
-            ```python
+        Example::
+        
             async def request_generator():
                 for i in range(10):
-                    yield UploadDataRequest(chunk=f"data_{i}")
+                    yield UploadRequest(data=f"chunk_{i}")
             
             stub = MyServiceStub(client.channel)
             response = await client.call_client_streaming(
                 stub.UploadData,
                 request_generator()
             )
-            ```
         """
         try:
             response = await method(request_iterator, timeout=timeout)
@@ -416,8 +411,8 @@ class GrpcUdsClient(GrpcUdsBase):
         Yields:
             Response messages
             
-        Example:
-            ```python
+        Example::
+        
             async def request_generator():
                 for i in range(10):
                     yield ChatRequest(message=f"msg_{i}")
@@ -429,7 +424,7 @@ class GrpcUdsClient(GrpcUdsBase):
                 request_generator()
             ):
                 print(response.message)
-            ```
+            
         """
         try:
             call = method(request_iterator, timeout=timeout)
@@ -446,8 +441,8 @@ class GrpcUdsServiceRegistry:
     
     Useful for modules that need to provide multiple independent services.
     
-    Example:
-        ```python
+    Example::
+    
         registry = GrpcUdsServiceRegistry()
         
         # Register permission service
@@ -462,7 +457,6 @@ class GrpcUdsServiceRegistry:
         
         # Start all
         await registry.start_all()
-        ```
     """
     
     def __init__(self):
