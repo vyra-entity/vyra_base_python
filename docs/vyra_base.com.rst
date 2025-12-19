@@ -13,34 +13,10 @@ Subpackages
 Submodules
 ----------
 
-vyra\_base.com.handler.communication module
-----------------------------------------------------
+vyra\_base.com.handler module
+------------------------------
 
-.. automodule:: vyra_base.com.handler.communication
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-vyra\_base.com.handler.database module
------------------------------------------
-
-.. automodule:: vyra_base.com.handler.database
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-vyra\_base.com.handler.ros2 module
--------------------------------------------
-
-.. automodule:: vyra_base.com.handler.ros2
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-vyra\_base.com.handler.ipc module
--------------------------------------------
-
-.. automodule:: vyra_base.com.handler.ipc
+.. automodule:: vyra_base.com.handler
    :members:
    :show-inheritance:
    :undoc-members:

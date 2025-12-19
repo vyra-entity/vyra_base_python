@@ -48,7 +48,9 @@ autodoc_mock_imports = [
     "geometry_msgs", 
     "sensor_msgs",
     "builtin_interfaces",
-    "unique_identifier_msgs"
+    "unique_identifier_msgs",
+    "grpc",
+    "grpc.aio",
 ]
 
 templates_path = ['_templates']
