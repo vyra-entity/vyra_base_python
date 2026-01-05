@@ -76,7 +76,7 @@ event = StateEvent(
 | Event             | Auswirkung                                                                    |
 | ----------------- | ----------------------------------------------------------------------------- |
 | INTERRUPT         | Unterbricht aktuelle Operation, kann alle Layer betreffen                     |
-| EMERGENCY_STOP    | Not-Aus: Health→Critical, Lifecycle→ShuttingDown, Operational→Stopped         |
+| EMERGENCY_STOP    | Not-Aus: Health→Warning, Operational→Stopped         |
 | PRIORITY_OVERRIDE | Admin/Debug override für spezielle Systemzustände                             |
 
 ---

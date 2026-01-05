@@ -475,6 +475,11 @@ class StateMachine:
                 self._record_transition("operational", old.value, self._operational.value, event, True)
                 self._notify_callbacks("operational", old.value, self._operational.value)
     
+        elif event.event_type == EventType.PRIORITY_OVERRIDE:
+            # Priority override: no state change, just log
+            Logger.info("Priority override event received - no state change applied")
+
+
     # -------------------------------------------------------------------------
     # Internal - State Resolution
     # -------------------------------------------------------------------------
