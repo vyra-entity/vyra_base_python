@@ -47,6 +47,8 @@ from .lifecycle_layer import LifecycleLayer
 from .operational_layer import OperationalLayer
 from .health_layer import HealthLayer
 from .unified import UnifiedStateMachine
+from .operational_metaclass import MetaOperationalState, OperationalStateError
+from .operational_state_machine import OperationalStateMachine
 
 __all__ = [
     # Core engine
@@ -75,6 +77,10 @@ __all__ = [
     "HealthLayer",
     # Unified interface (recommended)
     "UnifiedStateMachine",
+    # Metaclass-based operational state machine
+    "MetaOperationalState",
+    "OperationalStateError",
+    "OperationalStateMachine",
 ]
 
 __version__ = "3.0.0"

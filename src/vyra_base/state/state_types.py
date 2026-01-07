@@ -32,7 +32,6 @@ class OperationalState(Enum):
     IDLE = "Idle"                     # Inactive, waiting for work (Resting)
     READY = "Ready"                   # Prepared to accept tasks (Attentive)
     RUNNING = "Running"               # Actively executing a task (Active)
-    BACKGROUND_RUNNING = "BackgroundRunning"  # Running background tasks
     PAUSED = "Paused"                 # Task suspended, can resume
     STOPPED = "Stopped"               # Process stopped, need to reset and reinitialize
 
@@ -63,13 +62,11 @@ LIFECYCLE_TRANSITIONS = {
 OPERATIONAL_TRANSITIONS = {
     (OperationalState.IDLE, OperationalState.READY),
     (OperationalState.READY, OperationalState.RUNNING),
+    (OperationalState.READY, OperationalState.STOPPED),
     (OperationalState.RUNNING, OperationalState.PAUSED),
     (OperationalState.RUNNING, OperationalState.STOPPED),
-    (OperationalState.RUNNING, OperationalState.BACKGROUND_RUNNING),
-    (OperationalState.BACKGROUND_RUNNING, OperationalState.RUNNING),
-    (OperationalState.BACKGROUND_RUNNING, OperationalState.PAUSED),
-    (OperationalState.BACKGROUND_RUNNING, OperationalState.STOPPED),
     (OperationalState.PAUSED, OperationalState.READY),
+    (OperationalState.PAUSED, OperationalState.STOPPED),
     (OperationalState.STOPPED, OperationalState.IDLE)
 }
 
@@ -89,7 +86,6 @@ LIFECYCLE_OPERATIONAL_RULES = {
         OperationalState.IDLE,
         OperationalState.READY,
         OperationalState.RUNNING,
-        OperationalState.BACKGROUND_RUNNING,
         OperationalState.PAUSED,
         OperationalState.STOPPED
     },

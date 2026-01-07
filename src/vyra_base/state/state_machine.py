@@ -503,14 +503,14 @@ class StateMachine:
         transitions = {
             (OperationalState.IDLE, EventType.SET_READY): OperationalState.READY,
             (OperationalState.READY, EventType.TASK_START): OperationalState.RUNNING,
+            (OperationalState.READY, EventType.TASK_STOP): OperationalState.STOPPED,
             (OperationalState.RUNNING, EventType.TASK_START): OperationalState.RUNNING,
             (OperationalState.RUNNING, EventType.TASK_PAUSE): OperationalState.PAUSED,
             (OperationalState.RUNNING, EventType.TASK_STOP): OperationalState.STOPPED,
             (OperationalState.PAUSED, EventType.TASK_RESUME): OperationalState.RUNNING,
+            (OperationalState.PAUSED, EventType.SET_READY): OperationalState.READY,
+            (OperationalState.PAUSED, EventType.TASK_STOP): OperationalState.STOPPED,
             (OperationalState.STOPPED, EventType.TASK_RESET): OperationalState.IDLE,
-            (OperationalState.RUNNING, EventType.SET_BACKGROUND): OperationalState.BACKGROUND_RUNNING,
-            (OperationalState.READY, EventType.SET_BACKGROUND): OperationalState.BACKGROUND_RUNNING,
-            (OperationalState.BACKGROUND_RUNNING, EventType.SET_FOREGROUND): OperationalState.READY,
         }
         return transitions.get((current, event_type))
     
