@@ -34,6 +34,7 @@ class EventType(Enum):
     TASK_COMPLETE = "task_complete"
     TASK_STOP = "task_stop"
     TASK_RESET = "task_reset"
+    TASK_ERROR = "task_error"  # Task failed, go to ERROR state
     
     # Health events
     WARN = "warn"
@@ -104,6 +105,7 @@ EVENT_LAYER_MAP = {
     EventType.TASK_RESUME: "operational",
     EventType.TASK_STOP: "operational",
     EventType.TASK_RESET: "operational",
+    EventType.TASK_ERROR: "operational",
     
     # Health events
     EventType.WARN: "health",

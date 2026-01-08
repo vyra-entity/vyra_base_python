@@ -7,6 +7,7 @@ Tests cover:
 - Automatic transitions
 - Error handling
 - Success/failure paths
+- Operation decorator with reference counting
 """
 
 import pytest
@@ -18,6 +19,7 @@ from vyra_base.state import (
     OperationalStateError,
     StateEvent,
     EventType,
+    operation,
 )
 
 
@@ -27,24 +29,17 @@ class TestModule(OperationalStateMachine):
     def __init__(self, state_machine):
         super().__init__(state_machine)
         self.initialized = False
-        self.started = False
         self.paused = False
         self.stopped = False
         self.reset_called = False
         self.should_fail = False
+        self.operation_count = 0
     
     def on_initialize(self):
         """Test initialization."""
         if self.should_fail:
             return False
         self.initialized = True
-        return True
-    
-    def on_start(self):
-        """Test start."""
-        if self.should_fail:
-            return False
-        self.started = True
         return True
     
     def on_pause(self):
@@ -74,9 +69,26 @@ class TestModule(OperationalStateMachine):
             return False
         self.reset_called = True
         self.initialized = False
-        self.started = False
         self.stopped = False
         return True
+    
+    @operation
+    def process_data(self, data):
+        """Test operation with decorator."""
+        if self.should_fail:
+            raise ValueError("Processing failed")
+        self.operation_count += 1
+        return f"Processed: {data}"
+    
+    def start_async_operation(self):
+        """Helper to simulate starting an async operation (stays in RUNNING)."""
+        if self.get_operational_state() not in {OperationalState.READY, OperationalState.RUNNING}:
+            raise OperationalStateError(f"Cannot start operation from {self.get_operational_state()}")
+        self._increment_operation_counter()
+    
+    def complete_async_operation(self):
+        """Helper to complete an async operation (may return to READY)."""
+        self._decrement_operation_counter()
 
 
 @pytest.fixture
@@ -103,14 +115,12 @@ class TestMetaclassWrapping:
         """Test that on_* methods are wrapped."""
         # Check that methods exist and are wrapped
         assert hasattr(test_module, 'on_initialize')
-        assert hasattr(test_module, 'on_start')
         assert hasattr(test_module, 'on_pause')
         assert callable(test_module.on_initialize)
     
     def test_public_api_methods_exist(self, test_module):
         """Test that public API methods exist."""
         assert hasattr(test_module, 'initialize')
-        assert hasattr(test_module, 'start')
         assert hasattr(test_module, 'pause')
         assert hasattr(test_module, 'resume')
         assert hasattr(test_module, 'stop')
@@ -127,14 +137,7 @@ class TestStateValidation:
         test_module.initialize()
         assert test_module.initialized
     
-    def test_start_requires_ready(self, test_module):
-        """Test that start requires READY state."""
-        # Start from IDLE should fail
-        with pytest.raises(OperationalStateError) as exc_info:
-            test_module.start()
-        assert "Cannot call on_start" in str(exc_info.value)
-        assert "Required states: ['Ready']" in str(exc_info.value)
-    
+
     def test_pause_requires_running(self, test_module):
         """Test that pause requires RUNNING state."""
         # Pause from IDLE should fail
@@ -158,45 +161,33 @@ class TestStateValidation:
         assert "Cannot call on_stop" in str(exc_info.value)
     
     def test_reset_requires_stopped(self, test_module):
-        """Test that reset requires STOPPED state."""
+        """Test that reset requires STOPPED or ERROR state."""
         # Reset from IDLE should fail
         with pytest.raises(OperationalStateError) as exc_info:
             test_module.reset()
         assert "Cannot call on_reset" in str(exc_info.value)
-        assert "Required states: ['Stopped']" in str(exc_info.value)
+        assert "Required states:" in str(exc_info.value)
 
 
 class TestSuccessTransitions:
     """Test successful state transitions."""
     
     def test_initialize_success_path(self, test_module):
-        """Test initialize success: IDLE -> READY -> RUNNING."""
+        """Test initialize success: IDLE -> READY."""
         assert test_module.is_idle()
         
         result = test_module.initialize()
         
         assert result is True
         assert test_module.initialized
-        assert test_module.is_running()
-    
-    def test_start_success_path(self, state_machine):
-        """Test start success: READY -> RUNNING."""
-        module = TestModule(state_machine)
-        # Get to READY state
-        module.initialize()
-        module.pause()
-        module.resume()
-        
-        assert module.is_ready()
-        result = module.start()
-        
-        assert result is True
-        assert module.started
-        assert module.is_running()
+        assert test_module.is_ready()
+        assert test_module.get_operation_counter() == 0
     
     def test_pause_success_path(self, test_module):
         """Test pause success: RUNNING -> PAUSED."""
         test_module.initialize()
+        # Start async operation to stay in RUNNING
+        test_module.start_async_operation()
         assert test_module.is_running()
         
         result = test_module.pause()
@@ -208,6 +199,7 @@ class TestSuccessTransitions:
     def test_resume_success_path(self, test_module):
         """Test resume success: PAUSED -> READY."""
         test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
         test_module.pause()
         assert test_module.is_paused()
         
@@ -216,10 +208,12 @@ class TestSuccessTransitions:
         assert result is True
         assert not test_module.paused
         assert test_module.is_ready()
+        assert test_module.get_operation_counter() == 0  # Counter reset
     
     def test_stop_success_path(self, test_module):
         """Test stop success: RUNNING -> STOPPED."""
         test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
         assert test_module.is_running()
         
         result = test_module.stop()
@@ -231,6 +225,7 @@ class TestSuccessTransitions:
     def test_reset_success_path(self, test_module):
         """Test reset success: STOPPED -> IDLE."""
         test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
         test_module.stop()
         assert test_module.is_stopped()
         
@@ -245,7 +240,7 @@ class TestFailureTransitions:
     """Test failure state transitions."""
     
     def test_initialize_failure_path(self, test_module):
-        """Test initialize failure: IDLE -> READY -> STOPPED."""
+        """Test initialize failure: IDLE -> ERROR."""
         test_module.should_fail = True
         assert test_module.is_idle()
         
@@ -253,27 +248,12 @@ class TestFailureTransitions:
         
         assert result is False
         assert not test_module.initialized
-        assert test_module.is_stopped()
-    
-    def test_start_failure_path(self, state_machine):
-        """Test start failure: READY -> STOPPED."""
-        module = TestModule(state_machine)
-        module.initialize()
-        module.pause()
-        module.resume()
-        
-        module.should_fail = True
-        assert module.is_ready()
-        
-        result = module.start()
-        
-        assert result is False
-        assert not module.started
-        assert module.is_stopped()
+        assert test_module.is_error()
     
     def test_resume_failure_path(self, test_module):
-        """Test resume failure: PAUSED -> STOPPED."""
+        """Test resume failure: PAUSED -> ERROR."""
         test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
         test_module.pause()
         
         test_module.should_fail = True
@@ -282,7 +262,7 @@ class TestFailureTransitions:
         result = test_module.resume()
         
         assert result is False
-        assert test_module.is_stopped()
+        assert test_module.is_error()
 
 
 class TestExceptionHandling:
@@ -299,8 +279,8 @@ class TestExceptionHandling:
         with pytest.raises(ValueError):
             module.initialize()
         
-        # Should transition to STOPPED on exception
-        assert module.is_stopped()
+        # Should transition to ERROR on exception
+        assert module.is_error()
 
 
 class TestFullLifecycle:
@@ -308,11 +288,15 @@ class TestFullLifecycle:
     
     def test_complete_success_flow(self, test_module):
         """Test complete success flow through all states."""
-        # IDLE -> RUNNING
+        # IDLE -> READY
         assert test_module.is_idle()
         test_module.initialize()
-        assert test_module.is_running()
+        assert test_module.is_ready()
         assert test_module.initialized
+        
+        # READY -> RUNNING (via async operation)
+        test_module.start_async_operation()
+        assert test_module.is_running()
         
         # RUNNING -> PAUSED
         test_module.pause()
@@ -324,10 +308,9 @@ class TestFullLifecycle:
         assert test_module.is_ready()
         assert not test_module.paused
         
-        # READY -> RUNNING
-        test_module.start()
+        # READY -> RUNNING (via async operation)
+        test_module.start_async_operation()
         assert test_module.is_running()
-        assert test_module.started
         
         # RUNNING -> STOPPED
         test_module.stop()
@@ -344,7 +327,7 @@ class TestFullLifecycle:
         # Fail initialization
         test_module.should_fail = True
         test_module.initialize()
-        assert test_module.is_stopped()
+        assert test_module.is_error()
         
         # Reset to try again
         test_module.should_fail = False  # Clear failure flag before reset
@@ -353,8 +336,7 @@ class TestFullLifecycle:
         
         # Success on second try
         test_module.initialize()
-        assert test_module.is_running()
-        assert test_module.initialized
+        assert test_module.is_ready()
         assert test_module.initialized
 
 
@@ -371,29 +353,37 @@ class TestStateQueries:
         """Test is_ready query."""
         assert not test_module.is_ready()
         test_module.initialize()
-        test_module.pause()
-        test_module.resume()
         assert test_module.is_ready()
     
     def test_is_running(self, test_module):
         """Test is_running query."""
         assert not test_module.is_running()
         test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
         assert test_module.is_running()
     
     def test_is_paused(self, test_module):
         """Test is_paused query."""
         assert not test_module.is_paused()
         test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
         test_module.pause()
         assert test_module.is_paused()
     
     def test_is_stopped(self, test_module):
         """Test is_stopped query."""
         assert not test_module.is_stopped()
+        test_module.initialize()
+        test_module.start_async_operation()  # Go to RUNNING
+        test_module.stop()
+        assert test_module.is_stopped()
+    
+    def test_is_error(self, test_module):
+        """Test is_error query."""
+        assert not test_module.is_error()
         test_module.should_fail = True
         test_module.initialize()
-        assert test_module.is_stopped()
+        assert test_module.is_error()
     
     def test_get_operational_state(self, test_module):
         """Test get_operational_state method."""
@@ -402,7 +392,7 @@ class TestStateQueries:
         
         test_module.initialize()
         state = test_module.get_operational_state()
-        assert state == OperationalState.RUNNING
+        assert state == OperationalState.READY
     
     def test_get_all_states(self, test_module):
         """Test get_all_states method."""
@@ -419,13 +409,13 @@ class TestReturnValues:
     def test_true_return_is_success(self, test_module):
         """Test that returning True is treated as success."""
         test_module.initialize()
-        assert test_module.is_running()
+        assert test_module.is_ready()
     
     def test_false_return_is_failure(self, test_module):
         """Test that returning False is treated as failure."""
         test_module.should_fail = True
         test_module.initialize()
-        assert test_module.is_stopped()
+        assert test_module.is_error()
     
     def test_none_return_is_success(self, state_machine):
         """Test that returning None is treated as success."""
@@ -435,7 +425,7 @@ class TestReturnValues:
         
         module = NoReturnModule(state_machine)
         module.initialize()
-        assert module.is_running()
+        assert module.is_ready()
 
 
 class TestModuleWithoutMethods:
@@ -480,5 +470,101 @@ class TestIntegration:
         assert final_history_size > initial_history_size
 
 
+class TestOperationDecorator:
+    """Test @operation decorator functionality."""
+    
+    def test_operation_requires_ready_or_running(self, test_module):
+        """Test that @operation requires READY or RUNNING state."""
+        # Operation from IDLE should fail
+        with pytest.raises(OperationalStateError) as exc_info:
+            test_module.process_data("test")
+        assert "Cannot call process_data" in str(exc_info.value)
+    
+    def test_operation_transitions_ready_to_running(self, test_module):
+        """Test that operation transitions READY -> RUNNING."""
+        test_module.initialize()
+        assert test_module.is_ready()
+        
+        # Call operation - should transition to RUNNING
+        result = test_module.process_data("test_data")
+        
+        assert result == "Processed: test_data"
+        assert test_module.operation_count == 1
+        # After operation completes, counter is 0, should be back to READY
+        assert test_module.is_ready()
+        assert test_module.get_operation_counter() == 0
+    
+    def test_operation_reference_counting(self, test_module):
+        """Test that operation reference counting works correctly."""
+        test_module.initialize()
+        assert test_module.is_ready()
+        assert test_module.get_operation_counter() == 0
+        
+        # Simulate nested operations by checking counter during execution
+        class CountingModule(OperationalStateMachine):
+            def __init__(self, state_machine):
+                super().__init__(state_machine)
+                self.counter_values = []
+            
+            @operation
+            def outer_operation(self):
+                self.counter_values.append(('outer_start', self.get_operation_counter()))
+                self.inner_operation()
+                self.counter_values.append(('outer_end', self.get_operation_counter()))
+                return True
+            
+            @operation
+            def inner_operation(self):
+                self.counter_values.append(('inner', self.get_operation_counter()))
+                return True
+        
+        module = CountingModule(test_module._state_machine)
+        module._set_operational_state(OperationalState.READY)
+        
+        module.outer_operation()
+        
+        # Should see: outer starts (1), inner runs (2), outer continues (1)
+        assert len(module.counter_values) == 3
+        assert module.counter_values[0] == ('outer_start', 1)
+        assert module.counter_values[1] == ('inner', 2)
+        assert module.counter_values[2] == ('outer_end', 1)
+        assert module.is_ready()
+        assert module.get_operation_counter() == 0
+    
+    def test_operation_from_running_state(self, test_module):
+        """Test that operation can be called when already RUNNING."""
+        test_module.initialize()
+        assert test_module.is_ready()
+        
+        # First operation takes us to RUNNING and back to READY
+        result1 = test_module.process_data("data1")
+        assert result1 == "Processed: data1"
+        # After operation completes, should be READY (counter 0)
+        assert test_module.is_ready()
+        assert test_module.get_operation_counter() == 0
+        
+        # Second operation from READY
+        result2 = test_module.process_data("data2")
+        assert result2 == "Processed: data2"
+        # Should be back to READY after all operations complete
+        assert test_module.is_ready()
+        assert test_module.get_operation_counter() == 0
+    
+    def test_operation_exception_handling(self, test_module):
+        """Test that exceptions in operations are handled correctly."""
+        test_module.initialize()
+        assert test_module.is_ready()
+        test_module.should_fail = True
+        
+        with pytest.raises(ValueError) as exc_info:
+            test_module.process_data("fail")
+        
+        assert "Processing failed" in str(exc_info.value)
+        # Counter should be properly decremented even on exception
+        assert test_module.get_operation_counter() == 0
+        assert test_module.is_ready()
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+

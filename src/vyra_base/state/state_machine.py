@@ -502,15 +502,21 @@ class StateMachine:
         """Determine target operational state for given event."""
         transitions = {
             (OperationalState.IDLE, EventType.SET_READY): OperationalState.READY,
+            (OperationalState.IDLE, EventType.TASK_ERROR): OperationalState.ERROR,
             (OperationalState.READY, EventType.TASK_START): OperationalState.RUNNING,
             (OperationalState.READY, EventType.TASK_STOP): OperationalState.STOPPED,
+            (OperationalState.READY, EventType.TASK_ERROR): OperationalState.ERROR,
             (OperationalState.RUNNING, EventType.TASK_START): OperationalState.RUNNING,
+            (OperationalState.RUNNING, EventType.SET_READY): OperationalState.READY,
             (OperationalState.RUNNING, EventType.TASK_PAUSE): OperationalState.PAUSED,
             (OperationalState.RUNNING, EventType.TASK_STOP): OperationalState.STOPPED,
+            (OperationalState.RUNNING, EventType.TASK_ERROR): OperationalState.ERROR,
             (OperationalState.PAUSED, EventType.TASK_RESUME): OperationalState.RUNNING,
             (OperationalState.PAUSED, EventType.SET_READY): OperationalState.READY,
             (OperationalState.PAUSED, EventType.TASK_STOP): OperationalState.STOPPED,
+            (OperationalState.PAUSED, EventType.TASK_ERROR): OperationalState.ERROR,
             (OperationalState.STOPPED, EventType.TASK_RESET): OperationalState.IDLE,
+            (OperationalState.ERROR, EventType.TASK_RESET): OperationalState.IDLE,
         }
         return transitions.get((current, event_type))
     

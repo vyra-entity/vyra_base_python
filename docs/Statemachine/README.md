@@ -63,6 +63,36 @@ Themen:
 
 ---
 
+### **5. [OPERATIONAL_STATE_MACHINE_API_COMPLETE.md](./OPERATIONAL_STATE_MACHINE_API_COMPLETE.md)**
+**Operational State Machine API** - Vollständige API-Referenz für Module
+
+Themen:
+- Static Lifecycle Methods (on_initialize, on_pause, on_resume, on_stop, on_reset)
+- Dynamic Operations mit @operation Decorator
+- Reference Counting für concurrent operations
+- ERROR State und Error Recovery
+- State Query Methods
+- Best Practices und Troubleshooting
+- Komplette Code-Beispiele
+
+**Start hier für:** Module implementieren, @operation nutzen, State Management
+
+---
+
+### **6. [operational_state_machine.md](./operational_state_machine.md)**
+**Operational State Machine Details** - Konzepte und Patterns
+
+**Start hier für:** Operationale States verstehen, Module-Design
+
+---
+
+### **7. [operational_state_machine_quick_reference.md](./operational_state_machine_quick_reference.md)**
+**Quick Reference** - Schnellübersicht für Entwickler
+
+**Start hier für:** Schnelle Nachschlagewerk während Entwicklung
+
+---
+
 ## 🚀 **Quick Start**
 
 ### Minimal Example:
@@ -104,9 +134,15 @@ usm.complete_shutdown()          # ShuttingDown → Offline
 3. [Transitions.md](./Transitions.md) - Wie wechseln States
 
 ### **Ich will die State Machine nutzen:**
-1. [3_Layer_Statemachine.md](./3_Layer_Statemachine.md) - Section "UnifiedStateMachine"
-2. [Events.md](./Events.md) - Events senden und empfangen
-3. Code: `src/vyra_base/state/unified.py`
+1. [OPERATIONAL_STATE_MACHINE_API_COMPLETE.md](./OPERATIONAL_STATE_MACHINE_API_COMPLETE.md) - Modul-API Referenz
+2. [3_Layer_Statemachine.md](./3_Layer_Statemachine.md) - Section "UnifiedStateMachine"
+3. [Events.md](./Events.md) - Events senden und empfangen
+4. Code: `src/vyra_base/state/unified.py`
+
+### **Ich will Module mit @operation erstellen:**
+1. [OPERATIONAL_STATE_MACHINE_API_COMPLETE.md](./OPERATIONAL_STATE_MACHINE_API_COMPLETE.md) - Vollständige API-Referenz
+2. [operational_state_machine_quick_reference.md](./operational_state_machine_quick_reference.md) - Quick Reference
+3. Code: `src/vyra_base/state/operational_state_machine.py`
 
 ### **Ich will Events verstehen:**
 1. [Events.md](./Events.md) - Komplette Event-Dokumentation

@@ -6,7 +6,6 @@ industrial automation standards (ISO 13849, IEC 61508).
 """
 
 from enum import Enum
-from typing import Set
 
 
 class LifecycleState(Enum):
@@ -34,6 +33,7 @@ class OperationalState(Enum):
     RUNNING = "Running"               # Actively executing a task (Active)
     PAUSED = "Paused"                 # Task suspended, can resume
     STOPPED = "Stopped"               # Process stopped, need to reset and reinitialize
+    ERROR = "Error"                   # Error state, requires reset to recover
 
 
 class HealthState(Enum):
@@ -61,13 +61,18 @@ LIFECYCLE_TRANSITIONS = {
 
 OPERATIONAL_TRANSITIONS = {
     (OperationalState.IDLE, OperationalState.READY),
+    (OperationalState.IDLE, OperationalState.ERROR),
     (OperationalState.READY, OperationalState.RUNNING),
-    (OperationalState.READY, OperationalState.STOPPED),
+    (OperationalState.READY, OperationalState.ERROR),
+    (OperationalState.RUNNING, OperationalState.READY),
     (OperationalState.RUNNING, OperationalState.PAUSED),
     (OperationalState.RUNNING, OperationalState.STOPPED),
+    (OperationalState.RUNNING, OperationalState.ERROR),
     (OperationalState.PAUSED, OperationalState.READY),
     (OperationalState.PAUSED, OperationalState.STOPPED),
-    (OperationalState.STOPPED, OperationalState.IDLE)
+    (OperationalState.PAUSED, OperationalState.ERROR),
+    (OperationalState.STOPPED, OperationalState.IDLE),
+    (OperationalState.ERROR, OperationalState.IDLE),
 }
 
 HEALTH_TRANSITIONS = {
@@ -87,19 +92,23 @@ LIFECYCLE_OPERATIONAL_RULES = {
         OperationalState.READY,
         OperationalState.RUNNING,
         OperationalState.PAUSED,
-        OperationalState.STOPPED
+        OperationalState.STOPPED,
+        OperationalState.ERROR
     },
     LifecycleState.RECOVERING: {          # Limited operational states
         OperationalState.IDLE,
         OperationalState.PAUSED,
         OperationalState.STOPPED,
+        OperationalState.ERROR,
     },
     LifecycleState.SHUTTING_DOWN: {       # Freezing operational state
-        OperationalState.IDLE
+        OperationalState.IDLE,
+        OperationalState.ERROR
     },
     LifecycleState.OFFLINE: {         # Only idle when offline
         OperationalState.IDLE,
-        OperationalState.STOPPED
+        OperationalState.STOPPED,
+        OperationalState.ERROR
     },
 }
 

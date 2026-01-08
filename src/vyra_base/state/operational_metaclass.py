@@ -25,8 +25,9 @@ class MetaOperationalState(type):
     """
     Metaclass that automatically manages operational state transitions.
     
-    This metaclass wraps user-defined lifecycle methods (prefixed with 'on_')
+    This metaclass wraps user-defined lifecycle methods (prefixed with ``on_``)
     and automatically handles:
+    
     - Pre-condition state validation
     - State transitions before method execution
     - Success/failure state transitions after method execution
@@ -34,35 +35,39 @@ class MetaOperationalState(type):
     
     Supported lifecycle methods and their state transitions:
     
-    on_initialize():
+    ``on_initialize()``:
         Pre-condition: IDLE
-        Before execution: IDLE -> READY
-        On success: READY -> RUNNING
-        On failure: READY -> STOPPED
+        
+        On success: IDLE -> READY (resets operation counter)
+        
+        On failure: IDLE -> ERROR
     
-    on_start():
-        Pre-condition: READY
-        On success: READY -> RUNNING
-        On failure: READY -> STOPPED
-    
-    on_pause():
+    ``on_pause()``:
         Pre-condition: RUNNING
+        
         On success: RUNNING -> PAUSED
+        
         On failure: No state change
     
-    on_resume():
+    ``on_resume()``:
         Pre-condition: PAUSED
-        On success: PAUSED -> READY
-        On failure: PAUSED -> STOPPED
+        
+        On success: PAUSED -> READY (resets operation counter)
+        
+        On failure: PAUSED -> ERROR
     
-    on_stop():
+    ``on_stop()``:
         Pre-condition: RUNNING, PAUSED
+        
         On success: (current) -> STOPPED
-        On failure: No state change
+        
+        On failure: (current) -> ERROR
     
-    on_reset():
-        Pre-condition: STOPPED
-        On success: STOPPED -> IDLE
+    ``on_reset()``:
+        Pre-condition: STOPPED, ERROR
+        
+        On success: (current) -> IDLE
+        
         On failure: No state change
     
     Example:
@@ -72,52 +77,47 @@ class MetaOperationalState(type):
         ...         print("Initializing...")
         ...         return True
         ...
-        ...     def on_start(self):
-        ...         # Start main processing
-        ...         print("Starting...")
-        ...         return True
         >>>
         >>> module = MyModule(state_machine)
-        >>> module.initialize()  # Automatically: IDLE -> READY, execute, READY -> RUNNING
+        >>> module.initialize()  # Automatically: IDLE -> READY on success
     """
     
     # Mapping of lifecycle methods to their state transition rules
     STATE_RULES = {
         'on_initialize': {
             'required_states': {OperationalState.IDLE},
-            'pre_transition': OperationalState.READY,
-            'success_transition': OperationalState.RUNNING,
-            'failure_transition': OperationalState.STOPPED,
-        },
-        'on_start': {
-            'required_states': {OperationalState.READY},
             'pre_transition': None,
-            'success_transition': OperationalState.RUNNING,
-            'failure_transition': OperationalState.STOPPED,
+            'success_transition': OperationalState.READY,
+            'failure_transition': OperationalState.ERROR,
+            'reset_counter': True,  # Reset operation counter on success
         },
         'on_pause': {
             'required_states': {OperationalState.RUNNING},
             'pre_transition': None,
             'success_transition': OperationalState.PAUSED,
-            'failure_transition': None,
+            'failure_transition': OperationalState.ERROR,
+            'reset_counter': False,
         },
         'on_resume': {
             'required_states': {OperationalState.PAUSED},
             'pre_transition': None,
             'success_transition': OperationalState.READY,
-            'failure_transition': OperationalState.STOPPED,
+            'failure_transition': OperationalState.ERROR,
+            'reset_counter': True,  # Reset operation counter on success
         },
         'on_stop': {
             'required_states': {OperationalState.RUNNING, OperationalState.PAUSED},
             'pre_transition': None,
             'success_transition': OperationalState.STOPPED,
-            'failure_transition': None,
+            'failure_transition': OperationalState.ERROR,
+            'reset_counter': False,
         },
         'on_reset': {
-            'required_states': {OperationalState.STOPPED},
+            'required_states': {OperationalState.STOPPED, OperationalState.ERROR},
             'pre_transition': None,
             'success_transition': OperationalState.IDLE,
             'failure_transition': None,
+            'reset_counter': False,
         },
     }
     
@@ -201,6 +201,12 @@ class MetaOperationalState(type):
             if success and rules['success_transition'] is not None:
                 new_state = rules['success_transition']
                 logger.info(f"Success transition: {self.get_operational_state().value} -> {new_state.value}")
+                
+                # Reset operation counter if specified
+                if rules.get('reset_counter', False):
+                    logger.debug(f"Resetting operation counter (was {self.get_operation_counter()})")
+                    self._reset_operation_counter()
+                
                 self._set_operational_state(new_state)
             elif not success and rules['failure_transition'] is not None:
                 new_state = rules['failure_transition']
