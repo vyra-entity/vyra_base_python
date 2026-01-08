@@ -28,7 +28,7 @@ class SimpleModule(OperationalStateMachine):
         self.data = None
         self.is_processing = False
     
-    def on_initialize(self):
+    def initialize(self):
         """
         Initialize the module.
         
@@ -43,7 +43,7 @@ class SimpleModule(OperationalStateMachine):
         print("SimpleModule: Hardware initialized")
         return True  # Success
     
-    def on_start(self):
+    def start(self):
         """
         Start main processing.
         
@@ -102,20 +102,20 @@ class FullLifecycleModule(OperationalStateMachine):
         self.tasks = []
         self.paused_at = None
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize with configuration."""
         print("FullLifecycle: Loading configuration...")
         self.config = {"max_tasks": 10, "timeout": 30}
         print(f"FullLifecycle: Config loaded: {self.config}")
         return True
     
-    def on_start(self):
+    def start(self):
         """Start task processing."""
         print("FullLifecycle: Starting task processing...")
         self.tasks = []
         return True
     
-    def on_pause(self):
+    def pause(self):
         """
         Pause current processing.
         
@@ -128,7 +128,7 @@ class FullLifecycleModule(OperationalStateMachine):
         self.paused_at = time.time()
         return True
     
-    def on_resume(self):
+    def resume(self):
         """
         Resume paused processing.
         
@@ -145,7 +145,7 @@ class FullLifecycleModule(OperationalStateMachine):
         self.paused_at = None
         return True
     
-    def on_stop(self):
+    def stop(self):
         """
         Stop processing.
         
@@ -157,7 +157,7 @@ class FullLifecycleModule(OperationalStateMachine):
         print(f"FullLifecycle: Processed {len(self.tasks)} tasks")
         return True
     
-    def on_reset(self):
+    def reset(self):
         """
         Reset to initial state.
         
@@ -192,33 +192,38 @@ def example_full_lifecycle():
     module = FullLifecycleModule(fsm)
     print(f"Initial state: {module.get_operational_state().value}\n")
     
-    # Initialize (IDLE -> READY -> RUNNING)
+    # Initialize (IDLE -> READY)
     print("1. Initializing...")
     module.initialize()
     print(f"   State: {module.get_operational_state().value}\n")
     
+    # Start an operation to go READY -> RUNNING
+    print("2. Starting operation (READY -> RUNNING)...")
+    module._increment_operation_counter()  # Simulate operation start
+    print(f"   State: {module.get_operational_state().value}\n")
+    
     # Pause (RUNNING -> PAUSED)
-    print("2. Pausing...")
+    print("3. Pausing...")
     module.pause()
     print(f"   State: {module.get_operational_state().value}\n")
     
     # Resume (PAUSED -> READY)
-    print("3. Resuming...")
+    print("4. Resuming...")
     module.resume()
     print(f"   State: {module.get_operational_state().value}\n")
     
-    # Start (READY -> RUNNING)
-    print("4. Starting...")
-    module.start()
+    # Start another operation (READY -> RUNNING)
+    print("5. Starting operation again...")
+    module._increment_operation_counter()
     print(f"   State: {module.get_operational_state().value}\n")
     
     # Stop (RUNNING -> STOPPED)
-    print("5. Stopping...")
+    print("6. Stopping...")
     module.stop()
     print(f"   State: {module.get_operational_state().value}\n")
     
     # Reset (STOPPED -> IDLE)
-    print("6. Resetting...")
+    print("7. Resetting...")
     module.reset()
     print(f"   State: {module.get_operational_state().value}\n")
 
@@ -236,7 +241,7 @@ class ErrorHandlingModule(OperationalStateMachine):
         super().__init__(state_machine)
         self.fail_initialization = False
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize with potential failure."""
         print("ErrorHandling: Attempting initialization...")
         
@@ -247,7 +252,7 @@ class ErrorHandlingModule(OperationalStateMachine):
         print("ErrorHandling: Initialization SUCCESS!")
         return True
     
-    def on_start(self):
+    def start(self):
         """Start with exception handling."""
         print("ErrorHandling: Starting...")
         # Exceptions are automatically caught and treated as failures
@@ -274,7 +279,7 @@ def example_error_handling():
     module1.fail_initialization = False
     module1.initialize()
     print(f"Final state: {module1.get_operational_state().value}")
-    print(f"Expected: RUNNING (success path: IDLE -> READY -> RUNNING)\n")
+    print(f"Expected: READY (success path: IDLE -> READY)\n")
     
     # Failed initialization
     print("Scenario B: Failed Initialization")
@@ -288,7 +293,7 @@ def example_error_handling():
     module2.fail_initialization = True
     module2.initialize()
     print(f"Final state: {module2.get_operational_state().value}")
-    print(f"Expected: STOPPED (failure path: IDLE -> READY -> STOPPED)\n")
+    print(f"Expected: ERROR (failure path: IDLE -> ERROR)\n")
 
 
 # =============================================================================
@@ -339,7 +344,7 @@ class IntegratedModule(OperationalStateMachine):
     def __init__(self, state_machine):
         super().__init__(state_machine)
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize and check all layers."""
         print("Integrated: Initializing...")
         
@@ -351,7 +356,7 @@ class IntegratedModule(OperationalStateMachine):
         
         return True
     
-    def on_start(self):
+    def start(self):
         """Start processing."""
         print("Integrated: Starting...")
         return True

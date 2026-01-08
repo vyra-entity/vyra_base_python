@@ -27,7 +27,7 @@ The `OperationalStateMachine` provides automatic operational state management th
 
 ## Lifecycle Methods and State Transitions
 
-### `on_initialize()`
+### `initialize()`
 **Purpose**: Setup and initialization logic
 
 **State Transitions**:
@@ -38,7 +38,7 @@ The `OperationalStateMachine` provides automatic operational state management th
 
 **Example**:
 ```python
-def on_initialize(self):
+def initialize(self):
     """Initialize hardware and load configuration."""
     self.config = load_config()
     self.hardware = setup_hardware()
@@ -61,7 +61,7 @@ def on_start(self):
     return True  # Success
 ```
 
-### `on_pause()`
+### `pause()`
 **Purpose**: Pause current operation
 
 **State Transitions**:
@@ -71,13 +71,13 @@ def on_start(self):
 
 **Example**:
 ```python
-def on_pause(self):
+def pause(self):
     """Pause task processing."""
     self.save_checkpoint()
     return True  # Success
 ```
 
-### `on_resume()`
+### `resume()`
 **Purpose**: Resume paused operation
 
 **State Transitions**:
@@ -87,13 +87,13 @@ def on_pause(self):
 
 **Example**:
 ```python
-def on_resume(self):
+def resume(self):
     """Resume from paused state."""
     self.restore_checkpoint()
     return True  # Success
 ```
 
-### `on_stop()`
+### `stop()`
 **Purpose**: Stop current operation
 
 **State Transitions**:
@@ -103,13 +103,13 @@ def on_resume(self):
 
 **Example**:
 ```python
-def on_stop(self):
+def stop(self):
     """Stop processing and cleanup."""
     self.cleanup_resources()
     return True  # Success
 ```
 
-### `on_reset()`
+### `reset()`
 **Purpose**: Reset to initial state
 
 **State Transitions**:
@@ -119,7 +119,7 @@ def on_stop(self):
 
 **Example**:
 ```python
-def on_reset(self):
+def reset(self):
     """Reset to initial state."""
     self.clear_all_data()
     return True  # Success
@@ -143,7 +143,7 @@ class MyModule(OperationalStateMachine):
         super().__init__(state_machine)
         self.data = None
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize module."""
         print("Initializing...")
         self.data = []
@@ -170,7 +170,7 @@ Methods can return `False` to indicate failure, or raise exceptions:
 ```python
 class RobustModule(OperationalStateMachine):
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize with validation."""
         if not self.validate_config():
             return False  # Failure: READY -> STOPPED
@@ -186,7 +186,7 @@ class RobustModule(OperationalStateMachine):
 ```python
 class ProductionModule(OperationalStateMachine):
     
-    def on_initialize(self):
+    def initialize(self):
         """Setup phase."""
         self.load_configuration()
         self.initialize_hardware()
@@ -197,22 +197,22 @@ class ProductionModule(OperationalStateMachine):
         self.begin_processing()
         return True
     
-    def on_pause(self):
+    def pause(self):
         """Temporary pause."""
         self.save_state()
         return True
     
-    def on_resume(self):
+    def resume(self):
         """Resume production."""
         self.restore_state()
         return True
     
-    def on_stop(self):
+    def stop(self):
         """Clean shutdown."""
         self.finalize_processing()
         return True
     
-    def on_reset(self):
+    def reset(self):
         """Reset for next run."""
         self.clear_all_state()
         return True
@@ -273,7 +273,7 @@ Methods should return:
 - Exception: Treated as failure
 
 ```python
-def on_initialize(self):
+def initialize(self):
     # Explicit success
     return True
     
@@ -281,7 +281,7 @@ def on_start(self):
     # Implicit success (no return)
     self.do_something()
     
-def on_stop(self):
+def stop(self):
     # Explicit failure
     if not self.can_stop():
         return False
@@ -306,7 +306,7 @@ def on_stop(self):
 ```python
 class ValidatedModule(OperationalStateMachine):
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize with custom validation."""
         # Check prerequisites
         if not self.check_prerequisites():
@@ -393,7 +393,7 @@ class OldModule:
 
 ```python
 class NewModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         """Initialize module."""
         self.setup()
         return True  # All state management automatic!

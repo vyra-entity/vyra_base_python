@@ -67,7 +67,7 @@ Themen:
 **Operational State Machine API** - Vollständige API-Referenz für Module
 
 Themen:
-- Static Lifecycle Methods (on_initialize, on_pause, on_resume, on_stop, on_reset)
+- Static Lifecycle Methods (initialize, pause, resume, stop, reset)
 - Dynamic Operations mit @operation Decorator
 - Reference Counting für concurrent operations
 - ERROR State und Error Recovery

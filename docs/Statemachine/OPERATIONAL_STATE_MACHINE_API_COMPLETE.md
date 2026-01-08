@@ -60,7 +60,7 @@ Performs one-time module initialization and transitions to READY state.
 
 **Signature:**
 ```python
-def on_initialize(self) -> bool:
+def initialize(self) -> bool:
     """
     User implementation: Initialize module resources.
     
@@ -86,7 +86,7 @@ def on_initialize(self) -> bool:
 from vyra_base import state
 
 class MyModule(state.OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         """Initialize hardware and configuration."""
         try:
             self.config = self._load_config()
@@ -105,7 +105,7 @@ Temporarily suspends ongoing operations.
 
 **Signature:**
 ```python
-def on_pause(self) -> bool:
+def pause(self) -> bool:
     """
     User implementation: Pause module operations.
     
@@ -126,7 +126,7 @@ def on_pause(self) -> bool:
 
 **Example:**
 ```python
-def on_pause(self):
+def pause(self):
     """Pause ongoing operations."""
     if self.hardware:
         self.hardware.pause()
@@ -142,7 +142,7 @@ Resumes from paused state, returns to READY (not RUNNING).
 
 **Signature:**
 ```python
-def on_resume(self) -> bool:
+def resume(self) -> bool:
     """
     User implementation: Resume module operations.
     
@@ -164,7 +164,7 @@ def on_resume(self) -> bool:
 
 **Example:**
 ```python
-def on_resume(self):
+def resume(self):
     """Resume from paused state."""
     if self.hardware:
         self.hardware.resume()
@@ -180,7 +180,7 @@ Performs clean shutdown of operations.
 
 **Signature:**
 ```python
-def on_stop(self) -> bool:
+def stop(self) -> bool:
     """
     User implementation: Stop module operations.
     
@@ -201,7 +201,7 @@ def on_stop(self) -> bool:
 
 **Example:**
 ```python
-def on_stop(self):
+def stop(self):
     """Stop module operations cleanly."""
     if self.hardware:
         self.hardware.stop()
@@ -217,7 +217,7 @@ Resets module to initial IDLE state, used for recovery from ERROR or STOPPED sta
 
 **Signature:**
 ```python
-def on_reset(self) -> bool:
+def reset(self) -> bool:
     """
     User implementation: Reset module to initial state.
     
@@ -238,7 +238,7 @@ def on_reset(self) -> bool:
 
 **Example:**
 ```python
-def on_reset(self):
+def reset(self):
     """Reset to initial state."""
     if self.hardware:
         self.hardware.release()
@@ -360,7 +360,7 @@ class DataProcessor(state.OperationalStateMachine):
         super().__init__(state_machine)
         self.items_processed = 0
     
-    def on_initialize(self):
+    def initialize(self):
         """Initialize processor."""
         self.items_processed = 0
         return True
@@ -499,7 +499,7 @@ Combine static lifecycle control with dynamic operations:
 
 ```python
 class HybridModule(state.OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         """Static: IDLE → READY"""
         self.resources = self._allocate()
         return True
@@ -509,22 +509,22 @@ class HybridModule(state.OperationalStateMachine):
         """Dynamic: READY ↔ RUNNING"""
         return self._transform(data)
     
-    def on_pause(self):
+    def pause(self):
         """Static: RUNNING → PAUSED"""
         self._save_checkpoint()
         return True
     
-    def on_resume(self):
+    def resume(self):
         """Static: PAUSED → READY (counter reset)"""
         self._restore_checkpoint()
         return True
     
-    def on_stop(self):
+    def stop(self):
         """Static: RUNNING/PAUSED → STOPPED"""
         self._finalize()
         return True
     
-    def on_reset(self):
+    def reset(self):
         """Static: STOPPED/ERROR → IDLE"""
         self.resources = None
         return True
@@ -716,7 +716,7 @@ if module.is_running() and counter == 0:
 Always return `True` (success) or `False` (failure):
 
 ```python
-def on_initialize(self):
+def initialize(self):
     try:
         self._setup()
         return True  # Success
@@ -821,7 +821,7 @@ For legacy code using `on_start()` method:
 ### Old Pattern
 ```python
 class OldModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         return True
     
     def on_start(self):
@@ -836,7 +836,7 @@ class OldModule(OperationalStateMachine):
 ### New Pattern
 ```python
 class NewModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         # Goes directly to READY (not RUNNING)
         return True
     
@@ -868,7 +868,7 @@ class ProductionLine(state.OperationalStateMachine):
     
     # Static Lifecycle Methods
     
-    def on_initialize(self):
+    def initialize(self):
         """IDLE → READY: Initialize production line."""
         try:
             self.hardware = self._connect_hardware()
@@ -878,26 +878,26 @@ class ProductionLine(state.OperationalStateMachine):
             self.logger.error(f"Init failed: {e}")
             return False  # Goes to ERROR
     
-    def on_pause(self):
+    def pause(self):
         """RUNNING → PAUSED: Pause production."""
         self.checkpoint = self._save_state()
         self.hardware.pause()
         return True
     
-    def on_resume(self):
+    def resume(self):
         """PAUSED → READY: Resume production."""
         self.hardware.resume()
         if self.checkpoint:
             self._restore_state(self.checkpoint)
         return True  # Counter reset to 0
     
-    def on_stop(self):
+    def stop(self):
         """RUNNING/PAUSED → STOPPED: Stop production."""
         self.hardware.stop()
         self._save_statistics()
         return True
     
-    def on_reset(self):
+    def reset(self):
         """STOPPED/ERROR → IDLE: Reset line."""
         if self.hardware:
             self.hardware.disconnect()

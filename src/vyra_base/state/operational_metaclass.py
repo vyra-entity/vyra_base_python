@@ -25,8 +25,7 @@ class MetaOperationalState(type):
     """
     Metaclass that automatically manages operational state transitions.
     
-    This metaclass wraps user-defined lifecycle methods (prefixed with ``on_``)
-    and automatically handles:
+    This metaclass wraps user-defined lifecycle methods and automatically handles:
     
     - Pre-condition state validation
     - State transitions before method execution
@@ -35,35 +34,35 @@ class MetaOperationalState(type):
     
     Supported lifecycle methods and their state transitions:
     
-    ``on_initialize()``:
+    ``initialize()``:
         Pre-condition: IDLE
         
         On success: IDLE -> READY (resets operation counter)
         
         On failure: IDLE -> ERROR
     
-    ``on_pause()``:
+    ``pause()``:
         Pre-condition: RUNNING
         
         On success: RUNNING -> PAUSED
         
         On failure: No state change
     
-    ``on_resume()``:
+    ``resume()``:
         Pre-condition: PAUSED
         
         On success: PAUSED -> READY (resets operation counter)
         
         On failure: PAUSED -> ERROR
     
-    ``on_stop()``:
+    ``stop()``:
         Pre-condition: RUNNING, PAUSED
         
         On success: (current) -> STOPPED
         
         On failure: (current) -> ERROR
     
-    ``on_reset()``:
+    ``reset()``:
         Pre-condition: STOPPED, ERROR
         
         On success: (current) -> IDLE
@@ -72,7 +71,7 @@ class MetaOperationalState(type):
     
     Example:
         >>> class MyModule(OperationalStateMachine):
-        ...     def on_initialize(self):
+        ...     def initialize(self):
         ...         # Setup hardware, load config, etc.
         ...         print("Initializing...")
         ...         return True
@@ -84,35 +83,35 @@ class MetaOperationalState(type):
     
     # Mapping of lifecycle methods to their state transition rules
     STATE_RULES = {
-        'on_initialize': {
+        'initialize': {
             'required_states': {OperationalState.IDLE},
             'pre_transition': None,
             'success_transition': OperationalState.READY,
             'failure_transition': OperationalState.ERROR,
             'reset_counter': True,  # Reset operation counter on success
         },
-        'on_pause': {
+        'pause': {
             'required_states': {OperationalState.RUNNING},
             'pre_transition': None,
             'success_transition': OperationalState.PAUSED,
             'failure_transition': OperationalState.ERROR,
             'reset_counter': False,
         },
-        'on_resume': {
+        'resume': {
             'required_states': {OperationalState.PAUSED},
             'pre_transition': None,
             'success_transition': OperationalState.READY,
             'failure_transition': OperationalState.ERROR,
             'reset_counter': True,  # Reset operation counter on success
         },
-        'on_stop': {
+        'stop': {
             'required_states': {OperationalState.RUNNING, OperationalState.PAUSED},
             'pre_transition': None,
             'success_transition': OperationalState.STOPPED,
             'failure_transition': OperationalState.ERROR,
             'reset_counter': False,
         },
-        'on_reset': {
+        'reset': {
             'required_states': {OperationalState.STOPPED, OperationalState.ERROR},
             'pre_transition': None,
             'success_transition': OperationalState.IDLE,
@@ -133,7 +132,7 @@ class MetaOperationalState(type):
         Returns:
             New class with wrapped methods
         """
-        # Find and wrap all 'on_*' methods that have state rules
+        # Find and wrap all lifecycle methods that have state rules
         for method_name, rules in cls.STATE_RULES.items():
             if method_name in attrs:
                 original_method = attrs[method_name]

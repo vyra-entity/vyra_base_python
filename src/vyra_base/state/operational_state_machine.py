@@ -26,13 +26,13 @@ class OperationalStateMachine(metaclass=MetaOperationalState):
     
     Subclasses should implement one or more of the following methods:
     
-    - on_initialize(): Setup and initialization logic
-    - on_pause(): Pause current operation
-    - on_resume(): Resume paused operation
-    - on_stop(): Stop current operation
-    - on_reset(): Reset to initial state
+    - initialize(): Setup and initialization logic
+    - pause(): Pause current operation
+    - resume(): Resume paused operation
+    - stop(): Stop current operation
+    - reset(): Reset to initial state
     
-    For dynamic operations, use the @operation decorator instead of on_start().
+    For dynamic operations, use the @operation decorator.
     
     All methods should return True on success, False on failure.
     Exceptions are caught and treated as failures.
@@ -43,10 +43,11 @@ class OperationalStateMachine(metaclass=MetaOperationalState):
         ...         super().__init__(state_machine)
         ...         self.data = None
         ...
-        ...     def on_initialize(self):
+        ...     def initialize(self):
         ...         # This runs when initialize() is called
         ...         # Pre-condition: IDLE state
-        ...         # On success: IDLE -> READY (operation counter reset)\n        ...         # On failure: IDLE -> ERROR
+        ...         # On success: IDLE -> READY (operation counter reset)
+        ...         # On failure: IDLE -> ERROR
         ...         self.data = []
         ...         print("Initialized!")
         ...         return True
@@ -218,113 +219,12 @@ class OperationalStateMachine(metaclass=MetaOperationalState):
     # -------------------------------------------------------------------------
     # Public Lifecycle API
     # -------------------------------------------------------------------------
-    
-    def initialize(self, *args, **kwargs) -> bool:
-        """
-        Initialize the module.
-        
-        Calls on_initialize() if implemented.
-        Automatic state management:
-        - Pre-condition: IDLE
-        - On success: IDLE -> READY (resets operation counter)
-        - On failure: IDLE -> ERROR
-        """
-        if hasattr(self, 'on_initialize'):
-            func = getattr(self, 'on_initialize', None)
-            if func:
-                return func(*args, **kwargs)
-            else:
-                return False
-        else:
-            logger.warning(f"{self.__class__.__name__} does not implement on_initialize()")
-            return False
-    
-    def pause(self, *args, **kwargs) -> bool:
-        """
-        Pause the module.
-        
-        Calls on_pause() if implemented.
-        Automatic state management:
-        - Pre-condition: RUNNING
-        - On success: RUNNING -> PAUSED
-        - On failure: RUNNING -> ERROR
-        """
-        if hasattr(self, 'on_pause'):
-            func = getattr(self, 'on_pause', None)
-            if func:
-                return func(*args, **kwargs)
-            else:
-                return False
-        else:
-            logger.warning(f"{self.__class__.__name__} does not implement on_pause()")
-            return False
-    
-    def resume(self, *args, **kwargs) -> bool:
-        """
-        Resume the module.
-        
-        Calls on_resume() if implemented.
-        Automatic state management:
-        - Pre-condition: PAUSED
-        - On success: PAUSED -> READY (resets operation counter)
-        - On failure: PAUSED -> ERROR
-        """
-        if hasattr(self, 'on_resume'):
-            func = getattr(self, 'on_resume', None)
-            if func:
-                return func(*args, **kwargs)
-            else:
-                return False
-        else:
-            logger.warning(f"{self.__class__.__name__} does not implement on_resume()")
-            return False
-    
-    def stop(self, *args, **kwargs) -> bool:
-        """
-        Stop the module.
-        
-        Calls on_stop() if implemented.
-        Automatic state management:
-        - Pre-condition: RUNNING or PAUSED
-        - On success: (current) -> STOPPED
-        - On failure: (current) -> ERROR
-        """
-        if hasattr(self, 'on_stop'):
-            func = getattr(self, 'on_stop', None)
-            if func:
-                return func(*args, **kwargs)
-            else:
-                return False
-        else:
-            logger.warning(f"{self.__class__.__name__} does not implement on_stop()")
-            return False
-    
-    def reset(self, *args, **kwargs) -> bool:
-        """
-        Reset the module.
-        
-        Calls on_reset() if implemented.
-        Automatic state management:
-        - Pre-condition: STOPPED or ERROR
-        - On success: (current) -> IDLE
-        - On failure: No state change
-        """
-        if hasattr(self, 'on_reset'):
-            func = getattr(self, 'on_reset', None)
-            if func:
-                return func(*args, **kwargs)
-            else:
-                return False
-        else:
-            logger.warning(f"{self.__class__.__name__} does not implement on_reset()")
-            return False
-    
-    # -------------------------------------------------------------------------
-    # Optional: Override these in subclasses
+    # Lifecycle Methods - Implement these in subclasses
     # -------------------------------------------------------------------------
     
-    # Note: Subclasses should define on_initialize(), on_pause(), etc.
-    # These will be automatically wrapped by the metaclass.
+    # Subclasses should implement: initialize(), pause(), resume(), stop(), reset()
+    # These methods will be automatically wrapped by the MetaOperationalState metaclass
+    # with state validation, transitions, and error handling.
     # For dynamic operations, use the @operation decorator.
     
     def __repr__(self) -> str:

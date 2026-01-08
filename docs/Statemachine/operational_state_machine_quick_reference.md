@@ -15,7 +15,7 @@ class MyModule(OperationalStateMachine):
         super().__init__(state_machine)
         self.data = None
     
-    def on_initialize(self):
+    def initialize(self):
         """Setup and initialization."""
         self.data = []
         return True  # Success
@@ -47,7 +47,7 @@ module.initialize()  # Automatic: IDLE→READY→RUNNING
 ## Return Values
 
 ```python
-def on_initialize(self):
+def initialize(self):
     return True    # ✓ Success - trigger success transition
     return False   # ✗ Failure - trigger failure transition
     return None    # ✓ Treated as success
@@ -104,11 +104,11 @@ IDLE ───initialize()──→ READY ───start()──→ RUNNING
 
 ```python
 class SimpleModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         self.setup()
         return True
     
-    def on_stop(self):
+    def stop(self):
         self.cleanup()
         return True
 
@@ -121,15 +121,15 @@ module.reset()       # Reset to IDLE
 
 ```python
 class ProcessingModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         self.load_data()
         return True
     
-    def on_pause(self):
+    def pause(self):
         self.save_checkpoint()
         return True
     
-    def on_resume(self):
+    def resume(self):
         self.restore_checkpoint()
         return True
 
@@ -143,7 +143,7 @@ module.start()       # Continue processing
 
 ```python
 class ValidatedModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         if not self.check_prerequisites():
             return False  # Failure → STOPPED
         
@@ -159,7 +159,7 @@ class ValidatedModule(OperationalStateMachine):
 
 ```python
 class RobustModule(OperationalStateMachine):
-    def on_initialize(self):
+    def initialize(self):
         try:
             self.connect_hardware()
             self.load_config()
