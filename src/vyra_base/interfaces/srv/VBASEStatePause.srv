@@ -1,0 +1,25 @@
+# VBASEStatePause.srv
+
+# Request
+VBASEKeyValue[] metadata  # Array of key-value pairs for initialization parameters
+
+---
+# Response
+bool success  # Indicates whether the operation was successful thus the state was set
+string message  # Additional information about the operation, e.g., "Transition started successfully", "Transition failed due to error", etc.
+
+# This service is used to pause the state of a component or module in the VYRA system.
+# Used to move a state machine from READY|RUNNING -> PAUSED state.
+# The request contains an array of key-value pairs that provide the necessary parameters for pausing.
+# The response indicates whether the pause was successful and provides additional information about the operation 
+# or failure information.
+# Example usage:
+# Request:
+# - metadata: [{key: "param1", value: "value1"}, {key: "param2", value: "value2"}]
+# Response:
+# - success: true
+# - message: "Initialization completed successfully"
+# or
+# - success: false
+# - message: "Initialization failed due to missing parameters [param1]"
+

@@ -13,7 +13,13 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 include = [
-    "vyra_base/helper/logger_config.json"
+    "vyra_base/helper/logger_config.json",
+    "vyra_base/interfaces/msg/*.msg",
+    "vyra_base/interfaces/srv/*.srv",
+    "vyra_base/interfaces/action/*.action",
+    "vyra_base/interfaces/config/*.json",
+    "vyra_base/interfaces/config/*.xml",
+    "vyra_base/interfaces/config/*.yaml"
 ]
 
 [tool.poetry.dependencies]

@@ -18,6 +18,8 @@ class EventType(Enum):
     START = "start"
     INIT_SUCCESS = "init_success"           # Initialization successful. Going to Active
     INIT_FAILURE = "init_failure"           # Initialization failed. Going to Recovering
+    SET_SUSPENDED = "set_suspended"         # Set to Suspended state
+    RESUME_SUSPENDED = "resume_suspended"     # Resume from Suspended state
     SHUTDOWN = "shutdown"                   # Begin shutdown
     FINISHED = "finished"                   # Going offline
     FAULT_DETECTED = "fault_detected"       # Fault detected, go to Recovering
@@ -27,8 +29,6 @@ class EventType(Enum):
     # Operational events
     SET_READY = "set_ready"
     TASK_START = "task_start"
-    SET_BACKGROUND = "set_background"
-    SET_FOREGROUND = "set_foreground"
     TASK_PAUSE = "task_pause"
     TASK_RESUME = "task_resume"
     TASK_COMPLETE = "task_complete"
@@ -91,6 +91,7 @@ EVENT_LAYER_MAP = {
     EventType.START: "lifecycle",
     EventType.INIT_SUCCESS: "lifecycle",
     EventType.INIT_FAILURE: "lifecycle",
+    EventType.SET_SUSPENDED: "lifecycle",
     EventType.SHUTDOWN: "lifecycle",
     EventType.FINISHED: "lifecycle",
     EventType.FAULT_DETECTED: "lifecycle",  # Can also affect health
@@ -100,9 +101,9 @@ EVENT_LAYER_MAP = {
     # Operational events
     EventType.SET_READY: "operational",
     EventType.TASK_START: "operational",
-    EventType.SET_BACKGROUND: "operational",
     EventType.TASK_PAUSE: "operational",
     EventType.TASK_RESUME: "operational",
+    EventType.TASK_COMPLETE: "operational",
     EventType.TASK_STOP: "operational",
     EventType.TASK_RESET: "operational",
     EventType.TASK_ERROR: "operational",

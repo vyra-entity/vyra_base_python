@@ -1,0 +1,177 @@
+[
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "initialize",
+        "displayname": "Initialize",
+        "description": "Executing initial commands and set state IDLE -> READY",
+        "filetype": "VBASEStateInitialize.srv",
+        "params": [
+            {
+                "name": "params",
+                "datatype": "string[]",
+                "displayname": "Initialization Parameters",
+                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "pause",
+        "displayname": "Pause",
+        "description": "Pause the current operation and set state READY|RUNNING -> PAUSED",
+        "filetype": "VBASEStatePause.srv",
+        "params": [
+            {
+                "name": "params",
+                "datatype": "string[]",
+                "displayname": "Pause Parameters",
+                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "stop",
+        "displayname": "Stop",
+        "description": "Stop the current operation and set state READY|RUNNING|PAUSED -> STOPPED",
+        "filetype": "VBASEStateStop.srv",
+        "params": [
+            {
+                "name": "params",
+                "datatype": "string[]",
+                "displayname": "Stop Parameters",
+                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "resume",
+        "displayname": "Resume",
+        "description": "Resume the current operation and set state PAUSED -> RUNNING",
+        "filetype": "VBASEStateResume.srv",
+        "params": [
+            {
+                "name": "params",
+                "datatype": "string[]",
+                "displayname": "Resume Parameters",
+                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": ["ros2_srv"],
+        "type": "callable",
+        "functionname": "reset",
+        "displayname": "Reset",
+        "description": "Reset the current operation and set state STOPPED -> IDLE",
+        "filetype": "VBASEStateReset.srv",
+        "params": [
+            {
+                "name": "params",
+                "datatype": "string[]",
+                "displayname": "Reset Parameters",
+                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the transition was successful"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "A message providing additional information about the transition"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    }
+]

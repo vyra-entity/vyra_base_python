@@ -17,7 +17,7 @@ class LifecycleState(Enum):
     INITIALIZING = "Initializing"     # Startup/configuration in progress
     ACTIVE = "Active"                 # Fully operational
     RECOVERING = "Recovering"         # Error recovery/restart in progress
-    SUSPENDED = "Suspended"           # Temporarily paused
+    SUSPENDED = "Suspended"           # Temporarily not operational (used for maintenance or updates)
     SHUTTING_DOWN = "ShuttingDown"    # Controlled shutdown
     OFFLINE = "Offline"       # Module is stopped/offline
 
@@ -54,6 +54,8 @@ LIFECYCLE_TRANSITIONS = {
     (LifecycleState.INITIALIZING, LifecycleState.RECOVERING),
     (LifecycleState.ACTIVE, LifecycleState.SHUTTING_DOWN),
     (LifecycleState.ACTIVE, LifecycleState.RECOVERING),
+    (LifecycleState.ACTIVE, LifecycleState.SUSPENDED),
+    (LifecycleState.SUSPENDED, LifecycleState.OFFLINE),
     (LifecycleState.RECOVERING, LifecycleState.ACTIVE),
     (LifecycleState.RECOVERING, LifecycleState.SHUTTING_DOWN),
     (LifecycleState.SHUTTING_DOWN, LifecycleState.OFFLINE)
@@ -63,6 +65,8 @@ OPERATIONAL_TRANSITIONS = {
     (OperationalState.IDLE, OperationalState.READY),
     (OperationalState.IDLE, OperationalState.ERROR),
     (OperationalState.READY, OperationalState.RUNNING),
+    (OperationalState.READY, OperationalState.PAUSED),
+    (OperationalState.READY, OperationalState.STOPPED),
     (OperationalState.READY, OperationalState.ERROR),
     (OperationalState.RUNNING, OperationalState.READY),
     (OperationalState.RUNNING, OperationalState.PAUSED),
@@ -100,6 +104,9 @@ LIFECYCLE_OPERATIONAL_RULES = {
         OperationalState.PAUSED,
         OperationalState.STOPPED,
         OperationalState.ERROR,
+    },
+    LifecycleState.SUSPENDED: {          # Only idle when suspended
+        OperationalState.IDLE,
     },
     LifecycleState.SHUTTING_DOWN: {       # Freezing operational state
         OperationalState.IDLE,

@@ -87,39 +87,3 @@ __all__ = [
     "operation",
     "OperationConfig",
 ]
-from .operational_state_machine import OperationalStateMachine
-
-__all__ = [
-    # Core engine
-    "StateMachine",
-    "StateMachineConfig",
-    "StateMachineError",
-    "InvalidTransitionError",
-    "LayerViolationError",
-    "StateTransition",
-    # State types
-    "LifecycleState",
-    "OperationalState",
-    "HealthState",
-    "is_valid_lifecycle_transition",
-    "is_valid_operational_transition",
-    "is_valid_health_transition",
-    "is_operational_allowed_in_lifecycle",
-    # Events
-    "StateEvent",
-    "EventType",
-    "get_event_target_layer",
-    "is_interrupt_event",
-    # High-level layers
-    "LifecycleLayer",
-    "OperationalLayer",
-    "HealthLayer",
-    # Unified interface (recommended)
-    "UnifiedStateMachine",
-    # Metaclass-based operational state machine
-    "MetaOperationalState",
-    "OperationalStateError",
-    "OperationalStateMachine",
-]
-
-__version__ = "3.0.0"

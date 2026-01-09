@@ -196,6 +196,22 @@ class UnifiedStateMachine:
         self.fsm.clear_history()
     
     # -------------------------------------------------------------------------
+    # Event Handling (for OperationalStateMachine compatibility)
+    # -------------------------------------------------------------------------
+    
+    def send_event(self, event):
+        """
+        Send an event to the state machine.
+        
+        This method is required for compatibility with OperationalStateMachine
+        which calls _state_machine.send_event(event).
+        
+        Args:
+            event: StateEvent to send to the FSM
+        """
+        self.fsm.send_event(event)
+    
+    # -------------------------------------------------------------------------
     # Standard Startup Sequence
     # -------------------------------------------------------------------------
     
