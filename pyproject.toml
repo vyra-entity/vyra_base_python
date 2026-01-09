@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vyra_base"
-version = "0.1.6"
+version = "0.1.7"
 description = "Base library for V.Y.R.A. modules written in Python"
 authors = ["Holger Schernewski"]
 license = "LICENSE"
@@ -14,6 +14,8 @@ classifiers = [
 ]
 include = [
     "vyra_base/helper/logger_config.json",
+    "vyra_base/interfaces/package.xml",
+    "vyra_base/interfaces/CMakeLists.template.txt",
     "vyra_base/interfaces/msg/*.msg",
     "vyra_base/interfaces/srv/*.srv",
     "vyra_base/interfaces/action/*.action",
