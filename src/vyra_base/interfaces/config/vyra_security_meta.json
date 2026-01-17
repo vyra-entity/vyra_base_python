@@ -5,12 +5,12 @@
         "functionname": "request_access",
         "displayname": "Request Access",
         "description": "Request access to this module to read parameters, control the module, or perform other actions.",
-        "filetype": "VBASERequestAccess.srv",
+        "filetype": "VBASESecurityRequestAccess.srv",
         "params": [
             {
+                "displayname": "module_name",
                 "datatype": "string",
-                "displayname": "certificate",
-                "description": "The certificate to use for authentication"
+                "description": "The name of the module to access"
             },
             {
                 "datatype": "uuid",
@@ -24,13 +24,18 @@
             },
             {
                 "datatype": "string",
-                "displayname": "level_4_psw",
-                "description": "Password for level 4 access (optional)"
+                "displayname": "password",
+                "description": "Password for access levels 2-4 (optional)"
             },
             {
                 "datatype": "string",
                 "displayname": "level_5_passkey",
                 "description": "Passkey for level 5 access (optional)"
+            },
+            {
+                "datatype": "string",
+                "displayname": "certificate",
+                "description": "The certificate to use for authentication (sl5)"
             }
         ],
         "returns": [
@@ -39,6 +44,42 @@
                 "datatype": "int",
                 "displayname": "Access Status",
                 "description": "The access status, e.g., '0:ACCESS_GRANTED', '1:ACCESS_DENIED', '2:MISSING_ACCESS_PARAMETERS', '3:INTERNAL_ERROR'"
+            },
+            {
+                "name": "granted_level",
+                "datatype": "int",
+                "displayname": "Granted Level",
+                "description": "The granted access level"
+            },
+            {
+                "name": "expiry_timestamp",
+                "datatype": "int64",
+                "displayname": "Expiry Timestamp",
+                "description": "The timestamp (in epoch format) when the access expires"
+            },
+            {
+                "name": "access_token",
+                "datatype": "string",
+                "displayname": "Access Token",
+                "description": "The access token to be used for subsequent authenticated requests"
+            },
+            {
+                "name": "refresh_token",
+                "datatype": "string",
+                "displayname": "Refresh Token",
+                "description": "The refresh token to renew the access token when it expires"
+            },
+            {
+                "name": "token_type",
+                "datatype": "string",
+                "displayname": "Token Type",
+                "description": "The type of the access token (e.g., 'Bearer')"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Additional information about the access request"
             }
         ],
         "access_level": 1,
