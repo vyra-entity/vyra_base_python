@@ -1,0 +1,1148 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="vyra_base.com package" href="vyra_base.com.html" /><link rel="prev" title="vyra_base" href="modules.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>vyra_base package - vyra_base 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #336790;
+  --color-brand-content: #336790;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">vyra_base 0.1.0</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">vyra_base 0.1.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">quickstart</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">vyra_base</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of vyra_base</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">vyra_base package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of vyra_base package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="vyra_base.com.html">vyra_base.com package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of vyra_base.com package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html">vyra_base.com.datalayer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html">vyra_base.com.feeder package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.core.html">vyra_base.core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html">vyra_base.defaults package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html">vyra_base.helper package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html">vyra_base.state package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html">vyra_base.storage package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/vyra_base.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="vyra-base-package">
+<h1>vyra_base package<a class="headerlink" href="#vyra-base-package" title="Link to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vyra_base.com.html">vyra_base.com package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.com.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.datalayer.html">vyra_base.com.datalayer package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#vyra-base-com-datalayer-action-client-module">vyra_base.com.datalayer.action_client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#vyra-base-com-datalayer-action-server-module">vyra_base.com.datalayer.action_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.callable">vyra_base.com.datalayer.callable module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.interface_factory">vyra_base.com.datalayer.interface_factory module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.job">vyra_base.com.datalayer.job module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.node">vyra_base.com.datalayer.node module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.publisher">vyra_base.com.datalayer.publisher module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#vyra-base-com-datalayer-service-client-module">vyra_base.com.datalayer.service_client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.service_server">vyra_base.com.datalayer.service_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.speaker">vyra_base.com.datalayer.speaker module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.subscriber">vyra_base.com.datalayer.subscriber module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer.typeconverter">vyra_base.com.datalayer.typeconverter module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.datalayer.html#module-vyra_base.com.datalayer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.feeder.html">vyra_base.com.feeder package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.available_module_feeder">vyra_base.com.feeder.available_module_feeder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.error_feeder">vyra_base.com.feeder.error_feeder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.feeder">vyra_base.com.feeder.feeder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.news_feeder">vyra_base.com.feeder.news_feeder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#module-vyra_base.com.feeder.state_feeder">vyra_base.com.feeder.state_feeder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.feeder.html#module-vyra_base.com.feeder">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.com.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.com.html#module-vyra_base.com.handler">vyra_base.com.handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase.socket_path"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase.socket_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase.channel"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase.channel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase.__init__"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase.is_running"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase.is_running</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase.start"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsBase.stop"><code class="docutils literal notranslate"><span class="pre">GrpcUdsBase.stop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServer"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServer.__init__"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServer.add_service"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServer.add_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServer.start"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServer.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServer.stop"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServer.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServer.wait_for_termination"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServer.wait_for_termination()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.__init__"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.call_bidirectional_streaming"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.call_bidirectional_streaming()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.call_client_streaming"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.call_client_streaming()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.call_server_streaming"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.call_server_streaming()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.call_unary"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.call_unary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.channel"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.channel</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.connect"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.connect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.start"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsClient.stop"><code class="docutils literal notranslate"><span class="pre">GrpcUdsClient.stop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.__init__"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.get_client"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.get_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.get_server"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.get_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.register_client"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.register_client()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.register_server"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.register_server()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.start_all"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.start_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.GrpcUdsServiceRegistry.stop_all"><code class="docutils literal notranslate"><span class="pre">GrpcUdsServiceRegistry.stop_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.DBCommunicationHandler"><code class="docutils literal notranslate"><span class="pre">DBCommunicationHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.DBCommunicationHandler.__init__"><code class="docutils literal notranslate"><span class="pre">DBCommunicationHandler.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.DBCommunicationHandler.emit"><code class="docutils literal notranslate"><span class="pre">DBCommunicationHandler.emit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.ROS2Handler"><code class="docutils literal notranslate"><span class="pre">ROS2Handler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.ROS2Handler.__init__"><code class="docutils literal notranslate"><span class="pre">ROS2Handler.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.com.html#vyra_base.com.handler.ROS2Handler.emit"><code class="docutils literal notranslate"><span class="pre">ROS2Handler.emit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.com.html#module-vyra_base.com">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vyra_base.core.html">vyra_base.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.core.html#module-vyra_base.core.entity">vyra_base.core.entity module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity"><code class="docutils literal notranslate"><span class="pre">VyraEntity</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.__init__"><code class="docutils literal notranslate"><span class="pre">VyraEntity.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.node"><code class="docutils literal notranslate"><span class="pre">VyraEntity.node</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.namespace"><code class="docutils literal notranslate"><span class="pre">VyraEntity.namespace</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.startup_entity"><code class="docutils literal notranslate"><span class="pre">VyraEntity.startup_entity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.shutdown_entity"><code class="docutils literal notranslate"><span class="pre">VyraEntity.shutdown_entity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.setup_storage"><code class="docutils literal notranslate"><span class="pre">VyraEntity.setup_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.set_interfaces"><code class="docutils literal notranslate"><span class="pre">VyraEntity.set_interfaces()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.register_storage"><code class="docutils literal notranslate"><span class="pre">VyraEntity.register_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.get_interface_list"><code class="docutils literal notranslate"><span class="pre">VyraEntity.get_interface_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.core.html#vyra_base.core.entity.VyraEntity.register_callables_callbacks"><code class="docutils literal notranslate"><span class="pre">VyraEntity.register_callables_callbacks()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.core.html#module-vyra_base.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vyra_base.defaults.html">vyra_base.defaults package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.defaults.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.defaults.html#module-vyra_base.defaults.constants">vyra_base.defaults.constants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.RequiredVersion"><code class="docutils literal notranslate"><span class="pre">RequiredVersion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.RequiredVersion.PYTHON_MIN"><code class="docutils literal notranslate"><span class="pre">RequiredVersion.PYTHON_MIN</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants"><code class="docutils literal notranslate"><span class="pre">FeederConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_DEFAULT_LENGTH"><code class="docutils literal notranslate"><span class="pre">FeederConstants.MAX_DEFAULT_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_PULLREQUESTSFEED_LENGTH"><code class="docutils literal notranslate"><span class="pre">FeederConstants.MAX_PULLREQUESTSFEED_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_NEWSFEED_LENGTH"><code class="docutils literal notranslate"><span class="pre">FeederConstants.MAX_NEWSFEED_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_ERRORFEED_LENGTH"><code class="docutils literal notranslate"><span class="pre">FeederConstants.MAX_ERRORFEED_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.MAX_STATEFEED_LENGTH"><code class="docutils literal notranslate"><span class="pre">FeederConstants.MAX_STATEFEED_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.FeederConstants.__init__"><code class="docutils literal notranslate"><span class="pre">FeederConstants.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants"><code class="docutils literal notranslate"><span class="pre">LoggerConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants.MAX_QUEUE_LENGTH"><code class="docutils literal notranslate"><span class="pre">LoggerConstants.MAX_QUEUE_LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.LoggerConstants.__init__"><code class="docutils literal notranslate"><span class="pre">LoggerConstants.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants"><code class="docutils literal notranslate"><span class="pre">TimeoutConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.CONNECT"><code class="docutils literal notranslate"><span class="pre">TimeoutConstants.CONNECT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.SEND"><code class="docutils literal notranslate"><span class="pre">TimeoutConstants.SEND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.RECEIVE"><code class="docutils literal notranslate"><span class="pre">TimeoutConstants.RECEIVE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.CLOSED"><code class="docutils literal notranslate"><span class="pre">TimeoutConstants.CLOSED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.TimeoutConstants.__init__"><code class="docutils literal notranslate"><span class="pre">TimeoutConstants.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants"><code class="docutils literal notranslate"><span class="pre">MessageLengthConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants.RECEIVE"><code class="docutils literal notranslate"><span class="pre">MessageLengthConstants.RECEIVE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.MessageLengthConstants.__init__"><code class="docutils literal notranslate"><span class="pre">MessageLengthConstants.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants"><code class="docutils literal notranslate"><span class="pre">CyclicRefreshConstants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.NEWSFEED"><code class="docutils literal notranslate"><span class="pre">CyclicRefreshConstants.NEWSFEED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.LOGGER"><code class="docutils literal notranslate"><span class="pre">CyclicRefreshConstants.LOGGER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.constants.CyclicRefreshConstants.__init__"><code class="docutils literal notranslate"><span class="pre">CyclicRefreshConstants.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.defaults.html#module-vyra_base.defaults.entries">vyra_base.defaults.entries module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.BOOL"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.BOOL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.BYTE"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.BYTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.CHAR"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.CHAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT8"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.INT8</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT8"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.UINT8</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT16"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.INT16</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT16"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.UINT16</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT32"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.INT32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT32"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.UINT32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.INT64"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.INT64</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.UINT64"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.UINT64</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.FLOAT32"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.FLOAT32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.FLOAT64"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.FLOAT64</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.STRING"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.STRING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.TIME"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.TIME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.DURATION"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.DURATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.ANY"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.ANY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.NONE"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigParamTypes.ARRAY"><code class="docutils literal notranslate"><span class="pre">FunctionConfigParamTypes.ARRAY</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.DCBase"><code class="docutils literal notranslate"><span class="pre">DCBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.DCBase.asdict"><code class="docutils literal notranslate"><span class="pre">DCBase.asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.DCBase.__init__"><code class="docutils literal notranslate"><span class="pre">DCBase.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.speaker"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseTypes.speaker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.callable"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseTypes.callable</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseTypes.job"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseTypes.job</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseParams</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.datatype"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseParams.datatype</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.displayname"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseParams.displayname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.description"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseParams.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseParams.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseParams.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseReturn</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.datatype"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseReturn.datatype</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.displayname"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseReturn.displayname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.description"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseReturn.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigBaseReturn.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionConfigBaseReturn.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle"><code class="docutils literal notranslate"><span class="pre">FunctionConfigDisplaystyle</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.visible"><code class="docutils literal notranslate"><span class="pre">FunctionConfigDisplaystyle.visible</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.published"><code class="docutils literal notranslate"><span class="pre">FunctionConfigDisplaystyle.published</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigDisplaystyle.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionConfigDisplaystyle.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker"><code class="docutils literal notranslate"><span class="pre">FunctionConfigPeriodicSpeaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.caller"><code class="docutils literal notranslate"><span class="pre">FunctionConfigPeriodicSpeaker.caller</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.interval"><code class="docutils literal notranslate"><span class="pre">FunctionConfigPeriodicSpeaker.interval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.asdict"><code class="docutils literal notranslate"><span class="pre">FunctionConfigPeriodicSpeaker.asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigPeriodicSpeaker.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionConfigPeriodicSpeaker.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.tags"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.tags</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.type"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.ros2type"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.ros2type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.functionname"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.functionname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.displayname"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.displayname</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.description"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.displaystyle"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.displaystyle</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.params"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.returns"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.returns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.qosprofile"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.qosprofile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.callback"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.callback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.periodic"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.periodic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.asdict"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.FunctionConfigEntry.__init__"><code class="docutils literal notranslate"><span class="pre">FunctionConfigEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry"><code class="docutils literal notranslate"><span class="pre">ErrorEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.level"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.code"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.code</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.uuid"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.uuid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.timestamp"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.description"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.solution"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.solution</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.miscellaneous"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.miscellaneous</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.module_name"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.module_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.module_id"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.module_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.ERROR_LEVEL"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.ERROR_LEVEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ErrorEntry.__init__"><code class="docutils literal notranslate"><span class="pre">ErrorEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry"><code class="docutils literal notranslate"><span class="pre">NewsEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.__init__"><code class="docutils literal notranslate"><span class="pre">NewsEntry.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.message"><code class="docutils literal notranslate"><span class="pre">NewsEntry.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.level"><code class="docutils literal notranslate"><span class="pre">NewsEntry.level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.timestamp"><code class="docutils literal notranslate"><span class="pre">NewsEntry.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.uuid"><code class="docutils literal notranslate"><span class="pre">NewsEntry.uuid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.module_name"><code class="docutils literal notranslate"><span class="pre">NewsEntry.module_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.module_id"><code class="docutils literal notranslate"><span class="pre">NewsEntry.module_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.NewsEntry.MESSAGE_LEVEL"><code class="docutils literal notranslate"><span class="pre">NewsEntry.MESSAGE_LEVEL</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.uuid"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.uuid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.ack_by_user"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.ack_by_user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.ack_on_date"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.ack_on_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_structure"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.request_structure</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_on_date"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.request_on_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_description"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.request_description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.response"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.response</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_action"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.request_action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.request_action_args"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.request_action_args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.module_id"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.module_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.color"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.color</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.PullRequestEntry.__init__"><code class="docutils literal notranslate"><span class="pre">PullRequestEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry"><code class="docutils literal notranslate"><span class="pre">StateEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.current"><code class="docutils literal notranslate"><span class="pre">StateEntry.current</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.trigger"><code class="docutils literal notranslate"><span class="pre">StateEntry.trigger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.module_id"><code class="docutils literal notranslate"><span class="pre">StateEntry.module_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.module_name"><code class="docutils literal notranslate"><span class="pre">StateEntry.module_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.timestamp"><code class="docutils literal notranslate"><span class="pre">StateEntry.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.previous"><code class="docutils literal notranslate"><span class="pre">StateEntry.previous</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.StateEntry.__init__"><code class="docutils literal notranslate"><span class="pre">StateEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry"><code class="docutils literal notranslate"><span class="pre">ModuleEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.uuid"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.uuid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.name"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.template"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.template</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.description"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.version"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.to_dict"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.gen_uuid"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.gen_uuid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.restructure_uuid"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.restructure_uuid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.ModuleEntry.__init__"><code class="docutils literal notranslate"><span class="pre">ModuleEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.AvailableModuleEntry"><code class="docutils literal notranslate"><span class="pre">AvailableModuleEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.entries.AvailableModuleEntry.__init__"><code class="docutils literal notranslate"><span class="pre">AvailableModuleEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.defaults.html#module-vyra_base.defaults.exceptions">vyra_base.defaults.exceptions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.exceptions.FeederException"><code class="docutils literal notranslate"><span class="pre">FeederException</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.exceptions.FeederException.__init__"><code class="docutils literal notranslate"><span class="pre">FeederException.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.defaults.html#module-vyra_base.defaults.info">vyra_base.defaults.info module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo"><code class="docutils literal notranslate"><span class="pre">AuthorInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Author"><code class="docutils literal notranslate"><span class="pre">AuthorInfo.Author</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.FileChange"><code class="docutils literal notranslate"><span class="pre">AuthorInfo.FileChange</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.defaults.html#vyra_base.defaults.info.AuthorInfo.Version"><code class="docutils literal notranslate"><span class="pre">AuthorInfo.Version</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.defaults.html#module-vyra_base.defaults">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vyra_base.helper.html">vyra_base.helper package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.env_handler">vyra_base.helper.env_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.env_handler.EnvHandler"><code class="docutils literal notranslate"><span class="pre">EnvHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.env_handler.EnvHandler.__init__"><code class="docutils literal notranslate"><span class="pre">EnvHandler.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.env_handler.EnvHandler.env"><code class="docutils literal notranslate"><span class="pre">EnvHandler.env</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.env_handler.EnvHandler.load_env"><code class="docutils literal notranslate"><span class="pre">EnvHandler.load_env()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.error_handler">vyra_base.helper.error_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback"><code class="docutils literal notranslate"><span class="pre">ErrorTraceback</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback.check_error_exist"><code class="docutils literal notranslate"><span class="pre">ErrorTraceback.check_error_exist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist"><code class="docutils literal notranslate"><span class="pre">ErrorTraceback.w_check_error_exist()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.file_lock">vyra_base.helper.file_lock module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_lock.get_lock_for_file"><code class="docutils literal notranslate"><span class="pre">get_lock_for_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_lock.release_lock_for_file"><code class="docutils literal notranslate"><span class="pre">release_lock_for_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_lock.get_lock_for_file_sync"><code class="docutils literal notranslate"><span class="pre">get_lock_for_file_sync()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_lock.release_lock_for_file_sync"><code class="docutils literal notranslate"><span class="pre">release_lock_for_file_sync()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.file_reader">vyra_base.helper.file_reader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader"><code class="docutils literal notranslate"><span class="pre">FileReader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_json_file"><code class="docutils literal notranslate"><span class="pre">FileReader.open_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_markdown_file"><code class="docutils literal notranslate"><span class="pre">FileReader.open_markdown_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_env_file"><code class="docutils literal notranslate"><span class="pre">FileReader.open_env_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_toml_file"><code class="docutils literal notranslate"><span class="pre">FileReader.open_toml_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_ini_file"><code class="docutils literal notranslate"><span class="pre">FileReader.open_ini_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_yaml_file"><code class="docutils literal notranslate"><span class="pre">FileReader.open_yaml_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_json_file_sync"><code class="docutils literal notranslate"><span class="pre">FileReader.open_json_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_markdown_file_sync"><code class="docutils literal notranslate"><span class="pre">FileReader.open_markdown_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_env_file_sync"><code class="docutils literal notranslate"><span class="pre">FileReader.open_env_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_toml_file_sync"><code class="docutils literal notranslate"><span class="pre">FileReader.open_toml_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_ini_file_sync"><code class="docutils literal notranslate"><span class="pre">FileReader.open_ini_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_reader.FileReader.open_yaml_file_sync"><code class="docutils literal notranslate"><span class="pre">FileReader.open_yaml_file_sync()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.file_writer">vyra_base.helper.file_writer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter"><code class="docutils literal notranslate"><span class="pre">FileWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter.write_json_file"><code class="docutils literal notranslate"><span class="pre">FileWriter.write_json_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter.write_binary_file"><code class="docutils literal notranslate"><span class="pre">FileWriter.write_binary_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter.write_yaml_file"><code class="docutils literal notranslate"><span class="pre">FileWriter.write_yaml_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter.write_json_file_sync"><code class="docutils literal notranslate"><span class="pre">FileWriter.write_json_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter.write_binary_file_sync"><code class="docutils literal notranslate"><span class="pre">FileWriter.write_binary_file_sync()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.file_writer.FileWriter.write_yaml_file_sync"><code class="docutils literal notranslate"><span class="pre">FileWriter.write_yaml_file_sync()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.log_filter">vyra_base.helper.log_filter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter"><code class="docutils literal notranslate"><span class="pre">LogFilter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter.param"><code class="docutils literal notranslate"><span class="pre">LogFilter.param</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.log_filter.LogFilter.__init__"><code class="docutils literal notranslate"><span class="pre">LogFilter.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper.logger">vyra_base.helper.logger module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogMode"><code class="docutils literal notranslate"><span class="pre">LogMode</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.DEBUG"><code class="docutils literal notranslate"><span class="pre">LogMode.DEBUG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.INFO"><code class="docutils literal notranslate"><span class="pre">LogMode.INFO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.WARNING"><code class="docutils literal notranslate"><span class="pre">LogMode.WARNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogMode.ERROR"><code class="docutils literal notranslate"><span class="pre">LogMode.ERROR</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry"><code class="docutils literal notranslate"><span class="pre">LogEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.message"><code class="docutils literal notranslate"><span class="pre">LogEntry.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.mode"><code class="docutils literal notranslate"><span class="pre">LogEntry.mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.debug"><code class="docutils literal notranslate"><span class="pre">LogEntry.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.error"><code class="docutils literal notranslate"><span class="pre">LogEntry.error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.warn"><code class="docutils literal notranslate"><span class="pre">LogEntry.warn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.warning"><code class="docutils literal notranslate"><span class="pre">LogEntry.warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.LogEntry.__init__"><code class="docutils literal notranslate"><span class="pre">LogEntry.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger"><code class="docutils literal notranslate"><span class="pre">Logger</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.logger"><code class="docutils literal notranslate"><span class="pre">Logger.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.pre_log_buffer"><code class="docutils literal notranslate"><span class="pre">Logger.pre_log_buffer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.initialize"><code class="docutils literal notranslate"><span class="pre">Logger.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.log"><code class="docutils literal notranslate"><span class="pre">Logger.log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.debug"><code class="docutils literal notranslate"><span class="pre">Logger.debug()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.warn"><code class="docutils literal notranslate"><span class="pre">Logger.warn()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.warning"><code class="docutils literal notranslate"><span class="pre">Logger.warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.error"><code class="docutils literal notranslate"><span class="pre">Logger.error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.info"><code class="docutils literal notranslate"><span class="pre">Logger.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.logging_on"><code class="docutils literal notranslate"><span class="pre">Logger.logging_on()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.helper.html#vyra_base.helper.logger.Logger.add_external"><code class="docutils literal notranslate"><span class="pre">Logger.add_external()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.helper.html#module-vyra_base.helper">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vyra_base.state.html">vyra_base.state package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.health_layer">vyra_base.state.health_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer"><code class="docutils literal notranslate"><span class="pre">HealthLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.__init__"><code class="docutils literal notranslate"><span class="pre">HealthLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.get_state"><code class="docutils literal notranslate"><span class="pre">HealthLayer.get_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.get_state_name"><code class="docutils literal notranslate"><span class="pre">HealthLayer.get_state_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.is_healthy"><code class="docutils literal notranslate"><span class="pre">HealthLayer.is_healthy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.is_warning"><code class="docutils literal notranslate"><span class="pre">HealthLayer.is_warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.is_critical"><code class="docutils literal notranslate"><span class="pre">HealthLayer.is_critical()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.is_degraded"><code class="docutils literal notranslate"><span class="pre">HealthLayer.is_degraded()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.is_operational_safe"><code class="docutils literal notranslate"><span class="pre">HealthLayer.is_operational_safe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.report_warning"><code class="docutils literal notranslate"><span class="pre">HealthLayer.report_warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.clear_warning"><code class="docutils literal notranslate"><span class="pre">HealthLayer.clear_warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.report_fault"><code class="docutils literal notranslate"><span class="pre">HealthLayer.report_fault()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.recover"><code class="docutils literal notranslate"><span class="pre">HealthLayer.recover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.check_and_report"><code class="docutils literal notranslate"><span class="pre">HealthLayer.check_and_report()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.emergency_stop"><code class="docutils literal notranslate"><span class="pre">HealthLayer.emergency_stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.on_state_change"><code class="docutils literal notranslate"><span class="pre">HealthLayer.on_state_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.get_info"><code class="docutils literal notranslate"><span class="pre">HealthLayer.get_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.health_layer.HealthLayer.get_severity_level"><code class="docutils literal notranslate"><span class="pre">HealthLayer.get_severity_level()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.lifecycle_layer">vyra_base.state.lifecycle_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.__init__"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.get_state"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.get_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.get_state_name"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.get_state_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.is_initializing"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.is_initializing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.is_active"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.is_active()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.is_recovering"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.is_recovering()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.is_shutting_down"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.is_shutting_down()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.is_offline"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.is_offline()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.can_accept_tasks"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.can_accept_tasks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.start"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.complete_initialization"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.complete_initialization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.fail_initialization"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.fail_initialization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.shutdown"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.complete_shutdown"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.complete_shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.enter_recovery"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.enter_recovery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.complete_recovery"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.complete_recovery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.fail_recovery"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.fail_recovery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.on_state_change"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.on_state_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.lifecycle_layer.LifecycleLayer.get_info"><code class="docutils literal notranslate"><span class="pre">LifecycleLayer.get_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.operational_layer">vyra_base.state.operational_layer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer"><code class="docutils literal notranslate"><span class="pre">OperationalLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.__init__"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.get_state"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.get_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.get_state_name"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.get_state_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.is_idle"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.is_idle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.is_ready"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.is_ready()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.is_running"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.is_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.is_paused"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.is_paused()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.is_stopped"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.is_stopped()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.can_start_task"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.can_start_task()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.is_busy"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.is_busy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.set_ready"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.set_ready()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.start_task"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.start_task()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.pause"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.pause()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.resume"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.resume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.stop"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.reset"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.start_background_processing"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.start_background_processing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.return_to_foreground"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.return_to_foreground()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.on_state_change"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.on_state_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operational_layer.OperationalLayer.get_info"><code class="docutils literal notranslate"><span class="pre">OperationalLayer.get_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.state_events">vyra_base.state.state_events module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType"><code class="docutils literal notranslate"><span class="pre">EventType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.START"><code class="docutils literal notranslate"><span class="pre">EventType.START</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.INIT_SUCCESS"><code class="docutils literal notranslate"><span class="pre">EventType.INIT_SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.INIT_FAILURE"><code class="docutils literal notranslate"><span class="pre">EventType.INIT_FAILURE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.SET_SUSPENDED"><code class="docutils literal notranslate"><span class="pre">EventType.SET_SUSPENDED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.RESUME_SUSPENDED"><code class="docutils literal notranslate"><span class="pre">EventType.RESUME_SUSPENDED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.SHUTDOWN"><code class="docutils literal notranslate"><span class="pre">EventType.SHUTDOWN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.FINISHED"><code class="docutils literal notranslate"><span class="pre">EventType.FINISHED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.FAULT_DETECTED"><code class="docutils literal notranslate"><span class="pre">EventType.FAULT_DETECTED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.RECOVERY_SUCCESS"><code class="docutils literal notranslate"><span class="pre">EventType.RECOVERY_SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.RECOVERY_FAILED"><code class="docutils literal notranslate"><span class="pre">EventType.RECOVERY_FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.SET_READY"><code class="docutils literal notranslate"><span class="pre">EventType.SET_READY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_START"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_START</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_PAUSE"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_PAUSE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_RESUME"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_RESUME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_COMPLETE"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_COMPLETE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_STOP"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_STOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_RESET"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_RESET</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.TASK_ERROR"><code class="docutils literal notranslate"><span class="pre">EventType.TASK_ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.WARN"><code class="docutils literal notranslate"><span class="pre">EventType.WARN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.CLEAR_WARNING"><code class="docutils literal notranslate"><span class="pre">EventType.CLEAR_WARNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.FAULT"><code class="docutils literal notranslate"><span class="pre">EventType.FAULT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.RECOVER"><code class="docutils literal notranslate"><span class="pre">EventType.RECOVER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.RESET"><code class="docutils literal notranslate"><span class="pre">EventType.RESET</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.INTERRUPT"><code class="docutils literal notranslate"><span class="pre">EventType.INTERRUPT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.EMERGENCY_STOP"><code class="docutils literal notranslate"><span class="pre">EventType.EMERGENCY_STOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.EventType.PRIORITY_OVERRIDE"><code class="docutils literal notranslate"><span class="pre">EventType.PRIORITY_OVERRIDE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent"><code class="docutils literal notranslate"><span class="pre">StateEvent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.event_type"><code class="docutils literal notranslate"><span class="pre">StateEvent.event_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.timestamp"><code class="docutils literal notranslate"><span class="pre">StateEvent.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.origin_layer"><code class="docutils literal notranslate"><span class="pre">StateEvent.origin_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.payload"><code class="docutils literal notranslate"><span class="pre">StateEvent.payload</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.event_id"><code class="docutils literal notranslate"><span class="pre">StateEvent.event_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.to_dict"><code class="docutils literal notranslate"><span class="pre">StateEvent.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.StateEvent.__init__"><code class="docutils literal notranslate"><span class="pre">StateEvent.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.get_event_target_layer"><code class="docutils literal notranslate"><span class="pre">get_event_target_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_events.is_interrupt_event"><code class="docutils literal notranslate"><span class="pre">is_interrupt_event()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.state_machine">vyra_base.state.state_machine module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineError"><code class="docutils literal notranslate"><span class="pre">StateMachineError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.InvalidTransitionError"><code class="docutils literal notranslate"><span class="pre">InvalidTransitionError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.LayerViolationError"><code class="docutils literal notranslate"><span class="pre">LayerViolationError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition"><code class="docutils literal notranslate"><span class="pre">StateTransition</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.from_state"><code class="docutils literal notranslate"><span class="pre">StateTransition.from_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.to_state"><code class="docutils literal notranslate"><span class="pre">StateTransition.to_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.layer"><code class="docutils literal notranslate"><span class="pre">StateTransition.layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.event"><code class="docutils literal notranslate"><span class="pre">StateTransition.event</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.timestamp"><code class="docutils literal notranslate"><span class="pre">StateTransition.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.success"><code class="docutils literal notranslate"><span class="pre">StateTransition.success</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.error_message"><code class="docutils literal notranslate"><span class="pre">StateTransition.error_message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.to_dict"><code class="docutils literal notranslate"><span class="pre">StateTransition.to_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateTransition.__init__"><code class="docutils literal notranslate"><span class="pre">StateTransition.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.initial_lifecycle"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.initial_lifecycle</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.initial_operational"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.initial_operational</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.initial_health"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.initial_health</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.operational_on_recovery"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.operational_on_recovery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.operational_on_shutdown"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.operational_on_shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.enable_transition_log"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.enable_transition_log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.max_history_size"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.max_history_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.strict_mode"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.strict_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachineConfig.__init__"><code class="docutils literal notranslate"><span class="pre">StateMachineConfig.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine"><code class="docutils literal notranslate"><span class="pre">StateMachine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.__init__"><code class="docutils literal notranslate"><span class="pre">StateMachine.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.get_current_state"><code class="docutils literal notranslate"><span class="pre">StateMachine.get_current_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.get_lifecycle_state"><code class="docutils literal notranslate"><span class="pre">StateMachine.get_lifecycle_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.get_operational_state"><code class="docutils literal notranslate"><span class="pre">StateMachine.get_operational_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.get_health_state"><code class="docutils literal notranslate"><span class="pre">StateMachine.get_health_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.is_active"><code class="docutils literal notranslate"><span class="pre">StateMachine.is_active()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.is_operational"><code class="docutils literal notranslate"><span class="pre">StateMachine.is_operational()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.is_healthy"><code class="docutils literal notranslate"><span class="pre">StateMachine.is_healthy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.send_event"><code class="docutils literal notranslate"><span class="pre">StateMachine.send_event()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.subscribe"><code class="docutils literal notranslate"><span class="pre">StateMachine.subscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.unsubscribe"><code class="docutils literal notranslate"><span class="pre">StateMachine.unsubscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.get_history"><code class="docutils literal notranslate"><span class="pre">StateMachine.get_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.clear_history"><code class="docutils literal notranslate"><span class="pre">StateMachine.clear_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_machine.StateMachine.get_diagnostic_info"><code class="docutils literal notranslate"><span class="pre">StateMachine.get_diagnostic_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.state_types">vyra_base.state.state_types module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState"><code class="docutils literal notranslate"><span class="pre">LifecycleState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState.INITIALIZING"><code class="docutils literal notranslate"><span class="pre">LifecycleState.INITIALIZING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState.ACTIVE"><code class="docutils literal notranslate"><span class="pre">LifecycleState.ACTIVE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState.RECOVERING"><code class="docutils literal notranslate"><span class="pre">LifecycleState.RECOVERING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState.SUSPENDED"><code class="docutils literal notranslate"><span class="pre">LifecycleState.SUSPENDED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState.SHUTTING_DOWN"><code class="docutils literal notranslate"><span class="pre">LifecycleState.SHUTTING_DOWN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.LifecycleState.OFFLINE"><code class="docutils literal notranslate"><span class="pre">LifecycleState.OFFLINE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState"><code class="docutils literal notranslate"><span class="pre">OperationalState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState.IDLE"><code class="docutils literal notranslate"><span class="pre">OperationalState.IDLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState.READY"><code class="docutils literal notranslate"><span class="pre">OperationalState.READY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState.RUNNING"><code class="docutils literal notranslate"><span class="pre">OperationalState.RUNNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState.PAUSED"><code class="docutils literal notranslate"><span class="pre">OperationalState.PAUSED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState.STOPPED"><code class="docutils literal notranslate"><span class="pre">OperationalState.STOPPED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.OperationalState.ERROR"><code class="docutils literal notranslate"><span class="pre">OperationalState.ERROR</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.HealthState"><code class="docutils literal notranslate"><span class="pre">HealthState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.HealthState.HEALTHY"><code class="docutils literal notranslate"><span class="pre">HealthState.HEALTHY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.HealthState.WARNING"><code class="docutils literal notranslate"><span class="pre">HealthState.WARNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.HealthState.CRITICAL"><code class="docutils literal notranslate"><span class="pre">HealthState.CRITICAL</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.is_valid_lifecycle_transition"><code class="docutils literal notranslate"><span class="pre">is_valid_lifecycle_transition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.is_valid_operational_transition"><code class="docutils literal notranslate"><span class="pre">is_valid_operational_transition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.is_valid_health_transition"><code class="docutils literal notranslate"><span class="pre">is_valid_health_transition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.state_types.is_operational_allowed_in_lifecycle"><code class="docutils literal notranslate"><span class="pre">is_operational_allowed_in_lifecycle()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state.unified">vyra_base.state.unified module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.__init__"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.get_all_states"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.get_all_states()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.get_lifecycle_state"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.get_lifecycle_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.get_operational_state"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.get_operational_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.get_health_state"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.get_health_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.is_operational"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.is_operational()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.is_healthy"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.is_healthy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.start"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.complete_initialization"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.complete_initialization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.fail_initialization"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.fail_initialization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.shutdown"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.complete_shutdown"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.complete_shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.set_ready"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.set_ready()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.start_task"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.start_task()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.pause"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.pause()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.resume"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.resume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.stop"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.reset"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.report_warning"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.report_warning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.report_fault"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.report_fault()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.recover"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.recover()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.emergency_stop"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.emergency_stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.on_lifecycle_change"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.on_lifecycle_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.on_operational_change"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.on_operational_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.on_health_change"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.on_health_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.on_any_change"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.on_any_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.get_diagnostic_info"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.get_diagnostic_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.get_history"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.get_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.clear_history"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.clear_history()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.send_event"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.send_event()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.standard_startup"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.standard_startup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.unified.UnifiedStateMachine.standard_shutdown"><code class="docutils literal notranslate"><span class="pre">UnifiedStateMachine.standard_shutdown()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.state.html#module-vyra_base.state">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.is_valid_lifecycle_transition"><code class="docutils literal notranslate"><span class="pre">is_valid_lifecycle_transition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.is_valid_operational_transition"><code class="docutils literal notranslate"><span class="pre">is_valid_operational_transition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.is_valid_health_transition"><code class="docutils literal notranslate"><span class="pre">is_valid_health_transition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.is_operational_allowed_in_lifecycle"><code class="docutils literal notranslate"><span class="pre">is_operational_allowed_in_lifecycle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.get_event_target_layer"><code class="docutils literal notranslate"><span class="pre">get_event_target_layer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.is_interrupt_event"><code class="docutils literal notranslate"><span class="pre">is_interrupt_event()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.MetaOperationalState"><code class="docutils literal notranslate"><span class="pre">MetaOperationalState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.MetaOperationalState.STATE_RULES"><code class="docutils literal notranslate"><span class="pre">MetaOperationalState.STATE_RULES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateError"><code class="docutils literal notranslate"><span class="pre">OperationalStateError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.__init__"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.get_all_states"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.get_all_states()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.get_operation_counter"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.get_operation_counter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.get_operational_state"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.get_operational_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.is_error"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.is_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.is_idle"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.is_idle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.is_paused"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.is_paused()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.is_ready"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.is_ready()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.is_running"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.is_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationalStateMachine.is_stopped"><code class="docutils literal notranslate"><span class="pre">OperationalStateMachine.is_stopped()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.operation"><code class="docutils literal notranslate"><span class="pre">operation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationConfig"><code class="docutils literal notranslate"><span class="pre">OperationConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.state.html#vyra_base.state.OperationConfig.__init__"><code class="docutils literal notranslate"><span class="pre">OperationConfig.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vyra_base.storage.html">vyra_base.storage package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.storage.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.storage.html#module-vyra_base.storage.db_access">vyra_base.storage.db_access module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS"><code class="docutils literal notranslate"><span class="pre">DBSTATUS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.SUCCESS"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.SUCCESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.ERROR"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_FOUND"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.NOT_FOUND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_ALLOWED"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.NOT_ALLOWED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.NOT_AUTHORIZED"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.NOT_AUTHORIZED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBSTATUS.CONFLICT"><code class="docutils literal notranslate"><span class="pre">DBSTATUS.CONFLICT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBTYPE"><code class="docutils literal notranslate"><span class="pre">DBTYPE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBTYPE.SQLITE"><code class="docutils literal notranslate"><span class="pre">DBTYPE.SQLITE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBTYPE.MYSQL"><code class="docutils literal notranslate"><span class="pre">DBTYPE.MYSQL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBTYPE.POSTGRESQL"><code class="docutils literal notranslate"><span class="pre">DBTYPE.POSTGRESQL</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBMESSAGE"><code class="docutils literal notranslate"><span class="pre">DBMESSAGE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DBMESSAGE.DEFAULT_ERROR"><code class="docutils literal notranslate"><span class="pre">DBMESSAGE.DEFAULT_ERROR</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess"><code class="docutils literal notranslate"><span class="pre">DbAccess</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.__init__"><code class="docutils literal notranslate"><span class="pre">DbAccess.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.session"><code class="docutils literal notranslate"><span class="pre">DbAccess.session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.create_all_tables"><code class="docutils literal notranslate"><span class="pre">DbAccess.create_all_tables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.create_selected_table"><code class="docutils literal notranslate"><span class="pre">DbAccess.create_selected_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.drop_table"><code class="docutils literal notranslate"><span class="pre">DbAccess.drop_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_access.DbAccess.check_table_exists"><code class="docutils literal notranslate"><span class="pre">DbAccess.check_table_exists()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.storage.html#module-vyra_base.storage.db_manipulator">vyra_base.storage.db_manipulator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue"><code class="docutils literal notranslate"><span class="pre">DBReturnValue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.__init__"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.status"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.value"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.details"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.details</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.error_return"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.error_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DBReturnValue.success_return"><code class="docutils literal notranslate"><span class="pre">DBReturnValue.success_return()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator"><code class="docutils literal notranslate"><span class="pre">DbManipulator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.__init__"><code class="docutils literal notranslate"><span class="pre">DbManipulator.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.get_table_structure"><code class="docutils literal notranslate"><span class="pre">DbManipulator.get_table_structure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.get_by_id"><code class="docutils literal notranslate"><span class="pre">DbManipulator.get_by_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.get_all"><code class="docutils literal notranslate"><span class="pre">DbManipulator.get_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.update"><code class="docutils literal notranslate"><span class="pre">DbManipulator.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.add"><code class="docutils literal notranslate"><span class="pre">DbManipulator.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.delete"><code class="docutils literal notranslate"><span class="pre">DbManipulator.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.bulk_add"><code class="docutils literal notranslate"><span class="pre">DbManipulator.bulk_add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.bulk_delete"><code class="docutils literal notranslate"><span class="pre">DbManipulator.bulk_delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.exists"><code class="docutils literal notranslate"><span class="pre">DbManipulator.exists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.count"><code class="docutils literal notranslate"><span class="pre">DbManipulator.count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.db_manipulator.DbManipulator.to_dict"><code class="docutils literal notranslate"><span class="pre">DbManipulator.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.storage.html#module-vyra_base.storage.storage">vyra_base.storage.storage module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.storage.Storage"><code class="docutils literal notranslate"><span class="pre">Storage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.storage.html#module-vyra_base.storage.tb_base">vyra_base.storage.tb_base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.Base"><code class="docutils literal notranslate"><span class="pre">Base</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.__init__"><code class="docutils literal notranslate"><span class="pre">Base.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.metadata"><code class="docutils literal notranslate"><span class="pre">Base.metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.Base.registry"><code class="docutils literal notranslate"><span class="pre">Base.registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum"><code class="docutils literal notranslate"><span class="pre">IntEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.impl"><code class="docutils literal notranslate"><span class="pre">IntEnum.impl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.__init__"><code class="docutils literal notranslate"><span class="pre">IntEnum.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.process_bind_param"><code class="docutils literal notranslate"><span class="pre">IntEnum.process_bind_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="vyra_base.storage.html#vyra_base.storage.tb_base.IntEnum.process_result_value"><code class="docutils literal notranslate"><span class="pre">IntEnum.process_result_value()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vyra_base.storage.html#module-vyra_base.storage">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-vyra_base">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vyra_base" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="vyra_base.extract_ros_interfaces">
+<span class="sig-prename descclassname"><span class="pre">vyra_base.</span></span><span class="sig-name descname"><span class="pre">extract_ros_interfaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vyra_base.html#extract_ros_interfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vyra_base.extract_ros_interfaces" title="Link to this definition">¶</a></dt>
+<dd><p>Extract ROS2 interface files from the pip-installed library into a ROS2 package.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_package_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a>) – Path to the target ROS2 package where interfaces will be extracted.</p></li>
+<li><p><strong>target_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p>This function copies interface files (msg, srv, action, json) from the installed
+vyra_base library to the specified ROS2 package directory.</p>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="vyra_base.com.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">vyra_base.com package</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="modules.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">vyra_base</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Holger Schernewski
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">vyra_base package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#module-vyra_base">Module contents</a><ul>
+<li><a class="reference internal" href="#vyra_base.extract_ros_interfaces"><code class="docutils literal notranslate"><span class="pre">extract_ros_interfaces()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>
