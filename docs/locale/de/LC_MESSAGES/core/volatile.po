@@ -1,0 +1,404 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../core/volatile.rst:2 ae28dc64d8054963be83825227e1c314
+msgid "Volatile - Volatile real-time data"
+msgstr ""
+
+#: ../../core/volatile.rst:4 e452e1f596d042c6b204ff7d18b1c7a1
+msgid ""
+"The :class:`~vyra_base.core.volatile.Volatile`-class manages volatilee "
+"Daten, die schnell geread and geschrieben are must - ideal for "
+"Echtzeitanwendungen."
+msgstr ""
+
+#: ../../core/volatile.rst:8 f50d883a4edc400aa48c2c6b03202be5
+msgid "Konzept"
+msgstr ""
+
+#: ../../core/volatile.rst:10 d9542c871b534927850a425b0f6fde6d
+msgid "Volatiles are **temporäre, fast Datenspeicher**, die:"
+msgstr ""
+
+#: ../../core/volatile.rst:12 09a4be76b1394d05a526e124beee6c06
+msgid "In Redis (In-Memory-Datenbank) gespeichert are"
+msgstr ""
+
+#: ../../core/volatile.rst:13 57029cdee2214071a62eccc49769475a
+msgid "Sehr fastn Zugriff bieten (~0.1ms)"
+msgstr ""
+
+#: ../../core/volatile.rst:14 468f50cb95ea4b8b9762e06864cd2986
+msgid "Bei Neustart verloren gehen (volatile)"
+msgstr ""
+
+#: ../../core/volatile.rst:15 af96e60b2dc8401db3889bd6a5e79b95
+msgid "Change-Events understützen"
+msgstr ""
+
+#: ../../core/volatile.rst:16 35677c57d3684c3b899cb25b05c3935f
+msgid "Pub/Sub-Mechanismen use"
+msgstr ""
+
+#: ../../core/volatile.rst:19 d3a716914fef4e42aa514b96e82605a9
+msgid "Wann Volatiles use?"
+msgstr ""
+
+#: ../../core/volatile.rst:21 e20be2638bcc42f69b84a7974528ea9a
+msgid "✅ **Ideal for:**"
+msgstr ""
+
+#: ../../core/volatile.rst:23 2f15c13b3238482685da716452f03b0a
+msgid "Sensordaten in Echtzeit"
+msgstr ""
+
+#: ../../core/volatile.rst:24 64201c8211e147b29b1cbece43ca16cb
+msgid "Statusvariablen"
+msgstr ""
+
+#: ../../core/volatile.rst:25 04d5685a666548bf915f5fafd7eb02f2
+msgid "Temporary Berechnungsergebnisse"
+msgstr ""
+
+#: ../../core/volatile.rst:26 31037085ab2046b2bb52b59b3d1a788e
+msgid "Event-basierte Kommunikation zwischen Modulen"
+msgstr ""
+
+#: ../../core/volatile.rst:27 c5d365a579924392a22735874d1c1117
+msgid "Caching of Daten"
+msgstr ""
+
+#: ../../core/volatile.rst:29 251d9adb0887416bb0bd7e79790c1912
+msgid "❌ **Nicht suitable for:**"
+msgstr ""
+
+#: ../../core/volatile.rst:31 1d5c6ecfaf7a46139869e5d145a8c98f
+msgid "Persistente Konfiguration (use you :doc:`parameter`)"
+msgstr ""
+
+#: ../../core/volatile.rst:32 ded1a081ff4743ca9ee9f3592c197268
+msgid "Daten, die Neustarts survive must"
+msgstr ""
+
+#: ../../core/volatile.rst:33 f02c7def20db41e7a049f609084d7d80
+msgid "Sehr große Datenmengen (> GB)"
+msgstr ""
+
+#: ../../core/volatile.rst:36 5c2988cfe9db42dc9ec6130aec69f4e8
+msgid "Access via Entity"
+msgstr ""
+
+#: ../../core/volatile.rst:48 c0040e672b15498f8bcb564506889b94
+msgid "Werte set"
+msgstr ""
+
+#: ../../core/volatile.rst:66 0314b35edc8548a9b7204331c467cae4
+msgid "Werte read"
+msgstr ""
+
+#: ../../core/volatile.rst:85 a258d650979245d9946839dbbd1cb3b1
+msgid "Change-Events"
+msgstr ""
+
+#: ../../core/volatile.rst:87 cc03f8c86e054f2486fff62f17c7366e
+msgid "Monito you Änderungen an Volatiles in Echtzeit:"
+msgstr ""
+
+#: ../../core/volatile.rst:90 2fadfb6064224ea883df2b98eb1854b1
+msgid "Event register"
+msgstr ""
+
+#: ../../core/volatile.rst:98 415fef56aa6b475e8745dd6fd6a9b21a
+msgid "Event-Callback definieren"
+msgstr ""
+
+#: ../../core/volatile.rst:118 d502b7b793c044859830f7e94f231ad6
+msgid "Event entfernen"
+msgstr ""
+
+#: ../../core/volatile.rst:126 5a6c63bfae5f456195cc54fec42fd1e0
+msgid "Channel-Listener"
+msgstr ""
+
+#: ../../core/volatile.rst:128 6b7aab052be54584823f4ae8a5db03c1
+msgid "Für fortgeschrittene Pub/Sub-Kommunikation:"
+msgstr ""
+
+#: ../../core/volatile.rst:138 980c295a7cbb4f559836b59f245e7bf5
+msgid "Praktisches Beispiel"
+msgstr ""
+
+#: ../../core/volatile.rst:141 3112eee144454cbfb44a2da771a934e2
+msgid "Sensor-Daten with Event-Reaktion"
+msgstr ""
+
+#: ../../core/volatile.rst:172 dde17090661044bc85e1eb53cc574a41
+msgid "Inter-Modul-Kommunikation"
+msgstr ""
+
+#: ../../core/volatile.rst:184 a4884c1db77c4955ae07f08a91266056
+msgid ""
+"Beide Module must denselben Redis-Server use (standardmäßig der Fall im "
+"VYRA-System)."
+msgstr ""
+
+#: ../../core/volatile.rst:187 2190109eb25641a7908d7ea2bf07504d
+msgid "Redis-Backend"
+msgstr ""
+
+#: ../../core/volatile.rst:189 48c8558d2357406486195112b6e29989
+msgid "**Verbindung**: Automatisch via ``entity.stoage.redis_client``"
+msgstr ""
+
+#: ../../core/volatile.rst:191 64a8c0d78de24882ae0bcd820c191877
+msgid "**Speicherort**: In-Memory (RAM des Redis-Servers)"
+msgstr ""
+
+#: ../../core/volatile.rst:193 9c29976122e9445393faf262fe76b57a
+msgid "**Persisenz**: Keine - Daten gehen at Redis-Neustart verloren"
+msgstr ""
+
+#: ../../core/volatile.rst:196 87e3c40f07f040b980b45620daf6a2e9
+msgid ""
+"Redis can optional konfiguriert are, um Snapshots to create. This is done"
+" via die Redis-Konfiguration, not in VYRA selbst. Further information: "
+"https://redis.io/docs/management/persisttence/"
+msgstr ""
+
+#: ../../core/volatile.rst:201 e7f9a0b953434548bed2d2a685de0020
+msgid "Performance"
+msgstr ""
+
+#: ../../core/volatile.rst:203 7f5a999d7dcb4ee084f792961496bff4
+msgid "**Typische Zugriffszeiten:**"
+msgstr ""
+
+#: ../../core/volatile.rst:205 cbd5fcb228b94637a85d0aaffd73d0e2
+msgid "Schreiben: ~0.1 - 0.5 ms"
+msgstr ""
+
+#: ../../core/volatile.rst:206 e8ce383bd407451bba094868e074995f
+msgid "Lesen: ~0.1 - 0.3 ms"
+msgstr ""
+
+#: ../../core/volatile.rst:207 056df099c8c1480bbe9d6ae2d62e7b01
+msgid "Event-Trigger: ~1 - 5 ms"
+msgstr ""
+
+#: ../../core/volatile.rst:210 219a1730ff224f84b56eb5c81e6f46a2
+msgid ""
+"Volatiles are **100x fastr** als Parameter (SQLite). Use you Volatiles "
+"for hochfrequente Datenoperationen!"
+msgstr ""
+
+#: ../../core/volatile.rst:214 fabf3695d6694c47acb1ed02e1f5f423
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../core/volatile.rst:216 2dde74c1df9047e38a252a431aaf12f8
+msgid "✅ **Empfohlen:**"
+msgstr ""
+
+#: ../../core/volatile.rst:231 7ec9d3e4d48447a1bdf3b86f34451923
+msgid "❌ **Vermeiden:**"
+msgstr ""
+
+#: ../../core/volatile.rst:246 b1b9b2057e714f81b5673c7756148234
+msgid "Error Handling"
+msgstr ""
+
+#: ../../core/volatile.rst:260 bfaadc4c147b4381b26365c69acdf4de
+msgid "Further Information"
+msgstr ""
+
+#: ../../core/volatile.rst:262 5ee76b3aa5dd42ef986344f6d5a44605
+msgid ":doc:`entity` - Entity-Dokumentation"
+msgstr ""
+
+#: ../../core/volatile.rst:263 45831f2e67e44a319612b32e2ad18fd5
+msgid ":doc:`parameter` - Persistente Alternative"
+msgstr ""
+
+#: ../../core/volatile.rst:264 0aa351efba82406e86255a554cd1f249
+msgid ":doc:`../stoage` - Stoage-Backend Details"
+msgstr ""
+
+#: ../../core/volatile.rst:265 60f0a13d27624496bbbd7c11470da478
+msgid ":class:`~vyra_base.core.volatile.Volatile` - API-Referenz"
+msgstr ""
+
+#: ../../core/volatile.rst:266 ca3c381892874412bcc3d5d616c87943
+msgid "Redis Dokumentation: https://redis.io/docs/"
+msgstr ""
+
+#~ msgid ""
+#~ "Die :class:`~vyra_base.core.volatile.Volatile`-Klasse "
+#~ "verwaltet flüchtige Daten, die schnell "
+#~ "gelesen und geschrieben werden müssen -"
+#~ " ideal für Echtzeitanwendungen."
+#~ msgstr ""
+
+#~ msgid "Volatiles sind **temporäre, schnelle Datenspeicher**, die:"
+#~ msgstr ""
+
+#~ msgid "In Redis (In-Memory-Datenbank) gespeichert werden"
+#~ msgstr ""
+
+#~ msgid "✅ **Ideal für:**"
+#~ msgstr ""
+
+#~ msgid "Caching von Daten"
+#~ msgstr ""
+
+#~ msgid "❌ **Nicht geeignet für:**"
+#~ msgstr ""
+
+#~ msgid "Persistente Konfiguration (nutzen Sie :doc:`parameter`)"
+#~ msgstr ""
+
+#~ msgid "Daten, die Neustarts überleben müssen"
+#~ msgstr ""
+
+#~ msgid "Zugriff über Entity"
+#~ msgstr ""
+
+#~ msgid "Event registrieren"
+#~ msgstr ""
+
+#~ msgid "Channel-Listener"
+#~ msgstr ""
+
+#~ msgid "Sensor-Daten mit Event-Reaktion"
+#~ msgstr ""
+
+#~ msgid "**Verbindung**: Automatisch über ``entity.storage.redis_client``"
+#~ msgstr ""
+
+#~ msgid "**Persistenz**: Keine - Daten gehen bei Redis-Neustart verloren"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Redis kann optional konfiguriert werden, "
+#~ "um Snapshots zu erstellen. Dies erfolgt"
+#~ " über die Redis-Konfiguration, nicht "
+#~ "in VYRA selbst. Weitere Informationen: "
+#~ "https://redis.io/docs/management/persistence/"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Volatiles sind **100x schneller** als "
+#~ "Parameter (SQLite). Nutzen Sie Volatiles "
+#~ "für hochfrequente Datenoperationen!"
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid ":doc:`parameter` - Persistente Alternative"
+#~ msgstr ""
+
+#~ msgid "Volatile - Flüchtige Echtzeitdaten"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The :class:`~vyra_base.core.volatile.Volatile`-Klasse "
+#~ "verwaltet flüchtige Daten, die schnell "
+#~ "gelesen and geschrieben are müssen - "
+#~ "ideal for Echtzeitanwendungen."
+#~ msgstr ""
+
+#~ msgid "Volatiles are **temporäre, schnelle Datenspeicher**, die:"
+#~ msgstr ""
+
+#~ msgid "Sehr schnellen Zugriff bieten (~0.1ms)"
+#~ msgstr ""
+
+#~ msgid "Bei Neustart verloren gehen (flüchtig)"
+#~ msgstr ""
+
+#~ msgid "Change-Events unterstützen"
+#~ msgstr ""
+
+#~ msgid "Pub/Sub-Mechanismen nutzen"
+#~ msgstr ""
+
+#~ msgid "Wann Volatiles nutzen?"
+#~ msgstr ""
+
+#~ msgid "Temporäre Berechnungsergebnisse"
+#~ msgstr ""
+
+#~ msgid "❌ **Nicht geeignet for:**"
+#~ msgstr ""
+
+#~ msgid "Persisente Konfiguration (nutzen Sie :doc:`parameter`)"
+#~ msgstr ""
+
+#~ msgid "Daten, die Neustarts vialeben müssen"
+#~ msgstr ""
+
+#~ msgid "Werte setzen"
+#~ msgstr ""
+
+#~ msgid "Werte lesen"
+#~ msgstr ""
+
+#~ msgid "Überwachen Sie Änderungen an Volatiles in Echtzeit:"
+#~ msgstr ""
+
+#~ msgid "Event regisrieren"
+#~ msgstr ""
+
+#~ msgid "Channel-Lisener"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beide Module müssen denselben Redis-"
+#~ "Server verwenden (standardmäßig der Fall "
+#~ "im VYRA-System)."
+#~ msgstr ""
+
+#~ msgid "**Verbindung**: Automatisch via ``entity.storage.redis_client``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Redis can optional konfiguriert are, um"
+#~ " Snapshots to erstellen. Thes erfolgt "
+#~ "via die Redis-Konfiguration, nicht in"
+#~ " VYRA selbst. Weitere Informationen: "
+#~ "https://redis.io/docs/management/persisence/"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Volatiles are **100x schneller** als "
+#~ "Parameter (SQLite). Nutzen Sie Volatiles "
+#~ "for hochfrequente Datenoperationen!"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung"
+#~ msgstr ""
+
+#~ msgid ":doc:`parameter` - Persisente Alternative"
+#~ msgstr ""
+
+#~ msgid ":doc:`../storage` - Storage-Backend Details"
+#~ msgstr ""
+

@@ -1,0 +1,476 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.helper.rst:2 88d39cb2aa1f46e3a37532e97dfff31c
+msgid "vyra\\_base.helper package"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:5 d267934a8e4f4765b8791c85bda51416
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:8 9be271cab3e844ac8b8a71218bb941cb
+msgid "vyra\\_base.helper.env\\_handler module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:16 093927e3a02f45cfba47ae11395defe1
+msgid "vyra\\_base.helper.error\\_handler module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:24 0dce853afdef415d8d96e4365c4c905c
+msgid "vyra\\_base.helper.file\\_lock module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:32 ef772d5072b749b49b4fcfab46dff071
+msgid "vyra\\_base.helper.file\\_reader module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:40 94779c65f18540c9a46050a38fd00876
+msgid "vyra\\_base.helper.file\\_writer module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:48 8c104e3d5b8348619bead554c9421373
+msgid "vyra\\_base.helper.log\\_filter module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:56 16bc34b1b6734ece9001f9bf4f469d60
+msgid "vyra\\_base.helper.logger module"
+msgstr ""
+
+#: ../../vyra_base.helper.rst:64 1f339d5c47c64723b8b9525e9a74619b
+msgid "Module contents"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Class to handle the environment variables for the project."
+#~ msgstr ""
+
+#~ msgid "Initialize the EnvHandler class."
+#~ msgstr ""
+
+#~ msgid "Load the environment variables from a file."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Path to the environment file directory."
+#~ msgstr ""
+
+#~ msgid "Class to check traceback errors and feedback them to the logger."
+#~ msgstr ""
+
+#~ msgid "Check if an error occurred and log it."
+#~ msgstr ""
+
+#~ msgid "List to append error details to."
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "True if an error exists, otherwise False."
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid "Decorator to check if an error occurred after function execution."
+#~ msgstr ""
+
+#~ msgid "The function to decorate."
+#~ msgstr ""
+
+#~ msgid "The wrapped function."
+#~ msgstr ""
+
+#~ msgid "Get (or create) a lock for the specified file."
+#~ msgstr ""
+
+#~ msgid "The path to the file."
+#~ msgstr ""
+
+#~ msgid "An asyncio.Lock object for the file."
+#~ msgstr ""
+
+#~ msgid "Remove the lock from the dictionary if no tasks are waiting for it."
+#~ msgstr ""
+
+#~ msgid "Get (or create) a threading lock for the specified file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "A threading.Lock object for the file."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Remove the threading lock from the "
+#~ "dictionary if not locked (synchronous)."
+#~ msgstr ""
+
+#~ msgid "File reader."
+#~ msgstr ""
+
+#~ msgid "Reads file content from locally stored files into the module."
+#~ msgstr ""
+
+#~ msgid "Reads a JSON file."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To ensure cross platform compatibility, "
+#~ "JSON files are opened with utf8-sig "
+#~ "encoding."
+#~ msgstr ""
+
+#~ msgid "JSON formatted file."
+#~ msgstr ""
+
+#~ msgid "JSON file as a default configuration for the module."
+#~ msgstr ""
+
+#~ msgid "Parsed JSON content."
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid "If an unexpected IO error occurs."
+#~ msgstr ""
+
+#~ msgid "If a decoding error occurs."
+#~ msgstr ""
+
+#~ msgid "If a JSON decoding error occurs."
+#~ msgstr ""
+
+#~ msgid "If an unexpected type error occurs."
+#~ msgstr ""
+
+#~ msgid "If the file is not found."
+#~ msgstr ""
+
+#~ msgid "Reads a markdown file."
+#~ msgstr ""
+
+#~ msgid "Markdown formatted file."
+#~ msgstr ""
+
+#~ msgid "Markdown file as a default configuration for the module."
+#~ msgstr ""
+
+#~ msgid "File content."
+#~ msgstr ""
+
+#~ msgid "Reads an environment (.env) file."
+#~ msgstr ""
+
+#~ msgid "Path to the directory containing the .env file."
+#~ msgstr ""
+
+#~ msgid "Dictionary of environment variables."
+#~ msgstr ""
+
+#~ msgid "Reads a TOML file."
+#~ msgstr ""
+
+#~ msgid "TOML formatted file."
+#~ msgstr ""
+
+#~ msgid "Parsed TOML content as a dictionary."
+#~ msgstr ""
+
+#~ msgid "If tomli is not installed for Python < 3.11."
+#~ msgstr ""
+
+#~ msgid "Reads an INI file."
+#~ msgstr ""
+
+#~ msgid "INI formatted file."
+#~ msgstr ""
+
+#~ msgid "Parsed INI content as a dictionary."
+#~ msgstr ""
+
+#~ msgid "If configparser is not available."
+#~ msgstr ""
+
+#~ msgid "Reads a YAML file."
+#~ msgstr ""
+
+#~ msgid "YAML formatted file."
+#~ msgstr ""
+
+#~ msgid "Parsed YAML content as a dictionary."
+#~ msgstr ""
+
+#~ msgid "If PyYAML is not installed."
+#~ msgstr ""
+
+#~ msgid "Reads a JSON file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Reads a markdown file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Reads an environment (.env) file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Reads a TOML file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Reads an INI file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Reads a YAML file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "File writer."
+#~ msgstr ""
+
+#~ msgid "Writes Python objects to a file with both async and sync methods."
+#~ msgstr ""
+
+#~ msgid "Writes a JSON file from a dictionary (asynchronous)."
+#~ msgstr ""
+
+#~ msgid "The path to the file to write."
+#~ msgstr ""
+
+#~ msgid "The dictionary to serialize as JSON."
+#~ msgstr ""
+
+#~ msgid "True if writing finished successfully, else False."
+#~ msgstr ""
+
+#~ msgid "Writes binary content to a file (asynchronous)."
+#~ msgstr ""
+
+#~ msgid "The binary content to write."
+#~ msgstr ""
+
+#~ msgid "Writes a YAML file from a dictionary (asynchronous)."
+#~ msgstr ""
+
+#~ msgid "The dictionary to serialize as YAML."
+#~ msgstr ""
+
+#~ msgid "Writes a JSON file from a dictionary (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Writes binary content to a file (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Writes a YAML file from a dictionary (synchronous)."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~logging.Filter`"
+#~ msgstr ""
+
+#~ msgid "Custom logging filter for filtering log records based on parameters."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Extends Python's logging.Filter to provide "
+#~ "VYRA-specific log filtering capabilities."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "Filter parameter string."
+#~ msgstr ""
+
+#~ msgid "Initialize a filter."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Initialize with the name of the "
+#~ "logger which, together with its "
+#~ "children, will have its events allowed"
+#~ " through the filter. If no name "
+#~ "is specified, allow every event."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~enum.Enum`"
+#~ msgstr ""
+
+#~ msgid "Enum for the different logging modes."
+#~ msgstr ""
+
+#~ msgid "0: debug-msg"
+#~ msgstr ""
+
+#~ msgid "1: info-msg"
+#~ msgstr ""
+
+#~ msgid "2: warning-msg"
+#~ msgstr ""
+
+#~ msgid "3: error-msg"
+#~ msgstr ""
+
+#~ msgid "Object for Logger entries."
+#~ msgstr ""
+
+#~ msgid "The log message."
+#~ msgstr ""
+
+#~ msgid "The log mode (default: LogMode.INFO)."
+#~ msgstr ""
+
+#~ msgid "Set the mode to debug."
+#~ msgstr ""
+
+#~ msgid "Self with mode set to DEBUG."
+#~ msgstr ""
+
+#~ msgid "Set the mode to error."
+#~ msgstr ""
+
+#~ msgid "Self with mode set to ERROR."
+#~ msgstr ""
+
+#~ msgid "Set the mode to warning."
+#~ msgstr ""
+
+#~ msgid "Self with mode set to WARNING."
+#~ msgstr ""
+
+#~ msgid "Alias for warn() method to match Python logging convention."
+#~ msgstr ""
+
+#~ msgid "Self with warning level set."
+#~ msgstr ""
+
+#~ msgid "Class for logging backend information."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The logger object is used globally "
+#~ "and is initialized only once, following"
+#~ " the Singleton design pattern."
+#~ msgstr ""
+
+#~ msgid "Initialize the logger with a configuration file."
+#~ msgstr ""
+
+#~ msgid "Path to the logging configuration file."
+#~ msgstr ""
+
+#~ msgid "Whether logging is active."
+#~ msgstr ""
+
+#~ msgid "Optional tag to add to the logger message as [<log_tag>] <message>."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+#~ msgstr ""
+
+#~ msgid "Log a message in different modes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Message and log level to be "
+#~ "logged. For more information see "
+#~ "LogEntry class."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "None. If logging is not active, "
+#~ "the message will be printed to "
+#~ "stdout. Otherwise, the message will be"
+#~ " logged according to its mode."
+#~ msgstr ""
+
+#~ msgid "Log a message in debug mode."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Independent of the logging configuration, "
+#~ "this function will always log the "
+#~ "message in debug mode. This is "
+#~ "useful for logging messages that should"
+#~ " always be logged, regardless of the"
+#~ " logging configuration."
+#~ msgstr ""
+
+#~ msgid "Log a message in warning mode."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Independent of the logging configuration, "
+#~ "this function will always log the "
+#~ "message in warning mode. This is "
+#~ "useful for logging messages that should"
+#~ " always be logged, regardless of the"
+#~ " logging configuration."
+#~ msgstr ""
+
+#~ msgid "Alias for warn() to match Python logging convention."
+#~ msgstr ""
+
+#~ msgid "Message to log as warning."
+#~ msgstr ""
+
+#~ msgid "Log a message in error mode."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Independent of the logging configuration, "
+#~ "this function will always log the "
+#~ "message in error mode. This is "
+#~ "useful for logging messages that should"
+#~ " always be logged, regardless of the"
+#~ " logging configuration."
+#~ msgstr ""
+
+#~ msgid "Log a message in info mode."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Independent of the logging configuration, "
+#~ "this function will always log the "
+#~ "message in info mode. This is "
+#~ "useful for logging messages that should"
+#~ " always be logged, regardless of the"
+#~ " logging configuration."
+#~ msgstr ""
+
+#~ msgid "Decorator-function to log the name of the functions that are called."
+#~ msgstr ""
+
+#~ msgid "The runtime duration of that function will also be logged."
+#~ msgstr ""
+
+#~ msgid "Function to be decorated."
+#~ msgstr ""
+
+#~ msgid "Wrapper function."
+#~ msgstr ""
+
+#~ msgid "Add an external logger by descriptor."
+#~ msgstr ""
+
+#~ msgid "The logger descriptor."
+#~ msgstr ""
+

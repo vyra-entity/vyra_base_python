@@ -1,0 +1,618 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../com/ros2_communication.rst:2 37346ed77c8d46f4b4fe2bbd241a673d
+msgid "ROS2 Communication"
+msgstr "ROS2 Kommunikation"
+
+#: ../../com/ros2_communication.rst:4 277189a5236c4609b997e02c3d7e40cf
+msgid ""
+"VYRA uses ROS2 for inter-module communication. The framework abstracts "
+"the ROS2 API and provides simple interfaces for Services, Topics, and "
+"Actions."
+msgstr ""
+
+#: ../../com/ros2_communication.rst:8 e20e4a3c913e4cfe89d7fb442ed92844
+msgid "Concepts"
+msgstr "Konzepte"
+
+#: ../../com/ros2_communication.rst:10 3290e27739b240559c9416a25ffc47d2
+msgid "ROS2 has three main communication patterns:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:12 486fc37133344c9c8ec6e9426acd2b53
+msgid "**Services (Request/Response)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:14 d680b016f9d742f89b9ad32954cb2bf4
+msgid "**Job** = Service Client (calls service)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:15 93442daaa3754840b9042e56803d1dc9
+msgid "**Callable** = Service Server (provides service)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:16 0660d5ef8b2047c2aca669e1b1b7507e
+msgid "Synchronous request-response communication"
+msgstr "Synchrone Anfrage-Antwort-Kommunikation"
+
+#: ../../com/ros2_communication.rst:18 34fd714910f44bad94c54021811b30ab
+msgid "**Topics (Publish/Subscribe)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:20 b8717ea24fef4c1c9e676cc98526c661
+msgid "**Speaker** = Publisher (publishes)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:21 21c4537e54e64a39b9e78e8704902ea0
+msgid "**Listener** = Subscriber (receives)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:22 ba3eb0bb0d244e47b4cb8918fd57b956
+msgid "Asynchronous broadcast communication"
+msgstr "Asynchrone Broadcast-Kommunikation"
+
+#: ../../com/ros2_communication.rst:24 70ea4e199cf747a3905202b1764f3c5b
+msgid "**Actions (Long-running operations)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:26 b2bf964751eb47d0bda98a891bef3842
+msgid "**Action Client** (starts action)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:27 f04c1deb8d72423c86f6cea4934ffb09
+msgid "**Action Server** (executes action)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:28 a2e85f49934f44d0bfa69a37c2244828
+msgid "With feedback and cancel capability"
+msgstr "Mit Feedback und Cancel-Möglichkeit"
+
+#: ../../com/ros2_communication.rst:31 dc5887c9aacc4a6d82ae29bec08dfe6d
+msgid "Services: Job & Callable"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:34 efab333831aa4249ace64c565980e29e
+msgid "Job - Service Client"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:36 6bcbe3700ce744a6ab5c1caf4a988429
+msgid "A **Job** calls services on other modules:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:59 ../../com/ros2_communication.rst:97
+#: ../../com/ros2_communication.rst:128 ../../com/ros2_communication.rst:161
+#: 14853fc5328b4e62bdd9e66a36e8b85a 5a089dce5c6744e88ecbec4d70c1771e
+#: 5cdca411dfc046e2b0eb72c52ff7ace0 a7786ea8bc20471e85fadba4dc1e71e3
+msgid "**Parameters:**"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:61 cab0b9cfe24c4be3a01e9aaecace0f82
+msgid "``node``: The ROS2 node (typically ``entity.node``)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:62 cca940df95084ebc953625dd320684b3
+msgid "``service_name``: Service name (with namespace)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:63 87ff5fee676c4dc38d32b0a932da46bc
+msgid "``service_type``: ROS2 service type (imported from ``*_interfaces.srv``)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:66 0750586e8b7e4012a6684c18b9e21c44
+msgid "Callable - Service Server"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:68 82dbf5fa463d4e4493824d9712bd6b44
+msgid ""
+"A **Callable** provides a service for other modules. Use the "
+"``@remote_callable`` decorato:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:92 d1ab0fe560674d43a29198f00e648b8a
+msgid "**Automatic Regisration:**"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:94 a032d18c87d840788cea71da82a541cd
+msgid ""
+"Methods with ``@remote_callable`` are automatically registered as ROS2 "
+"services, when the JSON metadata is correctly defined (see "
+":doc:`../interfaces`)."
+msgstr ""
+
+#: ../../com/ros2_communication.rst:99 4b2646e159b74cdfbca90fb1cf9ad5e8
+msgid "``request``: Incoming service request (defined by service type)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:100 703bcabb4d774b3bb24cbd471e4b4d9a
+msgid "``response``: Outgoing service response (returned)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:103 18337a4ea80d4d1a9c2e4bc0b7053e5c
+msgid "Topics: Speaker & Listener"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:106 5936d6d118c34575bea79fad6e641e73
+msgid "Speaker - Publisher"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:108 06c2a2e651ee41e7b2ea89b24ab24f51
+msgid "A **Speaker** publishes messages on a topic:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:130 2820e823e8884a7c951968db476bc000
+msgid "``node``: The ROS2 node"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:131 19293013d16f4e83a5c21cecd1cf061f
+msgid "``topic_name``: Topic name"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:132 7129c15f01f244c9b6bff00d40a83d11
+msgid "``topic_type``: ROS2 message type (imported from ``*_interfaces.msg``)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:133 c7caee3d067946bab8c5495f958024c6
+msgid "``qos_profile``: Quality of Service (queue size or QoS object)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:136 1b51d0d17cca4dae9d866cebf60d12d3
+msgid "Listener - Subscriber"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:138 e1ef226d308e442b954e0df1a97c36a8
+msgid "A **Listener** receives messages from a topic:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:163 025790badd8d44429a4b4a67faf9c314
+msgid "``callback``: Function called for each message"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:164 244fe09b8cd64a3e98d199d06fd21ed1
+msgid "Other parameters same as Speaker"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:167 e7a35fcd49a04a9cae0a171e55c24c6d
+msgid "Practical Examples"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:170 19ff0631cd454fb0886f071b26223ba1
+msgid "Inter-Module Service Call"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:172 c7952c9de74c4e6bb6a49c891578329c
+msgid "**Module A (Server)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:189 6fd1f80508d447aeb5303165675eefec
+msgid "**Module B (Client)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:210 05362d77dc8e4fb796e0a4d1abb7fee2
+msgid "Topic-based Status Messages"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:212 72c54573ae9f42e2928acb6863ce3df9
+msgid "**Publisher (Module A)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:234 e002522754f1473e99052b80335b578b
+msgid "**Subscriber (Module B)**:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:253 96a72e3028164580a63da900194bb17a
+msgid "Interface Definition"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:255 2a2ba4a0d3c14b2b907d74c73dcf1ec1
+msgid "ROS2 interfaces are defined via JSON metadata."
+msgstr ""
+
+#: ../../com/ros2_communication.rst:257 8f683e444de2446bbe6f5e3e5d02abd2
+msgid "**Example** (``config/service_interfaces.json``):"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:276 a8807f3bff41405fb21773c5882b6029
+msgid "Thise metadata are loaded at entity start and automatically registered:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:284 7ca8725f6e5a47e8b6ac1475c7f04207
+msgid "For more details see :doc:`../interfaces`."
+msgstr ""
+
+#: ../../com/ros2_communication.rst:287 47494a99d67d4f4d9618645812baf7a0
+msgid "Quality of Service (QoS)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:289 e7ddb80639d14a4aa4b6b1e8e8ff0f81
+msgid "ROS2 uses QoS profiles to configure communication:"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:310 d05887717343466b887277c34e706b9b
+msgid "**Typical Profiles:**"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:312 977f72c01c8e4faeae0f4c3ac4b176f5
+msgid "**Sensor Data**: ``BEST_EFFORT`` (fast, loss acceptable)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:313 52d98bfa52dd44caaa8c63487837155d
+msgid "**Commands**: ``RELIABLE`` (guaranteed delivery)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:314 791be1dce3f14f89868fbe7ac870961d
+msgid ""
+"**Persistent Data**: ``TRANSIENT_LOCAL`` (new subscribers receive last "
+"message)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:317 38d3b7a6bad8492f8d01a59d16190a9a
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../com/ros2_communication.rst:319 426c76760dc64c4fb40240c7f0b9cf76
+msgid "✅ **Recommended:**"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:321 f25eb6f8bca94b03b92813f43905a264
+msgid "Use meaningful service/topic names with namespace"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:322 13b51cf3f7ea4005b4905c93921a7206
+msgid "Define interfaces in JSON metadata"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:323 a24130e3f632414f9ce061d559b003f8
+msgid "Use ``@remote_callable`` for automatic regisration"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:324 4daf5c87a0bd43879e1f418ced5dd8ed
+msgid "Implement timeouts for service calls"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:325 b24a12e001df4e7db63be78be42f5b2e
+msgid "Use QoS profiles appropriate for the use case"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:327 426c76760dc64c4fb40240c7f0b9cf76
+msgid "❌ **Avoid:**"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:329 a39b1150beab495fb5cd26cfa6a26a70
+msgid "Manual ROS2 node creation (use ``entity.node``)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:330 300896b55962429cb76592c3472850af
+msgid "Very large messages (> 1 MB) via topics"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:331 3289c87ffeea4c8ba8d697156e5f58d3
+msgid "High-frequency service calls (> 100 Hz, use topics)"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:332 6df3c2aedc3346f88ef09f93a6fe741d
+msgid "Blocking calls without timeout"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:335 81431077caaf4f239501449d2841505d
+msgid "Error Handling"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:353 63b8eee285904698933580da36d95a64
+msgid "Further Information"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:355 579eb99053db4cc382a6f7c882833152
+msgid ":doc:`ipc_communication` - IPC within a module"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:356 f7908bb39e6a4c2180e5de549ff6282a
+msgid ":doc:`feeders` - Automatic feeders"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:357 62ffe76f7b3d4c748f4b30424d98fa13
+msgid ":doc:`../interfaces` - Interface definitions"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:358 4f943b4e63074355978cef5ba914ec3a
+msgid ":doc:`../vyra_base.com.datalayer` - API Reference"
+msgstr ""
+
+#: ../../com/ros2_communication.rst:359 87e52b1951d54ddea895a30980787e67
+msgid "ROS2 Documentation: https://docs.ros.org/en/kilted/"
+msgstr ""
+
+#~ msgid "ROS2 Kommunikation"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "VYRA nutzt ROS2 für die Kommunikation"
+#~ " zwischen Modulen. Das Framework "
+#~ "abstrahiert die ROS2-API und bietet "
+#~ "einfache Schnittstellen für Services, Topics"
+#~ " und Actions."
+#~ msgstr ""
+
+#~ msgid "Konzepte"
+#~ msgstr ""
+
+#~ msgid "**Job** = Service Client (ruft auf)"
+#~ msgstr ""
+
+#~ msgid "**Callable** = Service Server (wird aufgerufen)"
+#~ msgstr ""
+
+#~ msgid "Synchrone Anfrage-Antwort-Kommunikation"
+#~ msgstr ""
+
+#~ msgid "**Speaker** = Publisher (veröffentlicht)"
+#~ msgstr ""
+
+#~ msgid "**Listener** = Subscriber (empfängt)"
+#~ msgstr ""
+
+#~ msgid "Asynchrone Broadcast-Kommunikation"
+#~ msgstr ""
+
+#~ msgid "**Actions (Langläufige Operationen)**:"
+#~ msgstr ""
+
+#~ msgid "**Action Client** (startet Aktion)"
+#~ msgstr ""
+
+#~ msgid "Mit Feedback und Cancel-Möglichkeit"
+#~ msgstr ""
+
+#~ msgid "Ein **Speaker** veröffentlicht Nachrichten auf einem Topic:"
+#~ msgstr ""
+
+#~ msgid "Ein **Listener** empfängt Nachrichten von einem Topic:"
+#~ msgstr ""
+
+#~ msgid ":doc:`../vyra_base.com.datalayer` - API-Referenz"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "VYRA uses ROS2 for inter-module "
+#~ "communication. Das Framework abstrahiert die"
+#~ " ROS2-API und bietet einfache "
+#~ "Schnittstellen für Services, Topics und "
+#~ "Actions."
+#~ msgstr ""
+
+#~ msgid "ROS2 kennt drei Hauptkommunikationsmuster:"
+#~ msgstr ""
+
+#~ msgid "**Listener** = Subscriber (receives)"
+#~ msgstr ""
+
+#~ msgid "**Action Server** (führt Aktion aus)"
+#~ msgstr ""
+
+#~ msgid "Ein **Job** ruft Services auf anderen Modulen auf:"
+#~ msgstr ""
+
+#~ msgid "**Parameter:**"
+#~ msgstr ""
+
+#~ msgid "``node``: Die ROS2-Node (typischerweise ``entity.node``)"
+#~ msgstr ""
+
+#~ msgid "``service_name``: Name des Services (mit Namespace)"
+#~ msgstr ""
+
+#~ msgid "``service_type``: ROS2 Service-Typ (Import aus ``*_interfaces.srv``)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Ein **Callable** stellt einen Service "
+#~ "für andere Module bereit. Verwenden Sie"
+#~ " den ``@remote_callable`` Decorator:"
+#~ msgstr ""
+
+#~ msgid "**Automatische Registrierung:**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Methoden mit ``@remote_callable`` werden "
+#~ "automatisch als ROS2-Services registriert, "
+#~ "wenn die JSON-Metadaten korrekt "
+#~ "definiert sind (siehe :doc:`../interfaces`)."
+#~ msgstr ""
+
+#~ msgid "``request``: Eingehende Service-Anfrage (vom Service-Typ definiert)"
+#~ msgstr ""
+
+#~ msgid "``response``: Ausgehende Service-Antwort (wird zurückgegeben)"
+#~ msgstr ""
+
+#~ msgid "Topics: Speaker & Listener"
+#~ msgstr ""
+
+#~ msgid "Ein **Speaker** publishes Nachrichten auf einem Topic:"
+#~ msgstr ""
+
+#~ msgid "``node``: Die ROS2-Node"
+#~ msgstr ""
+
+#~ msgid "``topic_name``: Name des Topics"
+#~ msgstr ""
+
+#~ msgid "``topic_type``: ROS2 Message-Typ (Import aus ``*_interfaces.msg``)"
+#~ msgstr ""
+
+#~ msgid "``qos_profile``: Quality-of-Service (Queue-Size oder QoS-Objekt)"
+#~ msgstr ""
+
+#~ msgid "Listener - Subscriber"
+#~ msgstr ""
+
+#~ msgid "Ein **Listener** receives Nachrichten von einem Topic:"
+#~ msgstr ""
+
+#~ msgid "``callback``: Funktion, die bei jeder Nachricht aufgerufen wird"
+#~ msgstr ""
+
+#~ msgid "Andere Parameter wie beim Speaker"
+#~ msgstr ""
+
+#~ msgid "Praktische Beispiele"
+#~ msgstr ""
+
+#~ msgid "Inter-Modul-Service-Aufruf"
+#~ msgstr ""
+
+#~ msgid "**Modul A (Server)**:"
+#~ msgstr ""
+
+#~ msgid "**Modul B (Client)**:"
+#~ msgstr ""
+
+#~ msgid "Topic-basierte Statusmeldungen"
+#~ msgstr ""
+
+#~ msgid "**Publisher (Modul A)**:"
+#~ msgstr ""
+
+#~ msgid "**Subscriber (Modul B)**:"
+#~ msgstr ""
+
+#~ msgid "Interface-Definition"
+#~ msgstr ""
+
+#~ msgid "ROS2-Interfaces werden über JSON-Metadaten definiert."
+#~ msgstr ""
+
+#~ msgid "**Beispiel** (``config/service_interfaces.json``):"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Diese Metadaten werden beim Entity-Start"
+#~ " geladen und automatisch registriert:"
+#~ msgstr ""
+
+#~ msgid "Weitere Details siehe :doc:`../interfaces`."
+#~ msgstr ""
+
+#~ msgid "ROS2 nutzt QoS-Profile zur Konfiguration der Kommunikation:"
+#~ msgstr ""
+
+#~ msgid "**Typische Profile:**"
+#~ msgstr ""
+
+#~ msgid "**Sensor-Daten**: ``BEST_EFFORT`` (schnell, Verlust akzeptabel)"
+#~ msgstr ""
+
+#~ msgid "**Befehle**: ``RELIABLE`` (garantierte Zustellung)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Persistente Daten**: ``TRANSIENT_LOCAL`` (neue "
+#~ "Subscriber erhalten letzte Nachricht)"
+#~ msgstr ""
+
+#~ msgid "✅ **Empfohlen:**"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie aussagekräftige Service-/Topic-Namen mit Namespace"
+#~ msgstr ""
+
+#~ msgid "Definieren Sie Interfaces in JSON-Metadaten"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie ``@remote_callable`` für automatische Registrierung"
+#~ msgstr ""
+
+#~ msgid "Implementieren Sie Timeouts für Service-Calls"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie QoS-Profile passend zum Anwendungsfall"
+#~ msgstr ""
+
+#~ msgid "❌ **Vermeiden:**"
+#~ msgstr ""
+
+#~ msgid "Manuelle ROS2-Node-Erstellung (nutzen Sie ``entity.node``)"
+#~ msgstr ""
+
+#~ msgid "Sehr große Nachrichten (> 1 MB) über Topics"
+#~ msgstr ""
+
+#~ msgid "Hochfrequente Service-Calls (> 100 Hz, nutzen Sie Topics)"
+#~ msgstr ""
+
+#~ msgid "Blocking-Aufrufe ohne Timeout"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung"
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid ":doc:`ipc_communication` - IPC innerhalb eines Moduls"
+#~ msgstr ""
+
+#~ msgid ":doc:`feeders` - Automatische Feeder"
+#~ msgstr ""
+
+#~ msgid ":doc:`../interfaces` - Interface-Definitionen"
+#~ msgstr ""
+
+#~ msgid ":doc:`../vyra_base.com.datalayer` - API-Reference"
+#~ msgstr ""
+
+#~ msgid "ROS2 Dokumentation: https://docs.ros.org/en/kilted/"
+#~ msgstr ""
+
+#~ msgid "**Lisener** = Subscriber (receives)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A **Callable** provides a service for"
+#~ " other modules. Use the "
+#~ "``@remote_callable`` decorator:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Methods with ``@remote_callable`` are "
+#~ "automatically regisered as ROS2 services, "
+#~ "when the JSON metadata is correctly "
+#~ "defined (see :doc:`../interfaces`)."
+#~ msgstr ""
+
+#~ msgid "Topics: Speaker & Lisener"
+#~ msgstr ""
+
+#~ msgid "Lisener - Subscriber"
+#~ msgstr ""
+
+#~ msgid "A **Lisener** receives messages from a topic:"
+#~ msgstr ""
+
+#~ msgid "These metadata are loaded at entity start and automatically regisered:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Persisent Data**: ``TRANSIENT_LOCAL`` (new "
+#~ "subscribers receive last message)"
+#~ msgstr ""
+

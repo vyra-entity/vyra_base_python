@@ -1,0 +1,463 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../com/ipc_communication.rst:2 eddf8526bc1342a9909bf86812f57093
+msgid "IPC - Inter-Process Communication"
+msgstr "IPC - Inter-Process Communication"
+
+#: ../../com/ipc_communication.rst:4 f1c84ed1f979433abed7c6ef4de52b0b
+msgid ""
+"VYRA supports IPC (Inter-Process Communication) via **gRPC with Unix "
+"Domain Sockets**. This enables fast inter-process communication **within "
+"a module**."
+msgstr ""
+
+#: ../../com/ipc_communication.rst:8 5860db8d32ee4d889870bd14b01522dd
+msgid "Concept"
+msgstr "Konzept"
+
+#: ../../com/ipc_communication.rst:10 c399a3d3802f4c3092c69664289c2155
+msgid "IPC eignet sich for:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:12 c6ade0d4833e49b8884034f30e6ee552
+msgid "✅ **Use Cases:**"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:14 8ecca710de4b49458e24d3b4a05a559a
+msgid "Communication between processes in the same container/module"
+msgstr "Kommunikation zwischen Prozessen im selben Container/Modul"
+
+#: ../../com/ipc_communication.rst:15 da2131a0c4564fdeac6acce1f5a3b53e
+msgid "Fast internal API calls without network overhead"
+msgstr "Schnelle interne API-Calls ohne Netzwerk-Overhead"
+
+#: ../../com/ipc_communication.rst:16 a4104e5ca4294a708743dfd9a56e964e
+msgid "Decoupling of frontend and backend within the same module"
+msgstr "Entkopplung von Frontend und Backend im selben Modul"
+
+#: ../../com/ipc_communication.rst:17 aa6ab721f57d462db9caeafae75643a5
+msgid "Python ↔ Python communication within a module"
+msgstr "Python ↔ Python Kommunikation innerhalb eines Moduls"
+
+#: ../../com/ipc_communication.rst:19 ee2c12076a4a4f0fb97df0ab0b0a5dc9
+msgid "❌ **Not suitable for:**"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:21 4eb82393c4374243babd71ec5218ae79
+#, fuzzy
+msgid "Inter-module communication (use ROS2)"
+msgstr "IPC - Inter-Process Communication"
+
+#: ../../com/ipc_communication.rst:22 365858bd1607465781b49e545fedd608
+#, fuzzy
+msgid "Communication across container boandaries"
+msgstr "Kommunikation über Container-Grenzen hinweg"
+
+#: ../../com/ipc_communication.rst:23 3832579669134f298636c0e4a69f1a60
+msgid "External API access"
+msgstr "Externe API-Zugriffe"
+
+#: ../../com/ipc_communication.rst:26 5bb1cbd31c694180a34f5a97e8431b1a
+msgid ""
+"For communication **between modules**, always use ROS2 (Job/Callable). "
+"IPC is only intended for communication **within a module**."
+msgstr ""
+
+#: ../../com/ipc_communication.rst:30 89fbe44776ec4a618c990653a53dbf00
+msgid "gRPC via Unix Domain Socket"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:32 ad9970424ff94cf780d6f7028a9a6a3a
+msgid "VYRA nutzt **Unix Domain Sockets** statt TCP for gRPC-Kommunikation:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:34 ba158c07288e4e5aaad4641e634bcafb
+msgid "**Advantages:**"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:36 dfe5f386fa2446d28e4761ee6ec957dd
+msgid "⚡ Very fast (no network latency)"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:37 f25e5bea762844ceab4d3cc0e8542109
+msgid "🔒 Secure (local processes only)"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:38 defcb12fb91347229a035966f2ddc07a
+msgid "🎯 No port conflicts"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:39 242670bb43fa4d859aa18ce73fe76fe4
+msgid "💾 Less overhead than TCP/IP"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:41 c38478e1978940a084c2bb886eeb6739
+msgid "**Socket-Pfad:** ``/tmp/<module_name>_ipc.sock``"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:44 58938c07edca4f3f89f71e7c4f09e845
+msgid "Setup"
+msgstr "Einrichtung"
+
+#: ../../com/ipc_communication.rst:47 7a377383f1c24b6ea286f0f1a1512cdf
+msgid "Server-Seite (Backend)"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:49 0798264468fa40ffb1742f2d106aacb2
+msgid "Erstellen you einen gRPC-Server with Unix Domain Socket:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:70 891aa519c7c14415bc41e5bda5d97a9a
+msgid "Client-Seite (Frontend/undere Prozesse)"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:72 08be082ff1e04a0eb6a4da6dac906a6a
+msgid "Verbinden you sich with dem gRPC-Server:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:91 0c8398af7f03455fa4f2c627f019efd0
+msgid "Praktisches Beispiel"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:94 b211b2c8caac45048323e7efeb5be45d
+msgid "Szenario: Frontend-Backend-Kommunikation"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:96 89cef4f8d89f407ba6ed57c1ff8be3c0
+msgid "**Backend (Python gRPC Server)**:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:132 32d94a6d346841ba8db6a2ac4c49af20
+msgid "**Frontend (Python gRPC Client)**:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:165 ca3d782d18274312a4da556974bc9517
+msgid "gRPC Proto-Definitionen"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:167 648fc74c691642a984a55353d999e59d
+msgid "Definieren you Ihre gRPC-Services in ``.proto``-Dateien:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:202 c222492725e24208bb8c5808ae716126
+msgid "Kompilieren der Proto-Dateien:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:214 f604352fae0f421d8d2211c8a31f698d
+msgid "IPCHandler-Class"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:216 6d2d344048264976a076417e348c07fc
+msgid "VYRA bietet eine Helper-Class for IPC-Verbindungen:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:238 60bb04c776b748469fe44eca1518ae0b
+msgid ""
+"Further Details to IPCHandler-Implementierung can be found you in der "
+":class:`~vyra_base.com.handler.ipc.IPCHandler` API-Reference."
+msgstr ""
+
+#: ../../com/ipc_communication.rst:242 b30896a1809e44458d16bd9bbcf51b01
+msgid "Performance"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:244 3c2e7d1b44214172bfd7cb042d165508
+msgid "**Typische Latenzzeiten:**"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:246 2d474228eb934b49b42c5a3065af595d
+msgid "Unix Domain Socket: ~0.05 - 0.2 ms"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:247 4adc5434c6d343d0a7dfd2b9fd0e5a89
+msgid "TCP localhost: ~0.2 - 1 ms"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:248 25b36bc980fd40d3b90fb4f872e750c0
+msgid "ROS2 Service: ~1 - 5 ms"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:250 96040c52724744069094f0a50874c20f
+msgid "➡️ IPC is **10-100x fastr** als ROS2 for lokale Kommunikation."
+msgstr ""
+
+#: ../../com/ipc_communication.rst:253 7250c4eaaac44b828f9d0dcbfa077eaa
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../com/ipc_communication.rst:255 518949384c1b407eba1c88e23df0c963
+msgid "✅ **Empfohlen:**"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:257 b8ca82d5a176496180bf1c112293529b
+msgid "Use you IPC nur innerhalb eines Moduls"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:258 a1c8da9d575f47d18c768957adbb59a7
+msgid "Definieren you klare Proto-Definitionen"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:259 68b5ef54b9ee4e7d955f0ba277663285
+msgid "Implementieren you Error Handling and Timeouts"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:260 dbee47f06ba942cf9b3f0f3f47a99578
+msgid "Räumen you Socket-Dateien on Shutdown on"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:261 3ee885f2ba6f4e789bfef5f9c3b7b275
+msgid "Use you Connection-Pooling for frequent Calls"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:263 e4a17b6070df4caebbc3d69218c3ea2a
+msgid "❌ **Vermeiden:**"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:265 9c0f3bac92464e8883e5e4bba6acf477
+#, fuzzy
+msgid "IPC for Inter-module communication (use ROS2)"
+msgstr "IPC - Inter-Process Communication"
+
+#: ../../com/ipc_communication.rst:266 96f4c8c1598c436688dd33decdca76bc
+msgid "Sehr große messages (> 10 MB, use you Shared Memory)"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:267 d2ebaa1aa8d345ac927f970b7375486a
+msgid "Blocking-Calls without Timeout"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:268 b8fd196041d2467d9d855c73ff184bc4
+msgid "Hardcodierte Socket-Pfade (use you Konfiguration)"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:271 fcccc830d26b4a2fb577f6d25bb002c2
+msgid "Error Handling"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:297 5b7e21e61616418f997695ccbf5cefb0
+msgid "Cleanup"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:299 969dfff168714dd286c6fb8a9e7b7465
+msgid "Socket-Dateien should on Shutdown gelöscht are:"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:321 4735d2078bd94e37bff08f4605a69d0e
+msgid "Further Information"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:323 0440a33d77c0464ea85e1d7ce880f6e4
+msgid ":doc:`ros2_communication` - ROS2 for Inter-Modul-Kommunikation"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:324 dfe2918d402440e1b6465a72ebb5917c
+msgid ":doc:`../vyra_base.com` - API-Reference"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:325 ca5302e63f124f9ab632fcf028d5e51f
+msgid "gRPC Dokumentation: https://grpc.io/docs/languages/python/"
+msgstr ""
+
+#: ../../com/ipc_communication.rst:326 355f56f9d03f4b6f9a283ef5c7287d51
+msgid "Protocol Buffers: https://protobuf.dev/"
+msgstr ""
+
+#~ msgid ""
+#~ "VYRA unterstützt IPC (Inter-Process "
+#~ "Communication) über **gRPC mit Unix "
+#~ "Domain Sockets**. Dies ermöglicht schnelle "
+#~ "prozessübergreifende Kommunikation **innerhalb eines"
+#~ " Moduls**."
+#~ msgstr ""
+
+#~ msgid "Konzept"
+#~ msgstr ""
+
+#~ msgid "✅ **Anwendungsfälle:**"
+#~ msgstr ""
+
+#~ msgid "Kommunikation zwischen Prozessen im selben Container/Modul"
+#~ msgstr ""
+
+#~ msgid "Schnelle interne API-Calls ohne Netzwerk-Overhead"
+#~ msgstr ""
+
+#~ msgid "Entkopplung von Frontend und Backend im selben Modul"
+#~ msgstr ""
+
+#~ msgid "Python ↔ Python Kommunikation innerhalb eines Moduls"
+#~ msgstr ""
+
+#~ msgid "❌ **Nicht geeignet für:**"
+#~ msgstr ""
+
+#~ msgid "Inter-Modul-Kommunikation (nutzen Sie ROS2)"
+#~ msgstr ""
+
+#~ msgid "Kommunikation über Container-Grenzen hinweg"
+#~ msgstr ""
+
+#~ msgid "Externe API-Zugriffe"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Für Kommunikation **zwischen Modulen** nutzen"
+#~ " Sie immer ROS2 (Job/Callable). IPC "
+#~ "ist nur für Kommunikation **innerhalb "
+#~ "eines Moduls** gedacht."
+#~ msgstr ""
+
+#~ msgid "**Vorteile:**"
+#~ msgstr ""
+
+#~ msgid "⚡ Sehr schnell (keine Netzwerk-Latenz)"
+#~ msgstr ""
+
+#~ msgid "🔒 Sicher (nur lokale Prozesse)"
+#~ msgstr ""
+
+#~ msgid "🎯 Keine Port-Konflikte"
+#~ msgstr ""
+
+#~ msgid "💾 Weniger Overhead als TCP/IP"
+#~ msgstr ""
+
+#~ msgid "Einrichtung"
+#~ msgstr ""
+
+#~ msgid "IPCHandler-Klasse"
+#~ msgstr ""
+
+#~ msgid "VYRA bietet eine Helper-Klasse für IPC-Verbindungen:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Weitere Details zur IPCHandler-Implementierung"
+#~ " finden Sie in der "
+#~ ":class:`~vyra_base.com.handler.ipc.IPCHandler` API-"
+#~ "Referenz."
+#~ msgstr ""
+
+#~ msgid "IPC für Inter-Modul-Kommunikation (nutzen Sie ROS2)"
+#~ msgstr ""
+
+#~ msgid ":doc:`../vyra_base.com` - API-Referenz"
+#~ msgstr ""
+
+#~ msgid "IPC eignet sich für:"
+#~ msgstr ""
+
+#~ msgid "gRPC über Unix Domain Socket"
+#~ msgstr ""
+
+#~ msgid "VYRA nutzt **Unix Domain Sockets** statt TCP für gRPC-Kommunikation:"
+#~ msgstr ""
+
+#~ msgid "Erstellen Sie einen gRPC-Server mit Unix Domain Socket:"
+#~ msgstr ""
+
+#~ msgid "Verbinden Sie sich mit dem gRPC-Server:"
+#~ msgstr ""
+
+#~ msgid "VYRA bietet eine Helper-Class für IPC-Verbindungen:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Weitere Details zur IPCHandler-Implementierung"
+#~ " finden Sie in der "
+#~ ":class:`~vyra_base.com.handler.ipc.IPCHandler` API-"
+#~ "Reference."
+#~ msgstr ""
+
+#~ msgid "➡️ IPC ist **10-100x schneller** als ROS2 für lokale Kommunikation."
+#~ msgstr ""
+
+#~ msgid "Implementieren Sie Fehlerbehandlung und Timeouts"
+#~ msgstr ""
+
+#~ msgid "Räumen Sie Socket-Dateien beim Shutdown auf"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie Connection-Pooling für häufige Calls"
+#~ msgstr ""
+
+#~ msgid "Socket-Dateien sollten beim Shutdown gelöscht werden:"
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid ":doc:`ros2_communication` - ROS2 für Inter-Modul-Kommunikation"
+#~ msgstr ""
+
+#~ msgid "Erstellen Sie einen gRPC-Server with Unix Domain Socket:"
+#~ msgstr ""
+
+#~ msgid "Client-Seite (Frontend/andere Prozesse)"
+#~ msgstr ""
+
+#~ msgid "Verbinden Sie sich with dem gRPC-Server:"
+#~ msgstr ""
+
+#~ msgid "Definieren Sie Ihre gRPC-Services in ``.proto``-Dateien:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Weitere Details tor IPCHandler-Implementierung"
+#~ " finden Sie in der "
+#~ ":class:`~vyra_base.com.handler.ipc.IPCHandler` API-"
+#~ "Reference."
+#~ msgstr ""
+
+#~ msgid "➡️ IPC is **10-100x schneller** als ROS2 for lokale Kommunikation."
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie IPC nur innerhalb eines Moduls"
+#~ msgstr ""
+
+#~ msgid "Definieren Sie klare Proto-Definitionen"
+#~ msgstr ""
+
+#~ msgid "Implementieren Sie Fehlerbehandlung and Timeouts"
+#~ msgstr ""
+
+#~ msgid "Räumen Sie Socket-Dateien atm Shutdown on"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie Connection-Pooling for häufige Calls"
+#~ msgstr ""
+
+#~ msgid "Sehr große Nachrichten (> 10 MB, nutzen Sie Shared Memory)"
+#~ msgstr ""
+
+#~ msgid "Blocking-Calls ohne Timeout"
+#~ msgstr ""
+
+#~ msgid "Hardcodierte Socket-Pfade (nutzen Sie Konfiguration)"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung"
+#~ msgstr ""
+
+#~ msgid "Socket-Dateien sollten atm Shutdown gelöscht are:"
+#~ msgstr ""
+

@@ -1,0 +1,1071 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.com.datalayer.rst:2 d153c8de7d0f4602b2f229e37c31454f
+msgid "vyra\\_base.com.datalayer package"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:5 e9f59422ece14826ba7e6873acc92d0e
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:8 de22b1f3cea14e72b5016e77687673d9
+msgid "vyra\\_base.com.datalayer.action\\_client module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:17 5285c819d4f24d8e890a4c99e8a50691
+msgid "vyra\\_base.com.datalayer.action\\_server module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:26 6300ff7ef47a4708bcc4d5c861f48aa8
+msgid "vyra\\_base.com.datalayer.callable module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:34 eae384f988b94c0a8e3d753edc5c0cf8
+msgid "vyra\\_base.com.datalayer.interface\\_factoy module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:42 c5a16f86e0f44eb8829f6fde8dbf77eb
+msgid "vyra\\_base.com.datalayer.job module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:50 4bd3eba3a90c43b0b666c0a85380010d
+msgid "vyra\\_base.com.datalayer.node module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:58 1864b312040b45f5a0c0dfbb28eef63e
+msgid "vyra\\_base.com.datalayer.publisher module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:66 7c3112c7d6b94b4fb052d3acaea90f3a
+msgid "vyra\\_base.com.datalayer.service\\_client module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:75 d8287a6a22f4483789790e53a2b459b4
+msgid "vyra\\_base.com.datalayer.service\\_server module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:83 722281ed349349729ca00664121528be
+msgid "vyra\\_base.com.datalayer.speaker module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:91 9dd36cbba79a49ec9cc4045cf05e6b37
+msgid "vyra\\_base.com.datalayer.subscriber module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:99 841f8c3f61df47eda677319b99b25bfe
+msgid "vyra\\_base.com.datalayer.typeconverter module"
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:107 ec2b9513b11e4c4b803f16d2799e3900
+msgid "Module contents"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Action class to define the action name and type."
+#~ msgstr ""
+
+#~ msgid "This class is used to create an action client."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "Name of the action client."
+#~ msgstr ""
+
+#~ msgid "Type of the action."
+#~ msgstr ""
+
+#~ msgid "Callback for the result."
+#~ msgstr ""
+
+#~ msgid "Callback for feedback."
+#~ msgstr ""
+
+#~ msgid "The action client instance."
+#~ msgstr ""
+
+#~ msgid "Timeout for action client in seconds."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Default callback that raises an error if not overridden."
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid "Always raised to indicate the callback is not implemented."
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.NoReturn\\``"
+#~ msgstr ""
+
+#~ msgid "Base class for ROS2 action client."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class will be factory created "
+#~ "to call specific action functionality."
+#~ msgstr ""
+
+#~ msgid "Initialize the VyraActionClient."
+#~ msgstr ""
+
+#~ msgid "Information about the action."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node."
+#~ msgstr ""
+
+#~ msgid "Create an action client in the ROS2 node."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method should be called to "
+#~ "register the action client with the "
+#~ "ROS2 node."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+#~ msgstr ""
+
+#~ msgid "Send a goal to the action server."
+#~ msgstr ""
+
+#~ msgid "The order to send as part of the goal."
+#~ msgstr ""
+
+#~ msgid "If the action client has not been created."
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "A future representing the goal request."
+#~ msgstr ""
+
+#~ msgid "Callback for the goal response."
+#~ msgstr ""
+
+#~ msgid "The future containing the goal handle."
+#~ msgstr ""
+
+#~ msgid "Callback for receiving the result of the action."
+#~ msgstr ""
+
+#~ msgid "The future containing the result."
+#~ msgstr ""
+
+#~ msgid "Represents an action for the VyraActionServer."
+#~ msgstr ""
+
+#~ msgid "Name of the action server."
+#~ msgstr ""
+
+#~ msgid "type"
+#~ msgstr "Typ"
+
+#~ msgid "str"
+#~ msgstr ""
+
+#~ msgid "Any"
+#~ msgstr ""
+
+#~ msgid "Callback function for the action."
+#~ msgstr ""
+
+#~ msgid "Callable"
+#~ msgstr "Callable"
+
+#~ msgid "The ActionServer instance or None."
+#~ msgstr ""
+
+#~ msgid "Union[ActionServer, None]"
+#~ msgstr ""
+
+#~ msgid "If no execute callback is provided for the action server."
+#~ msgstr ""
+
+#~ msgid "Base class for ROS2 actions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class is intended to be "
+#~ "factory-created to implement specific "
+#~ "action functionality."
+#~ msgstr ""
+
+#~ msgid "Initialize the VyraActionServer."
+#~ msgstr ""
+
+#~ msgid "The action configuration."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node to attach the action server to."
+#~ msgstr ""
+
+#~ msgid "Create and register the action server with the ROS2 node."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method should be called to "
+#~ "register the action server with the "
+#~ "ROS2 node."
+#~ msgstr ""
+
+#~ msgid "Execute the action callback."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method should be overridden in "
+#~ "subclasses to provide specific functionality."
+#~ msgstr ""
+
+#~ msgid "The goal handle for the action."
+#~ msgstr ""
+
+#~ msgid "Represents and stores all information about a Vyra callable."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A callable is a function that can"
+#~ " be invoked with arguments and "
+#~ "returns a result within a specified "
+#~ "time limit. It is used to define"
+#~ " quick responses to requests in Vyra."
+#~ msgstr ""
+
+#~ msgid "Name of the callable."
+#~ msgstr ""
+
+#~ msgid "Type of the callable, typically a ROS2 service type."
+#~ msgstr ""
+
+#~ msgid "Description of the callable."
+#~ msgstr ""
+
+#~ msgid "The last return value of the callable."
+#~ msgstr ""
+
+#~ msgid "The associated VyraServiceServer instance."
+#~ msgstr ""
+
+#~ msgid "Callback function when connected."
+#~ msgstr ""
+
+#~ msgid "Merge another Callable into this one, combining their attributes."
+#~ msgstr ""
+
+#~ msgid "Another Callable instance to merge with."
+#~ msgstr ""
+
+#~ msgid "A new Callable instance with merged attributes."
+#~ msgstr ""
+
+#~ msgid "Represents a data space in the V.Y.R.A. system."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class is used to create and"
+#~ " manage various types of data layers"
+#~ " such as callables, jobs, observables, "
+#~ "and speakers."
+#~ msgstr ""
+
+#~ msgid "List of registered V.Y.R.A. callables."
+#~ msgstr ""
+
+#~ msgid "List of registered V.Y.R.A. jobs."
+#~ msgstr ""
+
+#~ msgid "List of registered V.Y.R.A. speakers."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Remove a specific object from the "
+#~ "DataSpace and clean up any associated"
+#~ " resources."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. callable, job, or speaker to remove from the DataSpace."
+#~ msgstr ""
+
+#~ msgid "If the object type is not recognized."
+#~ msgstr ""
+
+#~ msgid "None"
+#~ msgstr ""
+
+#~ msgid "Get a speaker by its name."
+#~ msgstr ""
+
+#~ msgid "Name of the speaker to retrieve."
+#~ msgstr ""
+
+#~ msgid "The VyraSpeaker object if found, otherwise None."
+#~ msgstr ""
+
+#~ msgid "Get a callable by its name."
+#~ msgstr ""
+
+#~ msgid "Name of the callable to retrieve."
+#~ msgstr ""
+
+#~ msgid "The VyraCallable object if found, otherwise None."
+#~ msgstr ""
+
+#~ msgid "Get a job by its name."
+#~ msgstr ""
+
+#~ msgid "Name of the job to retrieve."
+#~ msgstr ""
+
+#~ msgid "The VyraJob object if found, otherwise None."
+#~ msgstr ""
+
+#~ msgid "Add a speaker object to the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If a speaker with the same "
+#~ "publisher name already exists, merges "
+#~ "the new object with the existing "
+#~ "one."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. speaker to add or merge."
+#~ msgstr ""
+
+#~ msgid "The added or merged VyraSpeaker object."
+#~ msgstr ""
+
+#~ msgid "Add a callable object to the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If a callable with the same name"
+#~ " already exists, merges the new "
+#~ "object with the existing one."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. callable to add or merge."
+#~ msgstr ""
+
+#~ msgid "The added or merged VyraCallable object."
+#~ msgstr ""
+
+#~ msgid "Add a job object to the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If a job with the same name "
+#~ "already exists, merges the new object"
+#~ " with the existing one."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. job to add or merge."
+#~ msgstr ""
+
+#~ msgid "The added or merged VyraJob object."
+#~ msgstr ""
+
+#~ msgid "Get a speaker listener by its name."
+#~ msgstr ""
+
+#~ msgid "Get a callable executor by its name."
+#~ msgstr ""
+
+#~ msgid "The VyraCallableExecutor object if found, otherwise None."
+#~ msgstr ""
+
+#~ msgid "Get a job runner by its name."
+#~ msgstr ""
+
+#~ msgid "The VyraJobRunner object if found, otherwise None."
+#~ msgstr ""
+
+#~ msgid "Add a speaker listener object to the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If a speaker listener with the "
+#~ "same name already exists, merges the "
+#~ "new object with the existing one."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. speaker listener to add or merge."
+#~ msgstr ""
+
+#~ msgid "The added or merged VyraSpeakerListener object."
+#~ msgstr ""
+
+#~ msgid "Add a callable executor object to the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If a callable executor with the "
+#~ "same name already exists, merges the "
+#~ "new object with the existing one."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. callable executor to add or merge."
+#~ msgstr ""
+
+#~ msgid "The added or merged VyraCallableExecutor object."
+#~ msgstr ""
+
+#~ msgid "Add a job runner object to the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If a job runner with the same "
+#~ "name already exists, merges the new "
+#~ "object with the existing one."
+#~ msgstr ""
+
+#~ msgid "The V.Y.R.A. job runner to add or merge."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Remove a V.Y.R.A. speaker listener by"
+#~ " name. :type name: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` "
+#~ ":param name: Name of the speaker "
+#~ "listener to remove. :type name: str "
+#~ ":rtype: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\`` "
+#~ ":return: None"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Create a job runner for an "
+#~ "external V.Y.R.A. (V.Y.R.A. Operating System)"
+#~ " service."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A job is a function that will "
+#~ "be executed in the background and "
+#~ "will not block the caller. A job"
+#~ " can take a long time to "
+#~ "complete and will return a result "
+#~ "when it is done. Additionally, a "
+#~ "job can provide feedback information "
+#~ "during the process. This method creates"
+#~ " a client that can call an "
+#~ "external job service."
+#~ msgstr ""
+
+#~ msgid "The ROS2 service datatype definition."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node definition."
+#~ msgstr ""
+
+#~ msgid "Data to be sent to the job service."
+#~ msgstr ""
+
+#~ msgid "Identifier name for the job."
+#~ msgstr ""
+
+#~ msgid "Optional event loop for asynchronous execution."
+#~ msgstr ""
+
+#~ msgid "The created VyraJobRunner object."
+#~ msgstr ""
+
+#~ msgid "Represents and stores all information about a Vyra job."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A job is a long-running operation"
+#~ " that can provide feedback during "
+#~ "execution. It is based on ROS2 "
+#~ "actions and is used for operations "
+#~ "that take time to complete, such "
+#~ "as navigation, manipulation tasks, or "
+#~ "other asynchronous operations."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Jobs are analogous to Callables but "
+#~ "for long-running tasks: - VyraCallable"
+#~ " -> ROS2 Service (quick request/response)"
+#~ " - VyraJob -> ROS2 Action (long-"
+#~ "running with feedback)"
+#~ msgstr ""
+
+#~ msgid "Name of the job."
+#~ msgstr ""
+
+#~ msgid "Type of the job, typically a ROS2 action type."
+#~ msgstr ""
+
+#~ msgid "Description of the job."
+#~ msgstr ""
+
+#~ msgid "The last return value of the job."
+#~ msgstr ""
+
+#~ msgid "The associated VyraActionServer instance (for server-side)."
+#~ msgstr ""
+
+#~ msgid "Callback function for goal requests."
+#~ msgstr ""
+
+#~ msgid "Callback function for feedback updates."
+#~ msgstr ""
+
+#~ msgid "Callback function for final results."
+#~ msgstr ""
+
+#~ msgid "Merge another Job into this one, combining their attributes."
+#~ msgstr ""
+
+#~ msgid "Another Job instance to merge with."
+#~ msgstr ""
+
+#~ msgid "A new Job instance with merged attributes."
+#~ msgstr ""
+
+#~ msgid "Represents a job runner (action client) in the data layer."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A job runner is used to send "
+#~ "goals to action servers and receive "
+#~ "feedback/results. This is the client-"
+#~ "side counterpart to VyraJob (server-"
+#~ "side)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "JobRunner is analogous to CallableExecutor:"
+#~ " - VyraCallableExecutor -> ROS2 Service "
+#~ "Client (calls services) - VyraJobRunner "
+#~ "-> ROS2 Action Client (sends goals "
+#~ "to actions)"
+#~ msgstr ""
+
+#~ msgid "The name of the job runner."
+#~ msgstr ""
+
+#~ msgid "The type of the action."
+#~ msgstr ""
+
+#~ msgid "The description of the job runner."
+#~ msgstr ""
+
+#~ msgid "The last return value of the job runner."
+#~ msgstr ""
+
+#~ msgid "The associated VyraActionClient instance."
+#~ msgstr ""
+
+#~ msgid "Merges another JobRunner into this one, combining their attributes."
+#~ msgstr ""
+
+#~ msgid "Another JobRunner instance to merge with."
+#~ msgstr ""
+
+#~ msgid "A new JobRunner instance with merged attributes."
+#~ msgstr ""
+
+#~ msgid "The goal message to send."
+#~ msgstr ""
+
+#~ msgid "The result of the goal."
+#~ msgstr ""
+
+#~ msgid "Settings for a Vyra node."
+#~ msgstr ""
+
+#~ msgid "Name of the node."
+#~ msgstr ""
+
+#~ msgid "Dictionary of parameters for the node."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~rclpy.node.Node`"
+#~ msgstr ""
+
+#~ msgid "Vyra node class."
+#~ msgstr ""
+
+#~ msgid "NodeSettings object containing the node's settings."
+#~ msgstr ""
+
+#~ msgid "Set the reload event to notify that the node settings have changed."
+#~ msgstr ""
+
+#~ msgid "Get the node settings."
+#~ msgstr ""
+
+#~ msgid "Node to check the availability of other nodes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Note: Uses enable_rosout=False to avoid "
+#~ "SROS2 permission issues with the /rosout"
+#~ " topic during node availability checks. "
+#~ ":type enable_rosout: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\`` "
+#~ ":param enable_rosout: Whether to enable "
+#~ "the rosout logger. :type enable_rosout: "
+#~ "bool"
+#~ msgstr ""
+
+#~ msgid "Check if a node with the given name is available."
+#~ msgstr ""
+
+#~ msgid "Name of the node to check."
+#~ msgstr ""
+
+#~ msgid "True if the node is available, False otherwise."
+#~ msgstr ""
+
+#~ msgid "Check if the node name is valid."
+#~ msgstr ""
+
+#~ msgid "True if the node name is valid, False otherwise."
+#~ msgstr ""
+
+#~ msgid "Stores information for periodic function calls."
+#~ msgstr ""
+
+#~ msgid "Interval time in seconds between calls (default: 1.0)."
+#~ msgstr ""
+
+#~ msgid "Callable to be called periodically."
+#~ msgstr ""
+
+#~ msgid "ROS2 timer object."
+#~ msgstr ""
+
+#~ msgid "Stores information about a ROS2 publisher."
+#~ msgstr ""
+
+#~ msgid "Name of the publisher/topic."
+#~ msgstr ""
+
+#~ msgid "Message type for the publisher."
+#~ msgstr ""
+
+#~ msgid "PeriodicCaller instance for periodic publishing."
+#~ msgstr ""
+
+#~ msgid "Quality of Service profile or depth."
+#~ msgstr ""
+
+#~ msgid "The actual ROS2 publisher object."
+#~ msgstr ""
+
+#~ msgid "Base class for ROS2 publishers."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class is intended to be "
+#~ "factory-created to implement a specific "
+#~ "publisher for a topic."
+#~ msgstr ""
+
+#~ msgid "Initialize the VyraPublisher."
+#~ msgstr ""
+
+#~ msgid "PublisherInfo instance containing publisher configuration."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node to which the publisher belongs."
+#~ msgstr ""
+
+#~ msgid "Create a publisher in the ROS2 node."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method should be called to "
+#~ "register the publisher within the ROS2"
+#~ " node."
+#~ msgstr ""
+
+#~ msgid "If publisher type or name is not provided."
+#~ msgstr ""
+
+#~ msgid "Publish a message to the topic."
+#~ msgstr ""
+
+#~ msgid "The message to publish."
+#~ msgstr ""
+
+#~ msgid "If publisher type, name, or publisher instance is not set."
+#~ msgstr ""
+
+#~ msgid "Destroy the publisher and clean up resources."
+#~ msgstr ""
+
+#~ msgid "This method should be called to properly shut down the publisher."
+#~ msgstr ""
+
+#~ msgid "Data class for storing service information."
+#~ msgstr ""
+
+#~ msgid "Name of the service."
+#~ msgstr ""
+
+#~ msgid "Type of the service."
+#~ msgstr ""
+
+#~ msgid "Function to create a service request."
+#~ msgstr ""
+
+#~ msgid "Callback function for the service."
+#~ msgstr ""
+
+#~ msgid "ROS2 client instance or None."
+#~ msgstr ""
+
+#~ msgid "Union[Client, None]"
+#~ msgstr ""
+
+#~ msgid "Optional timeout for the service client."
+#~ msgstr ""
+
+#~ msgid "int | None"
+#~ msgstr ""
+
+#~ msgid "Number of calls to attempt at timeout before giving up."
+#~ msgstr ""
+
+#~ msgid "int"
+#~ msgstr ""
+
+#~ msgid "If no request function is provided for the service client."
+#~ msgstr ""
+
+#~ msgid "Base class for ROS2 services."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class is intended to be "
+#~ "factory-created to implement specific "
+#~ "service functionality."
+#~ msgstr ""
+
+#~ msgid "Initialize the VyraServiceClient."
+#~ msgstr ""
+
+#~ msgid "Information about the service."
+#~ msgstr ""
+
+#~ msgid "ROS2 node instance."
+#~ msgstr ""
+
+#~ msgid "Create a service caller in the ROS2 node."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method should be called to "
+#~ "register the service caller with the "
+#~ "ROS2 node."
+#~ msgstr ""
+
+#~ msgid "If the service type or name is not provided."
+#~ msgstr ""
+
+#~ msgid "If the service is not available within the timeout period."
+#~ msgstr ""
+
+#~ msgid "Wrapper for asynchronous functions."
+#~ msgstr ""
+
+#~ msgid "Positional arguments."
+#~ msgstr ""
+
+#~ msgid "Keyword arguments."
+#~ msgstr ""
+
+#~ msgid "Result of the wrapped function."
+#~ msgstr ""
+
+#~ msgid "The ROS2 service instance."
+#~ msgstr ""
+
+#~ msgid "Optional timeout for the callback."
+#~ msgstr ""
+
+#~ msgid "Dummy callback that raises a NotImplementedError."
+#~ msgstr ""
+
+#~ msgid "Always raised to indicate no callback is provided."
+#~ msgstr ""
+
+#~ msgid "Initialize the VyraServiceServer."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node to attach the service to."
+#~ msgstr ""
+
+#~ msgid "Optional asyncio event loop."
+#~ msgstr ""
+
+#~ msgid "Create and register a service in the ROS2 node."
+#~ msgstr ""
+
+#~ msgid "The callback function to handle service requests."
+#~ msgstr ""
+
+#~ msgid "If the callback is not callable."
+#~ msgstr ""
+
+#~ msgid "Destroy the service in the ROS2 node."
+#~ msgstr ""
+
+#~ msgid "This method will remove the service if it exists."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Execute an async coroutine in a "
+#~ "separate thread with its own event "
+#~ "loop."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Creates a new thread with a "
+#~ "dedicated asyncio event loop to run "
+#~ "async code from synchronous ROS2 service"
+#~ " callbacks."
+#~ msgstr ""
+
+#~ msgid "Coroutine to execute."
+#~ msgstr ""
+
+#~ msgid "Optional timeout in seconds."
+#~ msgstr ""
+
+#~ msgid "Result from coroutine execution."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Represents a speaker in the system. "
+#~ "A speaker is responsible for sending "
+#~ "messages or data to a topic using"
+#~ " a publisher server. :type name: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` "
+#~ ":param name: Name of the speaker. "
+#~ ":type name: str :type type: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\``"
+#~ " :param type: Type of the speaker,"
+#~ " typically a ROS2 message type. :type"
+#~ " type: Any :type description: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` "
+#~ ":param description: Description of the "
+#~ "speaker. :type description: str :type "
+#~ "publisher_server: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
+#~ " "
+#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.datalayer.publisher.VyraPublisher\\`\\]`"
+#~ " :param publisher_server: The publisher "
+#~ "server associated with the speaker. "
+#~ ":type publisher_server: VyraPublisher or None"
+#~ " :type last_send: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\``"
+#~ " :param last_send: The last sent "
+#~ "message or data. :type last_send: Any"
+#~ msgstr ""
+
+#~ msgid "Merges another speaker into this one, combining their attributes."
+#~ msgstr ""
+
+#~ msgid "Another speaker instance to merge with."
+#~ msgstr ""
+
+#~ msgid "This speaker instance with merged attributes."
+#~ msgstr ""
+
+#~ msgid "Sends a message using the speaker's publisher server."
+#~ msgstr ""
+
+#~ msgid "The message to send."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Represents a speaker listener in the "
+#~ "system. A speaker listener is "
+#~ "responsible for receiving messages or "
+#~ "data from a topic using a "
+#~ "subscriber server. :type name: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` "
+#~ ":param name: Name of the speaker "
+#~ "listener. :type name: str :type type:"
+#~ " "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\``"
+#~ " :param type: Type of the speaker "
+#~ "listener, typically a ROS2 message type."
+#~ " :type type: Any :type description: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` "
+#~ ":param description: Description of the "
+#~ "speaker listener. :type description: str "
+#~ ":param publisher_server: The publisher server"
+#~ " associated with the speaker listener. "
+#~ ":type publisher_server: VyraPublisher or None"
+#~ " :type last_send: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\``"
+#~ " :param last_send: The last sent "
+#~ "message or data. :type last_send: Any"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Merges another speaker listener into "
+#~ "this one, combining their attributes."
+#~ msgstr ""
+
+#~ msgid "Another speaker listener instance to merge with."
+#~ msgstr ""
+
+#~ msgid "This speaker listener instance with merged attributes."
+#~ msgstr ""
+
+#~ msgid "Listens for a message from the speaker's subscriber server."
+#~ msgstr ""
+
+#~ msgid "The maximum time to wait for a message, in seconds."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The received message, or None if "
+#~ "no message was received within the "
+#~ "timeout."
+#~ msgstr ""
+
+#~ msgid "Data class for storing subscription information."
+#~ msgstr ""
+
+#~ msgid "Name of the subscription."
+#~ msgstr ""
+
+#~ msgid "Message type for the subscription."
+#~ msgstr ""
+
+#~ msgid "Callback function for the subscription."
+#~ msgstr ""
+
+#~ msgid "The actual ROS2 subscription object."
+#~ msgstr ""
+
+#~ msgid "Default callback that raises a NotImplementedError."
+#~ msgstr ""
+
+#~ msgid "Base class for ROS2 subscriptions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class is intended to be "
+#~ "factory-created to implement specific "
+#~ "subscriptions for topics."
+#~ msgstr ""
+
+#~ msgid "Initialize the VyraSubscription."
+#~ msgstr ""
+
+#~ msgid "Information about the subscription."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node to attach the subscription to."
+#~ msgstr ""
+
+#~ msgid "Create and register the subscription with the ROS2 node."
+#~ msgstr ""
+
+#~ msgid "If the subscription type or name is not provided."
+#~ msgstr ""
+
+#~ msgid "Remove the subscription from the ROS2 node."
+#~ msgstr ""
+
+#~ msgid "This method will destroy the subscription if it exists."
+#~ msgstr ""
+
+#~ msgid "Callback method for the subscription."
+#~ msgstr ""
+
+#~ msgid "The message received from the subscription."
+#~ msgstr ""
+
+#~ msgid "A class to convert various Python data types to ROS 2 compatible types."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Convert a :class:`datetime.datetime` object to"
+#~ " a ROS 2 :class:`builtin_interfaces.msg.Time`."
+#~ msgstr ""
+
+#~ msgid "The datetime object to convert."
+#~ msgstr ""
+
+#~ msgid "The corresponding ROS 2 BuiltinTime message."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Convert a ROS 2 "
+#~ ":class:`builtin_interfaces.msg.Time` to a "
+#~ ":class:`datetime.datetime` object."
+#~ msgstr ""
+
+#~ msgid "The ROS 2 BuiltinTime message to convert."
+#~ msgstr ""
+
+#~ msgid "The corresponding datetime object (UTC)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Convert a :class:`uuid.UUID` to a ROS"
+#~ " 2 :class:`unique_identifier_msgs.msg.UUID`."
+#~ msgstr ""
+
+#~ msgid "The UUID to convert."
+#~ msgstr ""
+
+#~ msgid "The corresponding ROS 2 UUID message."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Convert a ROS 2 "
+#~ ":class:`unique_identifier_msgs.msg.UUID` to a "
+#~ ":class:`uuid.UUID`."
+#~ msgstr ""
+
+#~ msgid "The ROS 2 UUID message to convert."
+#~ msgstr ""
+
+#~ msgid "The corresponding UUID object."
+#~ msgstr ""
+
+#~ msgid "vyra\\_base.com.datalayer.interface\\_factory module"
+#~ msgstr ""
+

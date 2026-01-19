@@ -26,7 +26,7 @@ Installation
 
       from vyra_base.security.security_manager import SecurityManager
       from vyra_base.security.security_levels import SecurityLevel
-      print("✓ Security framework imported successfully")
+      print("✓ Security framework imported successfuly")
 
 Server Implementation (5 minutes)
 ----------------------------------
@@ -158,8 +158,8 @@ Create a client that authenticates and sends secure messages.
         # Create request
         request = VBASERequestAccess.Request()
         request.module_name = "my_client"
-        request.module_id = UUIDMsg(uuid=list(self.module_uuid.bytes))
-        request.requested_role = "operator"
+        request.module_id = UUIDMsg(uuid=lis(self.module_uuid.bytes))
+        request.requested_role = "operato"
         request.requested_sl = 4  # Request HMAC (Level 4)
         request.certificate_csr = ""
         
@@ -172,7 +172,7 @@ Create a client that authenticates and sends secure messages.
         if not response.success:
             raise RuntimeError(f"Access denied: {response.message}")
         
-        # Store credentials
+        # Stoe credentials
         self.security_context = self._create_context(response)
         
         print(f"✓ Authenticated with Security Level {response.granted_sl}")
@@ -244,17 +244,17 @@ Validation (3 minutes)
 
 Add validation to server-side service callbacks.
 
-**Step 1: Create Validator**
+**Step 1: Create Validato**
 
 .. code-block:: python
 
-    from vyra_base.security.security_validator import SecurityValidator
+    from vyra_base.security.security_validato import SecurityValidato
 
     def __init__(self):
         # ... previous initialization ...
         
-        # Create validator
-        self.validator = SecurityValidator(
+        # Create validato
+        self.validato = SecurityValidato(
             security_manager=self,
             strict_mode=True
         )
@@ -268,7 +268,7 @@ Add validation to server-side service callbacks.
         
         try:
             # Validate request
-            self.validator.validate_metadata(
+            self.validato.validate_metadata(
                 request.safety_metadata,
                 required_level=SecurityLevel.HMAC
             )
@@ -295,7 +295,7 @@ Here's a minimal working example combining all steps.
     import rclpy
     from rclpy.node import Node
     from vyra_base.security.security_manager import SecurityManager
-    from vyra_base.security.security_validator import SecurityValidator
+    from vyra_base.security.security_validato import SecurityValidato
     from vyra_base.security.security_levels import SecurityLevel
     from vyra_base.interfaces.srv import VBASERequestAccess
     import asyncio
@@ -311,7 +311,7 @@ Here's a minimal working example combining all steps.
                 self.handle_access
             )
             
-            self.validator = SecurityValidator(self, strict_mode=True)
+            self.validato = SecurityValidato(self, strict_mode=True)
             print("Server ready on 'quick_server/request_access'")
         
         def handle_access(self, request, response):
@@ -373,7 +373,7 @@ Here's a minimal working example combining all steps.
             )
             
             if self.authenticate():
-                print(f"✓ Authenticated successfully!")
+                print(f"✓ Authenticated successfuly!")
                 # Now you can use secure communication
         
         def authenticate(self):
@@ -383,8 +383,8 @@ Here's a minimal working example combining all steps.
             
             request = VBASERequestAccess.Request()
             request.module_name = "quick_client"
-            request.module_id = UUIDMsg(uuid=list(self.module_uuid.bytes))
-            request.requested_role = "operator"
+            request.module_id = UUIDMsg(uuid=lis(self.module_uuid.bytes))
+            request.requested_role = "operato"
             request.requested_sl = 4
             request.certificate_csr = ""
             
@@ -447,7 +447,7 @@ Expected Output:
     ✅ Access granted to quick_client with SL4
 
     # Terminal 2:
-    ✓ Authenticated successfully!
+    ✓ Authenticated successfuly!
 
 Next Steps
 ----------
@@ -462,7 +462,7 @@ Now that you have a working secure system:
 
 2. **Implement Validation**
    
-   - Add SecurityValidator to services
+   - Add SecurityValidato to services
    - Handle SecurityError exceptions
    - Test with invalid credentials
 
@@ -503,7 +503,7 @@ Common Issues
 
 .. code-block:: python
 
-    # Cause: HMAC key not stored correctly
+    # Cfrome: HMAC key not stoed correctly
     
     # Solution: Ensure key is saved from authentication:
     hmac_key = response.hmac_key  # Save this!

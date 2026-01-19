@@ -1,0 +1,1246 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../security/api.rst:2 89b356a7bc9444359f1c99033d4b1dea
+msgid "Security Framework API Reference"
+msgstr ""
+
+#: ../../security/api.rst:4 14123db2cc1e4deb8f48dc984f33cae1
+msgid "Complete API documentation for the VYRA Security Framework."
+msgstr ""
+
+#: ../../security/api.rst:9 244de03f96f94ef697856fddd78ada08
+msgid "Security Levels"
+msgstr ""
+
+#: ../../security/api.rst:14 ../../security/api.rst:55
+#: ../../security/api.rst:73 ../../security/api.rst:105
+#: 6187cad2c9ce472c8919aaa2a59b0510 8fddcc6dd1ab49a8ac9aef795b816963
+msgid "Classes"
+msgstr ""
+
+#: ../../security/api.rst:32 9d118cc413c9446b8c8ad97decfc0c61
+msgid "Exceptions"
+msgstr ""
+
+#: c58017a211f34578a1e6eba1056735d8 of
+#: vyra_base.security.security_levels.SecurityError:1
+msgid "Bases: :py:class:`Exception`"
+msgstr ""
+
+#: efc1fdbd87314f0ca9258cdd0bc1c0a3 of
+#: vyra_base.security.security_levels.SecurityError:1
+msgid "Base exception for security-related errors."
+msgstr ""
+
+#: 690646d1f2df4a449abb71ad274e34fa of
+#: vyra_base.security.security_levels.CertificateValidationError:1
+#: vyra_base.security.security_levels.InvalidSecurityLevelError:1
+#: vyra_base.security.security_levels.NonceValidationError:1
+#: vyra_base.security.security_levels.SessionExpiredError:1
+#: vyra_base.security.security_levels.SignatureValidationError:1
+#: vyra_base.security.security_levels.TimestampValidationError:1
+msgid "Bases: :py:class:`~vyra_base.security.security_levels.SecurityError`"
+msgstr ""
+
+#: a344b9175e6740ccb229fd151a7ef371 of
+#: vyra_base.security.security_levels.InvalidSecurityLevelError:1
+msgid "Raised when an invalid security level is specified."
+msgstr ""
+
+#: 45b85deff17542509924df8042a1d492 of
+#: vyra_base.security.security_levels.SignatureValidationError:1
+msgid "Raised when signature validation fails."
+msgstr ""
+
+#: 5f55b72367734ce28b507f37fcc86a87 of
+#: vyra_base.security.security_levels.CertificateValidationError:1
+msgid "Raised when certificate validation fails."
+msgstr ""
+
+#: 2fc5eed1f61a4e2ab75dd09d0bcfcca8 of
+#: vyra_base.security.security_levels.TimestampValidationError:1
+msgid "Raised when timestamp validation fails."
+msgstr ""
+
+#: d9f2812bbca147b8a6b70bf33a541df8 of
+#: vyra_base.security.security_levels.SessionExpiredError:1
+msgid "Raised when a session has expired."
+msgstr ""
+
+#: 347fc3ba2ddc437a80ec51093b2305d2 of
+#: vyra_base.security.security_levels.NonceValidationError:1
+msgid "Raised when nonce validation fails (replay attack detected)."
+msgstr ""
+
+#: ../../security/api.rst:50 9677f619816549fba14804de3966e3d6
+msgid "Security Manager"
+msgstr ""
+
+#: ../../security/api.rst:68 e172ed2c006245949e3239cffc1367aa
+msgid "Security Client"
+msgstr ""
+
+#: ../../security/api.rst:94 ../../security/api.rst:118
+#: aec16730046e46f19126c6e3434e0fbe
+msgid "Functions"
+msgstr ""
+
+#: 15c583b175404b72a292fbd22cd26516 of
+#: vyra_base.security.security_client.security_required:1
+msgid "Decorator for service callbacks requiring authentication."
+msgstr ""
+
+#: a0c2ac587f73464b92bcc4fc9dc6c742 of
+#: vyra_base.security.security_client.security_required:3
+msgid "This decorator checks that:"
+msgstr ""
+
+#: b74600bfb0384803bad091ea0beacca4 of
+#: vyra_base.security.security_client.security_required:5
+msgid "SafetyMetadata is present in the request"
+msgstr ""
+
+#: 81d296a722a944d7b8ac2becaaf0087d of
+#: vyra_base.security.security_client.security_required:6
+msgid "Security level meets the minimum requirement"
+msgstr ""
+
+#: fb7b9fefe71d4f979b7c059fc15151ac of
+#: vyra_base.security.security_client.security_required:7
+msgid "Session token is valid (if applicable)"
+msgstr ""
+
+#: 075e132bca544e17889ca40b2186e693 of
+#: vyra_base.security.security_client.security_required:8
+msgid "Signature is valid (for Level 4+)"
+msgstr ""
+
+#: 809c2e4d72e74841a81d916a018e8c2c of
+#: vyra_base.security.security_client.security_required:10
+msgid "Usage::"
+msgstr ""
+
+#: ../../security/api.rst a39a8a211c554c2ea6b23d47580c9e21
+#: eaf4ac87996a432dacb9d3b660bb4127
+msgid "Parameters"
+msgstr "Parameter"
+
+#: 864652b9975e49b7bdb485affe135fbc of
+#: vyra_base.security.security_client.security_required:18
+msgid "Minimum required security level"
+msgstr ""
+
+#: 2328d68ab5ea4a97974c6f011c67a4dd of
+#: vyra_base.security.security_client.security_required:20
+msgid "Whether to validate SafetyMetadata"
+msgstr ""
+
+#: ../../security/api.rst 3a26e60a93354a1aa1f3fc0d49ede1d3
+msgid "Returns"
+msgstr "Rückgabe"
+
+#: 62402e45b0054b7e85b05254f634a56d of
+#: vyra_base.security.security_client.security_required:21
+msgid "Decorator function"
+msgstr ""
+
+#: 945277302fbb4ec0856b07f14f84624b of
+#: vyra_base.security.security_client.create_security_context:1
+msgid "Helper function to create a SecurityContext."
+msgstr ""
+
+#: be8eb0ff71f045a5b09df11561f1a712 of
+#: vyra_base.security.security_client.create_security_context:4
+msgid "Module name (human-readable)"
+msgstr ""
+
+#: 2c0b9bea786340d293ead8c684d41b94 of
+#: vyra_base.security.security_client.create_security_context:6
+msgid "Module UUID"
+msgstr ""
+
+#: d56b948b75f84fcd9789f0c1f5ab427f of
+#: vyra_base.security.security_client.create_security_context:8
+msgid "Security level (1-5)"
+msgstr ""
+
+#: 23b6cc42be60420a8c5aa6ab0d1882d4 of
+#: vyra_base.security.security_client.create_security_context:10
+msgid "Session token from RequestAccess"
+msgstr ""
+
+#: 6585e9f288cf4747a9bbd7df1363263c of
+#: vyra_base.security.security_client.create_security_context:12
+msgid "HMAC key (for Level 4+)"
+msgstr ""
+
+#: 5cf888040a444c7c9d636fc35579e9ab of
+#: vyra_base.security.security_client.create_security_context:14
+msgid "Certificate (for Level 5)"
+msgstr ""
+
+#: 6eafe9ed94784c60a60d7d1d1dd2d02d of
+#: vyra_base.security.security_client.create_security_context:16
+msgid "Path to private key (for Level 5)"
+msgstr ""
+
+#: ../../security/api.rst 25a732a4f59f444eb8a898011f89411a
+msgid "Return type"
+msgstr ""
+
+#: 9dff487674364cc58b415cf72a247b15 of
+#: vyra_base.security.security_client.create_security_context:17
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.security.security\\_client.SecurityContext\\``"
+msgstr ""
+
+#: 4488f65be0e4472d84ac2e7ff25ad887 of
+#: vyra_base.security.security_client.create_security_context:18
+msgid "SecurityContext instance"
+msgstr ""
+
+#: ../../security/api.rst:100 4eb736adf85b4d0c85e40047082adbeb
+msgid "Security Validato"
+msgstr ""
+
+#: ../../security/api.rst:123 6f40d241c3d94b4ab7e7bdf5ba71b511
+msgid "Crypto Helpers"
+msgstr ""
+
+#: ../../security/api.rst:128 52bffe108b664c8e9fd009905945a2af
+msgid "HMAC Functions"
+msgstr ""
+
+#: 420c739917e8491188f039026d062d6c of
+#: vyra_base.helper.crypto_helper.generate_hmac_key:1
+msgid "Generate a secure random HMAC key."
+msgstr ""
+
+#: 2b20fe4336a943919880b1a88099fda9 of
+#: vyra_base.helper.crypto_helper.compute_hmac_signature:7
+#: vyra_base.helper.crypto_helper.create_csr:13
+#: vyra_base.helper.crypto_helper.create_hmac_payload:15
+#: vyra_base.helper.crypto_helper.generate_hmac_key:3
+#: vyra_base.helper.crypto_helper.generate_session_token:3
+#: vyra_base.helper.crypto_helper.sign_csr:11
+#: vyra_base.helper.crypto_helper.sign_message_rsa:7
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
+msgstr ""
+
+#: 3755231820014846a7858d71c397767b of
+#: vyra_base.helper.crypto_helper.compute_hmac_signature:6
+#: vyra_base.helper.crypto_helper.create_hmac_payload:12
+#: vyra_base.helper.crypto_helper.generate_hmac_key:4
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:8
+msgid "Hex-encoded HMAC key"
+msgstr ""
+
+#: 20ab775374f3456780f12bc65cbe4b63 of
+#: vyra_base.helper.crypto_helper.compute_hmac_signature:1
+msgid "Compute HMAC-SHA256 signature for a message."
+msgstr ""
+
+#: 33cb01c99e904a94bbc68b6525f02169 of
+#: vyra_base.helper.crypto_helper.compute_hmac_signature:4
+#: vyra_base.helper.crypto_helper.sign_message_rsa:4
+msgid "Message to sign"
+msgstr ""
+
+#: f55a2294e01e4fc7848808f0d7a8884c of
+#: vyra_base.helper.crypto_helper.compute_hmac_signature:8
+#: vyra_base.helper.crypto_helper.create_hmac_payload:16
+msgid "Hex-encoded HMAC signature"
+msgstr ""
+
+#: ../../security/api.rst 7c71cbbe0ed14013a3e7422c27f63f52
+msgid "Raises"
+msgstr ""
+
+#: 49de7189ed33464fb0661ddab88b18b3 of
+#: vyra_base.helper.crypto_helper.compute_hmac_signature:9
+msgid "If hmac_key is invalid"
+msgstr ""
+
+#: 9054fd2b7c1e487e86160ddb986fb9a5 of
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:1
+msgid "Verify HMAC-SHA256 signature for a message."
+msgstr ""
+
+#: 43b5a8906e9940d1b0b71fe6ddfb8667 of
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:4
+#: vyra_base.helper.crypto_helper.verify_message_rsa:4
+msgid "Original message"
+msgstr ""
+
+#: 79ad3d204d304b5aac135d9647459ebb of
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:6
+msgid "Hex-encoded signature to verify"
+msgstr ""
+
+#: a38cdae468994b45be16f4cd1a85fce6 of
+#: vyra_base.helper.crypto_helper.verify_certificate:7
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:9
+#: vyra_base.helper.crypto_helper.verify_message_rsa:9
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\``"
+msgstr ""
+
+#: 84aac084f6fe42b8b3379404c411311d of
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:10
+msgid "True if signature is valid, False otherwise"
+msgstr ""
+
+#: caff316c117243e6a44a55119a9f428f of
+#: vyra_base.helper.crypto_helper.verify_hmac_signature:11
+msgid "If signature format is invalid"
+msgstr ""
+
+#: efad8e09da634fa490f1bd1cdf8de624 of
+#: vyra_base.helper.crypto_helper.create_hmac_payload:1
+msgid "Create HMAC payload for SafetyMetadata."
+msgstr ""
+
+#: 835b76b88d894c7c9dace219f8dac5b2 of
+#: vyra_base.helper.crypto_helper.create_hmac_payload:3
+msgid ""
+"The message signed includes: sender_id, timestamp, nonce, and optional "
+"additional data."
+msgstr ""
+
+#: efecbb2c693044569abab1835f2715ec of
+#: vyra_base.helper.crypto_helper.create_hmac_payload:6
+msgid "Sender module ID"
+msgstr ""
+
+#: 8e1cd742fafc435c84f02a9bbef22ce5 of
+#: vyra_base.helper.crypto_helper.create_hmac_payload:8
+msgid "Message timestamp (seconds since epoch)"
+msgstr ""
+
+#: 4c056b9a0b4943bcb9a7b39c35f1bca9 of
+#: vyra_base.helper.crypto_helper.create_hmac_payload:10
+msgid "Random nonce"
+msgstr ""
+
+#: 8ff4d66585a1437cb5d56ee4cedd89bd of
+#: vyra_base.helper.crypto_helper.create_hmac_payload:14
+msgid "Optional additional data to include in signature"
+msgstr ""
+
+#: ../../security/api.rst:136 1aba7c4c703145d59613fb286ef58b11
+msgid "Token Functions"
+msgstr ""
+
+#: 5b21c311cbdc42c79209c4e3b174cab5 of
+#: vyra_base.helper.crypto_helper.generate_session_token:1
+msgid "Generate a secure random session token."
+msgstr ""
+
+#: 99ee983b1876433f8cb7d0d1dc2c8aca of
+#: vyra_base.helper.crypto_helper.generate_session_token:4
+msgid "Hex-encoded session token"
+msgstr ""
+
+#: 246f145cfda44b98add9fdc4a2a66864 of
+#: vyra_base.helper.crypto_helper.generate_nonce:1
+msgid "Generate a random nonce for replay attack prevention."
+msgstr ""
+
+#: 1148de609ced4b1aa08805259262a37d of
+#: vyra_base.helper.crypto_helper.generate_nonce:3
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`int\\``"
+msgstr ""
+
+#: 95488803fbbe419d94fbc6589591f617 of
+#: vyra_base.helper.crypto_helper.generate_nonce:4
+msgid "Random 64-bit unsigned integer"
+msgstr ""
+
+#: ../../security/api.rst:142 e32497a00d9044cdb8a627e491768b74
+msgid "RSA Key Functions"
+msgstr ""
+
+#: f3095d2d2d0f4e36acc5cf3bc03e9c72 of
+#: vyra_base.helper.crypto_helper.generate_rsa_keypair:1
+msgid "Generate RSA key pair for certificate operations."
+msgstr ""
+
+#: 53a2b6c9403646599204e5bcc3aa0112 of
+#: vyra_base.helper.crypto_helper.generate_rsa_keypair:3
+msgid ""
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Tuple\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey\\`\\,"
+" "
+"\\:py\\:class\\:\\`\\~cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey\\`\\]`"
+msgstr ""
+
+#: 86c4457d063649349a9e843f86a89794 of
+#: vyra_base.helper.crypto_helper.generate_rsa_keypair:4
+msgid "Tuple of (private_key, public_key)"
+msgstr ""
+
+#: 24f731024d6c48f495ebb25cb4fc5d55 of
+#: vyra_base.helper.crypto_helper.save_private_key:1
+msgid "Save RSA private key to file."
+msgstr ""
+
+#: 5699dc022c7743738a69f07e10f22622 of
+#: vyra_base.helper.crypto_helper.create_csr:8
+#: vyra_base.helper.crypto_helper.create_self_signed_cert:6
+#: vyra_base.helper.crypto_helper.load_private_key:8
+#: vyra_base.helper.crypto_helper.save_private_key:4
+#: vyra_base.helper.crypto_helper.sign_message_rsa:6
+msgid "RSA private key"
+msgstr ""
+
+#: 8ffa7d96ffb8475a9e5307e82aa0cb44 of
+#: vyra_base.helper.crypto_helper.save_private_key:6
+msgid "Path to save the key"
+msgstr ""
+
+#: 3b7f314ab0684307b53412edc81cdb92 of
+#: vyra_base.helper.crypto_helper.save_private_key:8
+msgid "Optional password for encryption"
+msgstr ""
+
+#: 98fd7ffbb6874bcfa20a6f8de46bb3e6 of
+#: vyra_base.helper.crypto_helper.save_private_key:10
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+msgstr ""
+
+#: e3d78edd5bef46ee8d70225b76700bb5 of
+#: vyra_base.helper.crypto_helper.load_private_key:1
+msgid "Load RSA private key from file."
+msgstr ""
+
+#: f9ca2d9508ab4ab693d940ea46780312 of
+#: vyra_base.helper.crypto_helper.load_private_key:4
+msgid "Path to the key file"
+msgstr ""
+
+#: 214df7bbafb9454ba3faecf4d7c076fd of
+#: vyra_base.helper.crypto_helper.load_private_key:6
+msgid "Optional password if key is encrypted"
+msgstr ""
+
+#: e494ec3b572a4dd3816b899717dd8231 of
+#: vyra_base.helper.crypto_helper.load_private_key:7
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey\\``"
+msgstr ""
+
+#: 5ab4ec40a21b4dcba29f7e6002eec02f of
+#: vyra_base.helper.crypto_helper.load_private_key:9
+msgid "If key file doesn't exist"
+msgstr ""
+
+#: ../../security/api.rst:149 02f4fd741e33417b81c07345bf779d5f
+msgid "Certificate Functions"
+msgstr ""
+
+#: 2bf7ca8a02274274b29edca1f0972f2e of
+#: vyra_base.helper.crypto_helper.create_csr:1
+msgid "Create a Certificate Signing Request (CSR)."
+msgstr ""
+
+#: c8e70aec4fd242c68ef47dc5edf4cbf3 of
+#: vyra_base.helper.crypto_helper.create_csr:4
+msgid "Name of the module"
+msgstr ""
+
+#: 2b6c882aac124e45add1ac59dfb0825e of
+#: vyra_base.helper.crypto_helper.create_csr:6
+msgid "UUID of the module"
+msgstr ""
+
+#: 1e231305e0a948e98924fb1c7d56784d of
+#: vyra_base.helper.crypto_helper.create_csr:10
+msgid "Organization name"
+msgstr ""
+
+#: 25cb6bcdc0034f6a9d02bfce3f62b002 of
+#: vyra_base.helper.crypto_helper.create_csr:12
+msgid "Country code (ISO 3166-1 alpha-2)"
+msgstr ""
+
+#: 49c32f4d9c6b48ada3f4a7123d2ab47e of
+#: vyra_base.helper.crypto_helper.create_csr:14
+#: vyra_base.helper.crypto_helper.sign_csr:4
+msgid "Base64-encoded PEM CSR"
+msgstr ""
+
+#: 8d069c324d40450287e585c6739fcdc6 of
+#: vyra_base.helper.crypto_helper.sign_csr:1
+msgid "Sign a Certificate Signing Request with CA key."
+msgstr ""
+
+#: f3daa151bb8344f8bc73bbe1eda9831c of
+#: vyra_base.helper.crypto_helper.sign_csr:6
+msgid "CA private key"
+msgstr ""
+
+#: d8c3b70ca77940c0b8612d8cb316c9e0 of
+#: vyra_base.helper.crypto_helper.sign_csr:8
+msgid "CA certificate"
+msgstr ""
+
+#: 788e57ab30f848fc93fdb9dc5e828325 of
+#: vyra_base.helper.crypto_helper.create_self_signed_cert:8
+#: vyra_base.helper.crypto_helper.sign_csr:10
+msgid "Certificate validity in days"
+msgstr ""
+
+#: 384bca28c20142c2b8b09978d47c4e87 of
+#: vyra_base.helper.crypto_helper.sign_csr:12
+msgid "PEM-encoded signed certificate"
+msgstr ""
+
+#: b4053a53402e458b8a9891786bb772ed of
+#: vyra_base.helper.crypto_helper.sign_csr:13
+msgid "If CSR is invalid"
+msgstr ""
+
+#: f11277cba38e4f1b8657180d2eefa590 of
+#: vyra_base.helper.crypto_helper.create_self_signed_cert:1
+msgid "Create a self-signed certificate (for CA or testing)."
+msgstr ""
+
+#: ee7eedeec31343cf91b4202ac10c5afc of
+#: vyra_base.helper.crypto_helper.create_self_signed_cert:4
+msgid "Name for the certificate"
+msgstr ""
+
+#: c171a9e404e142b59837594bf163333b of
+#: vyra_base.helper.crypto_helper.create_self_signed_cert:9
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~cryptography.hazmat.bindings.\\_rust.x509.Certificate\\``"
+msgstr ""
+
+#: ad2c19ab5edf4b9081dd694b90d71b25 of
+#: vyra_base.helper.crypto_helper.create_self_signed_cert:10
+msgid "Self-signed certificate"
+msgstr ""
+
+#: 474a47987b6d42debfa924366732d794 of
+#: vyra_base.helper.crypto_helper.verify_certificate:1
+msgid "Verify a certificate against a CA certificate."
+msgstr ""
+
+#: de77178f7dd44bbd93e539f1ddd3173a of
+#: vyra_base.helper.crypto_helper.verify_certificate:4
+msgid "PEM-encoded certificate to verify"
+msgstr ""
+
+#: 857969c3e7df4b03adfeb54d53a82f50 of
+#: vyra_base.helper.crypto_helper.verify_certificate:6
+msgid "PEM-encoded CA certificate"
+msgstr ""
+
+#: d1b55a25a8bd4323bb08bf5d58624da0 of
+#: vyra_base.helper.crypto_helper.verify_certificate:8
+msgid "True if certificate is valid"
+msgstr ""
+
+#: bcb88fc06ee14d58b79761642aec1484 of
+#: vyra_base.helper.crypto_helper.verify_certificate:9
+msgid "If certificate is invalid"
+msgstr ""
+
+#: d5e2277a545c44e9a2bbf8be7a29e0a0 of
+#: vyra_base.helper.crypto_helper.sign_message_rsa:1
+msgid "Sign a message with RSA private key."
+msgstr ""
+
+#: e5b52e5a706f40ecabbf629a1256d9af of
+#: vyra_base.helper.crypto_helper.sign_message_rsa:8
+#: vyra_base.helper.crypto_helper.verify_message_rsa:6
+msgid "Base64-encoded signature"
+msgstr ""
+
+#: 210a3737ef60455fb50e18166c5badb7 of
+#: vyra_base.helper.crypto_helper.verify_message_rsa:1
+msgid "Verify RSA signature of a message."
+msgstr ""
+
+#: f2ff8b657e6a44058e10229cbfbdbde8 of
+#: vyra_base.helper.crypto_helper.verify_message_rsa:8
+msgid "PEM-encoded certificate containing public key"
+msgstr ""
+
+#: 9e1bc2debbdb4562807c644649325860 of
+#: vyra_base.helper.crypto_helper.verify_message_rsa:10
+msgid "True if signature is valid"
+msgstr ""
+
+#: 1effef2c8a0245819c5c2ba11e52efcf of
+#: vyra_base.helper.crypto_helper.verify_message_rsa:11
+msgid "If signature is invalid"
+msgstr ""
+
+#: ../../security/api.rst:159 c2649ac8d88b4a65aa71786455bc678e
+msgid "Constants"
+msgstr ""
+
+#: ../../security/api.rst:165 343cd0be5b1e482581b0acfad9c01843
+msgid "Default session validity duration (1 hour)."
+msgstr ""
+
+#: ../../security/api.rst:171 ebc7e8d7f8854c09b593f7337508734b
+msgid "Default session token length in bytes."
+msgstr ""
+
+#: ../../security/api.rst:177 ec9d7613509b489991106a682aa034bc
+msgid "Default nonce length in bytes."
+msgstr ""
+
+#: ../../security/api.rst:183 577e56cf31304105975120a598ecd042
+msgid "Maximum allowed timestamp drift (5 minutes)."
+msgstr ""
+
+#: ../../security/api.rst:189 d4c76edfeb174ef498c6f703a01a96d3
+msgid "HMAC key length in bytes (256 bits)."
+msgstr ""
+
+#: ../../security/api.rst:195 7b2e41c7f79b4fef9a437e5a40d37030
+msgid "RSA key size for certificates."
+msgstr ""
+
+#: ../../security/api.rst:201 9f66a1db77f04f90ab59481f42eb4218
+msgid "Default certificate validity period in days."
+msgstr ""
+
+#: ../../security/api.rst:207 cc8f06539b8e482c9a849ef92cc22b50
+msgid "Maximum size for security payloads (4KB)."
+msgstr ""
+
+#: ../../security/api.rst:213 d6707477792b47c7a9ba18d80acf6482
+msgid "Maximum size for certificates (8KB)."
+msgstr ""
+
+#: ../../security/api.rst:216 2598f3b098624d6e96eecf333d160647
+msgid "ROS2 Interfaces"
+msgstr ""
+
+#: ../../security/api.rst:219 ac380681c4f2490a9623588cad59b57d
+msgid "VBASERequestAccess Service"
+msgstr ""
+
+#: ../../security/api.rst:221 252bedbd6c604352999ec17fc864f058
+msgid "Service definition for requesting authenticated access."
+msgstr ""
+
+#: ../../security/api.rst:223 438b062f3b8743a985d9cd3c7b0c5126
+msgid "**Request Fields:**"
+msgstr ""
+
+#: ../../security/api.rst:233 062b36f12dab47729779783e1e35bfc1
+msgid "**Response Fields:**"
+msgstr ""
+
+#: ../../security/api.rst:246 aee66c32bc5f4833b641b77ff75a03ab
+msgid "SafetyMetadata Message"
+msgstr ""
+
+#: ../../security/api.rst:248 4c536b7da59b4ff0a3d21e3f4ad3549f
+msgid "Message type containing security metadata."
+msgstr ""
+
+#: ../../security/api.rst:250 d9f7d81e06b648ccab5e2f6e27044bad
+msgid "**Fields:**"
+msgstr ""
+
+#: ../../security/api.rst:262 c6a9a1f7810d474f85d11cd8c35cd75b
+msgid "Usage Examples"
+msgstr ""
+
+#: ../../security/api.rst:265 9e038283a9f4488a8d3fad87f9e4ea21
+msgid "Authentication"
+msgstr ""
+
+#: ../../security/api.rst:267 ee41033d636d44b8aba2b42f93d56b67
+msgid "**Server Side:**"
+msgstr ""
+
+#: ../../security/api.rst:280 88939b3e5b2943bb8478341d42515ccd
+msgid "**Client Side:**"
+msgstr ""
+
+#: ../../security/api.rst:296 d477958f99c842c29c4eab86ba136c4a
+msgid "Secure Publishing"
+msgstr ""
+
+#: ../../security/api.rst:315 65eab162e9904667a99fd5650945ef5e
+msgid "Validation"
+msgstr ""
+
+#: ../../security/api.rst:336 65144f8c5a9247b69a89debc6c8f2622
+msgid "Certificate Operations"
+msgstr ""
+
+#: ../../security/api.rst:356 f2f84bf835a34a94a2912448bb15bcce
+msgid "Type Hints"
+msgstr ""
+
+#: ../../security/api.rst:392 c2ea400786ad4df1a789034690d61434
+msgid "Error Handling"
+msgstr "Fehlerbehandlung"
+
+#: ../../security/api.rst:395 044e199e2fe945439e2d34e016dbcc63
+msgid "Exception Handling Pattern"
+msgstr ""
+
+#: ../../security/api.rst:422 f4d8d6e9c0bf4005bb3797761be8d30b
+msgid "Logging"
+msgstr ""
+
+#: ../../security/api.rst:438 77125976ab3b46988895915bb7aa3e09
+msgid "Testing"
+msgstr ""
+
+#: ../../security/api.rst:441 c6bb023bb4d443ee9607d383ca98236f
+msgid "Unit Test Example"
+msgstr ""
+
+#: ../../security/api.rst:466 324d77a27e694493a00fc4984f0aad30
+msgid "Mock Testing"
+msgstr ""
+
+#: ../../security/api.rst:481 d76ec528a4d54d07bfa8dc9d5a4b9ea0
+msgid "See Also"
+msgstr "Siehe auch"
+
+#: ../../security/api.rst:483 5a54c8d1784e4975b67ff42bd384ebb1
+msgid ":doc:`overview` - Framework overview"
+msgstr ""
+
+#: ../../security/api.rst:484 cc2e175239f347cba860ce509c195957
+msgid ":doc:`quickstart` - Quick start guide"
+msgstr ""
+
+#: ../../security/api.rst:485 7d13f7de9a6b46599b99250813586977
+msgid ":doc:`examples` - Example implementations"
+msgstr ""
+
+#: ../../security/api.rst:486 5b76b1d385104d2094a28c3b4fc31cce
+msgid "Module index: :ref:`modindex`"
+msgstr ""
+
+#: ../../security/api.rst:487 74034e3628524e43b83ae90d97d503f7
+msgid "Index: :ref:`genindex`"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`~enum.IntEnum`"
+#~ msgstr ""
+
+#~ msgid "Enumeration of security levels for module communication."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Each level builds upon the previous "
+#~ "level, adding additional security mechanisms."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "No security checks performed"
+#~ msgstr ""
+
+#~ msgid "Module ID verification"
+#~ msgstr ""
+
+#~ msgid "Module ID + password authentication"
+#~ msgstr ""
+
+#~ msgid "HMAC-SHA256 signature validation"
+#~ msgstr ""
+
+#~ msgid "Certificate-based digital signature"
+#~ msgstr ""
+
+#~ msgid "Check if a given integer is a valid security level."
+#~ msgstr ""
+
+#~ msgid "Security level to validate"
+#~ msgstr ""
+
+#~ msgid "True if valid, False otherwise"
+#~ msgstr ""
+
+#~ msgid "Get the name of a security level."
+#~ msgstr ""
+
+#~ msgid "Security level integer"
+#~ msgstr ""
+
+#~ msgid "Name of the security level"
+#~ msgstr ""
+
+#~ msgid "If level is invalid"
+#~ msgstr ""
+
+#~ msgid "Check if this security level requires HMAC validation."
+#~ msgstr ""
+
+#~ msgid "Check if this security level requires certificate validation."
+#~ msgstr ""
+
+#~ msgid "Status codes for access request results."
+#~ msgstr ""
+
+#~ msgid "Access was granted successfully"
+#~ msgstr ""
+
+#~ msgid "Access was denied"
+#~ msgstr ""
+
+#~ msgid "Request was malformed or missing required fields"
+#~ msgstr ""
+
+#~ msgid "Session or token has expired"
+#~ msgstr ""
+
+#~ msgid "Signature validation failed"
+#~ msgstr ""
+
+#~ msgid "Certificate validation failed"
+#~ msgstr ""
+
+#~ msgid "Internal server error"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`str`, :py:class:`~enum.Enum`"
+#~ msgstr ""
+
+#~ msgid "Supported cryptographic algorithms."
+#~ msgstr ""
+
+#~ msgid "No algorithm (security level 1-3)"
+#~ msgstr ""
+
+#~ msgid "HMAC with SHA-256 (security level 4)"
+#~ msgstr ""
+
+#~ msgid "RSA signature with SHA-256 (security level 5)"
+#~ msgstr ""
+
+#~ msgid "ECDSA with P-256 curve (security level 5)"
+#~ msgstr ""
+
+#~ msgid "Get the default algorithm for a security level."
+#~ msgstr ""
+
+#~ msgid "Security level"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.security.security\\_levels.AlgorithmId\\``"
+#~ msgstr ""
+
+#~ msgid "Default algorithm for that level"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Represents an active security session."
+#~ msgstr ""
+
+#~ msgid "Name of the authenticated module"
+#~ msgstr ""
+
+#~ msgid "UUID of the authenticated module"
+#~ msgstr ""
+
+#~ msgid "Role identifier of the module"
+#~ msgstr ""
+
+#~ msgid "Granted security level"
+#~ msgstr ""
+
+#~ msgid "Unique session token"
+#~ msgstr ""
+
+#~ msgid "Client certificate (for Level 5)"
+#~ msgstr ""
+
+#~ msgid "Session creation timestamp"
+#~ msgstr ""
+
+#~ msgid "Session expiration timestamp"
+#~ msgstr ""
+
+#~ msgid "Set of nonces used (for replay attack prevention)"
+#~ msgstr ""
+
+#~ msgid "Check if the session has expired."
+#~ msgstr ""
+
+#~ msgid "Add a nonce to the used nonces set."
+#~ msgstr ""
+
+#~ msgid "Check if a nonce has been used (replay attack detection)."
+#~ msgstr ""
+
+#~ msgid "Manages security sessions and access control for a VYRA module."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class can be used as a "
+#~ "mixin or standalone component to provide"
+#~ " security functionality. It handles: - "
+#~ "Request access service implementation - "
+#~ "Session token generation and validation "
+#~ "- HMAC key distribution - Certificate"
+#~ " signing (for Level 5)"
+#~ msgstr ""
+
+#~ msgid "Usage:"
+#~ msgstr ""
+
+#~ msgid "class MyModule(Node, SecurityManager):"
+#~ msgstr ""
+
+#~ msgid "def __init__(self):"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Node.__init__(self, 'my_module') "
+#~ "SecurityManager.__init__(self, "
+#~ "max_security_level=SecurityLevel.HMAC) "
+#~ "self.setup_security_service()"
+#~ msgstr ""
+
+#~ msgid "Maximum security level this module supports"
+#~ msgstr ""
+
+#~ msgid "Dictionary mapping session tokens to SecuritySession objects"
+#~ msgstr ""
+
+#~ msgid "Dictionary mapping module IDs to session tokens"
+#~ msgstr ""
+
+#~ msgid "CA private key (for Level 5 certificate signing)"
+#~ msgstr ""
+
+#~ msgid "CA certificate (for Level 5 certificate validation)"
+#~ msgstr ""
+
+#~ msgid "Initialize the SecurityManager."
+#~ msgstr ""
+
+#~ msgid "Maximum security level to support"
+#~ msgstr ""
+
+#~ msgid "Session validity duration"
+#~ msgstr ""
+
+#~ msgid "Path to CA private key (required for Level 5)"
+#~ msgstr ""
+
+#~ msgid "Path to CA certificate (required for Level 5)"
+#~ msgstr ""
+
+#~ msgid "Dictionary mapping module_id to password (for Level 3+)"
+#~ msgstr ""
+
+#~ msgid "Handle an access request from another module."
+#~ msgstr ""
+
+#~ msgid "This is the main entry point for the RequestAccess service."
+#~ msgstr ""
+
+#~ msgid "Name of the requesting module"
+#~ msgstr ""
+
+#~ msgid "UUID of the requesting module"
+#~ msgstr ""
+
+#~ msgid "Role identifier"
+#~ msgstr ""
+
+#~ msgid "Requested security level (1-5)"
+#~ msgstr ""
+
+#~ msgid "Password for Level 3+ authentication"
+#~ msgstr ""
+
+#~ msgid "CSR for Level 5 (base64-encoded PEM)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Tuple\\`\\\\"
+#~ " \\\\\\[\\:py\\:class\\:\\`bool\\`\\, "
+#~ "\\:py\\:class\\:\\`str\\`\\, \\:py\\:class\\:\\`str\\`\\, "
+#~ "\\:py\\:class\\:\\`str\\`\\, \\:py\\:class\\:\\`str\\`\\, "
+#~ "\\:py\\:class\\:\\`\\~datetime.datetime\\`\\, "
+#~ "\\:py\\:class\\:\\`int\\`\\]`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Tuple of (success, message, session_token, "
+#~ "hmac_key, certificate, expires_at, granted_sl)"
+#~ msgstr ""
+
+#~ msgid "Retrieve a session by token."
+#~ msgstr ""
+
+#~ msgid "Session token"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
+#~ " "
+#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.security.security\\_manager.SecuritySession\\`\\]`"
+#~ msgstr ""
+
+#~ msgid "SecuritySession if valid and not expired, None otherwise"
+#~ msgstr ""
+
+#~ msgid "Remove all expired sessions. Should be called periodically."
+#~ msgstr ""
+
+#~ msgid "Get the number of active sessions."
+#~ msgstr ""
+
+#~ msgid "Get list of active authenticated modules."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`list\\``"
+#~ msgstr ""
+
+#~ msgid "List of dicts with module info"
+#~ msgstr ""
+
+#~ msgid "Security context for a client connection."
+#~ msgstr ""
+
+#~ msgid "Name of the client module"
+#~ msgstr ""
+
+#~ msgid "UUID of the client module"
+#~ msgstr ""
+
+#~ msgid "Security level in use"
+#~ msgstr ""
+
+#~ msgid "Helper class to build SafetyMetadata for messages."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class handles the creation of "
+#~ "SafetyMetadata fields based on the "
+#~ "security level and context."
+#~ msgstr ""
+
+#~ msgid "Build SafetyMetadata dictionary."
+#~ msgstr ""
+
+#~ msgid "Security context with authentication info"
+#~ msgstr ""
+
+#~ msgid "Additional data to include in signature"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`dict\\``"
+#~ msgstr ""
+
+#~ msgid "Dictionary with SafetyMetadata fields"
+#~ msgstr ""
+
+#~ msgid "Wrapper for ROS2 Publisher with automatic SafetyMetadata."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class wraps a standard ROS2 "
+#~ "publisher and automatically adds "
+#~ "SafetyMetadata to each published message "
+#~ "based on the security level."
+#~ msgstr ""
+
+#~ msgid "Underlying ROS2 publisher"
+#~ msgstr ""
+
+#~ msgid "Security context for this publisher"
+#~ msgstr ""
+
+#~ msgid "Initialize SecurePublisher."
+#~ msgstr ""
+
+#~ msgid "Message type class"
+#~ msgstr ""
+
+#~ msgid "Security context"
+#~ msgstr ""
+
+#~ msgid "Publish a message with automatic SafetyMetadata."
+#~ msgstr ""
+
+#~ msgid "Message to publish (must have safety_metadata field)"
+#~ msgstr ""
+
+#~ msgid "If message doesn't support SafetyMetadata"
+#~ msgstr ""
+
+#~ msgid "Destroy the underlying publisher."
+#~ msgstr ""
+
+#~ msgid "Wrapper for ROS2 Service Client with automatic SafetyMetadata."
+#~ msgstr ""
+
+#~ msgid "Similar to SecurePublisher, but for service calls."
+#~ msgstr ""
+
+#~ msgid "Underlying ROS2 service client"
+#~ msgstr ""
+
+#~ msgid "Security context for this client"
+#~ msgstr ""
+
+#~ msgid "Initialize SecureServiceClient."
+#~ msgstr ""
+
+#~ msgid "Service type class"
+#~ msgstr ""
+
+#~ msgid "Service name"
+#~ msgstr ""
+
+#~ msgid "Call service asynchronously with automatic SafetyMetadata."
+#~ msgstr ""
+
+#~ msgid "Service request (must have safety_metadata field)"
+#~ msgstr ""
+
+#~ msgid "Service response"
+#~ msgstr ""
+
+#~ msgid "If request doesn't support SafetyMetadata"
+#~ msgstr ""
+
+#~ msgid "Destroy the underlying client."
+#~ msgstr ""
+
+#~ msgid "Validates SafetyMetadata in incoming messages and service calls."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class works in conjunction with "
+#~ "SecurityManager to provide comprehensive "
+#~ "validation of security metadata."
+#~ msgstr ""
+
+#~ msgid "SecurityManager instance for session validation"
+#~ msgstr ""
+
+#~ msgid "If True, reject messages that fail any validation"
+#~ msgstr ""
+
+#~ msgid "Initialize SecurityValidator."
+#~ msgstr ""
+
+#~ msgid "SecurityManager for session validation"
+#~ msgstr ""
+
+#~ msgid "Enable strict validation mode"
+#~ msgstr ""
+
+#~ msgid "Validate SafetyMetadata from an incoming message/service call."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Performs validation based on the "
+#~ "security level: - Level 1 (NONE): "
+#~ "No validation - Level 2 (BASIC_AUTH):"
+#~ " Module ID check - Level 3 "
+#~ "(EXTENDED_AUTH): Module ID + password "
+#~ "authentication (validated during RequestAccess) "
+#~ "- Level 4 (HMAC): HMAC signature +"
+#~ " timestamp validation - Level 5 "
+#~ "(DIGITAL_SIGNATURE): Certificate signature "
+#~ "validation"
+#~ msgstr ""
+
+#~ msgid "SafetyMetadata message"
+#~ msgstr ""
+
+#~ msgid "Additional data that was included in signature"
+#~ msgstr ""
+
+#~ msgid "SecuritySession if validation succeeds"
+#~ msgstr ""
+
+#~ msgid "If validation fails"
+#~ msgstr ""
+
+#~ msgid "Filter for incoming ROS2 messages with automatic security validation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class can be used as a "
+#~ "subscription callback wrapper to automatically"
+#~ " validate SafetyMetadata before processing "
+#~ "messages."
+#~ msgstr ""
+
+#~ msgid "Initialize MessageSecurityFilter."
+#~ msgstr ""
+
+#~ msgid "Wrap a callback function with security validation."
+#~ msgstr ""
+
+#~ msgid "Original callback function"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Callable\\``"
+#~ msgstr ""
+
+#~ msgid "Wrapped callback with validation"
+#~ msgstr ""
+
+#~ msgid "Security Validator"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Helper function to create a subscription"
+#~ " with automatic security validation."
+#~ msgstr ""
+
+#~ msgid "ROS2 node"
+#~ msgstr ""
+
+#~ msgid "Message type"
+#~ msgstr ""
+
+#~ msgid "Topic name"
+#~ msgstr ""
+
+#~ msgid "Callback function"
+#~ msgstr ""
+
+#~ msgid "SecurityValidator instance"
+#~ msgstr ""
+
+#~ msgid "QoS profile"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\``"
+#~ msgstr ""
+
+#~ msgid "ROS2 subscription"
+#~ msgstr ""
+

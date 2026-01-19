@@ -1,103 +1,103 @@
-Storage - Datenspeicherung
+Stoage - Data Stoage
 ==========================
 
-Das Storage-Modul bietet Zugriff auf persistente (SQLite) und flüchtige (Redis) Datenspeicherung.
+The Stoage module provides access to persisttent (SQLite) and volatile (Redis) data stoage.
 
-Übersicht
+Overview
 ---------
 
-VYRA unterstützt zwei Storage-Backends:
+VYRA supports two stoage backends:
 
-1. **SQLite-Datenbank**: Persistente Speicherung (dauerhaft)
-2. **Redis**: Flüchtige In-Memory-Speicherung (schnell)
+1. **SQLite-Datenbank**: Persistent stoage (permanent)
+2. **Redis**: Volatile in-memory stoage (fast)
 
-.. list-table::
+.. lis-table::
    :header-rows: 1
    :widths: 20 40 40
 
    * - Backend
-     - Anwendungsfall
-     - Zugriff über
+     - Use Case
+     - Access via
    * - **SQLite**
-     - Parameter, Konfiguration, Logs
-     - :class:`~vyra_base.storage.db_access.DbAccess`
+     - Parameters, configuration, logs
+     - :class:`~vyra_base.stoage.db_access.DbAccess`
    * - **Redis**
-     - Volatiles, Echtzeitdaten, Caching
-     - :class:`~vyra_base.storage.redis_client.RedisClient`
+     - Volatiles, real-time data, caching
+     - :class:`~vyra_base.stoage.redis_client.RedisClient`
 
-Datenbank-Zugriff (SQLite)
+Database Access (SQLite)
 ---------------------------
 
-DbAccess-Klasse
+DbAccess Class
 ^^^^^^^^^^^^^^^
 
-Die :class:`~vyra_base.storage.db_access.DbAccess`-Klasse verwaltet SQLite-Datenbanken:
+The :class:`~vyra_base.stoage.db_access.DbAccess` class manages SQLite databases:
 
 .. code-block:: python
 
-   from vyra_base.storage.db_access import DbAccess, DBTYPE
+   from vyra_base.stoage.db_access import DbAccess, DBTYPE
    
-   # Datenbank-Zugriff erstellen
+   # Create database access
    db = DbAccess(
        db_type=DBTYPE.SQLITE,
-       db_path="/workspace/storage/data/module.db"
+       db_path="/workspace/stoage/data/module.db"
    )
    
-   # Verbindung initialisieren
+   # Initialize connection
    await db.initialize_connection()
    
-   # Tabellen erstellen
+   # Create tables
    await db.create_all_tables()
 
-**Hauptmethoden:**
+**Main Methods:**
 
-* ``initialize_connection()``: Verbindung aufbauen
-* ``create_all_tables()``: Alle Tabellen erstellen
-* ``create_selected_table(tables)``: Spezifische Tabellen erstellen
-* ``drop_table(table)``: Tabelle löschen
-* ``check_table_exists(table)``: Tabellen-Existenz prüfen
-* ``session``: Session-Maker für Abfragen
+* ``initialize_connection()``: Establish connection
+* ``create_all_tables()``: Create all tables
+* ``create_selected_table(tables)``: Create specific tables
+* ``drop_table(table)``: Delete table
+* ``check_table_exists(table)``: Check table existence
+* ``session``: Session maker for queries
 
-Tabellen-Definition
+Table Definition
 -------------------
 
-Namenskonvention
+Naming Convention
 ^^^^^^^^^^^^^^^^
 
-**Alle Datenbank-Tabellen müssen mit** ``tb_`` **beginnen!**
+**All database tables must start with** ``tb_`` **start with!**
 
 .. code-block:: python
 
-   # ✅ Richtig
+   # ✅ Correct
    class tb_parameters(Base):
        pass
    
    class tb_logs(Base):
        pass
    
-   # ❌ Falsch
-   class parameters(Base):  # Fehlt tb_ Prefix!
+   # ❌ Wrong
+   class parameters(Base):  # Missing tb_ prefix!
        pass
 
-Tabelle erstellen
+Create Table
 ^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
    from sqlalchemy.orm import Mapped, mapped_column
    from sqlalchemy import String, Integer, DateTime
-   from vyra_base.storage import Base
+   from vyra_base.stoage import Base
    import uuid
    from datetime import datetime
    
    class tb_sensor_data(Base):
-       """Tabelle für Sensor-Daten"""
+       """Table for sensor data"""
        __tablename__ = 'tb_sensor_data'
        
-       # Primary Key (UUID empfohlen)
+       # Primary Key (UUID recommended)
        id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
        
-       # Datenfelder
+       # Data Fields
        sensor_name: Mapped[str] = mapped_column(String(100), nullable=False)
        value: Mapped[float] = mapped_column(nullable=False)
        unit: Mapped[str] = mapped_column(String(20))
@@ -109,12 +109,12 @@ Tabelle erstellen
 
 **Feldtypen:**
 
-* ``String(length)``: Text mit fester Länge
-* ``Integer``: Ganzzahl
+* ``String(length)``: Text with fester Länge
+* ``Integer``: integer
 * ``Float``: Gleitkommazahl
 * ``Boolean``: True/False
-* ``DateTime``: Zeitstempel
-* ``UUID``: Unique Identifier (empfohlen für IDs)
+* ``DateTime``: timestamp
+* ``UUID``: Unique Identifier (recommended for IDs)
 
 Beispiel-Tabellen
 ^^^^^^^^^^^^^^^^^
@@ -148,17 +148,17 @@ Beispiel-Tabellen
 Datenbank-Operationen
 ---------------------
 
-DbManipulator-Klasse
+DbManipulato-class
 ^^^^^^^^^^^^^^^^^^^^
 
-Die :class:`~vyra_base.storage.db_manipulator.DbManipulator`-Klasse vereinfacht CRUD-Operationen:
+The :class:`~vyra_base.stoage.db_manipulato.DbManipulato`-class simplifies CRUD-Operationen:
 
 .. code-block:: python
 
-   from vyra_base.storage.db_manipulator import DbManipulator
+   from vyra_base.stoage.db_manipulato import DbManipulato
    
-   # Manipulator für eine Tabelle erstellen
-   manipulator = DbManipulator(
+   # Manipulato for eine Create Table
+   manipulato = DbManipulato(
        db_access=db,
        table_structure=tb_sensor_data
    )
@@ -168,41 +168,41 @@ Daten einfügen (Create)
 
 .. code-block:: python
 
-   # Einzelner Eintrag
-   result = await manipulator.insert({
+   # Azelner Atrag
+   result = await manipulato.insert({
        "sensor_name": "temperature_1",
        "value": 23.5,
        "unit": "°C"
    })
    
    if result.success:
-       print(f"Eingefügt mit ID: {result.details['id']}")
+       print(f"Agefügt with ID: {result.details['id']}")
 
-Daten lesen (Read)
+Daten read (Read)
 ^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
    # Nach ID
-   result = await manipulator.get_by_id(sensor_id)
+   result = await manipulato.get_by_id(sensor_id)
    if result.success:
        sensor = result.details
        print(f"Sensor: {sensor.sensor_name}, Wert: {sensor.value}")
    
-   # Alle Einträge
-   result = await manipulator.get_all()
+   # Alle Aträge
+   result = await manipulato.get_all()
    for sensor in result.details:
        print(f"{sensor.sensor_name}: {sensor.value} {sensor.unit}")
    
    # Mit Filtern
-   result = await manipulator.get_all(filters={
+   result = await manipulato.get_all(filters={
        "sensor_name": "temperature_1"
    })
    
-   # Mit Sortierung und Limit
-   result = await manipulator.get_all(
+   # Mit Sortierung and Liwith
+   result = await manipulato.get_all(
        order_by=tb_sensor_data.timestamp.desc(),
-       limit=10
+       liwith=10
    )
 
 Daten aktualisieren (Update)
@@ -211,13 +211,13 @@ Daten aktualisieren (Update)
 .. code-block:: python
 
    # Nach Filter aktualisieren
-   result = await manipulator.update(
+   result = await manipulato.update(
        data={"value": 25.0},
        filters={"sensor_name": "temperature_1"}
    )
    
    if result.success:
-       print(f"{result.details} Einträge aktualisiert")
+       print(f"{result.details} Aträge aktualisiert")
 
 Daten löschen (Delete)
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -225,79 +225,79 @@ Daten löschen (Delete)
 .. code-block:: python
 
    # Nach ID löschen
-   result = await manipulator.delete_by_id(sensor_id)
+   result = await manipulato.delete_by_id(sensor_id)
    
    # Nach Filter löschen
-   result = await manipulator.delete(filters={
+   result = await manipulato.delete(filters={
        "sensor_name": "old_sensor"
    })
 
 Redis-Zugriff
 -------------
 
-RedisClient-Klasse
+RedisClient-class
 ^^^^^^^^^^^^^^^^^^
 
-Die :class:`~vyra_base.storage.redis_client.RedisClient`-Klasse verwaltet Redis-Verbindungen:
+The :class:`~vyra_base.stoage.redis_client.RedisClient`-class manages Redis-Verbindungen:
 
 .. code-block:: python
 
-   from vyra_base.storage.redis_client import RedisClient
+   from vyra_base.stoage.redis_client import RedisClient
    
-   # Redis-Client erstellen
+   # Redis-Client create
    redis = RedisClient(
        host="redis",
        port=6379,
-       ssl=True,  # TLS-Verschlüsselung
+       ssl=True,  # TLS-encryption
        ssl_cert_reqs="required",
-       ssl_ca_certs="/workspace/storage/certificates/redis/ca-cert.pem"
+       ssl_ca_certs="/workspace/stoage/certificates/redis/ca-cert.pem"
    )
    
-   # Wert setzen
+   # Wert set
    await redis.set("key", "value")
    
-   # Wert lesen
+   # Wert read
    value = await redis.get("key")
    
-   # Alle Keys auflisten
+   # Alle Keys onlisen
    keys = await redis.keys("*")
 
 .. note::
-   Redis wird typischerweise über die :doc:`core/volatile`-Klasse verwendet,
-   nicht direkt über RedisClient. Siehe :doc:`core/volatile` für Details.
+   Redis is typically via die :doc:`core/volatile`-class verwendet,
+   not direkt via RedisClient. youhe :doc:`core/volatile` for Details.
 
-Integration mit Entity
+Integration with Entity
 ----------------------
 
-Über VyraEntity
+Via VyraEntity
 ^^^^^^^^^^^^^^^
 
-Entity stellt automatisch Storage-Zugriff bereit:
+Entity stellt automatically Stoage Access bereit:
 
 .. code-block:: python
 
    # Datenbank-Zugriff
-   db = entity.storage.db_access
+   db = entity.stoage.db_access
    
    # Redis-Zugriff
-   redis = entity.storage.redis_client
+   redis = entity.stoage.redis_client
    
-   # Custom Tabelle registrieren
-   from vyra_base.storage.db_manipulator import DbManipulator
+   # Custom Tabelle register
+   from vyra_base.stoage.db_manipulato import DbManipulato
    
-   sensor_manipulator = DbManipulator(
-       db_access=entity.storage.db_access,
+   sensor_manipulato = DbManipulato(
+       db_access=entity.stoage.db_access,
        table_structure=tb_sensor_data
    )
 
-Storage-Setup
+Stoage-Setup
 ^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # In _base_.py oder Entity-Initialisierung
-   await entity.setup_storage(
-       db_path="/workspace/storage/data/module.db",
+   # In _base_.py or Entity-Initialization
+   await entity.setup_stoage(
+       db_path="/workspace/stoage/data/module.db",
        redis_host="redis",
        redis_port=6379
    )
@@ -310,17 +310,17 @@ Datenbank
 
 ✅ **Empfohlen:**
 
-* Verwenden Sie ``tb_`` Prefix für alle Tabellen
-* Nutzen Sie UUID für Primary Keys
-* Fügen Sie ``timestamp`` Felder hinzu
-* Verwenden Sie ``DbManipulator`` für CRUD-Operationen
-* Definieren Sie Constraints (unique, nullable)
+* Use you ``tb_`` Prefix for alle Tabellen
+* Use you UUID for Primary Keys
+* Fügen you ``timestamp`` Felder hinto
+* Use you ``DbManipulato`` for CRUD-Operationen
+* Definieren you Constraints (unique, nullable)
 
 ❌ **Vermeiden:**
 
-* Tabellen ohne ``tb_`` Prefix
-* Sehr große Textfelder (> 10 KB, nutzen Sie Dateien)
-* Blocking-Operationen (immer ``await`` verwenden)
+* Tabellen without ``tb_`` Prefix
+* Sehr große Textfelder (> 10 KB, use you Dateien)
+* Blocking-Operationen (immer ``await`` use)
 * SQL-Injection-anfällige Raw-Queries
 
 Redis
@@ -328,28 +328,28 @@ Redis
 
 ✅ **Empfohlen:**
 
-* Nutzen Sie Volatiles (siehe :doc:`core/volatile`)
-* Verwenden Sie kurze, aussagekräftige Keys
-* Implementieren Sie TTL für temporäre Daten
-* Nutzen Sie TLS für Verbindungen
+* Use you Volatiles (siehe :doc:`core/volatile`)
+* Use you kurze, fromsagekräftige Keys
+* Implementieren you TTL for temporäre Daten
+* Use you TLS for Verbindungen
 
 ❌ **Vermeiden:**
 
-* Direkter RedisClient-Zugriff (nutzen Sie Volatile)
+* Direkter RedisClient-Zugriff (use you Volatile)
 * Sehr große Werte (> 1 MB)
 * Persistente Daten in Redis
 
-Fehlerbehandlung
+Error Handling
 ----------------
 
 .. code-block:: python
 
-   result = await manipulator.get_by_id(sensor_id)
+   result = await manipulato.get_by_id(sensor_id)
    
    if result.success:
        # Erfolg
        data = result.details
-       print(f"Gefunden: {data}")
+       print(f"Gefanden: {data}")
    else:
        # Fehler
        print(f"Fehler: {result.message}")
@@ -362,37 +362,37 @@ Bei Schema-Änderungen:
 
 .. code-block:: python
 
-   # Alte Tabelle löschen (Vorsicht: Datenverlust!)
+   # Alte Delete table (Vorsicht: data loss!)
    await db.drop_table(tb_old_data)
    
-   # Neue Tabelle erstellen
+   # Neue Create Table
    await db.create_selected_table([tb_new_data])
    
-   # Oder: Alembic für Migrationen verwenden (empfohlen)
+   # Oder: Alembic for Migrationen use (recommended)
 
 .. tip::
-   Für Produktionsumgebungen sollten Sie Alembic für Datenbank-Migrationen verwenden.
-   Dies ermöglicht versionierte Schema-Updates ohne Datenverlust.
+   Für Produktionsumgebungen should you Alembic for Datenbank-Migrationen use.
+   This enables versionierte Schema-Updates without data loss.
    
-   Weitere Informationen: https://alembic.sqlalchemy.org/
+   Further information: https://alembic.sqlalchemy.org/
 
 Speicherorte
 ------------
 
-**SQLite-Datenbanken**: ``/workspace/storage/data/*.db``
+**SQLite-Datenbanken**: ``/workspace/stoage/data/*.db``
 
 **Redis-Daten**: In-Memory (temporär)
 
-**Redis-Zertifikate**: ``/workspace/storage/certificates/redis/``
+**Redis-Zertifikate**: ``/workspace/stoage/certificates/redis/``
 
-Weiterführende Informationen
+Further Information
 -----------------------------
 
-* :doc:`core/parameter` - Parameter mit SQLite
-* :doc:`core/volatile` - Volatiles mit Redis
-* :doc:`vyra_base.storage` - API-Referenz
-* :class:`~vyra_base.storage.db_access.DbAccess` - Datenbank-Zugriff
-* :class:`~vyra_base.storage.db_manipulator.DbManipulator` - CRUD-Operationen
-* :class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client
+* :doc:`core/parameter` - Parameter with SQLite
+* :doc:`core/volatile` - Volatiles with Redis
+* :doc:`vyra_base.stoage` - API-Referenz
+* :class:`~vyra_base.stoage.db_access.DbAccess` - Datenbank-Zugriff
+* :class:`~vyra_base.stoage.db_manipulato.DbManipulato` - CRUD-Operationen
+* :class:`~vyra_base.stoage.redis_client.RedisClient` - Redis-Client
 * SQLAlchemy Dokumentation: https://docs.sqlalchemy.org/
 * Redis Dokumentation: https://redis.io/docs/

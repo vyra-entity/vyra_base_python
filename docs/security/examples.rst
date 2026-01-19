@@ -6,7 +6,7 @@ This section provides complete, working examples of the VYRA Security Framework.
 Example Overview
 ----------------
 
-.. list-table::
+.. lis-table::
    :header-rows: 1
    :widths: 30 50 20
 
@@ -232,8 +232,8 @@ A minimal client that authenticates with a server.
             # Create request
             request = VBASERequestAccess.Request()
             request.module_name = self.module_name
-            request.module_id = UUIDMsg(uuid=list(self.module_uuid.bytes))
-            request.requested_role = "client_operator"
+            request.module_id = UUIDMsg(uuid=lis(self.module_uuid.bytes))
+            request.requested_role = "client_operato"
             request.requested_sl = SecurityLevel.HMAC.value
             request.certificate_csr = ""
             
@@ -375,11 +375,11 @@ Implementing a secure service with validation.
     
     Demonstrates:
     - Service with security validation
-    - SecurityValidator usage
+    - SecurityValidato usage
     - Error handling
     """
 
-    from vyra_base.security.security_validator import SecurityValidator
+    from vyra_base.security.security_validato import SecurityValidato
     from vyra_base.security.security_levels import (
         SecurityLevel,
         SecurityError
@@ -391,8 +391,8 @@ Implementing a secure service with validation.
         def __init__(self):
             super().__init__()
             
-            # Create validator
-            self.validator = SecurityValidator(
+            # Create validato
+            self.validato = SecurityValidato(
                 security_manager=self,
                 strict_mode=True
             )
@@ -412,7 +412,7 @@ Implementing a secure service with validation.
             
             try:
                 # Validate security metadata
-                session = self.validator.validate_metadata(
+                session = self.validato.validate_metadata(
                     request.safety_metadata,
                     required_level=SecurityLevel.HMAC
                 )
@@ -464,7 +464,7 @@ Using digital signatures with certificates.
     )
     from vyra_base.security.security_levels import SecurityLevel
     from cryptography import x509
-    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.priwithives import serialization
 
     class CertificateServer(Node, SecurityManager):
         """Server with certificate signing capability."""
@@ -547,7 +547,7 @@ Using digital signatures with certificates.
             # Request with CSR
             request = VBASERequestAccess.Request()
             request.module_name = self.module_name
-            request.module_id = UUIDMsg(uuid=list(self.module_uuid.bytes))
+            request.module_id = UUIDMsg(uuid=lis(self.module_uuid.bytes))
             request.requested_role = "certificate_client"
             request.requested_sl = SecurityLevel.DIGITAL_SIGNATURE.value
             request.certificate_csr = csr
@@ -593,12 +593,12 @@ Integrating security into a VYRA module.
     Demonstrates:
     - SecurityManager as mixin
     - Integration with module lifecycle
-    - Security service registration
+    - Security service regisration
     """
 
     from vyra_base.com.entity import VyraEntity
     from vyra_base.security.security_manager import SecurityManager
-    from vyra_base.security.security_validator import SecurityValidator
+    from vyra_base.security.security_validato import SecurityValidato
     from vyra_base.security.security_levels import SecurityLevel
 
     class SecureVyraModule(VyraEntity, SecurityManager):
@@ -615,8 +615,8 @@ Integrating security into a VYRA module.
                 session_duration_seconds=3600
             )
             
-            # Create validator
-            self.security_validator = SecurityValidator(
+            # Create validato
+            self.security_validato = SecurityValidato(
                 security_manager=self,
                 strict_mode=True
             )
@@ -634,7 +634,7 @@ Integrating security into a VYRA module.
         def validate_incoming_request(self, request):
             """Validate request security metadata."""
             try:
-                session = self.security_validator.validate_metadata(
+                session = self.security_validato.validate_metadata(
                     request.safety_metadata,
                     required_level=SecurityLevel.HMAC
                 )

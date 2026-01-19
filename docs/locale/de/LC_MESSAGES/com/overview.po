@@ -1,0 +1,523 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../com/overview.rst:2 061c27a4f88a4235b45e04c55ed885ff
+msgid "COM API Overview"
+msgstr "COM API-Übersicht"
+
+#: ../../com/overview.rst:4 f81bb6809b3d495d906cf53b7ba0f024
+msgid ""
+"This page provides a complete overview of all communication APIs in "
+"vyra_base.com."
+msgstr ""
+
+#: ../../com/overview.rst:7 81658c9c597647ac843b65229246ea79
+msgid "ROS2 Communication (Datalayer)"
+msgstr "ROS2 Kommunikation (Datalayer)"
+
+#: ../../com/overview.rst:10 b6d85352498648728f1bb26c5057d1e8
+msgid "Services"
+msgstr "Services"
+
+#: ../../com/overview.rst:16 ../../com/overview.rst:36
+#: ../../com/overview.rst:59 ../../com/overview.rst:76
+#: ../../com/overview.rst:93 ../../com/overview.rst:116
+#: 11eb0821940544798d5296940d43fb6b 29e855318bff4cd1bc44648b095f2520
+#: 3c06768ed7ac421aae568b418197e218 676534d6f12f406d9b9eb1b9152b141b
+#: cdf35f54404a4be4998288a35d0498a2 eccd9391e53a499f84563db966845680
+msgid "Class"
+msgstr "Klasse"
+
+#: ../../com/overview.rst:17 ../../com/overview.rst:37
+#: ../../com/overview.rst:60 ../../com/overview.rst:77
+#: ../../com/overview.rst:94 ../../com/overview.rst:117
+#: 316e1d93ea3c42b49812cfc8dde5e87e 6472909170be4d5ba2cfab505d0b81ae
+#: 777fd97ab9444f77ad33ba11db1b2470 98b1cd2abae1488c86cd06190dd91c96
+#: d12574fbbced4bc4adcd5ede41992952 f490feeef8914fe881bb8d41c366b4e3
+msgid "Usage"
+msgstr "Verwendung"
+
+#: ../../com/overview.rst:18 ../../com/overview.rst:38
+#: ../../com/overview.rst:61 ../../com/overview.rst:78
+#: ../../com/overview.rst:95 ../../com/overview.rst:118
+#: 4bfd47c1abc446389e892711459585e3 5e18df2e5ce64784b5670fe9665805fe
+#: 70472a8f319d4179a48fe816929707a6 a9cf4658f78744e2b62ecf0d68bdf51a
+#: d0125a3721754407bb169497641d51f8 f3683a5709f34effb80edc93d8fe77b6
+msgid "Reference"
+msgstr "Referenz"
+
+#: ../../com/overview.rst:19 4e0895a8b0f14cf9901c4ac1f8e64410
+msgid "**VyraCallable**"
+msgstr ""
+
+#: ../../com/overview.rst:20 8fea0e1139f340a789c0f50f62581a07
+msgid "Service Server (provides service)"
+msgstr "Service Server (stellt Service bereit)"
+
+#: ../../com/overview.rst:21 bba8b0304dd34d2cbef9afe2de693b37
+msgid ":class:`~vyra_base.com.datalayer.callable.VyraCallable`"
+msgstr ""
+
+#: ../../com/overview.rst:22 90f23e70dfde4e8db5084d49ca729080
+msgid "**VyraJob** (via create_vyra_job)"
+msgstr ""
+
+#: ../../com/overview.rst:23 ed13a3456d5e46c89fec05d2c1453bf8
+msgid "Service Client (calls service)"
+msgstr "Service Client (ruft Service auf)"
+
+#: ../../com/overview.rst:24 40245d8525b548b58607e93936cf39b1
+msgid ":doc:`../vyra_base.com.datalayer`"
+msgstr ""
+
+#: ../../com/overview.rst:25 10cb735f60b64ae7b4867159a5fe93ab
+msgid "**@remote_callable**"
+msgstr ""
+
+#: ../../com/overview.rst:26 ../../com/overview.rst:154
+#: 427703cb6b1945e48506c38ef3372524 6bda855ea4184f56ae2d2c431e9e51d0
+#, fuzzy
+msgid "Decorato for automatic service regisration"
+msgstr "Decorator für automatische Service-Registrierung"
+
+#: ../../com/overview.rst:27 39f94343ed434efb81e5848638d1edf1
+msgid ":func:`~vyra_base.com.datalayer.interface_factoy.remote_callable`"
+msgstr ""
+
+#: ../../com/overview.rst:30 f15531eda3e4444cbc865bb7a382c39c
+msgid "Topics"
+msgstr "Topics"
+
+#: ../../com/overview.rst:39 1d54e48031b6454e94e78b936b872dcf
+msgid "**VyraSpeaker**"
+msgstr ""
+
+#: ../../com/overview.rst:40 8fad867655ba46f79836f27128a15b23
+msgid "Publisher (publishes)"
+msgstr "Publisher (veröffentlicht)"
+
+#: ../../com/overview.rst:41 931a68be9dea411b93245749d003f95d
+msgid ":class:`~vyra_base.com.datalayer.speaker.VyraSpeaker`"
+msgstr ""
+
+#: ../../com/overview.rst:42 78f24d71a47c48f3868dbcaf78637018
+msgid "**VyraSpeakerListener**"
+msgstr ""
+
+#: ../../com/overview.rst:43 e9c6bba2f8c047e3af1b9a7c5c749e3a
+msgid "Subscriber (receives)"
+msgstr "Subscriber (empfängt)"
+
+#: ../../com/overview.rst:44 07decab9357141d5a09c234e0426ed86
+msgid ":class:`~vyra_base.com.datalayer.speaker.VyraSpeakerListener`"
+msgstr ""
+
+#: ../../com/overview.rst:45 4d7322c565ba4d218c27bff4fc321de6
+msgid "**VyraPublisher**"
+msgstr ""
+
+#: ../../com/overview.rst:46 db00565cf3584e6eb377e871ae9f20b6
+msgid "Low-Level Publisher"
+msgstr "Low-Level Publisher"
+
+#: ../../com/overview.rst:47 4d9ef515ed944d6f99e0e2c2c877eacf
+msgid ":class:`~vyra_base.com.datalayer.publisher.VyraPublisher`"
+msgstr ""
+
+#: ../../com/overview.rst:48 65adc6f4a2f148058ba6fffe4cf24cbe
+msgid "**VyraSubscriber**"
+msgstr ""
+
+#: ../../com/overview.rst:49 4fe7c413ff4e4fa2b601cbef9e2dd476
+msgid "Low-Level Subscriber"
+msgstr "Low-Level Subscriber"
+
+#: ../../com/overview.rst:50 5607b51d4e06460da87f9be86104b156
+msgid ":class:`~vyra_base.com.datalayer.subscriber.VyraSubscriber`"
+msgstr ""
+
+#: ../../com/overview.rst:53 163af82621ff48ad88a789f7e1d4bd36
+msgid "Actions"
+msgstr "Actions"
+
+#: ../../com/overview.rst:62 c7a19cbe3fa043e28e68c696057429b3
+msgid "**VyraActionServer**"
+msgstr ""
+
+#: ../../com/overview.rst:63 d63a4f0273994bc1a62a91f704ebb1f5
+msgid "Action Server (executes)"
+msgstr "Action Server (führt aus)"
+
+#: ../../com/overview.rst:64 a108ca12aae3466c9d511c2f25d294ef
+msgid ":class:`~vyra_base.com.datalayer.action_server.VyraActionServer`"
+msgstr ""
+
+#: ../../com/overview.rst:65 8511f79eb8254395b3cee596230acf2a
+msgid "**VyraActionClient**"
+msgstr ""
+
+#: ../../com/overview.rst:66 a5b7fc56c4f747539d86fb141c8f61f8
+msgid "Action Client (starts action)"
+msgstr "Action Client (startet Aktion)"
+
+#: ../../com/overview.rst:67 741c1ed9f57648a687092ed7c58aa37f
+msgid ":class:`~vyra_base.com.datalayer.action_client.VyraActionClient`"
+msgstr ""
+
+#: ../../com/overview.rst:70 e4729ae6ea7349ab9d9fe1b062ae07c3
+msgid "Node Management"
+msgstr "Node-Verwaltung"
+
+#: ../../com/overview.rst:79 ead3edc6328e43dcb8848cbbfa4d7174
+msgid "**VyraNode**"
+msgstr ""
+
+#: ../../com/overview.rst:80 65c286e78f004909a12373e13037c99d
+msgid "Main ROS2 node for modules"
+msgstr "Haupt-ROS2-Node für Module"
+
+#: ../../com/overview.rst:81 2ef1b93e36fb4f6f9f8655ef2e733f96
+msgid ":class:`~vyra_base.com.datalayer.node.VyraNode`"
+msgstr ""
+
+#: ../../com/overview.rst:82 32a259815cae475fb7eedeb78fa1386b
+msgid "**CheckerNode**"
+msgstr ""
+
+#: ../../com/overview.rst:83 94df467c19a2488fa4096fb84e35240b
+msgid "Helper node for node availability checking"
+msgstr "Hilfs-Node zur Überprüfung der Node-Verfügbarkeit"
+
+#: ../../com/overview.rst:84 6afb2a6726a741138f69b30bd5754c37
+msgid ":class:`~vyra_base.com.datalayer.node.CheckerNode`"
+msgstr ""
+
+#: ../../com/overview.rst:87 f5d6dcd8f45644daa1727a69dd180d5d
+msgid "Feeder"
+msgstr ""
+
+#: ../../com/overview.rst:96 021e2e310d264cad831a0c135b10e7f3
+msgid "**BaseFeeder**"
+msgstr ""
+
+#: ../../com/overview.rst:97 b3562e8f096949faa78dd3aadfff53df
+msgid "Base class for all feeders"
+msgstr ""
+
+#: ../../com/overview.rst:98 3fbb8bf8b4d2412ea017bebd51f242d6
+msgid ":class:`~vyra_base.com.feeder.feeder.BaseFeeder`"
+msgstr ""
+
+#: ../../com/overview.rst:99 bad2b31014bf4af8b1d0a313db121e74
+msgid "**StateFeeder**"
+msgstr ""
+
+#: ../../com/overview.rst:100 5f2d779c100b4a6c9806adc44e074627
+msgid "Automatic state publication"
+msgstr "Automatische State-Publikation"
+
+#: ../../com/overview.rst:101 366c66bf231c4df7975600c1dce06285
+msgid ":class:`~vyra_base.com.feeder.state_feeder.StateFeeder`"
+msgstr ""
+
+#: ../../com/overview.rst:102 4309d937cb6f4b59b26c3bd7552b9108
+msgid "**NewsFeeder**"
+msgstr ""
+
+#: ../../com/overview.rst:103 f914fadc33f745db9be605f0abbf0c59
+#, fuzzy
+msgid "Automatic news publication"
+msgstr "Automatische State-Publikation"
+
+#: ../../com/overview.rst:104 f66432362e0d466a9e1eb98c4d11d0e9
+msgid ":class:`~vyra_base.com.feeder.news_feeder.NewsFeeder`"
+msgstr ""
+
+#: ../../com/overview.rst:105 d00300ba655148418347929535be446e
+msgid "**ErrorFeeder**"
+msgstr ""
+
+#: ../../com/overview.rst:106 e96056c372b041ef8c94b67c0bcae3ce
+#, fuzzy
+msgid "Automatic error publication"
+msgstr "Automatische State-Publikation"
+
+#: ../../com/overview.rst:107 7c7db5bd03da4133b7fbb9f0df941928
+msgid ":class:`~vyra_base.com.feeder.error_feeder.ErrorFeeder`"
+msgstr ""
+
+#: ../../com/overview.rst:110 7860042c3ae44ab4b790c671d78b5889
+msgid "IPC (Inter-Process Communication)"
+msgstr ""
+
+#: ../../com/overview.rst:119 f27cfcf0ce1e4caca8335f6dc4745cef
+msgid "**GrpcUdsServer**"
+msgstr ""
+
+#: ../../com/overview.rst:120 883ba43131e54d289215cd14bd2aa5f2
+msgid "gRPC server via Unix Domain Socket"
+msgstr ""
+
+#: ../../com/overview.rst:121 1ea1f5c39e554cb99a976a9f14358602
+msgid ":class:`~vyra_base.com.handler.ipc.GrpcUdsServer`"
+msgstr ""
+
+#: ../../com/overview.rst:122 cdafb768474a4108b6e94c0024f007e4
+msgid "**GrpcUdsClient**"
+msgstr ""
+
+#: ../../com/overview.rst:123 a9addab3e7d647b790d359dce036f793
+msgid "gRPC client via Unix Domain Socket"
+msgstr ""
+
+#: ../../com/overview.rst:124 7c0b02ba951b4a6ab4a8c4ef1b009db7
+msgid ":class:`~vyra_base.com.handler.ipc.GrpcUdsClient`"
+msgstr ""
+
+#: ../../com/overview.rst:127 752a9210523641c8aea8eae9c1a4dd4a
+#, fuzzy
+msgid "Factoy Functions"
+msgstr "Actions"
+
+#: ../../com/overview.rst:130 47f97d7cc9a847aca59e7e830e4a1446
+msgid "Interface Creation"
+msgstr ""
+
+#: ../../com/overview.rst:145 ea7d57b74b8044978456a3b3382a9613
+#, fuzzy
+msgid "Function"
+msgstr "Actions"
+
+#: ../../com/overview.rst:146 c045c710cc394c4fbc111fb0907b5c51
+msgid "Description"
+msgstr "Beschreibung"
+
+#: ../../com/overview.rst:147 b765086350bd44cda6b7374552dd2089
+msgid "``create_vyra_job(node, service_name, service_type)``"
+msgstr ""
+
+#: ../../com/overview.rst:148 36028ed4a39b49a5a070fd0eeec9b573
+msgid "Creates service client"
+msgstr ""
+
+#: ../../com/overview.rst:149 f70a7dbda3e24942b2485e5a07af5dd6
+msgid "``create_vyra_callable(node, service_name, service_type, callback)``"
+msgstr ""
+
+#: ../../com/overview.rst:150 7dcf3db2065b41528389130a4309c609
+msgid "Creates service server"
+msgstr ""
+
+#: ../../com/overview.rst:151 5006aeb34260404ab5da15adb41ae8f8
+msgid "``create_vyra_speaker(node, topic_name, topic_type, qos_profile)``"
+msgstr ""
+
+#: ../../com/overview.rst:152 9a6093ef76b74e168dcc6d5fdba194b3
+#, fuzzy
+msgid "Creates publisher"
+msgstr "Low-Level Publisher"
+
+#: ../../com/overview.rst:153 221de5e480e04d828960683e250bfcbc
+msgid "``@remote_callable``"
+msgstr ""
+
+#: ../../com/overview.rst:157 09dbf1a049cb479cb9ddfcda4f346a5c
+msgid "Usage Examples"
+msgstr ""
+
+#: ../../com/overview.rst:160 b909b9d9d5d94adf935b2bc14b34d18b
+msgid "Service Call (Job)"
+msgstr ""
+
+#: ../../com/overview.rst:175 7a0db4e9c4694f8c85cf0c61a9669400
+msgid "Provide Service (Callable)"
+msgstr ""
+
+#: ../../com/overview.rst:188 1ddcb01ed8a1478d98b0eae1cc10b5e3
+msgid "Publish Topic (Speaker)"
+msgstr ""
+
+#: ../../com/overview.rst:203 5e4ddeb5d1ba4f138c559dfb5bab13f6
+msgid "Use Feeders"
+msgstr ""
+
+#: ../../com/overview.rst:213 f6e881d163644de5bf75220a4673a069
+msgid "Use IPC"
+msgstr ""
+
+#: ../../com/overview.rst:224 fb1b389dba4a4dbe9d6eeae40405104d
+msgid "Complete API Reference"
+msgstr ""
+
+#: ../../com/overview.rst:226 f2b5a90634604c228a787c7d9d33ded6
+msgid ":doc:`../vyra_base.com.datalayer` - Datalayer (ROS2) API"
+msgstr ""
+
+#: ../../com/overview.rst:227 9209bef82d424ab981c109ebf43b5f6e
+msgid ":doc:`../vyra_base.com.feeder` - Feeder API"
+msgstr ""
+
+#: ../../com/overview.rst:228 c4ed7c662633419fbf8f9c8c021d976e
+msgid ":doc:`../vyra_base.com` - Complete COM API"
+msgstr ""
+
+#: ../../com/overview.rst:231 5f179d86b6c94648af60a1d72dcad8a9
+msgid "Further Documentation"
+msgstr ""
+
+#: ../../com/overview.rst:233 8ce0745a3f384d2eb8da138565c8d45a
+msgid ":doc:`ros2_communication` - ROS2 Details"
+msgstr ""
+
+#: ../../com/overview.rst:234 86ab9fa9fbf14018be528ee093200d1d
+msgid ":doc:`ipc_communication` - IPC Details"
+msgstr ""
+
+#: ../../com/overview.rst:235 4cb59b9fcf6342d99903049dbc250067
+msgid ":doc:`feeders` - Feeder Details"
+msgstr ""
+
+#~ msgid "COM API-Übersicht"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Diese Seite bietet eine vollständige "
+#~ "Übersicht über alle Kommunikations-APIs "
+#~ "in vyra_base.com."
+#~ msgstr ""
+
+#~ msgid "ROS2 Kommunikation (Datalayer)"
+#~ msgstr ""
+
+#~ msgid "Klasse"
+#~ msgstr ""
+
+#~ msgid "Verwendung"
+#~ msgstr ""
+
+#~ msgid "Referenz"
+#~ msgstr ""
+
+#~ msgid "Service Server (wird aufgerufen)"
+#~ msgstr ""
+
+#~ msgid "Service Client (ruft auf)"
+#~ msgstr ""
+
+#~ msgid "Decorator für automatische Service-Registrierung"
+#~ msgstr ""
+
+#~ msgid "Publisher (veröffentlicht)"
+#~ msgstr ""
+
+#~ msgid "Subscriber (empfängt)"
+#~ msgstr ""
+
+#~ msgid "Action Server (führt aus)"
+#~ msgstr ""
+
+#~ msgid "Action Client (startet Aktion)"
+#~ msgstr ""
+
+#~ msgid "Haupt-ROS2-Node für Module"
+#~ msgstr ""
+
+#~ msgid "Hilfsnodeode für Node-Verfügbarkeitsprüfung"
+#~ msgstr ""
+
+#~ msgid "Basis-Klasse für alle Feeder"
+#~ msgstr ""
+
+#~ msgid "Automatische State-Publikation"
+#~ msgstr ""
+
+#~ msgid "Beschreibung"
+#~ msgstr ""
+
+#~ msgid "Verwendungsbeispiele"
+#~ msgstr ""
+
+#~ msgid "Vollständige API-Referenz"
+#~ msgstr ""
+
+#~ msgid "Basis-Class für alle Feeder"
+#~ msgstr ""
+
+#~ msgid "Automatische News-Publikation"
+#~ msgstr ""
+
+#~ msgid "Automatische Error-Publikation"
+#~ msgstr ""
+
+#~ msgid "gRPC Server über Unix Domain Socket"
+#~ msgstr ""
+
+#~ msgid "gRPC Client über Unix Domain Socket"
+#~ msgstr ""
+
+#~ msgid "Interface-Erstellung"
+#~ msgstr ""
+
+#~ msgid "Funktion"
+#~ msgstr ""
+
+#~ msgid "Erstellt Service Client"
+#~ msgstr ""
+
+#~ msgid "Erstellt Service Server"
+#~ msgstr ""
+
+#~ msgid "Erstellt Publisher"
+#~ msgstr ""
+
+#~ msgid "Usagesbeispiele"
+#~ msgstr ""
+
+#~ msgid "Service-Aufruf (Job)"
+#~ msgstr ""
+
+#~ msgid "Service bereitstellen (Callable)"
+#~ msgstr ""
+
+#~ msgid "Topic veröffentlichen (Speaker)"
+#~ msgstr ""
+
+#~ msgid "Feeder nutzen"
+#~ msgstr ""
+
+#~ msgid "IPC verwenden"
+#~ msgstr ""
+
+#~ msgid "Vollständige API-Reference"
+#~ msgstr ""
+
+#~ msgid ":doc:`../vyra_base.com` - Vollständige COM API"
+#~ msgstr ""
+
+#~ msgid "Weiterführende Dokumentation"
+#~ msgstr ""
+
+#~ msgid ":func:`~vyra_base.com.datalayer.interface_factory.remote_callable`"
+#~ msgstr ""
+
+#~ msgid "Factory Functions"
+#~ msgstr ""
+

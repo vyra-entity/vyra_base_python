@@ -1,0 +1,38 @@
+{# Language Switcher for VYRA Documentation #}
+<div class="language-switcher" style="padding: 10px; text-align: right;">
+  <select id="language-select" onchange="switchLanguage(this.value)" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #336790; background-color: white; cursor: pointer;">
+    <option value="en" {{ 'selected' if language == 'en' else '' }}>🇬🇧 English</option>
+    <option value="de" {{ 'selected' if language == 'de' else '' }}>🇩🇪 Deutsch</option>
+  </select>
+</div>
+
+<script>
+function switchLanguage(lang) {
+  var currentPath = window.location.pathname;
+  var newPath;
+  
+  // Detect if we're currently in a language-specific path
+  if (currentPath.includes('/en/')) {
+    newPath = currentPath.replace('/en/', '/' + lang + '/');
+  } else if (currentPath.includes('/de/')) {
+    newPath = currentPath.replace('/de/', '/' + lang + '/');
+  } else {
+    // Default: prepend language to path
+    newPath = '/' + lang + currentPath;
+  }
+  
+  window.location.href = newPath;
+}
+
+// Set the correct language in dropdown based on current URL
+document.addEventListener('DOMContentLoaded', function() {
+  var currentPath = window.location.pathname;
+  var select = document.getElementById('language-select');
+  
+  if (currentPath.includes('/de/')) {
+    select.value = 'de';
+  } else if (currentPath.includes('/en/')) {
+    select.value = 'en';
+  }
+});
+</script>

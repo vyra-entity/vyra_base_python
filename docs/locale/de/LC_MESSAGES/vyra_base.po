@@ -1,0 +1,61 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.rst:2 a078bec869bd4ff7bcca78584bb7b7a9
+msgid "vyra\\_base package"
+msgstr ""
+
+#: ../../vyra_base.rst:5 c6a49e7436c34d6d882235df918f4ffe
+msgid "Subpackages"
+msgstr ""
+
+#: ../../vyra_base.rst:18 6d72165dfadc4216a0da3ccb4c8c8725
+msgid "Module contents"
+msgstr ""
+
+#~ msgid ""
+#~ "Extract ROS2 interface files from the"
+#~ " pip-installed library into a ROS2"
+#~ " package."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Path to the target ROS2 package where interfaces will be extracted."
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "None"
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This function copies interface files "
+#~ "(msg, srv, action, json) from the "
+#~ "installed vyra_base library to the "
+#~ "specified ROS2 package directory."
+#~ msgstr ""
+

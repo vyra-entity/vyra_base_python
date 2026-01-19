@@ -536,29 +536,63 @@ def create_vyra_callable(
 def create_vyra_job(
         type: Any,
         node: VyraNode,
-        fb_callback: Callable,
-        result_callback: Callable,
+        goal_callback: Callable,
+        feedback_callback: Union[Callable, None] = None,
+        result_callback: Union[Callable, None] = None,
         ident_name: str = "global_job",
-        async_loop = None) -> None:
+        async_loop = None) -> VyraJob:
     """
-    Create a job for a V.Y.R.A. (V.Y.R.A. Operating System) service.
+    Create a job (action server) for a V.Y.R.A. service.
 
-    A job is a function that will be executed in the background and will not block the caller.
-    A job can take a long time to complete and will return a result when it is done.
-    Additionally, a job can provide feedback information during the process.
+    A job is a long-running operation that can provide feedback during execution.
+    Jobs are based on ROS2 actions and are used for operations that take time to complete,
+    such as navigation, manipulation tasks, or other asynchronous operations.
 
-    :param name: Name of the job.
-    :type name: str
-    :param type: The ROS2 service datatype definition.
+    Jobs provide three types of callbacks:
+    - goal_callback: Handles incoming goals (required)
+    - feedback_callback: Provides progress updates (optional)
+    - result_callback: Returns final result (optional)
+
+    Example::
+    
+        def execute_task(goal_handle):
+            # Long-running task
+            for i in range(10):
+                feedback_msg = MyAction.Feedback()
+                feedback_msg.progress = i * 10
+                goal_handle.publish_feedback(feedback_msg)
+                time.sleep(1)
+            
+            result = MyAction.Result()
+            result.success = True
+            return result
+        
+        job = create_vyra_job(
+            type=MyAction,
+            node=entity.node,
+            goal_callback=execute_task,
+            ident_name="my_task"
+        )
+
+    :param type: The ROS2 action datatype definition.
     :type type: Any
     :param node: The ROS2 node definition.
     :type node: VyraNode
+    :param goal_callback: Callback function for executing the goal.
+    :type goal_callback: Callable
+    :param feedback_callback: Optional callback for feedback updates.
+    :type feedback_callback: Callable or None
+    :param result_callback: Optional callback for result processing.
+    :type result_callback: Callable or None
     :param ident_name: Identifier name for the job.
     :type ident_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
-    :return: None
+    :return: The created VyraJob instance.
+    :rtype: VyraJob
     """
+    from vyra_base.com.datalayer.action_server import Action, VyraActionServer
+    
     domain_name = "job"
     base_name: str = node.node_settings.name
 
@@ -566,11 +600,141 @@ def create_vyra_job(
         Logger.warn(
             "Node name has not been set. This could cause issues within the " \
             "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
-            "creating a callable."
+            "creating a job."
         )
 
     name: str = _name_parser(base_name, domain_name, ident_name)
-    raise NotImplementedError("Jobs are not yet implemented.")
+
+    action = Action(
+        name=name,
+        type=type,
+        callback=goal_callback
+    )
+
+    action_server = VyraActionServer(
+        action=action,
+        node=node
+    )
+
+    vyra_job: VyraJob = VyraJob(
+        name=ident_name,
+        type=type,
+        description="A job (action server) for the V.Y.R.A. Operating System.",
+        action_server=action_server,
+        goal_callback=goal_callback,
+        feedback_callback=feedback_callback,
+        result_callback=result_callback
+    )
+    vyra_job: VyraJob = DataSpace.add_job(vyra_job)
+
+    if not vyra_job.goal_callback:
+        Logger.error(
+            f"Job <{name}> has no goal callback function. "
+        )
+        raise ValueError(
+            "A goal callback function must be provided before "
+            f"creation of the job: {name}."
+        )
+
+    action_server.create_action_server()
+
+    Logger.log(f'VyraJob created: {name}')
+
+    return vyra_job
+
+
+@ErrorTraceback.w_check_error_exist
+def create_vyra_job_runner(
+        type: Any,
+        node: VyraNode,
+        feedback_callback: Union[Callable, None] = None,
+        result_callback: Union[Callable, None] = None,
+        ident_name: str = "global_job_runner",
+        timeout_sec: float = 5.0) -> VyraJobRunner:
+    """
+    Create a job runner (action client) for sending goals to V.Y.R.A. jobs.
+
+    A job runner is used to send goals to action servers and receive feedback/results.
+    This is the client-side counterpart to create_vyra_job (server-side).
+
+    Example::
+    
+        def on_feedback(feedback_msg):
+            print(f"Progress: {feedback_msg.feedback.progress}%")
+        
+        def on_result(result):
+            print(f"Task completed: {result.result.success}")
+        
+        job_runner = create_vyra_job_runner(
+            type=MyAction,
+            node=entity.node,
+            feedback_callback=on_feedback,
+            result_callback=on_result,
+            ident_name="my_task_client"
+        )
+        
+        # Send goal
+        goal = MyAction.Goal()
+        goal.target = "destination"
+        result = await job_runner.send_goal(goal)
+
+    :param type: The ROS2 action datatype definition.
+    :type type: Any
+    :param node: The ROS2 node definition.
+    :type node: VyraNode
+    :param feedback_callback: Optional callback for feedback updates.
+    :type feedback_callback: Callable or None
+    :param result_callback: Optional callback for result processing.
+    :type result_callback: Callable or None
+    :param ident_name: Identifier name for the job runner.
+    :type ident_name: str
+    :param timeout_sec: Timeout for waiting for action server (seconds).
+    :type timeout_sec: float
+    :return: The created VyraJobRunner instance.
+    :rtype: VyraJobRunner
+    """
+    from vyra_base.com.datalayer.action_client import ActionInfo, VyraActionClient
+    
+    domain_name = "job"
+    base_name: str = node.node_settings.name
+
+    if base_name == NodeSettings.name:
+        Logger.warn(
+            "Node name has not been set. This could cause issues within the " \
+            "V.Y.R.A. system. Please set the node name in the NodeSettings before " \
+            "creating a job runner."
+        )
+
+    name: str = _name_parser(base_name, domain_name, ident_name)
+
+    action_info = ActionInfo(
+        name=name,
+        type=type,
+        feedback_callable=feedback_callback if feedback_callback else lambda x: None,
+        result_callable=result_callback if result_callback else lambda x: None,
+        TIMEOUT_SEC=timeout_sec
+    )
+
+    action_client = VyraActionClient(
+        actionInfo=action_info,
+        node=node
+    )
+
+    vyra_job_runner: VyraJobRunner = VyraJobRunner(
+        name=ident_name,
+        type=type,
+        description="A job runner (action client) for the V.Y.R.A. Operating System.",
+        action_client=action_client,
+        feedback_callback=feedback_callback,
+        result_callback=result_callback
+    )
+    vyra_job_runner: VyraJobRunner = DataSpace.add_job_runner(vyra_job_runner)
+
+    action_client.create_action_client()
+
+    Logger.log(f'VyraJobRunner created: {name}')
+
+    return vyra_job_runner
 
 
 @ErrorTraceback.w_check_error_exist

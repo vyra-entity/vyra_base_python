@@ -1,38 +1,38 @@
-Volatile - Flüchtige Echtzeitdaten
+Volatile - Volatile real-time data
 ===================================
 
-Die :class:`~vyra_base.core.volatile.Volatile`-Klasse verwaltet flüchtige Daten,
-die schnell gelesen und geschrieben werden müssen - ideal für Echtzeitanwendungen.
+The :class:`~vyra_base.core.volatile.Volatile`-class manages volatilee Daten,
+die schnell geread and geschrieben are must - ideal for Echtzeitanwendungen.
 
 Konzept
 -------
 
-Volatiles sind **temporäre, schnelle Datenspeicher**, die:
+Volatiles are **temporäre, fast Datenspeicher**, die:
 
-* In Redis (In-Memory-Datenbank) gespeichert werden
-* Sehr schnellen Zugriff bieten (~0.1ms)
-* Bei Neustart verloren gehen (flüchtig)
-* Change-Events unterstützen
-* Pub/Sub-Mechanismen nutzen
+* In Redis (In-Memory-Datenbank) gespeichert are
+* Sehr fastn Zugriff bieten (~0.1ms)
+* Bei Neustart verloren gehen (volatile)
+* Change-Events understützen
+* Pub/Sub-Mechanismen use
 
-Wann Volatiles nutzen?
+Wann Volatiles use?
 ----------------------
 
-✅ **Ideal für:**
+✅ **Ideal for:**
 
 * Sensordaten in Echtzeit
 * Statusvariablen
-* Temporäre Berechnungsergebnisse
+* Temporary Berechnungsergebnisse
 * Event-basierte Kommunikation zwischen Modulen
-* Caching von Daten
+* Caching of Daten
 
-❌ **Nicht geeignet für:**
+❌ **Nicht suitable for:**
 
-* Persistente Konfiguration (nutzen Sie :doc:`parameter`)
-* Daten, die Neustarts überleben müssen
+* Persistente Konfiguration (use you :doc:`parameter`)
+* Daten, die Neustarts survive must
 * Sehr große Datenmengen (> GB)
 
-Zugriff über Entity
+Access via Entity
 -------------------
 
 .. code-block:: python
@@ -44,30 +44,30 @@ Zugriff über Entity
    # Volatile-Zugriff
    volatile = entity.volatile
 
-Werte setzen
+Werte set
 ------------
 
 .. code-block:: python
 
-   # Einfachen Wert setzen
+   # Afachen Wert set
    await entity.volatile.set_volatile_value("temperature", 23.5)
    
-   # Komplexe Daten (werden automatisch serialisiert)
+   # Komplexe Daten (are automatically serialisiert)
    await entity.volatile.set_volatile_value("sensor_data", {
        "temperature": 23.5,
        "humidity": 60.2,
        "timestamp": "2026-01-19T10:30:00"
    })
    
-   # Listen
+   # Lisen
    await entity.volatile.set_volatile_value("measurements", [1, 2, 3, 4, 5])
 
-Werte lesen
+Werte read
 -----------
 
 .. code-block:: python
 
-   # Einzelnen Wert lesen
+   # Azelnen Wert read
    temperature = await entity.volatile.get_volatile_value("temperature")
    print(f"Aktuelle Temperatur: {temperature}°C")
    
@@ -75,7 +75,7 @@ Werte lesen
    sensor_data = await entity.volatile.get_volatile_value("sensor_data")
    print(f"Temperatur: {sensor_data['temperature']}")
    
-   # Alle vorhandenen Keys auflisten
+   # Alle vorhandenen Keys onlisen
    all_keys = await entity.volatile.read_all_volatile_names()
    for key in all_keys:
        value = await entity.volatile.get_volatile_value(key)
@@ -84,14 +84,14 @@ Werte lesen
 Change-Events
 -------------
 
-Überwachen Sie Änderungen an Volatiles in Echtzeit:
+Monito you Änderungen an Volatiles in Echtzeit:
 
-Event registrieren
+Event register
 ^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Change-Event für einen Key aktivieren
+   # Change-Event for einen Key aktivieren
    await entity.volatile.add_change_event("temperature")
 
 Event-Callback definieren
@@ -100,15 +100,15 @@ Event-Callback definieren
 .. code-block:: python
 
    async def on_temperature_change(message: dict, callback_context):
-       """Wird aufgerufen, wenn sich 'temperature' ändert"""
+       """Wird ongerufen, wenn sich 'temperature' ändert"""
        new_value = message.get("value")
        print(f"Temperatur geändert: {new_value}°C")
        
-       # Reaktion auf Änderung
+       # Reaktion on Änderung
        if new_value > 30:
-           print("⚠️ Temperatur zu hoch!")
+           print("⚠️ Temperatur to hoch!")
    
-   # Callback registrieren
+   # Callback register
    await entity.volatile.transient_event_callback(
        message={"key": "temperature"},
        callback_context=on_temperature_change
@@ -129,36 +129,36 @@ Für fortgeschrittene Pub/Sub-Kommunikation:
 
 .. code-block:: python
 
-   # Listener für einen Channel aktivieren
+   # Listener for einen Channel aktivieren
    await entity.volatile.activate_listener("sensor_channel")
    
-   # Jetzt werden alle Nachrichten auf 'sensor_channel' empfangen
+   # Jetzt are alle messages on 'sensor_channel' empfangen
 
 Praktisches Beispiel
 --------------------
 
-Sensor-Daten mit Event-Reaktion
+Sensor-Daten with Event-Reaktion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   async def sensor_monitoring_example(entity: VyraEntity):
-       """Überwacht Sensordaten und reagiert auf Änderungen"""
+   async def sensor_monitoing_example(entity: VyraEntity):
+       """Viawacht Sensordaten and reagiert on Änderungen"""
        
        # Change-Event aktivieren
        await entity.volatile.add_change_event("temperature")
        await entity.volatile.add_change_event("humidity")
        
-       # Callback für Temperaturänderungen
+       # Callback for Temperaturchanges
        async def on_temp_change(message: dict, context):
            temp = await entity.volatile.get_volatile_value("temperature")
            if temp > 30:
-               # Warnung veröffentlichen
+               # Warnung publish
                entity.publish_error("Temperatur kritisch!")
        
        # Sensordaten aktualisieren (z.B. in einer Schleife)
        while True:
-           # Daten vom Sensor lesen (simuliert)
+           # Daten vom Sensor read (simuliert)
            current_temp = read_sensor_temperature()
            current_humidity = read_sensor_humidity()
            
@@ -166,7 +166,7 @@ Sensor-Daten mit Event-Reaktion
            await entity.volatile.set_volatile_value("temperature", current_temp)
            await entity.volatile.set_volatile_value("humidity", current_humidity)
            
-           await asyncio.sleep(1)  # Jede Sekunde aktualisieren
+           await asyncio.sleep(1)  # Jede Sekande aktualisieren
 
 Inter-Modul-Kommunikation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -176,26 +176,26 @@ Inter-Modul-Kommunikation
    # Modul A: Daten bereitstellen
    await entity_a.volatile.set_volatile_value("shared_status", "running")
    
-   # Modul B: Daten lesen
+   # Modul B: Daten read
    status = await entity_b.volatile.get_volatile_value("shared_status")
-   print(f"Status von Modul A: {status}")
+   print(f"Status of Modul A: {status}")
 
 .. note::
-   Beide Module müssen denselben Redis-Server verwenden (standardmäßig der Fall im VYRA-System).
+   Beide Module must denselben Redis-Server use (standardmäßig der Fall im VYRA-System).
 
 Redis-Backend
 -------------
 
-**Verbindung**: Automatisch über ``entity.storage.redis_client``
+**Verbindung**: Automatisch via ``entity.stoage.redis_client``
 
 **Speicherort**: In-Memory (RAM des Redis-Servers)
 
-**Persistenz**: Keine - Daten gehen bei Redis-Neustart verloren
+**Persisenz**: Keine - Daten gehen at Redis-Neustart verloren
 
 .. tip::
-   Redis kann optional konfiguriert werden, um Snapshots zu erstellen.
-   Dies erfolgt über die Redis-Konfiguration, nicht in VYRA selbst.
-   Weitere Informationen: https://redis.io/docs/management/persistence/
+   Redis can optional konfiguriert are, um Snapshots to create.
+   This is done via die Redis-Konfiguration, not in VYRA selbst.
+   Further information: https://redis.io/docs/management/persisttence/
 
 Performance
 -----------
@@ -207,8 +207,8 @@ Performance
 * Event-Trigger: ~1 - 5 ms
 
 .. important::
-   Volatiles sind **100x schneller** als Parameter (SQLite).
-   Nutzen Sie Volatiles für hochfrequente Datenoperationen!
+   Volatiles are **100x fastr** als Parameter (SQLite).
+   Use you Volatiles for hochfrequente Datenoperationen!
 
 Best Practices
 --------------
@@ -217,15 +217,15 @@ Best Practices
 
 .. code-block:: python
 
-   # Kurze, aussagekräftige Keys
+   # Kurze, fromsagekräftige Keys
    await volatile.set_volatile_value("temp_sensor_1", 23.5)
    
-   # Strukturierte Daten für zusammenhängende Werte
+   # Strukturierte Daten for tosammenhängende Werte
    await volatile.set_volatile_value("robot_pose", {
        "x": 1.5, "y": 2.3, "theta": 0.78
    })
    
-   # Change-Events für kritische Werte
+   # Change-Events for kritische Werte
    await volatile.add_change_event("emergency_stop")
 
 ❌ **Vermeiden:**
@@ -238,11 +238,11 @@ Best Practices
    # Zu große Datenstrukturen (> 1 MB)
    await volatile.set_volatile_value("huge_data", very_large_object)
    
-   # Hochfrequente Events ohne Bedarf
+   # High-frequency Events without Bedarf
    for i in range(10000):
        await volatile.add_change_event(f"sensor_{i}")
 
-Fehlerbehandlung
+Error Handling
 ----------------
 
 .. code-block:: python
@@ -250,17 +250,17 @@ Fehlerbehandlung
    try:
        value = await entity.volatile.get_volatile_value("nonexistent_key")
    except KeyError:
-       print("Key existiert nicht")
-       # Standardwert setzen
+       print("Key existts not")
+       # Standardwert set
        await entity.volatile.set_volatile_value("nonexistent_key", 0)
    except Exception as e:
        print(f"Redis-Verbindungsfehler: {e}")
 
-Weiterführende Informationen
+Further Information
 -----------------------------
 
 * :doc:`entity` - Entity-Dokumentation
 * :doc:`parameter` - Persistente Alternative
-* :doc:`../storage` - Storage-Backend Details
+* :doc:`../stoage` - Stoage-Backend Details
 * :class:`~vyra_base.core.volatile.Volatile` - API-Referenz
 * Redis Dokumentation: https://redis.io/docs/

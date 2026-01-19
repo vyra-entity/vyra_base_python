@@ -1,0 +1,551 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../helper.rst:2 c1606a910bc8411e80647131fa242ed4
+msgid "Helper-functions"
+msgstr ""
+
+#: ../../helper.rst:4 06eaee46a4ef468494dc5e5554432eaf
+msgid ""
+"The Helper-Modul bietet Hilfsfunktionen for wiederkehrende Aufgaben wie "
+"Logging, Error Handling, Kryptografie and Datei-Operationen."
+msgstr ""
+
+#: ../../helper.rst:8 b79ad7ab5eb245c7ab65d8e2a6a164fa
+msgid "Overview"
+msgstr ""
+
+#: ../../helper.rst:30 d28608425b37481cacb55de1aa2f4e0d
+msgid "Logger"
+msgstr ""
+
+#: ../../helper.rst:32 636843f750c048cf9e383911bd8aa3a1
+msgid "Konfigu rierbares Logging with ROS2-Integration:"
+msgstr ""
+
+#: ../../helper.rst:35 7a181689cd3c45b291b9ee428c23d29f
+msgid "Verwendung"
+msgstr ""
+
+#: ../../helper.rst:52 eb9caf4a6ace494c959a160132166c27
+msgid "Konfiguration"
+msgstr ""
+
+#: ../../helper.rst:69 eee297179d584c4e8ee1bd1802c7df47
+msgid "Use you strukturiertes Logging for bessere Auswertbarkeit:"
+msgstr ""
+
+#: ../../helper.rst:80 5d71b38edef14cdd944c3ac85286e403
+msgid "ErrorHandler & ErrorTraceback"
+msgstr ""
+
+#: ../../helper.rst:82 9a091bb13712411caa5b201b0cd39c12
+msgid "Error Handling with automaticallyem Traceback:"
+msgstr ""
+
+#: ../../helper.rst:85 c505daea1929452f937071d347359712
+msgid "ErrorTraceback Decorato"
+msgstr ""
+
+#: ../../helper.rst:97 e0ab059dda1b45f2b989870ab83e9fb5
+msgid "**Functionality:**"
+msgstr ""
+
+#: ../../helper.rst:99 5143c68050064283b883bccd4269dd98
+msgid "Automatisches Exception-Logging"
+msgstr ""
+
+#: ../../helper.rst:100 ca8338a4821b43299c7db3642f01b8cc
+msgid "Completer Traceback"
+msgstr ""
+
+#: ../../helper.rst:101 7df91d6f555e4d7aa3af6f475a6f28e7
+msgid "Integration with ErrorFeeder"
+msgstr ""
+
+#: ../../helper.rst:102 286c5e7ef45d4c389a251b4eb412b717
+msgid "Keine Unterbrechung des Programmflusses"
+msgstr ""
+
+#: ../../helper.rst:105 0efeca4f524f4ce8a1c102650920123b
+msgid "ErrorHandler"
+msgstr ""
+
+#: ../../helper.rst:122 6dfd6209ee104c66ae4a7cedbe1a5795
+msgid "CryptoHelper"
+msgstr ""
+
+#: ../../helper.rst:124 2fdd04a147684a7ab582d3da19925281
+msgid "Kryptografische functions for Sicherheit:"
+msgstr ""
+
+#: ../../helper.rst:127 0ab30aa114614a17a6565e22434abe26
+msgid "Hashing"
+msgstr ""
+
+#: ../../helper.rst:144 c1606a910bc8411e80647131fa242ed4
+msgid "encryption"
+msgstr ""
+
+#: ../../helper.rst:155 8ba2c873ef2c4c7aa4af5904be174ad6
+msgid ""
+"Use you niemals hartcodierte Schlüssel in Produktionscode! Use you "
+"environment variables or Secrets-Management."
+msgstr ""
+
+#: ../../helper.rst:159 e9fa7c52d6134a4faf082f0c9d37320f
+msgid "Zufallswerte"
+msgstr ""
+
+#: ../../helper.rst:170 f1602423bcec4b629e8a319028619c5b
+msgid "FileReader & FileWriter"
+msgstr ""
+
+#: ../../helper.rst:172 fa759a85f39c45f1b7f172c4585b4ac2
+msgid "Datei-Operationen with automaticallyer Format-Erkennung:"
+msgstr ""
+
+#: ../../helper.rst:175 c2430c1abe9c48869f508a05713c6abc
+msgid "FileReader"
+msgstr ""
+
+#: ../../helper.rst:193 e7ddb5e0c3f349378d92806a580327b5
+msgid "**Unterstützte Formate:**"
+msgstr ""
+
+#: ../../helper.rst:195 ea39e288db4b46bb831520941bc0382a
+msgid "JSON (``.json``)"
+msgstr ""
+
+#: ../../helper.rst:196 a18263ff41aa480a8851b5bc09069d50
+msgid "YAML (``.yaml``, ``.yml``)"
+msgstr ""
+
+#: ../../helper.rst:197 63b1a0ece26445a7ac83264f1a32a085
+msgid "TOML (``.toml``)"
+msgstr ""
+
+#: ../../helper.rst:198 4b47616e9ecb44d386e838118887d500
+msgid "Text (``.txt``, ``.md``, etc.)"
+msgstr ""
+
+#: ../../helper.rst:199 dc6ab357dc3a490f817c46712e6a2dc1
+msgid "Binär (alle underen)"
+msgstr ""
+
+#: ../../helper.rst:202 83eed1db23264671a84295dea45cb6be
+msgid "FileWriter"
+msgstr ""
+
+#: ../../helper.rst:227 f951b24336274b3a9991ea0a8199104e
+msgid "FileLock"
+msgstr ""
+
+#: ../../helper.rst:229 8cc66054069942738dbadb85636796f7
+msgid "Datei-Locking for gleichzeitigen Zugriff:"
+msgstr ""
+
+#: ../../helper.rst:246 3b2203d682264b22a5a3691fdbbcd85d
+msgid "FileLock verhindert Race-Conditions at gleichzeitigen Schreibaccessesn."
+msgstr ""
+
+#: ../../helper.rst:249 c2f5c3b2e0054acaaf7a14318e2ca738
+msgid "EnvHandler"
+msgstr ""
+
+#: ../../helper.rst:251 b36f2f5c4e0b4a3f8adf9ea239f4bfdf
+msgid "environment variables-Verwaltung:"
+msgstr ""
+
+#: ../../helper.rst:272 a53009ddd1b146f4915c72c3d510953a
+msgid "**.env-Datei Beispiel:**"
+msgstr ""
+
+#: ../../helper.rst:283 eb7c609764b84b02a189fa37f079e2b3
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../helper.rst:286 c61639f302cb494ca75d811f58dbb5e5
+msgid "Logging"
+msgstr ""
+
+#: ../../helper.rst:288 ../../helper.rst:304 ../../helper.rst:313
+#: ../../helper.rst:328 4ec3758c1f5b4eec84ee82fb40292ca9
+#: 7045d58898c6427780960b802fe52c9d
+msgid "✅ **Empfohlen:**"
+msgstr ""
+
+#: ../../helper.rst:290 a059df1d057e4c65a45e208d9c0c116f
+msgid "Use you strukturiertes Logging"
+msgstr ""
+
+#: ../../helper.rst:291 83ffd968dfed48f8a93caf471db8ae52
+msgid "Use you passende Log-Levels (DEBUG < INFO < WARNING < ERROR)"
+msgstr ""
+
+#: ../../helper.rst:292 e38df50f2e45450e918959913daa4156
+msgid "Loggen you wichtige Events (Start, Stop, Fehler)"
+msgstr ""
+
+#: ../../helper.rst:293 1f2d25cc8d9e41abbd407db8432b01e9
+msgid "Vermeiden you sensible Daten in Logs"
+msgstr ""
+
+#: ../../helper.rst:295 ../../helper.rst:319 c920c1e8235040c2aa440a6c2d97c2ba
+#: e8a3f26e7ef745c0bd6f40c30cf8c7b8
+msgid "❌ **Vermeiden:**"
+msgstr ""
+
+#: ../../helper.rst:297 15717307e93c4b0cbb05913b5698f2e3
+msgid "Excessive Logging in Hochfrequenz-Schleifen"
+msgstr ""
+
+#: ../../helper.rst:298 fdc8e0004941414e8b2270700e73ee3d
+msgid "Persönliche or Sicherheits-relevante Daten"
+msgstr ""
+
+#: ../../helper.rst:299 5cca514ec5ba468185b61a32d9d3e22a
+msgid "Logging without Context-information"
+msgstr ""
+
+#: ../../helper.rst:302 0df6771ae7e4498cbcb1c445f3466c70
+msgid "Error Handling"
+msgstr ""
+
+#: ../../helper.rst:306 e33255182f9740f68dbac3c94533ac9b
+msgid "Use you ``@ErrorTraceback`` for async functions"
+msgstr ""
+
+#: ../../helper.rst:307 708a55cee6c041a481e67beebdfcf02b
+msgid "Loggen you Fehler with completem Context"
+msgstr ""
+
+#: ../../helper.rst:308 a79a4e9384c541049b4cd327df928831
+msgid "Use you ErrorFeeder for zentrale Fehlersammlung"
+msgstr ""
+
+#: ../../helper.rst:311 7c2d1c56650a417bb8aa4789f0ea80cd
+msgid "Kryptografie"
+msgstr ""
+
+#: ../../helper.rst:315 17918788148b47c18ef83aec296aa3ce
+msgid "Use you ``hash_password()`` statt einfachem SHA-256"
+msgstr ""
+
+#: ../../helper.rst:316 f33a274bd8f54d8bbbd1a5640901dfe0
+msgid "Speichern you Schlüssel in environment variables"
+msgstr ""
+
+#: ../../helper.rst:317 084a07c9e1f64bb88f5a2c582134b7cf
+msgid "Use you starke, tofällige Schlüssel"
+msgstr ""
+
+#: ../../helper.rst:321 84ea9bf7cd2a4ca79c9e2fde3c58b1bf
+msgid "Hartcodierte Passwörter or Schlüssel"
+msgstr ""
+
+#: ../../helper.rst:322 1af639502c394ada83ad1be8f758e8d7
+msgid "Schwache Hashing-Algorithmen (MD5, SHA1)"
+msgstr ""
+
+#: ../../helper.rst:323 300d16d74bee46f58c02613f6138e3c2
+msgid "Wiederverwendung of Salts"
+msgstr ""
+
+#: ../../helper.rst:326 1f08e219b895483b93e462a24bf96d62
+msgid "Datei-Operationen"
+msgstr ""
+
+#: ../../helper.rst:330 fad132a72f344fe2a550947016c1a3a9
+msgid "Use you FileReader/FileWriter statt direktem I/O"
+msgstr ""
+
+#: ../../helper.rst:331 cef69940c1bb425994274e37929522ba
+msgid "Use you FileLock at gleichzeitigem Zugriff"
+msgstr ""
+
+#: ../../helper.rst:332 b637eab56fcc433dbbc73e3d112d9a9b
+msgid "Prüfen you Pfad-Exisenz vor Schreiboperationen"
+msgstr ""
+
+#: ../../helper.rst:335 4031f425eafe4d1093f19edc0d17469d
+msgid "Further Information"
+msgstr ""
+
+#: ../../helper.rst:337 2c61d3e5f6e54b759eaf2212b68f8793
+msgid ":doc:`vyra_base.helper` - API-Referenz"
+msgstr ""
+
+#: ../../helper.rst:338 8b299c92cea548f9a32b40675b865e78
+msgid ":class:`~vyra_base.helper.logger.Logger` - Logger-class"
+msgstr ""
+
+#: ../../helper.rst:339 9c207367481f431cb8504147f90e5b95
+msgid ":class:`~vyra_base.helper.error_traceback.ErrorTraceback` - Error-Decorato"
+msgstr ""
+
+#: ../../helper.rst:340 6e55bd603e644192aa26343fb96defad
+msgid ":class:`~vyra_base.helper.crypto_helper.CryptoHelper` - Krypto-functions"
+msgstr ""
+
+#: ../../helper.rst:341 a00829274bea4d51a3c2beec08ce3118
+msgid ":class:`~vyra_base.helper.file_reader.FileReader` - Datei read"
+msgstr ""
+
+#: ../../helper.rst:342 b9150fc38b004f5fba8555608a4723eb
+msgid ":class:`~vyra_base.helper.file_writer.FileWriter` - Datei schreiben"
+msgstr ""
+
+#: ../../helper.rst:343 e7d53fe93d504f85b6ff13eeb3ad936c
+msgid ":class:`~vyra_base.helper.file_lock.FileLock` - Datei-Locking"
+msgstr ""
+
+#: ../../helper.rst:344 99242490d08b43199023f53ff50ef8e9
+msgid ":class:`~vyra_base.helper.env_handler.EnvHandler` - environment variables"
+msgstr ""
+
+#~ msgid ""
+#~ "Das Helper-Modul bietet Hilfsfunktionen "
+#~ "für wiederkehrende Aufgaben wie Logging, "
+#~ "Fehlerbehandlung, Kryptografie und Datei-"
+#~ "Operationen."
+#~ msgstr ""
+
+#~ msgid "Übersicht"
+#~ msgstr ""
+
+#~ msgid "Helper-Modul"
+#~ msgstr ""
+
+#~ msgid "Beschreibung"
+#~ msgstr ""
+
+#~ msgid "**Logger**"
+#~ msgstr ""
+
+#~ msgid "Konfigurierbares Logging-System"
+#~ msgstr ""
+
+#~ msgid "**ErrorHandler / ErrorTraceback**"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung und Exception-Tracking"
+#~ msgstr ""
+
+#~ msgid "**CryptoHelper**"
+#~ msgstr ""
+
+#~ msgid "Kryptografische Funktionen (Hashing, Verschlüsselung)"
+#~ msgstr ""
+
+#~ msgid "**FileReader / FileWriter**"
+#~ msgstr ""
+
+#~ msgid "Datei-Operationen (JSON, YAML, etc.)"
+#~ msgstr ""
+
+#~ msgid "**FileLock**"
+#~ msgstr ""
+
+#~ msgid "Datei-Locking für gleichzeitigen Zugriff"
+#~ msgstr ""
+
+#~ msgid "**EnvHandler**"
+#~ msgstr ""
+
+#~ msgid "Umgebungsvariablen-Verwaltung"
+#~ msgstr ""
+
+#~ msgid "Konfigu rierbares Logging mit ROS2-Integration:"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie strukturiertes Logging für bessere Auswertbarkeit:"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung mit automatischem Traceback:"
+#~ msgstr ""
+
+#~ msgid "Integration mit ErrorFeeder"
+#~ msgstr ""
+
+#~ msgid "Kryptografische Funktionen für Sicherheit:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Verwenden Sie niemals hartcodierte Schlüssel"
+#~ " in Produktionscode! Nutzen Sie "
+#~ "Umgebungsvariablen oder Secrets-Management."
+#~ msgstr ""
+
+#~ msgid "Datei-Operationen mit automatischer Format-Erkennung:"
+#~ msgstr ""
+
+#~ msgid "Datei-Locking für gleichzeitigen Zugriff:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "FileLock verhindert Race-Conditions bei "
+#~ "gleichzeitigen Schreibzugriffen."
+#~ msgstr ""
+
+#~ msgid "Persönliche oder Sicherheits-relevante Daten"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie ``@ErrorTraceback`` für async Funktionen"
+#~ msgstr ""
+
+#~ msgid "Loggen Sie Fehler mit vollständigem Context"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie ErrorFeeder für zentrale Fehlersammlung"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie starke, zufällige Schlüssel"
+#~ msgstr ""
+
+#~ msgid "Hartcodierte Passwörter oder Schlüssel"
+#~ msgstr ""
+
+#~ msgid "Wiederverwendung von Salts"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie FileLock bei gleichzeitigem Zugriff"
+#~ msgstr ""
+
+#~ msgid "Prüfen Sie Pfad-Existenz vor Schreiboperationen"
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid "Helper-Funktionen"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Helper-Modul bietet Hilfsfunktionen "
+#~ "for wiederkehrende Aufgaben wie Logging, "
+#~ "Fehlerbehandlung, Kryptografie and Datei-"
+#~ "Operationen."
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie strukturiertes Logging for bessere Auswertbarkeit:"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung with automatischem Traceback:"
+#~ msgstr ""
+
+#~ msgid "ErrorTraceback Decorator"
+#~ msgstr ""
+
+#~ msgid "**Funktionalität:**"
+#~ msgstr ""
+
+#~ msgid "Vollständiger Traceback"
+#~ msgstr ""
+
+#~ msgid "Kryptografische Funktionen for Sicherheit:"
+#~ msgstr ""
+
+#~ msgid "Verschlüsselung"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Verwenden Sie niemals hartcodierte Schlüssel"
+#~ " in Produktionscode! Nutzen Sie "
+#~ "Umgebungsvariablen or Secrets-Management."
+#~ msgstr ""
+
+#~ msgid "Datei-Operationen with automatischer Format-Erkennung:"
+#~ msgstr ""
+
+#~ msgid "Binär (alle anderen)"
+#~ msgstr ""
+
+#~ msgid "FileLock verhindert Race-Conditions at gleichzeitigen Schreibtogriffen."
+#~ msgstr ""
+
+#~ msgid "Umgebungsvariablen-Verwaltung:"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie strukturiertes Logging"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie passende Log-Levels (DEBUG < INFO < WARNING < ERROR)"
+#~ msgstr ""
+
+#~ msgid "Loggen Sie wichtige Events (Start, Stop, Fehler)"
+#~ msgstr ""
+
+#~ msgid "Vermeiden Sie sensible Daten in Logs"
+#~ msgstr ""
+
+#~ msgid "Logging ohne Context-Informationen"
+#~ msgstr ""
+
+#~ msgid "Fehlerbehandlung"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie ``@ErrorTraceback`` for async Funktionen"
+#~ msgstr ""
+
+#~ msgid "Loggen Sie Fehler with vollständigem Context"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie ErrorFeeder for zentrale Fehlersammlung"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie ``hash_password()`` statt einfachem SHA-256"
+#~ msgstr ""
+
+#~ msgid "Speichern Sie Schlüssel in Umgebungsvariablen"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie starke, tofällige Schlüssel"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie FileReader/FileWriter statt direktem I/O"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie FileLock at gleichzeitigem Zugriff"
+#~ msgstr ""
+
+#~ msgid "Prüfen Sie Pfad-Exisenz vor Schreiboperationen"
+#~ msgstr ""
+
+#~ msgid ":class:`~vyra_base.helper.logger.Logger` - Logger-Klasse"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":class:`~vyra_base.helper.error_traceback.ErrorTraceback` - "
+#~ "Error-Decorator"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":class:`~vyra_base.helper.crypto_helper.CryptoHelper` - "
+#~ "Krypto-Funktionen"
+#~ msgstr ""
+
+#~ msgid ":class:`~vyra_base.helper.file_reader.FileReader` - Datei lesen"
+#~ msgstr ""
+
+#~ msgid ":class:`~vyra_base.helper.env_handler.EnvHandler` - Umgebungsvariablen"
+#~ msgstr ""
+

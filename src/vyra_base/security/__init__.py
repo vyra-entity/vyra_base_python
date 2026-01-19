@@ -71,18 +71,6 @@ from vyra_base.security.security_validator import (
     create_secure_subscription,
 )
 
-# Trust Manager (legacy, may be deprecated)
-try:
-    from vyra_base.security.trust import (
-        TrustlevelManager,
-        TRUST_LEVEL,
-        TRUST_STATUS,
-    )
-except ImportError:
-    # Trust module is optional/legacy
-    pass
-
-
 __all__ = [
     # Security Levels
     'SecurityLevel',

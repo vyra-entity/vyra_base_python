@@ -1,0 +1,283 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.core.rst:2 6b94fde53a3742ce9a823d5bd129379b
+msgid "vyra\\_base.core package"
+msgstr ""
+
+#: ../../vyra_base.core.rst:5 4ca3d3bd46d0465792992def322964d4
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.core.rst:8 c5e3e9f8a304452994b92ac8e01a3af7
+msgid "vyra\\_base.core.entity module"
+msgstr ""
+
+#: ../../vyra_base.core.rst:16 8507d3cc43d64983ba18fc720c072aed
+msgid "Module contents"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Base class for all V.Y.R.A. entities ."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class initializes the entity with"
+#~ " a ROS2 node, state, news, and "
+#~ "error feeders. It also provides methods"
+#~ " to register remote callables and "
+#~ "manage interfaces. It is designed to "
+#~ "be extended by specific entities that"
+#~ " require additional functionality."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "The ROS2 node for the entity."
+#~ msgstr ""
+
+#~ msgid "Feeder for state updates."
+#~ msgstr ""
+
+#~ msgid "Feeder for news updates."
+#~ msgstr ""
+
+#~ msgid "Feeder for error updates."
+#~ msgstr ""
+
+#~ msgid "State machine for managing entity states."
+#~ msgstr ""
+
+#~ msgid "List of interface configurations."
+#~ msgstr ""
+
+#~ msgid "List of registered storage objects."
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid "If the node name is already available in the ROS2 system."
+#~ msgstr ""
+
+#~ msgid "Wrapper for synchronous functions."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Positional arguments."
+#~ msgstr ""
+
+#~ msgid "Keyword arguments."
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "Result of the wrapped function."
+#~ msgstr ""
+
+#~ msgid "Get the ROS2 node of the entity."
+#~ msgstr ""
+
+#~ msgid "The ROS2 node."
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid "Get the namespace of the ROS2 node."
+#~ msgstr ""
+
+#~ msgid "The namespace of the node."
+#~ msgstr ""
+
+#~ msgid "Execute the entity startup sequence using the state machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method performs the complete "
+#~ "initialization sequence: 1. Start "
+#~ "initialization (Lifecycle: Uninitialized → "
+#~ "Initializing) 2. Initialize resources "
+#~ "(storages, parameters, etc.) 3. Complete "
+#~ "initialization (Lifecycle: Initializing → "
+#~ "Active) 4. Set operational ready "
+#~ "(Operational: Idle → Ready)"
+#~ msgstr ""
+
+#~ msgid "True if startup successful, False otherwise."
+#~ msgstr ""
+
+#~ msgid "Execute the entity shutdown sequence using the state machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method performs graceful shutdown: "
+#~ "1. Begin shutdown (Lifecycle: Active →"
+#~ " ShuttingDown) 2. Clean up resources "
+#~ "(operational tasks, storages, etc.) 3. "
+#~ "Complete shutdown (Lifecycle: ShuttingDown →"
+#~ " Deactivated)"
+#~ msgstr ""
+
+#~ msgid "True if shutdown successful, False otherwise."
+#~ msgstr ""
+
+#~ msgid "Set up the storage for the entity."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method initializes the storage "
+#~ "access for the entity, including "
+#~ "persistent and transient storage. It "
+#~ "should be called during the "
+#~ "initialization of the entity."
+#~ msgstr ""
+
+#~ msgid "Optional configuration for the storage setup."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Dictionary containing base types for "
+#~ "transient storage. Must be defined in"
+#~ " the vyra module interfaces."
+#~ msgstr ""
+
+#~ msgid "If the configuration is invalid or incomplete."
+#~ msgstr ""
+
+#~ msgid "If the storage setup fails."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+#~ msgstr ""
+
+#~ msgid "None"
+#~ msgstr ""
+
+#~ msgid "Add a DDS communication interface to this module."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Interfaces are used to communicate with"
+#~ " other modules or external systems. "
+#~ "Interface types can be:"
+#~ msgstr ""
+
+#~ msgid "``!vyra-callable``: Callable function that can be invoked remotely."
+#~ msgstr ""
+
+#~ msgid "``!vyra-job``: Job that can be executed in the background."
+#~ msgstr ""
+
+#~ msgid "``!vyra-speaker``: Speaker that can publish messages periodically."
+#~ msgstr ""
+
+#~ msgid "Settings for the module functions."
+#~ msgstr ""
+
+#~ msgid "Path to the permission file for the interface."
+#~ msgstr ""
+
+#~ msgid "Register a storage object to the entity."
+#~ msgstr ""
+
+#~ msgid "The storage object to register."
+#~ msgstr ""
+
+#~ msgid "If storage is not an instance of Storage."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Retrieves all capabilities (speaker, callable,"
+#~ " job) of the entity that are "
+#~ "set to visible from the module to"
+#~ " external access."
+#~ msgstr ""
+
+#~ msgid "The request object."
+#~ msgstr ""
+
+#~ msgid "The response object to update with the result."
+#~ msgstr ""
+
+#~ msgid "Registers all remote callables defined in the callback_parent."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Remote callables must be decorated with"
+#~ " ``@vyra_base.com.datalayer.callable.remote_callable``."
+#~ msgstr ""
+
+#~ msgid "Example::"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To register the remote callable in "
+#~ "this example, the instance_my_parent object"
+#~ " must be passed to this function:"
+#~ msgstr ""
+
+#~ msgid "``register_callables_callbacks(instance_my_parent)``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Inside your MyParentClass in a method"
+#~ " you can call the same function "
+#~ "and set the callback_parent to self "
+#~ "to register the callables of the "
+#~ "instance itself:"
+#~ msgstr ""
+
+#~ msgid "``register_callables_callbacks(self)``"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This function will iterate over all "
+#~ "attributes of the instance and register"
+#~ " those marked as remote callable with"
+#~ " the DataSpace."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This function will only register the "
+#~ "callbacks. Run ``entity.set_interfaces(your_config)`` "
+#~ "afterwards to load the interfaces in "
+#~ "vyra."
+#~ msgstr ""
+
+#~ msgid "The class or instance containing the remote callables."
+#~ msgstr ""
+
+#~ msgid "If callback_parent is not an instance of object."
+#~ msgstr ""
+
+#~ msgid "If callback_parent does not have any remote callables."
+#~ msgstr ""
+
+#~ msgid "If the callable registration fails."
+#~ msgstr ""
+

@@ -1,0 +1,539 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../interfaces.rst:2 f68356db92104e5a8a16ed52312d1f9a
+msgid "ROS2 Interfaces"
+msgstr ""
+
+#: ../../interfaces.rst:4 d32f96f148904ef08dfaa53a9adee0f1
+msgid ""
+"The ``vyra_base/interfaces`` Paket enthält alle Basis-ROS2-Interfaces for"
+" das VYRA-Framework. Thise Interfaces definieren standardisierte "
+"messages, Services and Actions."
+msgstr ""
+
+#: ../../interfaces.rst:8 856bb99223a147458ac90de21184d3e2
+msgid "Overview"
+msgstr ""
+
+#: ../../interfaces.rst:10 aef1f6b8cc374f869978524857e75463
+msgid "ROS2-Interfaces in VYRA bestehen from drei Typen:"
+msgstr ""
+
+#: ../../interfaces.rst:12 60f5ac521dc44e8ea20ed389bf9b28dd
+msgid "**Messages (.msg)**: Datenstrukturen for Topics"
+msgstr ""
+
+#: ../../interfaces.rst:13 770ac18cd903469fa4d792e20530c5fc
+msgid "**Services (.srv)**: Request/Response-Definitionen"
+msgstr ""
+
+#: ../../interfaces.rst:14 94c3c6f669a44847ac17d30617ee2f6b
+msgid "**Actions (.action)**: Langläufige Operationen with Feedback"
+msgstr ""
+
+#: ../../interfaces.rst:16 a9a102e5eb28419ba43eec9184a187e8
+msgid ""
+"Alle VYRA-Module can diese Basis-Interfaces use, um standardisierte "
+"Kommunikation to gewährleisen."
+msgstr ""
+
+#: ../../interfaces.rst:19 be7a58f5d1fe40ee87e4f3fa25c1d973
+msgid "Verfügbare Interfaces"
+msgstr ""
+
+#: ../../interfaces.rst:22 099494bb063340ccbd4a96d0d396920d
+msgid "Messages (msg/)"
+msgstr ""
+
+#: ../../interfaces.rst:38 6453c4fcfe6f4e6ca0514da8133d6d66
+msgid "Services (srv/)"
+msgstr ""
+
+#: ../../interfaces.rst:56 7325aebbe42749f79668dfd6a03fca03
+msgid "Actions (action/)"
+msgstr ""
+
+#: ../../interfaces.rst:68 a2adaa1c11d74083bfe0c05acf221338
+msgid "Interface-Metadaten"
+msgstr ""
+
+#: ../../interfaces.rst:70 f2715a174a4a46419c25c90fe1d7d63e
+msgid ""
+"Interfaces are via JSON-Konfigurationsdateien beschrieben. Thise becan be"
+" found sich in ``config/*.json`` and definieren, wie Interfaces verwendet"
+" are."
+msgstr ""
+
+#: ../../interfaces.rst:74 ea32f2f7fbd44e37aef87b8fd44aa8fa
+msgid "Beispiel-Metadaten"
+msgstr ""
+
+#: ../../interfaces.rst:76 f267a720db2b4cbcbaf5bb7926a58dd5
+msgid "**Parameter-Service-Definition** (``config/parameter_metadata.json``):"
+msgstr ""
+
+#: ../../interfaces.rst:97 b2533de8850a4a249d1c28aec450c4f7
+msgid "**Verwendungszweck:**"
+msgstr ""
+
+#: ../../interfaces.rst:99 7b675092c9654bad8d6ed2a985df42e9
+msgid "Automatische Service-Registration durch ``entity.set_interfaces()``"
+msgstr ""
+
+#: ../../interfaces.rst:100 0db3a6a796e6497fa648252962e05616
+msgid "Dokumentation der verfügbaren Schnittstellen"
+msgstr ""
+
+#: ../../interfaces.rst:101 df00c908f9bc4383ac22bdd3b29e861b
+msgid "Mapping of Service-Namen to Implementierungen"
+msgstr ""
+
+#: ../../interfaces.rst:104 19752bac0ba14255916add59fbce39b7
+msgid "Interface-Definition"
+msgstr ""
+
+#: ../../interfaces.rst:107 2ca03c5d9dd14259b937f239e538c946
+msgid "Beispiel: Service definieren"
+msgstr ""
+
+#: ../../interfaces.rst:109 4d1c24567b154319965b459efd585019
+msgid "**VBASESetParam.srv**:"
+msgstr ""
+
+#: ../../interfaces.rst:121 c0a9eb39009e4b669ed10b402eeffab2
+msgid "**Bedeutung:**"
+msgstr ""
+
+#: ../../interfaces.rst:123 a5456792f4614128be8ecc56bd6e7d3c
+msgid "Oberhalb of ``---``: Request-Struktur"
+msgstr ""
+
+#: ../../interfaces.rst:124 b3c9de0c42cc48efb7d6ec0162a2028f
+msgid "Unterhalb of ``---``: Response-Struktur"
+msgstr ""
+
+#: ../../interfaces.rst:125 a1940cec42164acc83041d3e5d6bd99e
+msgid "Kommentare with ``#``"
+msgstr ""
+
+#: ../../interfaces.rst:128 c20b1d1597eb4807a524ba3bf3b4f592
+msgid "Beispiel: Message definieren"
+msgstr ""
+
+#: ../../interfaces.rst:130 5ddb188df0094184bdfc7bde1b9d2343
+msgid "**VBASEUpdateParamEvent.msg**:"
+msgstr ""
+
+#: ../../interfaces.rst:141 72cf39b358884f7387be6d1401b95c55
+msgid "Eigene Module-Interfaces"
+msgstr ""
+
+#: ../../interfaces.rst:143 0e115aec391e40709659efd0003505d3
+msgid "Jedes VYRA-Modul sollte sein eigenes Interface-Paket haben:"
+msgstr ""
+
+#: ../../interfaces.rst:159 6b2926f496214b80ba3adf6bb5b91218
+msgid "**Naming Convention:**"
+msgstr ""
+
+#: ../../interfaces.rst:161 ba2cb57984ad486984f7cbb5abb94f57
+msgid "Modulname + ``_interfaces`` (z.B. ``v2_modulemanager_interfaces``)"
+msgstr ""
+
+#: ../../interfaces.rst:162 de02a863002c49cf8aa1cd744c29cfd7
+msgid ""
+"Prefix for Interface-Namen with Modul-Kürzel (z.B. ``MM`` for "
+"ModuleManager)"
+msgstr ""
+
+#: ../../interfaces.rst:165 fde87682a51a43bf9216615d808a4cf2
+msgid "Interface-Verwendung"
+msgstr ""
+
+#: ../../interfaces.rst:168 c006cd62a9334b98bd247f3b64ddbe42
+msgid "Im Python-Code"
+msgstr ""
+
+#: ../../interfaces.rst:192 543ef8564e264ff38ad7be2660d233be
+msgid "In JSON-Metadaten"
+msgstr ""
+
+#: ../../interfaces.rst:214 713c433d2c0d4812b0d55f61f8f7f181
+msgid "Automatische Registration"
+msgstr ""
+
+#: ../../interfaces.rst:216 186974abd09b4e7b86bb298ccf54c63f
+msgid "Entity lädt and regisriert Interfaces automatically:"
+msgstr ""
+
+#: ../../interfaces.rst:232 9212325070424182882adc2a8a4e32ab
+msgid "**Prozess:**"
+msgstr ""
+
+#: ../../interfaces.rst:234 0bcbedd221df43b0bcdf9c23db93118c
+msgid "JSON-Metadaten read (``config/*.json``)"
+msgstr ""
+
+#: ../../interfaces.rst:235 621a893d0007412bb27d33f9d0f93f58
+msgid "Interface-Typen importieren"
+msgstr ""
+
+#: ../../interfaces.rst:236 cf4ec935549d4261b773b96e3841a12f
+msgid "Methoden with ``@remote_callable`` can be found"
+msgstr ""
+
+#: ../../interfaces.rst:237 77bb36f32d034d009feed13db3a71774
+msgid "ROS2-Services register"
+msgstr ""
+
+#: ../../interfaces.rst:238 5f54dc9650ea49a3bb378d9ced37faa5
+msgid "DataSpace aktualisieren"
+msgstr ""
+
+#: ../../interfaces.rst:241 dcf1d16a007345c8b8671100b65da4af
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../interfaces.rst:243 1d9463ca72b54ffea5ac591e0d4fe6a4
+msgid "✅ **Empfohlen:**"
+msgstr ""
+
+#: ../../interfaces.rst:245 794469a4c3964fca9fdd72bc7105b588
+msgid "Use you VYRA-Basis-Interfaces wo möglich"
+msgstr ""
+
+#: ../../interfaces.rst:246 b6605ef63b2d4ac9b2fe950fd26a9298
+msgid "Erstellen you eigene Interface-Pakete for modulspezifische Typen"
+msgstr ""
+
+#: ../../interfaces.rst:247 6fe89de8447a49f7bfb3e63d77c67931
+msgid "Dokumentieren you Interfaces in JSON-Metadaten"
+msgstr ""
+
+#: ../../interfaces.rst:248 a4e161e07e9f413495f506fa8335d432
+msgid "Use you Namespaces for Interface-Namen (z.B. ``VBASE``, ``MM``)"
+msgstr ""
+
+#: ../../interfaces.rst:249 bce0194b22d644e4a8a22659f3138a65
+msgid "Versionieren you Interface-Änderungen"
+msgstr ""
+
+#: ../../interfaces.rst:251 b5ead7e78a49472aa7d9da7c26600466
+msgid "❌ **Vermeiden:**"
+msgstr ""
+
+#: ../../interfaces.rst:253 75ac580065aa44d5a8c0c931f8d57078
+msgid "Direkte Verwendung of ROS2-Standard-Interfaces without Wrapper"
+msgstr ""
+
+#: ../../interfaces.rst:254 83bb096d776d4fa2bda7b0bdef182e6a
+msgid "Viamäßig komplexe messages (> 1 KB)"
+msgstr ""
+
+#: ../../interfaces.rst:255 fade06be65ec4649be094c53979891b4
+msgid "Interfaces without Metadaten-Dokumentation"
+msgstr ""
+
+#: ../../interfaces.rst:256 9a629d7e4b85442faf6b82c4ce72c40b
+msgid "Breaking Changes an bestehenden Interfaces"
+msgstr ""
+
+#: ../../interfaces.rst:259 f8fe792e938f4d108ed605b98acedecb
+msgid "Colcon Build"
+msgstr ""
+
+#: ../../interfaces.rst:261 86f5ee401f854e23ba863a25bc7fd572
+msgid "Interfaces must with ``colcon build`` kompiliert are:"
+msgstr ""
+
+#: ../../interfaces.rst:270 11a439b109b044d8b2b1e1227aa30a74
+msgid "Nach dem Build are die Interfaces in Python verfügbar:"
+msgstr ""
+
+#: ../../interfaces.rst:278 306eb4aab91048858ea5f9877b2ca906
+msgid "Interface-Pfade"
+msgstr ""
+
+#: ../../interfaces.rst:280 3cb9137e255f43a2b9678f80c842b705
+msgid "**Quelle**: ``src/vyra_base/interfaces/``"
+msgstr ""
+
+#: ../../interfaces.rst:282 54d71e0801bb4e208e48d88159fb98b3
+msgid "**Nach Build**: ``install/vyra_base_interfaces/``"
+msgstr ""
+
+#: ../../interfaces.rst:284 9c06462fa34a43ee960dad216cfc23a3
+msgid "**Python-Import**: ``from vyra_base_interfaces.srv import *``"
+msgstr ""
+
+#: ../../interfaces.rst:286 bf3a310f903849ddb70cd9b09086623f
+msgid "**NFS-Share**: ``/nfs/ros_interfaces/`` (for alle Module togänglich)"
+msgstr ""
+
+#: ../../interfaces.rst:289 9fd91c3bd9904924ba4f550c6a7caeb8
+msgid "Further Information"
+msgstr ""
+
+#: ../../interfaces.rst:291 ffd1e3c1ca5e4531914a6a631e4fbf39
+msgid ":doc:`com/ros2_communication` - Verwendung of Interfaces"
+msgstr ""
+
+#: ../../interfaces.rst:292 635256f29d7c4ba7820df3c0be227765
+msgid ":doc:`vyra_base.com.datalayer` - Interface Factoy"
+msgstr ""
+
+#: ../../interfaces.rst:293 0735547b66894c6ba4ce6181cd69befa
+msgid ""
+"ROS2 Interface-Dokumentation: https://docs.ros.org/en/kilted/Concepts"
+"/About-ROS-Interfaces.html"
+msgstr ""
+
+#: ../../interfaces.rst:294 ea62e70857874528b4d15d5f75b00df7
+msgid "``package.xml`` - ROS2 Package-Konfiguration"
+msgstr ""
+
+#: ../../interfaces.rst:295 5247560018664df68fa71a62288bae81
+msgid "``CMakeLiss.txt`` - Build-Konfiguration"
+msgstr ""
+
+#~ msgid ""
+#~ "Das ``vyra_base/interfaces`` Paket enthält "
+#~ "alle Basis-ROS2-Interfaces für das "
+#~ "VYRA-Framework. Diese Interfaces definieren "
+#~ "standardisierte Nachrichten, Services und "
+#~ "Actions."
+#~ msgstr ""
+
+#~ msgid "Übersicht"
+#~ msgstr ""
+
+#~ msgid "ROS2-Interfaces in VYRA bestehen aus drei Typen:"
+#~ msgstr ""
+
+#~ msgid "**Messages (.msg)**: Datenstrukturen für Topics"
+#~ msgstr ""
+
+#~ msgid "**Actions (.action)**: Langläufige Operationen mit Feedback"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Alle VYRA-Module können diese Basis-"
+#~ "Interfaces nutzen, um standardisierte "
+#~ "Kommunikation zu gewährleisten."
+#~ msgstr ""
+
+#~ msgid "Interface"
+#~ msgstr ""
+
+#~ msgid "Beschreibung"
+#~ msgstr ""
+
+#~ msgid "**VBASEUpdateParamEvent.msg**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Event-Nachricht für Parameter-Änderungen "
+#~ "(wird von Parameter-System genutzt)"
+#~ msgstr ""
+
+#~ msgid "**VBASEVolatileList.msg**"
+#~ msgstr ""
+
+#~ msgid "Liste aller Volatile-Keys"
+#~ msgstr ""
+
+#~ msgid "**VBASEVolatileHash.msg**"
+#~ msgstr ""
+
+#~ msgid "Hash-Wert für Volatile-Daten"
+#~ msgstr ""
+
+#~ msgid "**VBASESetParam.srv**"
+#~ msgstr ""
+
+#~ msgid "Parameter setzen (Request: name, value / Response: success)"
+#~ msgstr ""
+
+#~ msgid "**VBASEReadAllParams.srv**"
+#~ msgstr ""
+
+#~ msgid "Alle Parameter lesen (Response: Liste aller Parameter)"
+#~ msgstr ""
+
+#~ msgid "**VBASEStateResume.srv**"
+#~ msgstr ""
+
+#~ msgid "State Machine fortsetzen (für Pause/Resume-Funktionalität)"
+#~ msgstr ""
+
+#~ msgid "**VBASESecurityRequestAccess.srv**"
+#~ msgstr ""
+
+#~ msgid "Sicherheits-Zugriff anfordern (Security Framework)"
+#~ msgstr ""
+
+#~ msgid "**VBASEInitiateUpdate.action**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Software-Update initiieren (langläufige "
+#~ "Operation mit Fortschritts-Feedback)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Interfaces werden über JSON-"
+#~ "Konfigurationsdateien beschrieben. Diese befinden"
+#~ " sich in ``config/*.json`` und definieren,"
+#~ " wie Interfaces verwendet werden."
+#~ msgstr ""
+
+#~ msgid "Automatische Service-Registrierung durch ``entity.set_interfaces()``"
+#~ msgstr ""
+
+#~ msgid "Mapping von Service-Namen zu Implementierungen"
+#~ msgstr ""
+
+#~ msgid "Oberhalb von ``---``: Request-Struktur"
+#~ msgstr ""
+
+#~ msgid "Unterhalb von ``---``: Response-Struktur"
+#~ msgstr ""
+
+#~ msgid "Kommentare mit ``#``"
+#~ msgstr ""
+
+#~ msgid "**Namenskonvention:**"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Prefix für Interface-Namen mit Modul-"
+#~ "Kürzel (z.B. ``MM`` für ModuleManager)"
+#~ msgstr ""
+
+#~ msgid "Automatische Registrierung"
+#~ msgstr ""
+
+#~ msgid "Entity lädt und registriert Interfaces automatisch:"
+#~ msgstr ""
+
+#~ msgid "Methoden mit ``@remote_callable`` finden"
+#~ msgstr ""
+
+#~ msgid "ROS2-Services registrieren"
+#~ msgstr ""
+
+#~ msgid "Erstellen Sie eigene Interface-Pakete für modulspezifische Typen"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie Namespaces für Interface-Namen (z.B. ``VBASE``, ``MM``)"
+#~ msgstr ""
+
+#~ msgid "Direkte Verwendung von ROS2-Standard-Interfaces ohne Wrapper"
+#~ msgstr ""
+
+#~ msgid "Interfaces müssen mit ``colcon build`` kompiliert werden:"
+#~ msgstr ""
+
+#~ msgid "Nach dem Build sind die Interfaces in Python verfügbar:"
+#~ msgstr ""
+
+#~ msgid "**NFS-Share**: ``/nfs/ros_interfaces/`` (für alle Module zugänglich)"
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid ":doc:`com/ros2_communication` - Verwendung von Interfaces"
+#~ msgstr ""
+
+#~ msgid "``CMakeLists.txt`` - Build-Konfiguration"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The ``vyra_base/interfaces`` Paket enthält "
+#~ "alle Basis-ROS2-Interfaces for das "
+#~ "VYRA-Framework. These Interfaces definieren "
+#~ "standardisierte Nachrichten, Services and "
+#~ "Actions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Alle VYRA-Module can diese Basis-"
+#~ "Interfaces nutzen, um standardisierte "
+#~ "Kommunikation to gewährleisen."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Interfaces are via JSON-Konfigurationsdateien"
+#~ " beschrieben. These befinden sich in "
+#~ "``config/*.json`` and definieren, wie "
+#~ "Interfaces verwendet are."
+#~ msgstr ""
+
+#~ msgid "Automatische Service-Regisrierung durch ``entity.set_interfaces()``"
+#~ msgstr ""
+
+#~ msgid "Automatische Regisrierung"
+#~ msgstr ""
+
+#~ msgid "Entity lädt and regisriert Interfaces automatisch:"
+#~ msgstr ""
+
+#~ msgid "JSON-Metadaten lesen (``config/*.json``)"
+#~ msgstr ""
+
+#~ msgid "Methoden with ``@remote_callable`` finden"
+#~ msgstr ""
+
+#~ msgid "ROS2-Services regisrieren"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie VYRA-Basis-Interfaces wo möglich"
+#~ msgstr ""
+
+#~ msgid "Erstellen Sie eigene Interface-Pakete for modulspezifische Typen"
+#~ msgstr ""
+
+#~ msgid "Dokumentieren Sie Interfaces in JSON-Metadaten"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie Namespaces for Interface-Namen (z.B. ``VBASE``, ``MM``)"
+#~ msgstr ""
+
+#~ msgid "Versionieren Sie Interface-Änderungen"
+#~ msgstr ""
+
+#~ msgid "Direkte Verwendung of ROS2-Standard-Interfaces ohne Wrapper"
+#~ msgstr ""
+
+#~ msgid "Übermäßig komplexe Nachrichten (> 1 KB)"
+#~ msgstr ""
+
+#~ msgid "Interfaces ohne Metadaten-Dokumentation"
+#~ msgstr ""
+
+#~ msgid "Interfaces müssen with ``colcon build`` kompiliert are:"
+#~ msgstr ""
+
+#~ msgid ":doc:`vyra_base.com.datalayer` - Interface Factory"
+#~ msgstr ""
+

@@ -1,9 +1,9 @@
-COM API-Übersicht
+COM API Overview
 =================
 
-Diese Seite bietet eine vollständige Übersicht über alle Kommunikations-APIs in vyra_base.com.
+This page provides a complete overview of all communication APIs in vyra_base.com.
 
-ROS2 Kommunikation (Datalayer)
+ROS2 Communication (Datalayer)
 -------------------------------
 
 Services
@@ -13,18 +13,18 @@ Services
    :header-rows: 1
    :widths: 20 40 40
 
-   * - Klasse
-     - Verwendung
-     - Referenz
+   * - Class
+     - Usage
+     - Reference
    * - **VyraCallable**
-     - Service Server (wird aufgerufen)
+     - Service Server (provides service)
      - :class:`~vyra_base.com.datalayer.callable.VyraCallable`
    * - **VyraJob** (via create_vyra_job)
-     - Service Client (ruft auf)
+     - Service Client (calls service)
      - :doc:`../vyra_base.com.datalayer`
    * - **@remote_callable**
-     - Decorator für automatische Service-Registrierung
-     - :func:`~vyra_base.com.datalayer.interface_factory.remote_callable`
+     - Decorato for automatic service regisration
+     - :func:`~vyra_base.com.datalayer.interface_factoy.remote_callable`
 
 Topics
 ^^^^^^
@@ -33,14 +33,14 @@ Topics
    :header-rows: 1
    :widths: 20 40 40
 
-   * - Klasse
-     - Verwendung
-     - Referenz
+   * - Class
+     - Usage
+     - Reference
    * - **VyraSpeaker**
-     - Publisher (veröffentlicht)
+     - Publisher (publishes)
      - :class:`~vyra_base.com.datalayer.speaker.VyraSpeaker`
    * - **VyraSpeakerListener**
-     - Subscriber (empfängt)
+     - Subscriber (receives)
      - :class:`~vyra_base.com.datalayer.speaker.VyraSpeakerListener`
    * - **VyraPublisher**
      - Low-Level Publisher
@@ -56,14 +56,14 @@ Actions
    :header-rows: 1
    :widths: 20 40 40
 
-   * - Klasse
-     - Verwendung
-     - Referenz
+   * - Class
+     - Usage
+     - Reference
    * - **VyraActionServer**
-     - Action Server (führt aus)
+     - Action Server (executes)
      - :class:`~vyra_base.com.datalayer.action_server.VyraActionServer`
    * - **VyraActionClient**
-     - Action Client (startet Aktion)
+     - Action Client (starts action)
      - :class:`~vyra_base.com.datalayer.action_client.VyraActionClient`
 
 Node Management
@@ -73,14 +73,14 @@ Node Management
    :header-rows: 1
    :widths: 20 40 40
 
-   * - Klasse
-     - Verwendung
-     - Referenz
+   * - Class
+     - Usage
+     - Reference
    * - **VyraNode**
-     - Haupt-ROS2-Node für Module
+     - Main ROS2 node for modules
      - :class:`~vyra_base.com.datalayer.node.VyraNode`
    * - **CheckerNode**
-     - Hilfsnodeode für Node-Verfügbarkeitsprüfung
+     - Helper node for node availability checking
      - :class:`~vyra_base.com.datalayer.node.CheckerNode`
 
 Feeder
@@ -90,20 +90,20 @@ Feeder
    :header-rows: 1
    :widths: 20 40 40
 
-   * - Klasse
-     - Verwendung
-     - Referenz
+   * - Class
+     - Usage
+     - Reference
    * - **BaseFeeder**
-     - Basis-Klasse für alle Feeder
+     - Base class for all feeders
      - :class:`~vyra_base.com.feeder.feeder.BaseFeeder`
    * - **StateFeeder**
-     - Automatische State-Publikation
+     - Automatic state publication
      - :class:`~vyra_base.com.feeder.state_feeder.StateFeeder`
    * - **NewsFeeder**
-     - Automatische News-Publikation
+     - Automatic news publication
      - :class:`~vyra_base.com.feeder.news_feeder.NewsFeeder`
    * - **ErrorFeeder**
-     - Automatische Error-Publikation
+     - Automatic error publication
      - :class:`~vyra_base.com.feeder.error_feeder.ErrorFeeder`
 
 IPC (Inter-Process Communication)
@@ -113,25 +113,25 @@ IPC (Inter-Process Communication)
    :header-rows: 1
    :widths: 20 40 40
 
-   * - Klasse
-     - Verwendung
-     - Referenz
+   * - Class
+     - Usage
+     - Reference
    * - **GrpcUdsServer**
-     - gRPC Server über Unix Domain Socket
+     - gRPC server via Unix Domain Socket
      - :class:`~vyra_base.com.handler.ipc.GrpcUdsServer`
    * - **GrpcUdsClient**
-     - gRPC Client über Unix Domain Socket
+     - gRPC client via Unix Domain Socket
      - :class:`~vyra_base.com.handler.ipc.GrpcUdsClient`
 
-Factory Functions
+Factoy Functions
 -----------------
 
-Interface-Erstellung
+Interface Creation
 ^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import (
+   from vyra_base.com.datalayer.interface_factoy import (
        create_vyra_job,      # Service Client
        create_vyra_callable,  # Service Server
        create_vyra_speaker,   # Publisher
@@ -142,41 +142,41 @@ Interface-Erstellung
    :header-rows: 1
    :widths: 30 70
 
-   * - Funktion
-     - Beschreibung
+   * - Function
+     - Description
    * - ``create_vyra_job(node, service_name, service_type)``
-     - Erstellt Service Client
+     - Creates service client
    * - ``create_vyra_callable(node, service_name, service_type, callback)``
-     - Erstellt Service Server
+     - Creates service server
    * - ``create_vyra_speaker(node, topic_name, topic_type, qos_profile)``
-     - Erstellt Publisher
+     - Creates publisher
    * - ``@remote_callable``
-     - Decorator für automatische Service-Registrierung
+     - Decorato for automatic service regisration
 
-Verwendungsbeispiele
+Usage Examples
 --------------------
 
-Service-Aufruf (Job)
+Service Call (Job)
 ^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import create_vyra_job
+   from vyra_base.com.datalayer.interface_factoy import create_vyra_job
    from example_interfaces.srv import AddTwoInts
    
    job = create_vyra_job(
        node=entity.node,
-       service_name="/calculator/add_two_ints",
+       service_name="/calculato/add_two_ints",
        service_type=AddTwoInts
    )
    response = await job.call_async(request)
 
-Service bereitstellen (Callable)
+Provide Service (Callable)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import remote_callable
+   from vyra_base.com.datalayer.interface_factoy import remote_callable
    
    class MyService:
        @remote_callable
@@ -184,12 +184,12 @@ Service bereitstellen (Callable)
            response.result = "success"
            return response
 
-Topic veröffentlichen (Speaker)
+Publish Topic (Speaker)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
+   from vyra_base.com.datalayer.interface_factoy import create_vyra_speaker
    from std_msgs.msg import String
    
    speaker = create_vyra_speaker(
@@ -199,17 +199,17 @@ Topic veröffentlichen (Speaker)
    )
    speaker.shout(message)
 
-Feeder nutzen
+Use Feeders
 ^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Über Entity (einfachster Weg)
+   # Via Entity (easiest way)
    entity.publish_state()
    entity.publish_news("Module started")
    entity.publish_error("Connection failed")
 
-IPC verwenden
+Use IPC
 ^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -220,14 +220,14 @@ IPC verwenden
    await client.connect()
    response = await client.call_unary("MethodName", request)
 
-Vollständige API-Referenz
+Complete API Reference
 --------------------------
 
 * :doc:`../vyra_base.com.datalayer` - Datalayer (ROS2) API
 * :doc:`../vyra_base.com.feeder` - Feeder API
-* :doc:`../vyra_base.com` - Vollständige COM API
+* :doc:`../vyra_base.com` - Complete COM API
 
-Weiterführende Dokumentation
+Further Documentation
 -----------------------------
 
 * :doc:`ros2_communication` - ROS2 Details

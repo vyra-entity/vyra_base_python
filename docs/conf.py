@@ -17,6 +17,12 @@ extensions = [
     'sphinx_autodoc_typehints',
 ]
 
+# -- Internationalization (i18n) configuration --------------------------------
+locale_dirs = ['locale/']   # Path where .mo files will be stored
+gettext_compact = False     # Create separate .pot files per document
+gettext_uuid = True         # Add UUID to .pot files for tracking
+gettext_allow_fuzzy_translations = True  # Include fuzzy translations
+
 # Autodoc settings
 autodoc_default_options = {
     'members': True,
@@ -61,6 +67,10 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'furo'
 html_static_path = ['_static']
 html_title = f"{project} {release}"
+
+# Language configuration
+language = 'en'  # Default language (overridden by -D language=de in build)
+
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#336790",

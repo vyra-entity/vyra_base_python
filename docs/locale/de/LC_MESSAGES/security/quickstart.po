@@ -1,0 +1,290 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../security/quickstart.rst:2 2c2404c32c664141b064d53a64a5336f
+msgid "Security Framework Quick Start"
+msgstr ""
+
+#: ../../security/quickstart.rst:4 21cc74e932cf4eaba023c720a4e40d35
+msgid ""
+"This guide will get you started with the VYRA Security Framework in 15 "
+"minutes."
+msgstr ""
+
+#: ../../security/quickstart.rst:7 3b6db9c6a99242e8bdbc2e58c1bc0291
+msgid "Installation"
+msgstr "Installation"
+
+#: ../../security/quickstart.rst:9 915e407f4eda4ecbbe3de7f877b06c36
+msgid "**Install Dependencies**"
+msgstr ""
+
+#: ../../security/quickstart.rst:15 ../../security/quickstart.rst:234
+#: 0c5190ec495a446b841b5ff56fd48ad5 5d0ab213a0104a9ea34bb4fa37620b24
+msgid "**Build Interfaces**"
+msgstr ""
+
+#: ../../security/quickstart.rst:23 6b8384ebbd174cbe9cbcf5d20bec948d
+msgid "**Verify Installation**"
+msgstr ""
+
+#: ../../security/quickstart.rst:32 56c37d0743f54639a585b5f0464d08ea
+msgid "Server Implementation (5 minutes)"
+msgstr ""
+
+#: ../../security/quickstart.rst:34 e563bb52a7b6431b9016710acc316131
+msgid "Create a secure server module that authenticates clients."
+msgstr ""
+
+#: ../../security/quickstart.rst:36 1aa1591e163246d983471a87dab329e3
+msgid "**Step 1: Create Node with SecurityManager**"
+msgstr ""
+
+#: ../../security/quickstart.rst:67 9e1b34cacac24c75b8e552fb2d68d107
+msgid "**Step 2: Implement Access Handler**"
+msgstr ""
+
+#: ../../security/quickstart.rst:101 6e88908ac1464e528402e859b9747fa2
+msgid "**Step 3: Run Server**"
+msgstr ""
+
+#: ../../security/quickstart.rst:117 18bd1bb2fca147889ff53b6f9ecae619
+msgid "Client Implementation (5 minutes)"
+msgstr ""
+
+#: ../../security/quickstart.rst:119 8621a34b7c584a50917760b173d881f9
+msgid "Create a client that authenticates and sends secure messages."
+msgstr ""
+
+#: ../../security/quickstart.rst:121 501ee9659939466d89c915246dd6962e
+msgid "**Step 1: Request Access**"
+msgstr ""
+
+#: ../../security/quickstart.rst:147 6512521ac984491fad904a170dadda67
+msgid "**Step 2: Authenticate**"
+msgstr ""
+
+#: ../../security/quickstart.rst:180 dd123306db764f23a2f1425db4b2744d
+msgid "**Step 3: Create Security Context**"
+msgstr ""
+
+#: ../../security/quickstart.rst:195 82d3dfe880df410293fb628a5824fc70
+msgid "**Step 4: Use Secure Communication**"
+msgstr ""
+
+#: ../../security/quickstart.rst:221 13bef93117e649d6ac75f67da704373a
+msgid "Message Definition (2 minutes)"
+msgstr ""
+
+#: ../../security/quickstart.rst:223 d11900070c314ac2a142efbd290beb12
+msgid "Add SafetyMetadata to your custom messages."
+msgstr ""
+
+#: ../../security/quickstart.rst:225 97112d8f069f4dbdb62471c38fca85bd
+msgid "**Create Message File**"
+msgstr ""
+
+#: ../../security/quickstart.rst:243 496d3c4ce7aa4d5b943df6cc9bc591d5
+msgid "Validation (3 minutes)"
+msgstr ""
+
+#: ../../security/quickstart.rst:245 b9b9c9971a614ca2b16104fb71b5a263
+msgid "Add validation to server-side service callbacks."
+msgstr ""
+
+#: ../../security/quickstart.rst:247 7a09c201cf3943a7bfe4eabd8939a311
+msgid "**Step 1: Create Validato**"
+msgstr ""
+
+#: ../../security/quickstart.rst:262 8b6b715af0fa4f54be11b72d901e55f1
+msgid "**Step 2: Validate in Callbacks**"
+msgstr ""
+
+#: ../../security/quickstart.rst:287 6304f491bcd847659a04472987f9b600
+msgid "Complete Example"
+msgstr ""
+
+#: ../../security/quickstart.rst:289 7fac0f4521b84ac5941fb0139518f9d9
+msgid "Here's a minimal working example combining all steps."
+msgstr ""
+
+#: ../../security/quickstart.rst:291 f6101438ef544694bd421153cea1bfe9
+msgid "**Server (secure_server.py)**"
+msgstr ""
+
+#: ../../security/quickstart.rst:354 889f9127457f4e518525145e885793f9
+msgid "**Client (secure_client.py)**"
+msgstr ""
+
+#: ../../security/quickstart.rst:423 80fc9d7982e94fab84c28231fc6fd33e
+msgid "Running the Example"
+msgstr ""
+
+#: ../../security/quickstart.rst:425 82a52551b82947b795e56068854249c6
+msgid "**Terminal 1 (Server):**"
+msgstr ""
+
+#: ../../security/quickstart.rst:433 c0c3700b258a4935a10c490237507420
+msgid "**Terminal 2 (Client):**"
+msgstr ""
+
+#: ../../security/quickstart.rst:441 cf57041010b040c8af561eb435ff0fab
+msgid "Expected Output:"
+msgstr ""
+
+#: ../../security/quickstart.rst:453 c8c39be243c34b4283957542101b9607
+msgid "Next Steps"
+msgstr ""
+
+#: ../../security/quickstart.rst:455 a99b5a29263741dcbb818955cdb61853
+msgid "Now that you have a working secure system:"
+msgstr ""
+
+#: ../../security/quickstart.rst:457 51c1e76b690c44c8be6f250b07538883
+msgid "**Add Message Security**"
+msgstr ""
+
+#: ../../security/quickstart.rst:459 9a48310370214da8b086d6ff66f655df
+msgid "Define messages with SafetyMetadata"
+msgstr ""
+
+#: ../../security/quickstart.rst:460 d0e7f769652440398a5f8e55e39d209b
+msgid "Use SecurePublisher for automatic signing"
+msgstr ""
+
+#: ../../security/quickstart.rst:461 0c0b4cde17b94f3ea72921d159930630
+msgid "See :doc:`overview` for details"
+msgstr ""
+
+#: ../../security/quickstart.rst:463 f60c96da13f54ed99105e9c229f85619
+msgid "**Implement Validation**"
+msgstr ""
+
+#: ../../security/quickstart.rst:465 9de64a92734943ce848aeb33ae44a02d
+msgid "Add SecurityValidato to services"
+msgstr ""
+
+#: ../../security/quickstart.rst:466 37eb4b24b6214a01a66cc1cb85a4e9dd
+msgid "Handle SecurityError exceptions"
+msgstr ""
+
+#: ../../security/quickstart.rst:467 a04c82bc4a424299aadc7e566db5e93e
+msgid "Test with invalid credentials"
+msgstr ""
+
+#: ../../security/quickstart.rst:469 3839ff3ee3cc440abd4ca62145667ab2
+msgid "**Explore Higher Levels**"
+msgstr ""
+
+#: ../../security/quickstart.rst:471 ad78f2b25a234ca49937b26bffb5bce7
+msgid "Try Level 5 (Digital Signatures)"
+msgstr ""
+
+#: ../../security/quickstart.rst:472 f82df87e69fd4a858087c59e93be2b7c
+msgid "Set up certificate infrastructure"
+msgstr ""
+
+#: ../../security/quickstart.rst:473 db03cd52b85a4788ab01075196c4add9
+msgid "See certificate examples"
+msgstr ""
+
+#: ../../security/quickstart.rst:475 a29fa4d770494f429e72b98856b8cda7
+msgid "**Read Full Documentation**"
+msgstr ""
+
+#: ../../security/quickstart.rst:477 6b9ee32ee4aa4ef399fae6db939e5bfe
+msgid ":doc:`overview` - Complete framework guide"
+msgstr ""
+
+#: ../../security/quickstart.rst:478 d286670d2f7e49178b46c76de6d181d9
+msgid ":doc:`api` - API reference"
+msgstr ""
+
+#: ../../security/quickstart.rst:479 820a6c2e1af94be3800c771cdb45a28f
+msgid ":doc:`examples` - More examples"
+msgstr ""
+
+#: ../../security/quickstart.rst:482 1c52c4febe98498cba24bcf33c6dcae5
+msgid "Common Issues"
+msgstr ""
+
+#: ../../security/quickstart.rst:484 29f0fcd365a042d58c5b84f19c410f98
+msgid "**Service Not Available**"
+msgstr ""
+
+#: ../../security/quickstart.rst:493 5d95196e6adc45eeb10c32520282ee4f
+msgid "**Missing SafetyMetadata Field**"
+msgstr ""
+
+#: ../../security/quickstart.rst:502 dd0cfb043da94d98bf8f48d33a180918
+msgid "**HMAC Signature Mismatch**"
+msgstr ""
+
+#: ../../security/quickstart.rst:511 86077d159bb94ef4b85b51494a726cb2
+msgid "**Import Errors**"
+msgstr ""
+
+#: ../../security/quickstart.rst:519 383a9ecab4664cda95c86d4a61e22d95
+msgid "Resources"
+msgstr ""
+
+#: ../../security/quickstart.rst:521 f34ba03ae53d44738d23b661f4241121
+msgid "**Examples**: ``/examples/security/``"
+msgstr ""
+
+#: ../../security/quickstart.rst:522 f9362aaab14e46f4861320a8a5b33053
+msgid "**Full Guide**: :doc:`overview`"
+msgstr ""
+
+#: ../../security/quickstart.rst:523 d906eddd8af745e8aa14a7a9c0fd4542
+msgid "**API Docs**: :doc:`api`"
+msgstr ""
+
+#: ../../security/quickstart.rst:524 c6bef6b1f61042599f3c3e463b3e6bf1
+msgid "**Integration**: ``docs/security/INTEGRATION_GUIDE.md``"
+msgstr ""
+
+#: ../../security/quickstart.rst:527 b8911bf0485b4d588191a82450db8d28
+msgid "Support"
+msgstr ""
+
+#: ../../security/quickstart.rst:529 1961cb6868ad4e00ad371b84af2a43bd
+msgid "For issues:"
+msgstr ""
+
+#: ../../security/quickstart.rst:531 33c33c46edfb4bbda7d056fda94cf0fb
+msgid "Check :doc:`overview` troubleshooting section"
+msgstr ""
+
+#: ../../security/quickstart.rst:532 0b07291e62e94876a5306a853f1e7443
+msgid "Review example code"
+msgstr ""
+
+#: ../../security/quickstart.rst:533 77177637b4c746668f75d7820302ac6c
+msgid "Enable debug logging:"
+msgstr ""
+
+#~ msgid "**Step 1: Create Validator**"
+#~ msgstr ""
+
+#~ msgid "Add SecurityValidator to services"
+#~ msgstr ""
+

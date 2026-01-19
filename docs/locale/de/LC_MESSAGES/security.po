@@ -1,0 +1,292 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../security.rst:6
+msgid "Contents:"
+msgstr ""
+
+#: ../../security.rst:2 437b86f5f2804eb4bd5cc77ec819b597
+msgid "Security Framework"
+msgstr "Sicherheits-Framework"
+
+#: ../../security.rst:4 c06ace778a094eeb97acbba9ac32103c
+msgid ""
+"The VYRA Security Framework provides comprehensive security features for "
+"inter-module communication in Docker Swarm environments."
+msgstr ""
+
+#: ../../security.rst:16 3cda4a9342b84602a869fac75847bee5
+msgid "Overview"
+msgstr "Übersicht"
+
+#: ../../security.rst:18 280df60515184c7b8ffebe089f6f6811
+msgid "The framework implements a 5-level security model:"
+msgstr ""
+
+#: ../../security.rst:50 a64bb702a29f402dad46dd7634afbcda
+msgid "Key Features"
+msgstr ""
+
+#: ../../security.rst:52 8133292a3f6b410f9793d3e633e26274
+msgid "**Multi-level Security**: Choose appropriate security for each operation"
+msgstr ""
+
+#: ../../security.rst:53 3cbfa27a6e0040948b3d93e55c087b02
+msgid "**Automatic Metadata**: Transparent SafetyMetadata handling"
+msgstr ""
+
+#: ../../security.rst:54 172b70848b0942e080dce4cfb052a38a
+msgid "**Session Management**: Token-based authentication with expiration"
+msgstr ""
+
+#: ../../security.rst:55 668378625b41490aabc0da9102f39243
+msgid "**Replay Protection**: Timestamp and nonce validation"
+msgstr ""
+
+#: ../../security.rst:56 7f759eebe59a4ae9835505a16d2f88dd
+msgid "**PKI Support**: Full certificate infrastructure for Level 5"
+msgstr ""
+
+#: ../../security.rst:59 252d69af2e0a4ab8a3600896468eb8a8
+msgid "Quick Start"
+msgstr ""
+
+#: ../../security.rst:62 3ad7ba2ac3734a79b46d9373e3a59994
+msgid "Server Module"
+msgstr ""
+
+#: ../../security.rst:78 731850e796ec4893830e466fd3ba04b9
+msgid "Client Module"
+msgstr ""
+
+#: ../../security.rst:103 ce9a466bfec744dab605dfcffa071166
+msgid "Documentation"
+msgstr ""
+
+#: ../../security.rst:105 cbec01d88f9249dc840cc3e5b6257d1d
+msgid "For detailed documentation, see:"
+msgstr ""
+
+#: ../../security.rst:107 4926a19b85b5484fa0b2f6caf1bf0694
+msgid ":doc:`security/overview` - Complete framework documentation"
+msgstr ""
+
+#: ../../security.rst:108 111ae4741f104dfa82809a711fd83f2f
+msgid ":doc:`security/quickstart` - Integration guide"
+msgstr ""
+
+#: ../../security.rst:109 0be934c9564f4f43818523f6d6c54961
+msgid ":doc:`security/api` - API reference"
+msgstr ""
+
+#: ../../security.rst:110 1112c184b23a46aab52809845df47667
+msgid ":doc:`security/examples` - Example implementations"
+msgstr ""
+
+#: ../../security.rst:113 c8750f34c1a448fb8ac2af2614acc17f
+msgid "Architecture"
+msgstr ""
+
+#: ../../security.rst:115 1809d079e38a416bb6f69c4ad02f077d
+msgid "The VYRA Security Framework follows a client-server architecture:"
+msgstr ""
+
+#: ../../security.rst:117 2be0f444ae8a405a9ffcaf9c68fa11b4
+msgid ""
+"**Client Module** (SecurityClient) - Requests authentication and sends "
+"secure messages"
+msgstr ""
+
+#: ../../security.rst:118 3b57aab58c3d465ab36dc8805645dd67
+msgid ""
+"**Server Module** (SecurityManager) - Provides authentication service and"
+" manages sessions"
+msgstr ""
+
+#: ../../security.rst:119 b595138196344670a29f14443868580e
+msgid "**SecurityValidato** - Validates incoming messages on the server side"
+msgstr ""
+
+#: ../../security.rst:121 dad1b68ffd914f7dadefb1b8ac96e77c
+msgid "**Flow:**"
+msgstr ""
+
+#: ../../security.rst:123 9b4d75ba05de42a0ae4600e3f54672bc
+msgid "Client → Server: RequestAccess"
+msgstr ""
+
+#: ../../security.rst:124 72bb310ff03a426787bd49b56feaae55
+msgid "Server → Client: Token + HMAC Key"
+msgstr ""
+
+#: ../../security.rst:125 08105a05a85f4d089974bff43530ff0e
+msgid "Client → Server: Secure Message (with SafetyMetadata)"
+msgstr ""
+
+#: ../../security.rst:126 659c7acc2fa840c4b46052bdb0706070
+msgid "Server → Validato: Validate metadata"
+msgstr ""
+
+#: ../../security.rst:127 275c932f6d12463793227820c4335464
+msgid "Validato → Server: Pass/Fail result"
+msgstr ""
+
+#: ../../security.rst:130 89fe1cb02aec496db70069edd0dc66b3
+msgid "Modules"
+msgstr "Module"
+
+#: ../../security.rst:132 5216bb8c959b4e6c99e30279eee28e8d
+msgid "The Security Framework consists of the following modules:"
+msgstr ""
+
+#: ../../security.rst:134 8113c036ae184560836f1c3a73acdf62
+msgid "**Security Levels** - Defines the 5 security levels and related enums"
+msgstr ""
+
+#: ../../security.rst:135 7949a227f8c841c995d97a775eb5f62b
+msgid "**Security Manager** - Server-side authentication and session management"
+msgstr ""
+
+#: ../../security.rst:136 625fe98c87bd483ba6e475731609f469
+msgid "**Security Client** - Client-side wrappers for secure communication"
+msgstr ""
+
+#: ../../security.rst:137 b901c54af3614e618a420c299fb3d90e
+msgid "**Security Validato** - Validates incoming messages and signatures"
+msgstr ""
+
+#: ../../security.rst:138 e2ea976739164986bcf072ab65a8dde7
+msgid "**Crypto Helpers** - Cryptographic operations (HMAC, RSA, certificates)"
+msgstr ""
+
+#: ../../security.rst:140 b091fb983933465db8591b911da6d3bb
+msgid "For detailed API documentation, see :doc:`security/api`."
+msgstr ""
+
+#: ../../security.rst:143 7a723260e8434f47bc9d68bf694bb719
+msgid "Indices and tables"
+msgstr ""
+
+#: ../../security.rst:145 86680c06209347df9ba0e9d1ea44c86c
+msgid ":ref:`genindex`"
+msgstr ""
+
+#: ../../security.rst:146 758e41f1445f4505b57c262a6c6e8891
+msgid ":ref:`modindex`"
+msgstr ""
+
+#: ../../security.rst:147 f3a1498f6d364f85b36f54742cf42ce2
+msgid ":ref:`search`"
+msgstr ""
+
+#~ msgid "Security Levels"
+#~ msgstr ""
+
+#~ msgid "Level"
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr ""
+
+#~ msgid "Features"
+#~ msgstr ""
+
+#~ msgid "Use Case"
+#~ msgstr ""
+
+#~ msgid "1"
+#~ msgstr ""
+
+#~ msgid "NONE"
+#~ msgstr ""
+
+#~ msgid "No security"
+#~ msgstr ""
+
+#~ msgid "Public information"
+#~ msgstr ""
+
+#~ msgid "2"
+#~ msgstr ""
+
+#~ msgid "BASIC_AUTH"
+#~ msgstr ""
+
+#~ msgid "Module ID verification"
+#~ msgstr ""
+
+#~ msgid "Internal networks"
+#~ msgstr ""
+
+#~ msgid "3"
+#~ msgstr ""
+
+#~ msgid "TIMESTAMP"
+#~ msgstr ""
+
+#~ msgid "ID + timestamp validation"
+#~ msgstr ""
+
+#~ msgid "Replay attack prevention"
+#~ msgstr ""
+
+#~ msgid "4"
+#~ msgstr ""
+
+#~ msgid "HMAC"
+#~ msgstr ""
+
+#~ msgid "HMAC-SHA256 signatures"
+#~ msgstr ""
+
+#~ msgid "Message integrity"
+#~ msgstr ""
+
+#~ msgid "5"
+#~ msgstr ""
+
+#~ msgid "DIGITAL_SIGNATURE"
+#~ msgstr ""
+
+#~ msgid "Certificate-based PKI"
+#~ msgstr ""
+
+#~ msgid "Maximum security"
+#~ msgstr ""
+
+#~ msgid "The Security Framework consists of the following modules:"
+#~ msgstr ""
+
+#~ msgid "**SecurityValidator** - Validates incoming messages on the server side"
+#~ msgstr ""
+
+#~ msgid "Server → Validator: Validate metadata"
+#~ msgstr ""
+
+#~ msgid "Validator → Server: Pass/Fail result"
+#~ msgstr ""
+
+#~ msgid "The Security Framework consiss of the following modules:"
+#~ msgstr ""
+
+#~ msgid "**Security Validator** - Validates incoming messages and signatures"
+#~ msgstr ""
+

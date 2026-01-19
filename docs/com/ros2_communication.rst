@@ -1,31 +1,31 @@
-ROS2 Kommunikation
+ROS2 Communication
 ==================
 
-VYRA nutzt ROS2 für die Kommunikation zwischen Modulen. Das Framework abstrahiert die ROS2-API
-und bietet einfache Schnittstellen für Services, Topics und Actions.
+VYRA uses ROS2 for inter-module communication. The framework abstracts the ROS2 API
+and provides simple interfaces for Services, Topics, and Actions.
 
-Konzepte
+Concepts
 --------
 
-ROS2 kennt drei Hauptkommunikationsmuster:
+ROS2 has three main communication patterns:
 
 1. **Services (Request/Response)**:
    
-   * **Job** = Service Client (ruft auf)
-   * **Callable** = Service Server (wird aufgerufen)
-   * Synchrone Anfrage-Antwort-Kommunikation
+   * **Job** = Service Client (calls service)
+   * **Callable** = Service Server (provides service)
+   * Synchronous request-response communication
 
 2. **Topics (Publish/Subscribe)**:
    
-   * **Speaker** = Publisher (veröffentlicht)
-   * **Listener** = Subscriber (empfängt)
-   * Asynchrone Broadcast-Kommunikation
+   * **Speaker** = Publisher (publishes)
+   * **Listener** = Subscriber (receives)
+   * Asynchronous broadcast communication
 
-3. **Actions (Langläufige Operationen)**:
+3. **Actions (Long-running operations)**:
    
-   * **Action Client** (startet Aktion)
-   * **Action Server** (führt Aktion aus)
-   * Mit Feedback und Cancel-Möglichkeit
+   * **Action Client** (starts action)
+   * **Action Server** (executes action)
+   * With feedback and cancel capability
 
 Services: Job & Callable
 -------------------------
@@ -33,71 +33,71 @@ Services: Job & Callable
 Job - Service Client
 ^^^^^^^^^^^^^^^^^^^^
 
-Ein **Job** ruft Services auf anderen Modulen auf:
+A **Job** calls services on other modules:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import create_vyra_job
+   from vyra_base.com.datalayer.interface_factoy import create_vyra_job
    from example_interfaces.srv import AddTwoInts
    
-   # Job erstellen
+   # Create job
    job = create_vyra_job(
        node=entity.node,
-       service_name="/calculator/add_two_ints",
+       service_name="/calculato/add_two_ints",
        service_type=AddTwoInts
    )
    
-   # Request vorbereiten
+   # Prepare request
    request = AddTwoInts.Request()
    request.a = 5
    request.b = 7
    
-   # Service asynchron aufrufen
+   # Call service asynchronously
    response = await job.call_async(request)
-   print(f"Ergebnis: {response.sum}")
+   print(f"Result: {response.sum}")
 
-**Parameter:**
+**Parameters:**
 
-* ``node``: Die ROS2-Node (typischerweise ``entity.node``)
-* ``service_name``: Name des Services (mit Namespace)
-* ``service_type``: ROS2 Service-Typ (Import aus ``*_interfaces.srv``)
+* ``node``: The ROS2 node (typically ``entity.node``)
+* ``service_name``: Service name (with namespace)
+* ``service_type``: ROS2 service type (imported from ``*_interfaces.srv``)
 
 Callable - Service Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Ein **Callable** stellt einen Service für andere Module bereit.
-Verwenden Sie den ``@remote_callable`` Decorator:
+A **Callable** provides a service for other modules.
+Use the ``@remote_callable`` decorato:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import remote_callable
+   from vyra_base.com.datalayer.interface_factoy import remote_callable
    from vyra_base.state import OperationalStateMachine
    
-   class Calculator(OperationalStateMachine):
+   class Calculato(OperationalStateMachine):
        def __init__(self, unified_state_machine):
            super().__init__(unified_state_machine)
        
        @remote_callable
        async def add_two_ints(self, request, response):
-           """Addiert zwei Zahlen"""
+           """Adds two numbers"""
            response.sum = request.a + request.b
            return response
        
        @remote_callable
        async def get_status(self, request, response):
-           """Gibt den aktuellen Status zurück"""
+           """Returns the current status"""
            response.status = "operational"
            return response
 
-**Automatische Registrierung:**
+**Automatic Regisration:**
 
-Methoden mit ``@remote_callable`` werden automatisch als ROS2-Services registriert,
-wenn die JSON-Metadaten korrekt definiert sind (siehe :doc:`../interfaces`).
+Methods with ``@remote_callable`` are automatically registered as ROS2 services,
+when the JSON metadata is correctly defined (see :doc:`../interfaces`).
 
-**Parameter:**
+**Parameters:**
 
-* ``request``: Eingehende Service-Anfrage (vom Service-Typ definiert)
-* ``response``: Ausgehende Service-Antwort (wird zurückgegeben)
+* ``request``: Incoming service request (defined by service type)
+* ``response``: Outgoing service response (returned)
 
 Topics: Speaker & Listener
 ---------------------------
@@ -105,14 +105,14 @@ Topics: Speaker & Listener
 Speaker - Publisher
 ^^^^^^^^^^^^^^^^^^^
 
-Ein **Speaker** veröffentlicht Nachrichten auf einem Topic:
+A **Speaker** publishes messages on a topic:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
+   from vyra_base.com.datalayer.interface_factoy import create_vyra_speaker
    from std_msgs.msg import String
    
-   # Speaker erstellen
+   # Create speaker
    speaker = create_vyra_speaker(
        node=entity.node,
        topic_name="/status_updates",
@@ -120,33 +120,33 @@ Ein **Speaker** veröffentlicht Nachrichten auf einem Topic:
        qos_profile=10  # Queue-Size
    )
    
-   # Nachricht veröffentlichen
+   # Publish message
    msg = String()
    msg.data = "System running"
    speaker.shout(msg)
 
-**Parameter:**
+**Parameters:**
 
-* ``node``: Die ROS2-Node
-* ``topic_name``: Name des Topics
-* ``topic_type``: ROS2 Message-Typ (Import aus ``*_interfaces.msg``)
-* ``qos_profile``: Quality-of-Service (Queue-Size oder QoS-Objekt)
+* ``node``: The ROS2 node
+* ``topic_name``: Topic name
+* ``topic_type``: ROS2 message type (imported from ``*_interfaces.msg``)
+* ``qos_profile``: Quality of Service (queue size or QoS object)
 
 Listener - Subscriber
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Ein **Listener** empfängt Nachrichten von einem Topic:
+A **Listener** receives messages from a topic:
 
 .. code-block:: python
 
    from vyra_base.com.datalayer.subscriber import VyraSubscriber
    from std_msgs.msg import String
    
-   # Callback-Funktion definieren
+   # Define callback function
    def on_message_received(msg):
-       print(f"Empfangen: {msg.data}")
+       print(f"Received: {msg.data}")
    
-   # Listener erstellen
+   # Create listener
    listener = VyraSubscriber(
        node=entity.node,
        topic_name="/status_updates",
@@ -155,72 +155,72 @@ Ein **Listener** empfängt Nachrichten von einem Topic:
        qos_profile=10
    )
    
-   # Subscription erstellen
+   # Subscription create
    listener.create_subscription()
 
-**Parameter:**
+**Parameters:**
 
-* ``callback``: Funktion, die bei jeder Nachricht aufgerufen wird
-* Andere Parameter wie beim Speaker
+* ``callback``: Function called for each message
+* Other parameters same as Speaker
 
-Praktische Beispiele
+Practical Examples
 --------------------
 
-Inter-Modul-Service-Aufruf
+Inter-Module Service Call
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Modul A (Server)**:
+**Module A (Server)**:
 
 .. code-block:: python
 
    class RobotController(OperationalStateMachine):
        @remote_callable
        async def move_to_position(self, request, response):
-           """Bewegt Roboter zur Position"""
+           """Moves robot to position"""
            x, y = request.target_x, request.target_y
            
-           # Bewegung ausführen
+           # Execute movement
            success = await self.robot.move_to(x, y)
            
            response.success = success
            response.message = "Movement complete"
            return response
 
-**Modul B (Client)**:
+**Module B (Client)**:
 
 .. code-block:: python
 
-   # Job erstellen
+   # Create job
    move_job = create_vyra_job(
        node=entity.node,
        service_name="/robot_controller/move_to_position",
        service_type=MoveToPosition
    )
    
-   # Bewegung anfordern
+   # Request movement
    request = MoveToPosition.Request()
    request.target_x = 10.5
    request.target_y = 5.3
    
    response = await move_job.call_async(request)
    if response.success:
-       print("Roboter erfolgreich bewegt")
+       print("Robot moved successfuly")
 
-Topic-basierte Statusmeldungen
+Topic-based Status Messages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Publisher (Modul A)**:
+**Publisher (Module A)**:
 
 .. code-block:: python
 
-   # Speaker für Status-Updates
+   # Speaker for status updates
    status_speaker = create_vyra_speaker(
        node=entity.node,
        topic_name="/system_status",
        topic_type=SystemStatus
    )
    
-   # Regelmäßig Status senden
+   # Publish status regularly
    async def publish_status_loop():
        while True:
            status = SystemStatus()
@@ -229,18 +229,18 @@ Topic-basierte Statusmeldungen
            status.timestamp = get_current_time()
            
            status_speaker.shout(status)
-           await asyncio.sleep(1.0)  # Jede Sekunde
+           await asyncio.sleep(1.0)  # Every second
 
-**Subscriber (Modul B)**:
+**Subscriber (Module B)**:
 
 .. code-block:: python
 
-   # Callback für Status-Empfang
+   # Callback for status reception
    def on_status_received(msg):
        if msg.cpu_usage > 80:
-           logger.warning(f"Hohe CPU-Last: {msg.cpu_usage}%")
+           logger.warning(f"High CPU load: {msg.cpu_usage}%")
    
-   # Listener erstellen
+   # Create listener
    status_listener = VyraSubscriber(
        node=entity.node,
        topic_name="/system_status",
@@ -249,12 +249,12 @@ Topic-basierte Statusmeldungen
    )
    status_listener.create_subscription()
 
-Interface-Definition
+Interface Definition
 --------------------
 
-ROS2-Interfaces werden über JSON-Metadaten definiert.
+ROS2 interfaces are defined via JSON metadata.
 
-**Beispiel** (``config/service_interfaces.json``):
+**Example** (``config/service_interfaces.json``):
 
 .. code-block:: json
 
@@ -263,17 +263,17 @@ ROS2-Interfaces werden über JSON-Metadaten definiert.
            {
                "name": "add_two_ints",
                "type": "example_interfaces/srv/AddTwoInts",
-               "description": "Addiert zwei Ganzzahlen"
+               "description": "Adds two integers"
            },
            {
                "name": "get_status",
                "type": "std_srvs/srv/Trigger",
-               "description": "Gibt aktuellen Status zurück"
+               "description": "Returns current status"
            }
        ]
    }
 
-Diese Metadaten werden beim Entity-Start geladen und automatisch registriert:
+Thise metadata are loaded at entity start and automatically registered:
 
 .. code-block:: python
 
@@ -281,25 +281,25 @@ Diese Metadaten werden beim Entity-Start geladen und automatisch registriert:
    interfaces = await entity.load_interfaces_from_config()
    await entity.set_interfaces(interfaces)
 
-Weitere Details siehe :doc:`../interfaces`.
+For more details see :doc:`../interfaces`.
 
 Quality of Service (QoS)
 ------------------------
 
-ROS2 nutzt QoS-Profile zur Konfiguration der Kommunikation:
+ROS2 uses QoS profiles to configure communication:
 
 .. code-block:: python
 
    from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
    
-   # Custom QoS-Profil
+   # Custom QoS profile
    qos = QoSProfile(
-       depth=10,  # Queue-Size
-       reliability=ReliabilityPolicy.RELIABLE,  # oder BEST_EFFORT
-       durability=DurabilityPolicy.VOLATILE  # oder TRANSIENT_LOCAL
+       depth=10,  # Queue size
+       reliability=ReliabilityPolicy.RELIABLE,  # or BEST_EFFORT
+       durability=DurabilityPolicy.VOLATILE  # or TRANSIENT_LOCAL
    )
    
-   # Mit Speaker verwenden
+   # Use with Speaker
    speaker = create_vyra_speaker(
        node=entity.node,
        topic_name="/important_data",
@@ -307,31 +307,31 @@ ROS2 nutzt QoS-Profile zur Konfiguration der Kommunikation:
        qos_profile=qos
    )
 
-**Typische Profile:**
+**Typical Profiles:**
 
-* **Sensor-Daten**: ``BEST_EFFORT`` (schnell, Verlust akzeptabel)
-* **Befehle**: ``RELIABLE`` (garantierte Zustellung)
-* **Persistente Daten**: ``TRANSIENT_LOCAL`` (neue Subscriber erhalten letzte Nachricht)
+* **Sensor Data**: ``BEST_EFFORT`` (fast, loss acceptable)
+* **Commands**: ``RELIABLE`` (guaranteed delivery)
+* **Persistent Data**: ``TRANSIENT_LOCAL`` (new subscribers receive last message)
 
 Best Practices
 --------------
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
-* Verwenden Sie aussagekräftige Service-/Topic-Namen mit Namespace
-* Definieren Sie Interfaces in JSON-Metadaten
-* Nutzen Sie ``@remote_callable`` für automatische Registrierung
-* Implementieren Sie Timeouts für Service-Calls
-* Verwenden Sie QoS-Profile passend zum Anwendungsfall
+* Use meaningful service/topic names with namespace
+* Define interfaces in JSON metadata
+* Use ``@remote_callable`` for automatic regisration
+* Implement timeouts for service calls
+* Use QoS profiles appropriate for the use case
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
-* Manuelle ROS2-Node-Erstellung (nutzen Sie ``entity.node``)
-* Sehr große Nachrichten (> 1 MB) über Topics
-* Hochfrequente Service-Calls (> 100 Hz, nutzen Sie Topics)
-* Blocking-Aufrufe ohne Timeout
+* Manual ROS2 node creation (use ``entity.node``)
+* Very large messages (> 1 MB) via topics
+* High-frequency service calls (> 100 Hz, use topics)
+* Blocking calls without timeout
 
-Fehlerbehandlung
+Error Handling
 ----------------
 
 .. code-block:: python
@@ -339,21 +339,21 @@ Fehlerbehandlung
    from rclpy.task import Future
    
    try:
-       # Service-Call mit Timeout
+       # Service call with timeout
        response = await asyncio.wait_for(
            job.call_async(request),
-           timeout=5.0  # 5 Sekunden
+           timeout=5.0  # 5 seconds
        )
    except asyncio.TimeoutError:
-       logger.error("Service-Aufruf timeout")
+       logger.error("Service call timeout")
    except Exception as e:
-       logger.error(f"Service-Fehler: {e}")
+       logger.error(f"Service error: {e}")
 
-Weiterführende Informationen
+Further Information
 -----------------------------
 
-* :doc:`ipc_communication` - IPC innerhalb eines Moduls
-* :doc:`feeders` - Automatische Feeder
-* :doc:`../interfaces` - Interface-Definitionen
-* :doc:`../vyra_base.com.datalayer` - API-Referenz
-* ROS2 Dokumentation: https://docs.ros.org/en/kilted/
+* :doc:`ipc_communication` - IPC within a module
+* :doc:`feeders` - Automatic feeders
+* :doc:`../interfaces` - Interface definitions
+* :doc:`../vyra_base.com.datalayer` - API Reference
+* ROS2 Documentation: https://docs.ros.org/en/kilted/

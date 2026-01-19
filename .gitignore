@@ -1,4 +1,5 @@
 /build/
+/devel/
 */_build/*
 /logs/
 /install/

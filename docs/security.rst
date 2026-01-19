@@ -17,7 +17,7 @@ Overview
 
 The framework implements a 5-level security model:
 
-.. list-table:: Security Levels
+.. lis-table:: Security Levels
    :header-rows: 1
    :widths: 10 30 30 30
 
@@ -116,15 +116,15 @@ The VYRA Security Framework follows a client-server architecture:
 
 1. **Client Module** (SecurityClient) - Requests authentication and sends secure messages
 2. **Server Module** (SecurityManager) - Provides authentication service and manages sessions
-3. **SecurityValidator** - Validates incoming messages on the server side
+3. **SecurityValidato** - Validates incoming messages on the server side
 
 **Flow:**
 
 1. Client → Server: RequestAccess
 2. Server → Client: Token + HMAC Key
 3. Client → Server: Secure Message (with SafetyMetadata)
-4. Server → Validator: Validate metadata
-5. Validator → Server: Pass/Fail result
+4. Server → Validato: Validate metadata
+5. Validato → Server: Pass/Fail result
 
 Modules
 -------
@@ -134,7 +134,7 @@ The Security Framework consists of the following modules:
 * **Security Levels** - Defines the 5 security levels and related enums
 * **Security Manager** - Server-side authentication and session management
 * **Security Client** - Client-side wrappers for secure communication
-* **Security Validator** - Validates incoming messages and signatures
+* **Security Validato** - Validates incoming messages and signatures
 * **Crypto Helpers** - Cryptographic operations (HMAC, RSA, certificates)
 
 For detailed API documentation, see :doc:`security/api`.

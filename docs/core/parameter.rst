@@ -1,24 +1,24 @@
 Parameter - Persistente Konfiguration
 ======================================
 
-Die :class:`~vyra_base.core.parameter.Parameter`-Klasse verwaltet persistente Konfigurationsdaten,
-die in einer SQLite-Datenbank gespeichert werden.
+The :class:`~vyra_base.core.parameter.Parameter`-class manages persisttente Konfigurationsdaten,
+die in einer SQLite-Datenbank gespeichert are.
 
 Konzept
 -------
 
-Parameter sind **dauerhafte Konfigurationswerte**, die:
+Parameter are **permanente Configuration values**, die:
 
-* In einer SQLite-Datenbank gespeichert werden
+* In einer SQLite-Datenbank gespeichert are
 * Zwischen Modul-Neustarts erhalten bleiben
-* Über ROS2-Services zugänglich sind
-* Automatisch validiert werden können
-* Change-Events unterstützen
+* Via ROS2-Services togänglich are
+* Automatisch validiert are can
+* Change-Events understützen
 
-Zugriff über Entity
+Access via Entity
 -------------------
 
-Der einfachste Zugriff erfolgt über die VyraEntity:
+The easiest Zugriff is done via die VyraEntity:
 
 .. code-block:: python
 
@@ -26,21 +26,21 @@ Der einfachste Zugriff erfolgt über die VyraEntity:
    
    entity = VyraEntity(...)
    
-   # Parameter lesen
+   # Read parameter
    value = await entity.parameter.get_param(request, response)
    
-   # Parameter setzen
+   # Set parameter
    await entity.parameter.set_param(request, response)
 
-Parameter lesen
+Read parameter
 ---------------
 
-Einzelner Parameter
+Azelner Parameter
 ^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Request vorbereiten (vereinfacht)
+   # Request prepare (simplifies)
    request = type('obj', (object,), {
        'parameter_name': 'max_speed'
    })()
@@ -63,7 +63,7 @@ Alle Parameter
    for param in response.parameters:
        print(f"{param.name}: {param.value}")
 
-Parameter setzen
+Set parameter
 ----------------
 
 .. code-block:: python
@@ -74,23 +74,23 @@ Parameter setzen
    })()
    response = type('obj', (object,), {})()
    
-   # Parameter setzen
+   # Set parameter
    await entity.parameter.set_param(request, response)
    if response.success:
        print("Parameter erfolgreich gesetzt")
 
-Standardwerte laden
+default values load
 -------------------
 
-Parameter können aus JSON-Dateien mit Standardwerten initialisiert werden:
+Parameter can from JSON-Dateien with default values initialisiert are:
 
 .. code-block:: python
 
-   # Standardwerte aus JSON laden
+   # default values from JSON load
    await entity.parameter.load_defaults(
        db_session=db_session,
        config_path="/workspace/config/defaults.json",
-       reset=False  # True = bestehende Werte überschreiben
+       reset=False  # True = bestehende Werte overwrite
    )
 
 **Beispiel JSON-Struktur:**
@@ -107,7 +107,7 @@ Parameter können aus JSON-Dateien mit Standardwerten initialisiert werden:
            {
                "name": "timeout",
                "value": "30",
-               "description": "Timeout in Sekunden"
+               "description": "Timeout in seconds"
            }
        ]
    }
@@ -115,7 +115,7 @@ Parameter können aus JSON-Dateien mit Standardwerten initialisiert werden:
 Change-Events
 -------------
 
-Überwachen Sie Parameteränderungen in Echtzeit:
+Monito you Parameterchanges in Echtzeit:
 
 .. code-block:: python
 
@@ -126,66 +126,66 @@ Change-Events
    await entity.parameter.get_update_param_event_topic(request, response)
    event_topic = response.event_topic
    
-   # Listener für den Event-Topic einrichten (über ROS2)
-   # Der Event wird bei jeder Parameteränderung getriggert
+   # Listener for den Event-Topic set up (via ROS2)
+   # The Event is at jeder Parameteränderung getriggert
 
 Datenspeicherung
 ----------------
 
-**Speicherort**: ``/workspace/storage/data/<module_name>.db``
+**Speicherort**: ``/workspace/stoage/data/<module_name>.db``
 
-Die SQLite-Datenbank speichert Parameter in folgender Struktur:
+The SQLite-Datenbank speichert Parameter in folgender Struktur:
 
-* **Tabellenname**: ``tb_parameters`` (siehe :doc:`../storage`)
+* **Tabellenname**: ``tb_parameters`` (siehe :doc:`../stoage`)
 * **Spalten**: ``name``, ``value``, ``description``, ``timestamp``
-* **Zugriff**: Über SQLAlchemy ORM
+* **Zugriff**: Via SQLAlchemy ORM
 
 .. note::
-   Parameter-Datenbank-Tabellen folgen der Namenskonvention ``tb_<name>``.
-   Weitere Informationen zur Tabellenstruktur finden Sie unter :doc:`../storage`.
+   Parameter-Datenbank-Tabellen folgen der Naming Convention ``tb_<name>``.
+   Further information to Tabellenstruktur can be found you under :doc:`../stoage`.
 
 Anwendungsfälle
 ---------------
 
-Parameter eignen sich für:
+Parameter eignen sich for:
 
 ✅ **Empfohlen:**
 
-* Konfigurationswerte (Timeouts, Limits, Schwellwerte)
-* Kalibrationsdaten
-* Benutzerpräferenzen
-* Systemeinstellungen
+* Configuration values (Timeouts, Liwiths, thresholds)
+* calibration data
+* user preferences
+* system settings
 
-❌ **Nicht empfohlen:**
+❌ **Nicht recommended:**
 
-* Hochfrequente Echtzeitdaten (nutzen Sie :doc:`volatile`)
-* Große Datenmengen (> MB, nutzen Sie externe Datenbanken)
-* Temporäre Zwischenspeicher
+* High-frequency real-time data (use you :doc:`volatile`)
+* Große Datenmengen (> MB, use you externe Datenbanken)
+* Temporary buffers
 
 Performance-Hinweise
 --------------------
 
 .. warning::
-   Datenbankzugriffe sind relativ langsam (~1-10ms).
-   Vermeiden Sie häufige Parameter-Updates in Echtzeit-Schleifen.
+   Database accesses are relatively slow (~1-10ms).
+   Vermeiden you frequent Parameter-Updates in Echtzeit-Schleifen.
 
 .. tip::
-   Cachen Sie oft gelesene Parameter in lokalen Variablen:
+   Cachen you oft gereade Parameter in lokalen Variablen:
    
    .. code-block:: python
    
-      # Einmal beim Start laden
+      # Amal on Start load
       max_speed = await entity.parameter.get_param(...)
       
-      # In Schleife nutzen (ohne DB-Zugriff)
+      # In Schleife use (without DB-Zugriff)
       for i in range(1000):
           if speed > max_speed:
               # ...
 
-Weiterführende Informationen
+Further Information
 -----------------------------
 
 * :doc:`entity` - Entity-Dokumentation
-* :doc:`volatile` - Flüchtige Alternative
-* :doc:`../storage` - Storage-Backend Details
+* :doc:`volatile` - Volatile Alternative
+* :doc:`../stoage` - Stoage-Backend Details
 * :class:`~vyra_base.core.parameter.Parameter` - API-Referenz

@@ -1,0 +1,1090 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.state.rst:2 48496397321c4c88beb7e7412224b361
+msgid "vyra\\_base.state package"
+msgstr ""
+
+#: ../../vyra_base.state.rst:5 1ebdb97d518d425bb73e7f7c31b78bb6
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.state.rst:8 8332addfa1134c58bb7724038ea49318
+msgid "vyra\\_base.state.health\\_layer module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:16 92c90b78463c43639c8169f2a0fdce25
+msgid "vyra\\_base.state.lifecycle\\_layer module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:24 081d5ee7235b45b89a9b033460ab4bed
+msgid "vyra\\_base.state.operational\\_layer module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:32 d41b98fbe97d4bf38f5d58acf9f39a2b
+msgid "vyra\\_base.state.state\\_events module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:40 8cbaba1f701e4e37b9029d87c82b8446
+msgid "vyra\\_base.state.state\\_machine module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:48 7ff6f1207a3c46918f282696b7c9d905
+msgid "vyra\\_base.state.state\\_types module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:56 87134d3683f0497a9be5097e23ad51b2
+msgid "vyra\\_base.state.unified module"
+msgstr ""
+
+#: ../../vyra_base.state.rst:64 942c727b181d440eac19db8edff55f48
+msgid "Module contents"
+msgstr ""
+
+#~ msgid ""
+#~ "Health Layer - High-level API for"
+#~ " system health monitoring and management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This layer monitors system integrity: -"
+#~ " Health status tracking (OK, Warning, "
+#~ "Overloaded, Faulted, Critical) - Warning "
+#~ "and fault reporting - Load management"
+#~ " - Recovery coordination - Escalation "
+#~ "to lifecycle layer"
+#~ msgstr ""
+
+#~ msgid "Thread-safe wrapper around StateMachine for health management."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "High-level API for health state management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Provides intuitive methods for health "
+#~ "monitoring: - report_warning() - Report "
+#~ "non-critical issues - recover() - "
+#~ "Attempt recovery - escalate() - Escalate"
+#~ " to critical state"
+#~ msgstr ""
+
+#~ msgid "Example"
+#~ msgstr "Beispiel"
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Initialize health layer."
+#~ msgstr ""
+
+#~ msgid "StateMachine instance to control"
+#~ msgstr ""
+
+#~ msgid "Get current health state."
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_types.HealthState\\``"
+#~ msgstr ""
+
+#~ msgid "Get current health state as string."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
+#~ msgstr ""
+
+#~ msgid "Check if health is OK."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\``"
+#~ msgstr ""
+
+#~ msgid "Check if there are warnings."
+#~ msgstr ""
+
+#~ msgid "Check if health is critical."
+#~ msgstr ""
+
+#~ msgid "Check if health is degraded (warning or worse)."
+#~ msgstr ""
+
+#~ msgid "Check if safe for operational tasks."
+#~ msgstr ""
+
+#~ msgid "Report non-critical warning."
+#~ msgstr ""
+
+#~ msgid "Transitions: OK → Warning"
+#~ msgstr ""
+
+#~ msgid "Warning details (metrics, thresholds, etc.)"
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "New health state"
+#~ msgstr ""
+
+#~ msgid "Clear active warnings."
+#~ msgstr ""
+
+#~ msgid "Transitions: Warning → OK"
+#~ msgstr ""
+
+#~ msgid "Clearance details"
+#~ msgstr ""
+
+#~ msgid "Report critical fault."
+#~ msgstr ""
+
+#~ msgid "Transitions: OK/Warning → Critical"
+#~ msgstr ""
+
+#~ msgid "Fault details"
+#~ msgstr ""
+
+#~ msgid "Attempt recovery from fault."
+#~ msgstr ""
+
+#~ msgid "Transitions: Critical → OK/Warning"
+#~ msgstr ""
+
+#~ msgid "Recovery details"
+#~ msgstr ""
+
+#~ msgid "Check metrics and automatically report appropriate health state."
+#~ msgstr ""
+
+#~ msgid "System metrics to evaluate"
+#~ msgstr ""
+
+#~ msgid "Threshold for warning state"
+#~ msgstr ""
+
+#~ msgid "New health state after evaluation"
+#~ msgstr ""
+
+#~ msgid "Trigger emergency stop (affects all layers)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This is an interrupt event that "
+#~ "immediately: - Sets lifecycle to "
+#~ "Deactivated - Sets operational to Idle"
+#~ " - Sets health to Warning"
+#~ msgstr ""
+
+#~ msgid "Emergency stop reason"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\"
+#~ " \\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+#~ "\\:py\\:class\\:\\`str\\`\\]`"
+#~ msgstr ""
+
+#~ msgid "New state of all layers"
+#~ msgstr ""
+
+#~ msgid "Register callback for health state changes."
+#~ msgstr ""
+
+#~ msgid "Function(layer, old_state, new_state)"
+#~ msgstr ""
+
+#~ msgid "Callback priority (higher = earlier execution)"
+#~ msgstr ""
+
+#~ msgid "Get health layer information."
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\"
+#~ " \\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+#~ "\\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
+#~ msgstr ""
+
+#~ msgid "Dictionary with state and status info"
+#~ msgstr ""
+
+#~ msgid "Get health severity as numeric level."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`int\\``"
+#~ msgstr ""
+
+#~ msgid "0 = HEALTHY, 1 = Warning, 2 = Critical"
+#~ msgstr ""
+
+#~ msgid "Lifecycle Layer - High-level API for module lifecycle management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This layer controls module existence "
+#~ "states: - Startup and initialization -"
+#~ " Activation and deactivation - Recovery "
+#~ "from failures - Controlled shutdown"
+#~ msgstr ""
+
+#~ msgid "Thread-safe wrapper around StateMachine for lifecycle operations."
+#~ msgstr ""
+
+#~ msgid "High-level API for lifecycle state management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Provides intuitive methods for module "
+#~ "lifecycle control: - start() - Begin "
+#~ "initialization - activate() - Enter "
+#~ "active state - shutdown() - Controlled"
+#~ " deactivation - recover() - Recover "
+#~ "from faults"
+#~ msgstr ""
+
+#~ msgid "Initialize lifecycle layer."
+#~ msgstr ""
+
+#~ msgid "Existing StateMachine instance. Creates new if None."
+#~ msgstr ""
+
+#~ msgid "Get current lifecycle state."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_types.LifecycleState\\``"
+#~ msgstr ""
+
+#~ msgid "Get current lifecycle state as string."
+#~ msgstr ""
+
+#~ msgid "Check if module is initializing."
+#~ msgstr ""
+
+#~ msgid "Check if module is active."
+#~ msgstr ""
+
+#~ msgid "Check if module is recovering."
+#~ msgstr ""
+
+#~ msgid "Check if module is shutting down."
+#~ msgstr ""
+
+#~ msgid "Check if module is offline."
+#~ msgstr ""
+
+#~ msgid "Check if module can accept operational tasks."
+#~ msgstr ""
+
+#~ msgid "Start module initialization."
+#~ msgstr ""
+
+#~ msgid "Transitions: Offline → Initializing"
+#~ msgstr ""
+
+#~ msgid "Optional initialization parameters"
+#~ msgstr ""
+
+#~ msgid "New lifecycle state"
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid "If not in Offline state"
+#~ msgstr ""
+
+#~ msgid "Mark initialization as successful."
+#~ msgstr ""
+
+#~ msgid "Transitions: Initializing → Active"
+#~ msgstr ""
+
+#~ msgid "Optional initialization results"
+#~ msgstr ""
+
+#~ msgid "Mark initialization as failed."
+#~ msgstr ""
+
+#~ msgid "Transitions: Initializing → Recovering"
+#~ msgstr ""
+
+#~ msgid "Error description"
+#~ msgstr ""
+
+#~ msgid "Begin controlled shutdown."
+#~ msgstr ""
+
+#~ msgid "Transitions: Active → ShuttingDown"
+#~ msgstr ""
+
+#~ msgid "Shutdown reason"
+#~ msgstr ""
+
+#~ msgid "Complete shutdown process."
+#~ msgstr ""
+
+#~ msgid "Transitions: ShuttingDown → Offline"
+#~ msgstr ""
+
+#~ msgid "Enter recovery mode due to fault."
+#~ msgstr ""
+
+#~ msgid "Transitions: Active → Recovering"
+#~ msgstr ""
+
+#~ msgid "Fault description and context"
+#~ msgstr ""
+
+#~ msgid "Complete recovery successfully."
+#~ msgstr ""
+
+#~ msgid "Transitions: Recovering → Active"
+#~ msgstr ""
+
+#~ msgid "Mark recovery as failed."
+#~ msgstr ""
+
+#~ msgid "Transitions: Recovering → Deactivated"
+#~ msgstr ""
+
+#~ msgid "Recovery failure reason"
+#~ msgstr ""
+
+#~ msgid "Register callback for lifecycle state changes."
+#~ msgstr ""
+
+#~ msgid "Get lifecycle layer information."
+#~ msgstr ""
+
+#~ msgid "Dictionary with state and capability info"
+#~ msgstr ""
+
+#~ msgid "Operational Layer - High-level API for task and activity management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This layer controls operational states: "
+#~ "- Task lifecycle (ready, running, "
+#~ "paused, completed) - Processing and "
+#~ "delegation - Blocking and unblocking -"
+#~ " Auto-reset mechanisms"
+#~ msgstr ""
+
+#~ msgid "Thread-safe wrapper around StateMachine for operational control."
+#~ msgstr ""
+
+#~ msgid "High-level API for operational state management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Provides intuitive methods for task "
+#~ "control: - ready() - Signal readiness"
+#~ " for tasks - start_task() - Begin "
+#~ "task execution - pause() / resume() "
+#~ "- Pause and resume tasks - "
+#~ "complete() - Mark task completion"
+#~ msgstr ""
+
+#~ msgid "Initialize operational layer."
+#~ msgstr ""
+
+#~ msgid "Get current operational state."
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_types.OperationalState\\``"
+#~ msgstr ""
+
+#~ msgid "Get current operational state as string."
+#~ msgstr ""
+
+#~ msgid "Check if operational is idle."
+#~ msgstr ""
+
+#~ msgid "Check if operational is ready for tasks."
+#~ msgstr ""
+
+#~ msgid "Check if task is running."
+#~ msgstr ""
+
+#~ msgid "Check if task is paused."
+#~ msgstr ""
+
+#~ msgid "Check if task is stopped."
+#~ msgstr ""
+
+#~ msgid "Check if new task can be started."
+#~ msgstr ""
+
+#~ msgid "Check if actively working (running, processing, delegating)."
+#~ msgstr ""
+
+#~ msgid "Signal readiness for task execution."
+#~ msgstr ""
+
+#~ msgid "Transitions: Idle → Ready"
+#~ msgstr ""
+
+#~ msgid "Optional readiness metadata"
+#~ msgstr ""
+
+#~ msgid "New operational state"
+#~ msgstr ""
+
+#~ msgid "Start task execution."
+#~ msgstr ""
+
+#~ msgid "Transitions: Ready → Running"
+#~ msgstr ""
+
+#~ msgid "Task description and parameters"
+#~ msgstr ""
+
+#~ msgid "Pause current task."
+#~ msgstr ""
+
+#~ msgid "Transitions: Running → Paused"
+#~ msgstr ""
+
+#~ msgid "Pause reason"
+#~ msgstr ""
+
+#~ msgid "Resume paused task."
+#~ msgstr ""
+
+#~ msgid "Transitions: Paused → Running"
+#~ msgstr ""
+
+#~ msgid "Mark task as completed."
+#~ msgstr ""
+
+#~ msgid "Transitions: Running → Completed"
+#~ msgstr ""
+
+#~ msgid "Task results and metrics"
+#~ msgstr ""
+
+#~ msgid "Reset from Completed to Ready state."
+#~ msgstr ""
+
+#~ msgid "Transitions: Completed → Ready"
+#~ msgstr ""
+
+#~ msgid "Enter background processing mode."
+#~ msgstr ""
+
+#~ msgid "Transitions: Running → Processing"
+#~ msgstr ""
+
+#~ msgid "Processing task details"
+#~ msgstr ""
+
+#~ msgid "Complete background processing."
+#~ msgstr ""
+
+#~ msgid "Transitions: Processing → Running"
+#~ msgstr ""
+
+#~ msgid "Register callback for operational state changes."
+#~ msgstr ""
+
+#~ msgid "Get operational layer information."
+#~ msgstr ""
+
+#~ msgid "Event definitions for the 3-layer state machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Events trigger state transitions according "
+#~ "to the industrial automation event-"
+#~ "driven architecture pattern."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~enum.Enum`"
+#~ msgstr ""
+
+#~ msgid "Event types for state transitions."
+#~ msgstr ""
+
+#~ msgid "Immutable event for state machine transitions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Contains all information about a state"
+#~ " transition event including timestamp, "
+#~ "origin, and optional payload for tracing"
+#~ " and debugging."
+#~ msgstr ""
+
+#~ msgid "Convert event to dictionary for serialization."
+#~ msgstr ""
+
+#~ msgid "Get the primary layer affected by an event."
+#~ msgstr ""
+
+#~ msgid "Check if event is a system interrupt."
+#~ msgstr ""
+
+#~ msgid "Core 3-layer state machine engine for industrial automation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This implementation follows industrial "
+#~ "standards: - IEC 61508 (Functional "
+#~ "Safety) - IEC 61131-3 (PLC Programming)"
+#~ " - ISO 13849 (Safety of Machinery)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Features: - Thread-safe operation with"
+#~ " RLock - Event-driven architecture -"
+#~ " Comprehensive logging and tracing - "
+#~ "Rule-based state transitions - Layer "
+#~ "interaction validation"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`Exception`"
+#~ msgstr ""
+
+#~ msgid "Base exception for state machine errors."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~vyra_base.state.state_machine.StateMachineError`"
+#~ msgstr ""
+
+#~ msgid "Raised when an invalid state transition is attempted."
+#~ msgstr ""
+
+#~ msgid "Raised when layer interaction rules are violated."
+#~ msgstr ""
+
+#~ msgid "Record of a state transition for auditing and debugging."
+#~ msgstr ""
+
+#~ msgid "Convert transition to dictionary."
+#~ msgstr ""
+
+#~ msgid "Configuration for state machine behavior."
+#~ msgstr ""
+
+#~ msgid "Professional 3-layer state machine for industrial automation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Architecture: - **Lifecycle Layer**: Controls"
+#~ " module existence (startup/lifetime/shutdown) -"
+#~ " **Operational Layer**: Manages runtime "
+#~ "activity (tasks/processing) - **Health "
+#~ "Layer**: Monitors system integrity "
+#~ "(health/warnings/errors)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Layer Interaction Rules: 1. Lifecycle →"
+#~ " Operational: Controls allowed states 2."
+#~ " Health → Operational: Regulates behavior"
+#~ " 3. Health → Lifecycle: Escalates "
+#~ "critical issues 4. Operational cannot "
+#~ "directly affect Lifecycle or Health"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Thread Safety: All public methods are"
+#~ " thread-safe using reentrant locks."
+#~ msgstr ""
+
+#~ msgid "Initialize the state machine."
+#~ msgstr ""
+
+#~ msgid "Configuration object. Uses defaults if None."
+#~ msgstr ""
+
+#~ msgid "Get current state of all layers."
+#~ msgstr ""
+
+#~ msgid "'lifecycle', 'operational', 'health'"
+#~ msgstr ""
+
+#~ msgid "Check if module is in Active lifecycle state."
+#~ msgstr ""
+
+#~ msgid "Check if module health is OK."
+#~ msgstr ""
+
+#~ msgid "Send event to state machine and trigger transitions."
+#~ msgstr ""
+
+#~ msgid "StateEvent object"
+#~ msgstr ""
+
+#~ msgid "New state after processing event"
+#~ msgstr ""
+
+#~ msgid "In strict mode, if transition is invalid"
+#~ msgstr ""
+
+#~ msgid "If layer rules are violated"
+#~ msgstr ""
+
+#~ msgid "Subscribe to state changes on a specific layer."
+#~ msgstr ""
+
+#~ msgid "Layer name ('lifecycle', 'operational', 'health', 'any')"
+#~ msgstr ""
+
+#~ msgid "Higher priority callbacks are called first"
+#~ msgstr ""
+
+#~ msgid "Remove a callback subscription."
+#~ msgstr ""
+
+#~ msgid "Get state transition history."
+#~ msgstr ""
+
+#~ msgid "Maximum number of entries to return (newest first)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.List\\`\\\\"
+#~ " "
+#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_machine.StateTransition\\`\\]`"
+#~ msgstr ""
+
+#~ msgid "List of StateTransition objects"
+#~ msgstr ""
+
+#~ msgid "Clear transition history."
+#~ msgstr ""
+
+#~ msgid "Get comprehensive diagnostic information."
+#~ msgstr ""
+
+#~ msgid "Dictionary with current states, history stats, and configuration"
+#~ msgstr ""
+
+#~ msgid "State type definitions for the 3-layer state machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This module defines the valid states "
+#~ "for each layer according to industrial"
+#~ " automation standards (ISO 13849, IEC "
+#~ "61508)."
+#~ msgstr ""
+
+#~ msgid "Lifecycle states define the existence and high-level life of a module."
+#~ msgstr ""
+
+#~ msgid "Similar to ROS2 Lifecycle nodes and IEC 61131-3 PLC states."
+#~ msgstr ""
+
+#~ msgid "Operational states define the runtime activity of a module."
+#~ msgstr ""
+
+#~ msgid "Represents what the module is currently doing during normal operation."
+#~ msgstr ""
+
+#~ msgid "Health states describe the integrity and error conditions of a module."
+#~ msgstr ""
+
+#~ msgid "Follows safety integrity levels (SIL) from IEC 61508."
+#~ msgstr ""
+
+#~ msgid "Check if lifecycle transition is valid."
+#~ msgstr ""
+
+#~ msgid "Check if operational transition is valid."
+#~ msgstr ""
+
+#~ msgid "Check if health transition is valid."
+#~ msgstr ""
+
+#~ msgid "Check if operational state is allowed in current lifecycle state."
+#~ msgstr ""
+
+#~ msgid "Integration module for easy unified state machine access."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Provides a simple API that combines "
+#~ "all three layers into a single "
+#~ "unified interface for module state "
+#~ "management."
+#~ msgstr ""
+
+#~ msgid "Unified interface for 3-layer state machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Combines Lifecycle, Operational, and Health"
+#~ " layers into a single easy-to-"
+#~ "use API. Recommended for most use "
+#~ "cases."
+#~ msgstr ""
+
+#~ msgid "Initialize unified state machine."
+#~ msgstr ""
+
+#~ msgid "Configuration for state machine behavior"
+#~ msgstr ""
+
+#~ msgid "Get lifecycle state."
+#~ msgstr ""
+
+#~ msgid "Get operational state."
+#~ msgstr ""
+
+#~ msgid "Get health state."
+#~ msgstr ""
+
+#~ msgid "Check if module can execute tasks."
+#~ msgstr ""
+
+#~ msgid "Complete initialization successfully."
+#~ msgstr ""
+
+#~ msgid "Signal readiness for tasks."
+#~ msgstr ""
+
+#~ msgid "Reset operational state to Idle."
+#~ msgstr ""
+
+#~ msgid "Trigger emergency stop."
+#~ msgstr ""
+
+#~ msgid "Subscribe to lifecycle state changes."
+#~ msgstr ""
+
+#~ msgid "Subscribe to operational state changes."
+#~ msgstr ""
+
+#~ msgid "Subscribe to health state changes."
+#~ msgstr ""
+
+#~ msgid "Subscribe to any state change across all layers."
+#~ msgstr ""
+
+#~ msgid "Send an event to the state machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method is required for "
+#~ "compatibility with OperationalStateMachine which "
+#~ "calls _state_machine.send_event(event)."
+#~ msgstr ""
+
+#~ msgid "StateEvent to send to the FSM"
+#~ msgstr ""
+
+#~ msgid "Execute standard module startup sequence."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Sequence: 1. Start initialization 2. "
+#~ "Complete initialization 3. Set operational "
+#~ "ready"
+#~ msgstr ""
+
+#~ msgid "True if startup successful, False otherwise"
+#~ msgstr ""
+
+#~ msgid "Execute standard module shutdown sequence."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Sequence: 1. Begin shutdown 2. Complete"
+#~ " any pending tasks (module responsibility)"
+#~ " 3. Complete shutdown"
+#~ msgstr ""
+
+#~ msgid "True if shutdown successful, False otherwise"
+#~ msgstr ""
+
+#~ msgid "3-Layer State Machine System for VYRA Modules"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This module implements a hierarchical "
+#~ "state machine with three layers: - "
+#~ "Lifecycle Layer: Module existence and "
+#~ "initialization states - Operational Layer: "
+#~ "Runtime activity states - Health Layer:"
+#~ " Diagnostic and error states"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Each layer has specific rules about "
+#~ "how it can influence other layers: "
+#~ "- Lifecycle controls Operational and "
+#~ "Health - Health can override Operational"
+#~ " and escalate Lifecycle - Operational "
+#~ "cannot directly change Lifecycle or "
+#~ "Health (only reports events)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Conforms to industrial standards: - IEC"
+#~ " 61508 (Functional Safety) - IEC "
+#~ "61131-3 (PLC Programming) - ISO 13849"
+#~ " (Safety of Machinery)"
+#~ msgstr ""
+
+#~ msgid "Author: VYRA Development Team License: See LICENSE file"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`type`"
+#~ msgstr ""
+
+#~ msgid "Metaclass that automatically manages operational state transitions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This metaclass wraps user-defined "
+#~ "lifecycle methods and automatically handles:"
+#~ msgstr ""
+
+#~ msgid "Pre-condition state validation"
+#~ msgstr ""
+
+#~ msgid "State transitions before method execution"
+#~ msgstr ""
+
+#~ msgid "Success/failure state transitions after method execution"
+#~ msgstr ""
+
+#~ msgid "Error handling and logging"
+#~ msgstr ""
+
+#~ msgid "Supported lifecycle methods and their state transitions:"
+#~ msgstr ""
+
+#~ msgid "``initialize()``:"
+#~ msgstr ""
+
+#~ msgid "Pre-condition: IDLE"
+#~ msgstr ""
+
+#~ msgid "On success: IDLE -> READY (resets operation counter)"
+#~ msgstr ""
+
+#~ msgid "On failure: IDLE -> ERROR"
+#~ msgstr ""
+
+#~ msgid "``pause()``:"
+#~ msgstr ""
+
+#~ msgid "Pre-condition: RUNNING"
+#~ msgstr ""
+
+#~ msgid "On success: RUNNING -> PAUSED"
+#~ msgstr ""
+
+#~ msgid "On failure: No state change"
+#~ msgstr ""
+
+#~ msgid "``resume()``:"
+#~ msgstr ""
+
+#~ msgid "Pre-condition: PAUSED"
+#~ msgstr ""
+
+#~ msgid "On success: PAUSED -> READY (resets operation counter)"
+#~ msgstr ""
+
+#~ msgid "On failure: PAUSED -> ERROR"
+#~ msgstr ""
+
+#~ msgid "``stop()``:"
+#~ msgstr ""
+
+#~ msgid "Pre-condition: RUNNING, PAUSED"
+#~ msgstr ""
+
+#~ msgid "On success: (current) -> STOPPED"
+#~ msgstr ""
+
+#~ msgid "On failure: (current) -> ERROR"
+#~ msgstr ""
+
+#~ msgid "``reset()``:"
+#~ msgstr ""
+
+#~ msgid "Pre-condition: STOPPED, ERROR"
+#~ msgstr ""
+
+#~ msgid "On success: (current) -> IDLE"
+#~ msgstr ""
+
+#~ msgid "Raised when an operation is called in an invalid operational state."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Base class for modules that need "
+#~ "automatic operational state management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class integrates with the 3-layer"
+#~ " StateMachine and provides a clean "
+#~ "interface for defining lifecycle methods "
+#~ "that automatically handle state transitions."
+#~ msgstr ""
+
+#~ msgid "Subclasses should implement one or more of the following methods:"
+#~ msgstr ""
+
+#~ msgid "initialize(): Setup and initialization logic"
+#~ msgstr ""
+
+#~ msgid "pause(): Pause current operation"
+#~ msgstr ""
+
+#~ msgid "resume(): Resume paused operation"
+#~ msgstr ""
+
+#~ msgid "stop(): Stop current operation"
+#~ msgstr ""
+
+#~ msgid "reset(): Reset to initial state"
+#~ msgstr ""
+
+#~ msgid "For dynamic operations, use the @operation decorator."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "All methods should return True on "
+#~ "success, False on failure. Exceptions "
+#~ "are caught and treated as failures."
+#~ msgstr ""
+
+#~ msgid "Initialize the operational state machine."
+#~ msgstr ""
+
+#~ msgid "The underlying 3-layer StateMachine instance"
+#~ msgstr ""
+
+#~ msgid "Get all current states (lifecycle, operational, health)."
+#~ msgstr ""
+
+#~ msgid "Get the current operation reference counter value."
+#~ msgstr ""
+
+#~ msgid "Number of currently active operations"
+#~ msgstr ""
+
+#~ msgid "Check if in ERROR state."
+#~ msgstr ""
+
+#~ msgid "Check if in IDLE state."
+#~ msgstr ""
+
+#~ msgid "Check if in PAUSED state."
+#~ msgstr ""
+
+#~ msgid "Check if in READY state."
+#~ msgstr ""
+
+#~ msgid "Check if in RUNNING state."
+#~ msgstr ""
+
+#~ msgid "Check if in STOPPED state."
+#~ msgstr ""
+
+#~ msgid "Decorator for methods that need automatic operational state management."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This decorator wraps a method with "
+#~ "state validation and transition logic. "
+#~ "When reference counting is enabled "
+#~ "(default), it automatically manages READY "
+#~ "<-> RUNNING transitions based on the "
+#~ "number of active operations."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Default behavior with reference counting: "
+#~ "- Pre-condition: READY or RUNNING "
+#~ "state - Before execution: If in "
+#~ "READY, transition to RUNNING and "
+#~ "increment counter - After execution: "
+#~ "Decrement counter; if counter reaches 0,"
+#~ " transition to READY"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Custom behavior (use_reference_counting=False): -"
+#~ " Use custom required_states, pre_transition, "
+#~ "success/failure transitions"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Function to decorate (provided automatically"
+#~ " when used without parentheses)"
+#~ msgstr ""
+
+#~ msgid "States that must be active before operation can run"
+#~ msgstr ""
+
+#~ msgid "State to transition to before execution"
+#~ msgstr ""
+
+#~ msgid "State to transition to on success"
+#~ msgstr ""
+
+#~ msgid "State to transition to on failure"
+#~ msgstr ""
+
+#~ msgid "Enable automatic reference counting for READY<->RUNNING"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Callable\\``"
+#~ msgstr ""
+
+#~ msgid "Decorated function with state management"
+#~ msgstr ""
+
+#~ msgid "Configuration for operation decorator behavior."
+#~ msgstr ""
+
+#~ msgid "Initialize operation configuration."
+#~ msgstr ""
+
+#~ msgid "Set of states required before operation can execute"
+#~ msgstr ""
+
+#~ msgid "State to transition to before execution (if not using ref counting)"
+#~ msgstr ""
+
+#~ msgid "State to transition to on success (if not using ref counting)"
+#~ msgstr ""
+
+#~ msgid "State to transition to on failure (if not using ref counting)"
+#~ msgstr ""
+
+#~ msgid "If True, use reference counting for READY<->RUNNING transitions"
+#~ msgstr ""
+

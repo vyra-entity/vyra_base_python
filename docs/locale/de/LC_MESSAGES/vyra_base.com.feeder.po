@@ -1,0 +1,325 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.com.feeder.rst:2 1a5dfd460e1c474d8e09a4c9da75fe8c
+msgid "vyra\\_base.com.feeder package"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:5 97812b1004ca4b40a914eab275585f51
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:8 58fd7fb0578d490193d826456138da68
+msgid "vyra\\_base.com.feeder.available\\_module\\_feeder module"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:16 3946af8b9f6d44808672932164300403
+msgid "vyra\\_base.com.feeder.error\\_feeder module"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:24 8e94bc8ea4e24fe8949e685f8d794eae
+msgid "vyra\\_base.com.feeder.feeder module"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:32 4d06631e8fc9440a9759db9fcbdc9892
+msgid "vyra\\_base.com.feeder.news\\_feeder module"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:40 82290821fb7947068e6316b946d510fb
+msgid "vyra\\_base.com.feeder.state\\_feeder module"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:48 53a9155685284a66b8ea80b657ec8bda
+msgid "Module contents"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`~vyra_base.com.feeder.feeder.BaseFeeder`"
+#~ msgstr ""
+
+#~ msgid "Collection of the error messages."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "The ros2-msg type for the feeder."
+#~ msgstr ""
+
+#~ msgid "The VyraNode instance associated with this feeder (ROS2 Node)."
+#~ msgstr ""
+
+#~ msgid "The module configuration entry."
+#~ msgstr ""
+
+#~ msgid "Flag to enable or disable logging next to feeding. Defaults to False."
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid "If the VyraSpeaker cannot be created with the given type."
+#~ msgstr ""
+
+#~ msgid "Initialize the BaseFeeder."
+#~ msgstr ""
+
+#~ msgid "Feed a news entry to the feeder."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The content can either be a "
+#~ "dictionary which will be processed into"
+#~ " an :class:`vyra_base.defaults.entries.ErrorEntry`, or"
+#~ " an :class:`vyra_base.defaults.entries.ErrorEntry` "
+#~ "object itself. Use the method "
+#~ ":meth:`build_errorfeed` to create an "
+#~ ":class:`vyra_base.defaults.entries.ErrorEntry` from a "
+#~ "dict."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The error entry to be fed. Can "
+#~ "be a dictionary with error details "
+#~ "or an :class:`vyra_base.defaults.entries.ErrorEntry` "
+#~ "object."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If the type of errorElement is "
+#~ "neither a dict nor an "
+#~ ":class:`vyra_base.defaults.entries.ErrorEntry`."
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+#~ msgstr ""
+
+#~ msgid "Build an error entry from the given keyword arguments."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A dictionary containing error details. "
+#~ "Keys are:  - ``code``: int16 - "
+#~ "Error code (default: 0x00000000) - "
+#~ "``uuid``: UUID - Unique identifier for"
+#~ " the error (default: a new UUID) "
+#~ "- ``description``: str - Description of"
+#~ " the error (default: '') - "
+#~ "``solution``: str - Suggested solution "
+#~ "for the error (default: '') - "
+#~ "``miscellaneous``: str - Additional "
+#~ "information (default: '') - ``level``: "
+#~ "ErrorEntry.ERROR_LEVEL - Level of the "
+#~ "error (default: ErrorEntry.ERROR_LEVEL.MINOR_FAULT)"
+#~ msgstr ""
+
+#~ msgid "A dictionary containing error details. Keys are:"
+#~ msgstr ""
+
+#~ msgid "``code``: int16 - Error code (default: 0x00000000)"
+#~ msgstr ""
+
+#~ msgid "``uuid``: UUID - Unique identifier for the error (default: a new UUID)"
+#~ msgstr ""
+
+#~ msgid "``description``: str - Description of the error (default: '')"
+#~ msgstr ""
+
+#~ msgid "``solution``: str - Suggested solution for the error (default: '')"
+#~ msgstr ""
+
+#~ msgid "``miscellaneous``: str - Additional information (default: '')"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "``level``: ErrorEntry.ERROR_LEVEL - Level of"
+#~ " the error (default: "
+#~ "ErrorEntry.ERROR_LEVEL.MINOR_FAULT)"
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid ""
+#~ "An instance of "
+#~ ":class:`vyra_base.defaults.entries.ErrorEntry` populated "
+#~ "with the provided details."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Abstract class."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Provides the required interface for the"
+#~ " ``deque`` method all inheriting deque "
+#~ "objects require to work."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Create the feeder and its communication"
+#~ " handlers. :raises FeederException: If the"
+#~ " speaker could not be created. "
+#~ ":raises TypeError: If a handler class"
+#~ " is not a subclass of "
+#~ "CommunicationHandler. :type loggingOn: "
+#~ ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\`` "
+#~ ":param loggingOn: If True, enables "
+#~ "logging in the base logger. :type "
+#~ "loggingOn: bool :raises FeederException: If"
+#~ " the speaker could not be created."
+#~ " :raises TypeError: If a handler "
+#~ "class is not a subclass of "
+#~ "CommunicationHandler."
+#~ msgstr ""
+
+#~ msgid "Feed a message to the feeder."
+#~ msgstr ""
+
+#~ msgid "The message to feed."
+#~ msgstr ""
+
+#~ msgid "Set the logger for the feeder."
+#~ msgstr ""
+
+#~ msgid "Add a communication handler to the feeder."
+#~ msgstr ""
+
+#~ msgid "The communication handler to add."
+#~ msgstr ""
+
+#~ msgid "If the handler is not a CommunicationHandler."
+#~ msgstr ""
+
+#~ msgid "True if the handler was added, False if it was already present."
+#~ msgstr ""
+
+#~ msgid "Add a handler class to the feeder."
+#~ msgstr ""
+
+#~ msgid "The handler class to add."
+#~ msgstr ""
+
+#~ msgid "If handler_class is not a subclass of CommunicationHandler."
+#~ msgstr ""
+
+#~ msgid "Collection of the news messages."
+#~ msgstr ""
+
+#~ msgid "Module configuration entry."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The content can either be a string"
+#~ " which will be processed into a "
+#~ "NewsEntry, or a NewsEntry object itself."
+#~ " Use the method ``build_newsfeed`` to "
+#~ "create a NewsEntry from a string "
+#~ "or list."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The news entry to be fed. Can "
+#~ "be a string or list of strings "
+#~ "to be processed into a NewsEntry, "
+#~ "or a NewsEntry object."
+#~ msgstr ""
+
+#~ msgid "If the type of newsElement is not supported."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Build a well structured newsfeed entry"
+#~ " from plain text and module "
+#~ "information."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The arguments to be processed into "
+#~ "a news entry. Can be a string "
+#~ "or list of strings."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A structured news entry containing the"
+#~ " message, level, timestamp, UUID, module"
+#~ " name, module ID, module template, "
+#~ "and type."
+#~ msgstr ""
+
+#~ msgid "If the type of the message level is not valid."
+#~ msgstr ""
+
+#~ msgid "Extract the message level from a given message string."
+#~ msgstr ""
+
+#~ msgid "The message string from which to extract the level."
+#~ msgstr ""
+
+#~ msgid "The extracted message level if found, otherwise None."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Responsible for loading a ROS2 Handler"
+#~ " and feeding StateEntry elements to "
+#~ "this handler."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "Name of the feeder."
+#~ msgstr ""
+
+#~ msgid "Documentation string for the feeder."
+#~ msgstr ""
+
+#~ msgid "Logging level."
+#~ msgstr ""
+
+#~ msgid "ROS2 message type."
+#~ msgstr ""
+
+#~ msgid "VyraNode instance."
+#~ msgstr ""
+
+#~ msgid "Module configuration."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Initializes a StateFeeder instance for "
+#~ "sending changes in state of a "
+#~ "module."
+#~ msgstr ""
+
+#~ msgid "Adds value to the logger and the remote handler."
+#~ msgstr ""
+
+#~ msgid "The state entry to feed."
+#~ msgstr ""
+
+#~ msgid "If the provided element is not of type StateEntry."
+#~ msgstr ""
+

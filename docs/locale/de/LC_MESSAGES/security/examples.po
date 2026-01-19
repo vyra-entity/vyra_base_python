@@ -1,0 +1,171 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../security/examples.rst:2 e3c591262fc6456ab166e87f81adc61f
+msgid "Security Framework Examples"
+msgstr ""
+
+#: ../../security/examples.rst:4 de90d51e01524f148f62a168590d8c00
+msgid ""
+"This section provides complete, working examples of the VYRA Security "
+"Framework."
+msgstr ""
+
+#: ../../security/examples.rst:7 8975d809282541fbac322880a6037a04
+msgid "Example Overview"
+msgstr ""
+
+#: ../../security/examples.rst:38 58162c42dd0b4c88ab64db1b7c05ce5d
+msgid "Basic Secure Server"
+msgstr ""
+
+#: ../../security/examples.rst:40 19a462c1b9af4975849ed08f466f3b77
+msgid "A minimal server providing authentication services."
+msgstr ""
+
+#: ../../security/examples.rst:171 96429e3c4777428cbd7e78bde9cc436c
+msgid "Basic Secure Client"
+msgstr ""
+
+#: ../../security/examples.rst:173 030ffbd136c24b21b2f21d4470bc9fc8
+msgid "A minimal client that authenticates with a server."
+msgstr ""
+
+#: ../../security/examples.rst:300 23aa55d3e34c4ef09077180db2045480
+msgid "Secure Publisher Example"
+msgstr ""
+
+#: ../../security/examples.rst:302 f3ec8acf79b54e3ebfce43bd158968ea
+msgid "Publishing messages with automatic security metadata."
+msgstr ""
+
+#: ../../security/examples.rst:367 38ad221540ef425ea6979f96fabe52a8
+msgid "Secure Service Example"
+msgstr ""
+
+#: ../../security/examples.rst:369 95290f4828da4536a27264cc47ca0efa
+msgid "Implementing a secure service with validation."
+msgstr ""
+
+#: ../../security/examples.rst:443 b5787ec6b73f4217937ee1d21242419f
+msgid "Certificate-Based Authentication (Level 5)"
+msgstr ""
+
+#: ../../security/examples.rst:445 2b4cfe02e7cf4527a4a9da414be4dd57
+msgid "Using digital signatures with certificates."
+msgstr ""
+
+#: ../../security/examples.rst:584 be0da363c042486586519e3dd78c7cf3
+msgid "Integration with VyraEntity"
+msgstr ""
+
+#: ../../security/examples.rst:586 81b1f70eb19f4e8485bb3cc43681a124
+msgid "Integrating security into a VYRA module."
+msgstr ""
+
+#: ../../security/examples.rst:647 532046dab5ba4b74bc5a99f8ee85f7aa
+msgid "Running the Examples"
+msgstr ""
+
+#: ../../security/examples.rst:649 c1dd342e15694271afd51c6672831237
+msgid "**Prerequisites:**"
+msgstr ""
+
+#: ../../security/examples.rst:657 48f3c9a6c1684982b197671aee4cad24
+msgid "**Run Basic Server:**"
+msgstr ""
+
+#: ../../security/examples.rst:663 926f8f2008004e1081292d98b0e67482
+msgid "**Run Basic Client:**"
+msgstr ""
+
+#: ../../security/examples.rst:669 f32dd63949b545778e2d306366f112c1
+msgid "**Expected Output:**"
+msgstr ""
+
+#: ../../security/examples.rst:685 64269dea19ad47e283949cc791f218dd
+msgid "Further Reading"
+msgstr ""
+
+#: ../../security/examples.rst:687 64cfc2efdfca46b3bdc0816d5497cfc7
+msgid ":doc:`overview` - Complete framework documentation"
+msgstr ""
+
+#: ../../security/examples.rst:688 9fd04f55cee04788a9bad46221639104
+msgid ":doc:`quickstart` - Quick start guide"
+msgstr ""
+
+#: ../../security/examples.rst:689 4ec07c6d4ed548b18552076c2a45ee82
+msgid ":doc:`api` - API reference"
+msgstr ""
+
+#: ../../security/examples.rst:690 a8f6d590c3d6464c8fa5feb8a9717d37
+msgid "Example code: ``/examples/security/``"
+msgstr ""
+
+#~ msgid "Example"
+#~ msgstr "Beispiel"
+
+#~ msgid "Description"
+#~ msgstr "Beschreibung"
+
+#~ msgid "Level"
+#~ msgstr ""
+
+#~ msgid ":ref:`basic-server`"
+#~ msgstr ""
+
+#~ msgid "Minimal secure server"
+#~ msgstr ""
+
+#~ msgid "4 (HMAC)"
+#~ msgstr ""
+
+#~ msgid ":ref:`basic-client`"
+#~ msgstr ""
+
+#~ msgid "Minimal secure client"
+#~ msgstr ""
+
+#~ msgid ":ref:`secure-publisher`"
+#~ msgstr ""
+
+#~ msgid "Secure message publishing"
+#~ msgstr ""
+
+#~ msgid ":ref:`secure-service`"
+#~ msgstr ""
+
+#~ msgid "Secure service implementation"
+#~ msgstr ""
+
+#~ msgid ":ref:`certificate-auth`"
+#~ msgstr ""
+
+#~ msgid "Certificate-based auth"
+#~ msgstr ""
+
+#~ msgid "5 (Digital)"
+#~ msgstr ""
+
+#~ msgid ":ref:`vyra-integration`"
+#~ msgstr ""
+

@@ -1,0 +1,529 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.storage.rst:2 f48c5bc5f9c44768911f4e2ed17cfac3
+msgid "vyra\\_base.stoage package"
+msgstr ""
+
+#: ../../vyra_base.storage.rst:5 23e7978fde484736a43c71f27076beed
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.storage.rst:8 c757902c472a4a8bbb19832b19a53a20
+msgid "vyra\\_base.stoage.db\\_access module"
+msgstr ""
+
+#: ../../vyra_base.storage.rst:16 5fe6a19a04b9498f9eadc7f50290417c
+msgid "vyra\\_base.stoage.db\\_manipulato module"
+msgstr ""
+
+#: ../../vyra_base.storage.rst:24 4dcf8c20e1ea4965b76ef02f14a80ade
+msgid "vyra\\_base.stoage.stoage module"
+msgstr ""
+
+#: ../../vyra_base.storage.rst:32 932e9a3a98a548f2a3263f7e659d05db
+msgid "vyra\\_base.stoage.tb\\_base module"
+msgstr ""
+
+#: ../../vyra_base.storage.rst:40 1760f41537a7476e900c87cbfbddbdfe
+msgid "Module contents"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`str`, :py:class:`~enum.Enum`"
+#~ msgstr ""
+
+#~ msgid "Enumeration of database operation status codes."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "Operation completed successfully."
+#~ msgstr ""
+
+#~ msgid "An error occurred during the operation."
+#~ msgstr ""
+
+#~ msgid "Requested resource was not found."
+#~ msgstr ""
+
+#~ msgid "Operation is not allowed."
+#~ msgstr ""
+
+#~ msgid "User is not authorized for this operation."
+#~ msgstr ""
+
+#~ msgid "Operation conflicts with existing data."
+#~ msgstr ""
+
+#~ msgid "Enumeration of supported database types."
+#~ msgstr ""
+
+#~ msgid "SQLite database engine."
+#~ msgstr ""
+
+#~ msgid "MySQL database engine."
+#~ msgstr ""
+
+#~ msgid "PostgreSQL database engine."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Collection of standard database error messages."
+#~ msgstr ""
+
+#~ msgid "Generic error message for database operations."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~vyra_base.storage.storage.Storage`"
+#~ msgstr ""
+
+#~ msgid "Baseclass for database access."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Initialize database object."
+#~ msgstr ""
+
+#~ msgid "The id of the V.Y.R.A. module."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Path to the ini file of your "
+#~ "sqlalchemy config. Defaults to "
+#~ "WORKING_PATH+PATH_DB_CONFIG."
+#~ msgstr ""
+
+#~ msgid "Dictionary with database configuration."
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If neither db_config_path nor db_config "
+#~ "is provided, or if db_config is "
+#~ "not a dict."
+#~ msgstr ""
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid "Create a session for the database."
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "A session object."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Create all database tables that are "
+#~ "children of the SQLAlchemy Base class."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This method will create all tables "
+#~ "that are defined in the SQLAlchemy "
+#~ "Base class. It will also create "
+#~ "the tables if they do not exist."
+#~ " This method will not create the "
+#~ "tables if they already exist."
+#~ msgstr ""
+
+#~ msgid "Status of the operation."
+#~ msgstr ""
+
+#~ msgid "Create new database table."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Table configurations as python classes "
+#~ "(SQLAlchemy declarative base style)."
+#~ msgstr ""
+
+#~ msgid "Delete table from database."
+#~ msgstr ""
+
+#~ msgid "Table class (SQLAlchemy declarative base)."
+#~ msgstr ""
+
+#~ msgid "Check if a table exists in the database."
+#~ msgstr ""
+
+#~ msgid "True if the table exists, False otherwise."
+#~ msgstr ""
+
+#~ msgid "Handling database datatables"
+#~ msgstr ""
+
+#~ msgid "Standardized return value container for database operations."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Encapsulates the result of database "
+#~ "operations with status, value, and "
+#~ "details. Provides convenience methods for "
+#~ "setting error/success states."
+#~ msgstr ""
+
+#~ msgid "Operation status (see DBSTATUS enum)."
+#~ msgstr ""
+
+#~ msgid "Main return value (data or error message)."
+#~ msgstr ""
+
+#~ msgid "Additional details about the operation."
+#~ msgstr ""
+
+#~ msgid "Set the return value to error status."
+#~ msgstr ""
+
+#~ msgid "Additional error details."
+#~ msgstr ""
+
+#~ msgid "Self with error status set."
+#~ msgstr ""
+
+#~ msgid "Set the return value to success status."
+#~ msgstr ""
+
+#~ msgid "Self with success status set."
+#~ msgstr ""
+
+#~ msgid "Datatable class manipulator"
+#~ msgstr ""
+
+#~ msgid "Wrapper for synchronous functions."
+#~ msgstr ""
+
+#~ msgid "Positional arguments."
+#~ msgstr ""
+
+#~ msgid "Keyword arguments."
+#~ msgstr ""
+
+#~ msgid "Result of the wrapped function."
+#~ msgstr ""
+
+#~ msgid "Read the datatable structure from the config file."
+#~ msgstr ""
+
+#~ msgid "Table structure information."
+#~ msgstr ""
+
+#~ msgid "Read line from datatable of database by 'id'."
+#~ msgstr ""
+
+#~ msgid "If the id is -1 or None, the last line will be read."
+#~ msgstr ""
+
+#~ msgid "Private key of the table element to select the row to be read."
+#~ msgstr ""
+
+#~ msgid "Row data or not found status."
+#~ msgstr ""
+
+#~ msgid "Read all lines from datatable of database."
+#~ msgstr ""
+
+#~ msgid "Filter elements to identify the rows to be read."
+#~ msgstr ""
+
+#~ msgid "Column name to order the result."
+#~ msgstr ""
+
+#~ msgid "Number of lines to be read."
+#~ msgstr ""
+
+#~ msgid "List of rows or not found status."
+#~ msgstr ""
+
+#~ msgid "Update a line in a datatable of database by given data."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If the table config has a field"
+#~ " 'max_lines' and the number of lines"
+#~ " are greater than this field, the "
+#~ "lowest 'id' value will be deleted "
+#~ "and the new entry will be added"
+#~ " by a incremented 'id' value."
+#~ msgstr ""
+
+#~ msgid "Update data in an existing entry."
+#~ msgstr ""
+
+#~ msgid "Filter to select the row to be updated."
+#~ msgstr ""
+
+#~ msgid "Update status."
+#~ msgstr ""
+
+#~ msgid "Add a new a row in a datatable."
+#~ msgstr ""
+
+#~ msgid "Content of the new entry to be added to the table."
+#~ msgstr ""
+
+#~ msgid "Add status and details."
+#~ msgstr ""
+
+#~ msgid "Update a line in a datatable of database by a given 'id'."
+#~ msgstr ""
+
+#~ msgid "Private key of the table element to select the row to be deleted."
+#~ msgstr ""
+
+#~ msgid "Delete status and details."
+#~ msgstr ""
+
+#~ msgid "Add multiple rows to a datatable."
+#~ msgstr ""
+
+#~ msgid "Data list to be added to the table."
+#~ msgstr ""
+
+#~ msgid "Bulk add status and details."
+#~ msgstr ""
+
+#~ msgid "Delete multiple rows in a datatable by given filters."
+#~ msgstr ""
+
+#~ msgid "Filter elements to identify the rows to be deleted."
+#~ msgstr ""
+
+#~ msgid "Bulk delete status and details."
+#~ msgstr ""
+
+#~ msgid "Check if a row exists in the datatable by a given 'id'."
+#~ msgstr ""
+
+#~ msgid "Private key of the table element to check."
+#~ msgstr ""
+
+#~ msgid "Existence status."
+#~ msgstr ""
+
+#~ msgid "Count the number of rows in a datatable matching given filters."
+#~ msgstr ""
+
+#~ msgid "Filter elements to identify the rows to be counted."
+#~ msgstr ""
+
+#~ msgid "Number of matching rows."
+#~ msgstr ""
+
+#~ msgid "Convert a SQLAlchemy model instance to a dictionary."
+#~ msgstr ""
+
+#~ msgid "SQLAlchemy model instance."
+#~ msgstr ""
+
+#~ msgid "List of column names to exclude."
+#~ msgstr ""
+
+#~ msgid "Dictionary representation of the object."
+#~ msgstr ""
+
+#~ msgid "Base class for storage access."
+#~ msgstr ""
+
+#~ msgid "This class provides a common interface for different storage backends."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "It can be used to access different"
+#~ " storage backends like databases, files,"
+#~ " etc."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Bases: :py:class:`~sqlalchemy.ext.asyncio.session.AsyncAttrs`,"
+#~ " :py:class:`~sqlalchemy.orm.decl_api.DeclarativeBase`"
+#~ msgstr ""
+
+#~ msgid "Base class for all SQLAlchemy models in the application."
+#~ msgstr ""
+
+#~ msgid "A simple constructor that allows initialization from kwargs."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Sets attributes on the constructed "
+#~ "instance using the names and values "
+#~ "in ``kwargs``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Only keys that are present as "
+#~ "attributes of the instance's class are"
+#~ " allowed. These could be, for "
+#~ "example, any mapped columns or "
+#~ "relationships."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Refers to the :class:`_schema.MetaData` "
+#~ "collection that will be used for "
+#~ "new :class:`_schema.Table` objects."
+#~ msgstr ""
+
+#~ msgid ":ref:`orm_declarative_metadata`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Refers to the :class:`_orm.registry` in "
+#~ "use where new :class:`_orm.Mapper` objects "
+#~ "will be associated."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~sqlalchemy.sql.type_api.TypeDecorator`"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A SQLAlchemy TypeDecorator for storing "
+#~ "Python IntEnum values as integers in "
+#~ "the database."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This class allows seamless conversion "
+#~ "between Python IntEnum members and their"
+#~ " integer representation in the database."
+#~ " When binding parameters, it converts "
+#~ "IntEnum members to their integer values."
+#~ " When retrieving results, it converts "
+#~ "integers back to the corresponding "
+#~ "IntEnum members."
+#~ msgstr ""
+
+#~ msgid "The IntEnum class to use for conversion."
+#~ msgstr ""
+
+#~ msgid "Construct a :class:`.TypeDecorator`."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Arguments sent here are passed to "
+#~ "the constructor of the class assigned"
+#~ " to the ``impl`` class level "
+#~ "attribute, assuming the ``impl`` is a"
+#~ " callable, and the resulting object "
+#~ "is assigned to the ``self.impl`` "
+#~ "instance attribute (thus overriding the "
+#~ "class attribute of the same name)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If the class level ``impl`` is not"
+#~ " a callable (the unusual case), it"
+#~ " will be assigned to the same "
+#~ "instance attribute 'as-is', ignoring "
+#~ "those arguments passed to the "
+#~ "constructor."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Subclasses can override this to "
+#~ "customize the generation of ``self.impl`` "
+#~ "entirely."
+#~ msgstr ""
+
+#~ msgid "Convert Python enum to database value before storing."
+#~ msgstr ""
+
+#~ msgid "Python enum value to convert."
+#~ msgstr ""
+
+#~ msgid "SQLAlchemy dialect."
+#~ msgstr ""
+
+#~ msgid "Integer value for database storage."
+#~ msgstr ""
+
+#~ msgid "Convert database value back to Python enum after retrieval."
+#~ msgstr ""
+
+#~ msgid "Database integer value."
+#~ msgstr ""
+
+#~ msgid "Python enum instance."
+#~ msgstr ""
+
+#~ msgid "VYRA Base Storage Module"
+#~ msgstr ""
+
+#~ msgid "Provides access to SQLite database and Redis storage."
+#~ msgstr ""
+
+#~ msgid "Public API for external developers"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Important: All database tables MUST use"
+#~ " the ``tb_`` prefix! Example: "
+#~ "tb_parameters, tb_sensor_data, tb_logs"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Unified Redis Client for vyra_base "
+#~ "Combines RedisAccess and RedisManipulator "
+#~ "functionality with TLS support and "
+#~ "streaming capabilities for professional "
+#~ "communication"
+#~ msgstr ""
+
+#~ msgid "Wrapper for asynchronous functions."
+#~ msgstr ""
+
+#~ msgid "Alias for create_pubsub_listener (backward compatibility)"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+#~ msgstr ""
+
+#~ msgid "Alias for publish_with_metadata (backward compatibility)"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`int\\``"
+#~ msgstr ""
+
+#~ msgid "vyra\\_base.storage package"
+#~ msgstr ""
+
+#~ msgid "vyra\\_base.storage.db\\_access module"
+#~ msgstr ""
+
+#~ msgid "vyra\\_base.storage.db\\_manipulator module"
+#~ msgstr ""
+
+#~ msgid "vyra\\_base.storage.storage module"
+#~ msgstr ""
+
+#~ msgid "vyra\\_base.storage.tb\\_base module"
+#~ msgstr ""
+

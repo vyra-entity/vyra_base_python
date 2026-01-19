@@ -15,17 +15,17 @@ Classes
 
 .. autoclass:: SecurityLevel
    :members:
-   :undoc-members:
+   :andoc-members:
    :no-index:
 
 .. autoclass:: AccessStatus
    :members:
-   :undoc-members:
+   :andoc-members:
    :no-index:
 
 .. autoclass:: AlgorithmId
    :members:
-   :undoc-members:
+   :andoc-members:
    :no-index:
 
 Exceptions
@@ -56,12 +56,12 @@ Classes
 
 .. autoclass:: SecuritySession
    :members:
-   :undoc-members:
+   :andoc-members:
    :show-inheritance:
 
 .. autoclass:: SecurityManager
    :members:
-   :undoc-members:
+   :andoc-members:
    :show-inheritance:
 
 Security Client
@@ -74,20 +74,20 @@ Classes
 
 .. autoclass:: SecurityContext
    :members:
-   :undoc-members:
+   :andoc-members:
 
 .. autoclass:: SafetyMetadataBuilder
    :members:
-   :undoc-members:
+   :andoc-members:
 
 .. autoclass:: SecurePublisher
    :members:
-   :undoc-members:
+   :andoc-members:
    :show-inheritance:
 
 .. autoclass:: SecureServiceClient
    :members:
-   :undoc-members:
+   :andoc-members:
    :show-inheritance:
 
 Functions
@@ -96,22 +96,22 @@ Functions
 .. autofunction:: security_required
 .. autofunction:: create_security_context
 
-Security Validator
+Security Validato
 ------------------
 
-.. currentmodule:: vyra_base.security.security_validator
+.. currentmodule:: vyra_base.security.security_validato
 
 Classes
 ~~~~~~~
 
-.. autoclass:: SecurityValidator
+.. autoclass:: SecurityValidato
    :members:
-   :undoc-members:
+   :andoc-members:
    :show-inheritance:
 
 .. autoclass:: MessageSecurityFilter
    :members:
-   :undoc-members:
+   :andoc-members:
    :show-inheritance:
 
 Functions
@@ -316,13 +316,13 @@ Validation
 
 .. code-block:: python
 
-    from vyra_base.security.security_validator import SecurityValidator
+    from vyra_base.security.security_validato import SecurityValidato
 
-    validator = SecurityValidator(security_manager, strict_mode=True)
+    validato = SecurityValidato(security_manager, strict_mode=True)
 
     def callback(self, request, response):
         try:
-            validator.validate_metadata(
+            validato.validate_metadata(
                 request.safety_metadata,
                 required_level=SecurityLevel.HMAC
             )
@@ -372,7 +372,7 @@ Type Hints
     ) -> Tuple[bool, str, str, str, str, datetime, int]:
         ...
 
-    # SecurityValidator
+    # SecurityValidato
     def validate_metadata(
         self,
         metadata: Any,
@@ -404,7 +404,7 @@ Exception Handling Pattern
     )
 
     try:
-        validator.validate_metadata(metadata, SecurityLevel.HMAC)
+        validato.validate_metadata(metadata, SecurityLevel.HMAC)
     except SignatureValidationError:
         # Handle invalid signature
         pass

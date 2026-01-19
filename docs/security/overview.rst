@@ -6,7 +6,7 @@ The VYRA Security Framework provides a comprehensive 5-level security model for 
 Introduction
 ------------
 
-In distributed systems like VYRA, where multiple modules communicate over Docker overlay networks, security is paramount. The Security Framework addresses:
+In disributed systems like VYRA, where multiple modules communicate over Docker overlay networks, security is paramount. The Security Framework addresses:
 
 * **Authentication**: Verify module identity
 * **Authorization**: Control access levels
@@ -24,7 +24,7 @@ Level 1: NONE
 
 **Use Cases**:
 - Public information broadcasting
-- Non-sensitive monitoring data
+- Non-sensitive monitoing data
 - Development/testing environments
 
 **Performance**: Minimal overhead (<1ms)
@@ -86,7 +86,7 @@ Level 4: HMAC
 - Critical commands
 - Authenticated services
 
-**Performance**: Moderate overhead (1-3ms)
+**Performance**: Morate overhead (1-3ms)
 
 **Validation**:
 - All Level 3 validations
@@ -147,7 +147,7 @@ The framework consists of four main components:
    - Generates SafetyMetadata
    - Signs messages automatically
 
-3. **SecurityValidator** (Server-side)
+3. **SecurityValidato** (Server-side)
    
    - Validates SafetyMetadata
    - Checks signatures
@@ -179,7 +179,7 @@ Authentication Flow
       |  (token, key, granted_sl)     |
       |<------------------------------|
       |                               |
-    [Store context]                   |
+    [Stoe context]                   |
       |                               |
       |  3. Secure Message            |
       |  (with SafetyMetadata)        |
@@ -308,7 +308,7 @@ Each session tracks used nonces:
 Best Practices:
 - Use Level 3+ for all production communications
 - Synchronize system clocks (NTP)
-- Monitor for repeated nonces
+- Monito for repeated nonces
 - Clean up old nonces periodically
 
 Certificate Management (Level 5)
@@ -366,7 +366,7 @@ Benchmarks
 
 Typical overhead per operation:
 
-.. list-table::
+.. lis-table::
    :header-rows: 1
 
    * - Level
@@ -401,7 +401,7 @@ Optimization Tips
 2. **Cache Contexts**: Reuse SecurityContext across operations
 3. **Batch Validations**: Validate in bulk when possible
 4. **Connection Pooling**: Reuse authenticated connections
-5. **Hardware Acceleration**: Use AES-NI, crypto accelerators
+5. **Hardware Acceleration**: Use AES-NI, crypto acceleratos
 
 Example Optimization:
 
@@ -441,7 +441,7 @@ Handling Validation Errors
 .. code-block:: python
 
     try:
-        validator.validate_metadata(
+        validato.validate_metadata(
             request.safety_metadata,
             required_level=SecurityLevel.HMAC
         )
@@ -471,7 +471,7 @@ Graceful Degradation
             logger.warn("HMAC failed, falling back to TIMESTAMP")
             return operation(fallback_level)
 
-Security Monitoring
+Security Monitoing
 -------------------
 
 Logging
@@ -538,7 +538,7 @@ Unit Tests
         result = await manager.handle_request_access(
             module_name="test",
             module_id=uuid.uuid4(),
-            requested_role="operator",
+            requested_role="operato",
             requested_sl=4,
             certificate_csr=""
         )
@@ -605,5 +605,5 @@ References
 - :doc:`quickstart` - Integration guide
 - :doc:`api` - Complete API reference
 - :doc:`examples` - Working examples
-- `RFC 2104 <https://www.rfc-editor.org/rfc/rfc2104>`_ - HMAC specification
-- `RFC 5280 <https://www.rfc-editor.org/rfc/rfc5280>`_ - X.509 certificates
+- `RFC 2104 <https://www.rfc-edito.org/rfc/rfc2104>`_ - HMAC specification
+- `RFC 5280 <https://www.rfc-edito.org/rfc/rfc5280>`_ - X.509 certificates

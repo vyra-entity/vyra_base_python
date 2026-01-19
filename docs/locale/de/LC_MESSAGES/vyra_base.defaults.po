@@ -1,0 +1,630 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../vyra_base.defaults.rst:2 69dbcd6c2b8f4bc3b671f5375f0588dd
+msgid "vyra\\_base.defaults package"
+msgstr ""
+
+#: ../../vyra_base.defaults.rst:5 a9e541d435ec40cba23b13de6a2549aa
+msgid "Submodules"
+msgstr ""
+
+#: ../../vyra_base.defaults.rst:8 3866f155131f48b9bf7283f1190eddfd
+msgid "vyra\\_base.defaults.constants module"
+msgstr ""
+
+#: ../../vyra_base.defaults.rst:16 b317c9a3ece548908b9c9ca42610c5aa
+msgid "vyra\\_base.defaults.entries module"
+msgstr ""
+
+#: ../../vyra_base.defaults.rst:24 6387a3bd3777411599a0579037e95545
+msgid "vyra\\_base.defaults.exceptions module"
+msgstr ""
+
+#: ../../vyra_base.defaults.rst:32 fa4c9d901e344e1f92519f2e56b48969
+msgid "vyra\\_base.defaults.info module"
+msgstr ""
+
+#: ../../vyra_base.defaults.rst:40 b923dc33bf244b6cac3245ac97930be6
+msgid "Module contents"
+msgstr ""
+
+#~ msgid "Bases: :py:class:`~enum.Enum`"
+#~ msgstr ""
+
+#~ msgid "Constants used in the V.Y.R.A. universe."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "According to \"Pyright\", annotations like "
+#~ "``Final[str]`` are not allowed."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`object`"
+#~ msgstr ""
+
+#~ msgid "Constants for feeder limits."
+#~ msgstr ""
+
+#~ msgid "Variables"
+#~ msgstr ""
+
+#~ msgid "Default maximum length."
+#~ msgstr ""
+
+#~ msgid "Maximum length for pull requests feed."
+#~ msgstr ""
+
+#~ msgid "Maximum length for news feed."
+#~ msgstr ""
+
+#~ msgid "Maximum length for error feed."
+#~ msgstr ""
+
+#~ msgid "Maximum length for state feed."
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr "Parameter"
+
+#~ msgid "Return type"
+#~ msgstr ""
+
+#~ msgid "Constants for logger configuration."
+#~ msgstr ""
+
+#~ msgid "Maximum queue length for logger."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Sets all constants for handling timeout"
+#~ " and message length of the different"
+#~ " connection types like async, UDP."
+#~ msgstr ""
+
+#~ msgid "Timeout for connect (seconds)."
+#~ msgstr ""
+
+#~ msgid "Timeout for send (seconds)."
+#~ msgstr ""
+
+#~ msgid "Timeout for receive (seconds)."
+#~ msgstr ""
+
+#~ msgid "Timeout for closed state (seconds)."
+#~ msgstr ""
+
+#~ msgid "Constants for message length."
+#~ msgstr ""
+
+#~ msgid "Maximum receive message length (bytes)."
+#~ msgstr ""
+
+#~ msgid "Set the cyclic refresh time for the different modules in milliseconds."
+#~ msgstr ""
+
+#~ msgid "Refresh time for news feed (ms)."
+#~ msgstr ""
+
+#~ msgid "Refresh time for logger (ms)."
+#~ msgstr ""
+
+#~ msgid "Enum for the function configuration parameter types."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Represents the types of parameters that"
+#~ " can be used in a function "
+#~ "configuration."
+#~ msgstr ""
+
+#~ msgid "Boolean type"
+#~ msgstr ""
+
+#~ msgid "Byte type"
+#~ msgstr ""
+
+#~ msgid "Char type"
+#~ msgstr ""
+
+#~ msgid "8-bit integer"
+#~ msgstr ""
+
+#~ msgid "8-bit unsigned integer"
+#~ msgstr ""
+
+#~ msgid "16-bit integer"
+#~ msgstr ""
+
+#~ msgid "16-bit unsigned integer"
+#~ msgstr ""
+
+#~ msgid "32-bit integer"
+#~ msgstr ""
+
+#~ msgid "32-bit unsigned integer"
+#~ msgstr ""
+
+#~ msgid "64-bit integer"
+#~ msgstr ""
+
+#~ msgid "64-bit unsigned integer"
+#~ msgstr ""
+
+#~ msgid "32-bit float"
+#~ msgstr ""
+
+#~ msgid "64-bit float"
+#~ msgstr ""
+
+#~ msgid "String type"
+#~ msgstr ""
+
+#~ msgid "Time type"
+#~ msgstr ""
+
+#~ msgid "Duration type"
+#~ msgstr ""
+
+#~ msgid "Any type (user defined)"
+#~ msgstr ""
+
+#~ msgid "None type"
+#~ msgstr ""
+
+#~ msgid "Array type"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Base dataclass providing utility methods "
+#~ "for all VYRA dataclass entries."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Provides common functionality like dict "
+#~ "conversion for dataclass instances."
+#~ msgstr ""
+
+#~ msgid "Convert the dataclass instance to a dictionary."
+#~ msgstr ""
+
+#~ msgid "Returns"
+#~ msgstr "Rückgabe"
+
+#~ msgid "Dictionary representation of the dataclass."
+#~ msgstr ""
+
+#~ msgid "Enum for the function configuration base types."
+#~ msgstr ""
+
+#~ msgid "Represents the types of a function configuration."
+#~ msgstr ""
+
+#~ msgid "Represents a speaker function (simple publisher)"
+#~ msgstr ""
+
+#~ msgid "Represents a callable function (request-reply pattern)"
+#~ msgstr ""
+
+#~ msgid "Represents a job function (request-feedback-reply pattern)"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~vyra_base.defaults.entries.DCBase`"
+#~ msgstr ""
+
+#~ msgid "Enum for the function configuration base parameters."
+#~ msgstr ""
+
+#~ msgid "Represents the parameters of a function configuration."
+#~ msgstr ""
+
+#~ msgid "The data type of the parameter (:class:`FunctionConfigParamTypes`)"
+#~ msgstr ""
+
+#~ msgid "The display name of the parameter"
+#~ msgstr ""
+
+#~ msgid "A description of the parameter"
+#~ msgstr ""
+
+#~ msgid "Enum for the function configuration base return values."
+#~ msgstr ""
+
+#~ msgid "Represents the return values of a function configuration."
+#~ msgstr ""
+
+#~ msgid "The data type of the return value (:class:`FunctionConfigParamTypes`)"
+#~ msgstr ""
+
+#~ msgid "The display name of the return value"
+#~ msgstr ""
+
+#~ msgid "A description of the return value"
+#~ msgstr ""
+
+#~ msgid "Enum for the function configuration display style."
+#~ msgstr ""
+
+#~ msgid "Defines how the function is displayed in the GUI."
+#~ msgstr ""
+
+#~ msgid "If True, the function is visible in the GUI"
+#~ msgstr ""
+
+#~ msgid "If True, the function is published in the GUI"
+#~ msgstr ""
+
+#~ msgid "Stores the periodic speaker settings."
+#~ msgstr ""
+
+#~ msgid "The function to be called periodically"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The time interval in seconds for "
+#~ "the periodic call (default: 1.0, must"
+#~ " be between 0.01 and 10.0)"
+#~ msgstr ""
+
+#~ msgid "Raises"
+#~ msgstr ""
+
+#~ msgid "If the interval is not between 0.01 and 10.0 seconds"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Convert periodic speaker config to "
+#~ "dictionary, replacing callable with name."
+#~ msgstr ""
+
+#~ msgid "Dictionary with caller function name instead of reference."
+#~ msgstr ""
+
+#~ msgid "Contains the function configuration."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Stores the function settings for type"
+#~ " safety and DDS communication node "
+#~ "configuration."
+#~ msgstr ""
+
+#~ msgid "Tags for the function"
+#~ msgstr ""
+
+#~ msgid "Type of the function"
+#~ msgstr ""
+
+#~ msgid "ROS2 type of the function"
+#~ msgstr ""
+
+#~ msgid "Name of the function"
+#~ msgstr ""
+
+#~ msgid "Display name of the function"
+#~ msgstr ""
+
+#~ msgid "Description of the function"
+#~ msgstr ""
+
+#~ msgid "Display style of the function"
+#~ msgstr ""
+
+#~ msgid "Parameters of the function"
+#~ msgstr ""
+
+#~ msgid "Return values of the function"
+#~ msgstr ""
+
+#~ msgid "Quality of Service profile (default: 10)"
+#~ msgstr ""
+
+#~ msgid "Function to be called when the function is invoked (only for callable)"
+#~ msgstr ""
+
+#~ msgid "Function to be called periodically (only for speaker)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Convert FunctionConfigEntry to dictionary with"
+#~ " special handling for callable fields."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Converts callable references and ROS2 "
+#~ "types to their string names for "
+#~ "serialization. Nested dataclasses are "
+#~ "recursively converted."
+#~ msgstr ""
+
+#~ msgid "Dictionary representation with serializable values."
+#~ msgstr ""
+
+#~ msgid "Container for the error entry."
+#~ msgstr ""
+
+#~ msgid "Stores the error details."
+#~ msgstr ""
+
+#~ msgid "The ros2 type of the error entry"
+#~ msgstr ""
+
+#~ msgid "The level of the error (default: 0, MINOR_FAULT)"
+#~ msgstr ""
+
+#~ msgid "The error code (default: 0x00000000)"
+#~ msgstr ""
+
+#~ msgid "Unique identifier for the error entry"
+#~ msgstr ""
+
+#~ msgid "Timestamp of when the error occurred"
+#~ msgstr ""
+
+#~ msgid "Description of the error"
+#~ msgstr ""
+
+#~ msgid "Suggested solution for the error"
+#~ msgstr ""
+
+#~ msgid "Additional information about the error"
+#~ msgstr ""
+
+#~ msgid "Name of the module where the error occurred"
+#~ msgstr ""
+
+#~ msgid "Unique identifier for the module"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`~enum.IntEnum`"
+#~ msgstr ""
+
+#~ msgid "Enum for the error level."
+#~ msgstr ""
+
+#~ msgid "Minor fault (0)"
+#~ msgstr ""
+
+#~ msgid "Major fault (1)"
+#~ msgstr ""
+
+#~ msgid "Critical fault (2)"
+#~ msgstr ""
+
+#~ msgid "Emergency fault (3)"
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`dict`"
+#~ msgstr ""
+
+#~ msgid "News feed entry object."
+#~ msgstr ""
+
+#~ msgid "Writes informational data to the graphical user interface."
+#~ msgstr ""
+
+#~ msgid "The type of the news entry"
+#~ msgstr ""
+
+#~ msgid "The level of the message (default: 2, INFO)"
+#~ msgstr ""
+
+#~ msgid "The message content"
+#~ msgstr ""
+
+#~ msgid "Timestamp of when the message was created"
+#~ msgstr ""
+
+#~ msgid "Unique identifier for the news entry"
+#~ msgstr ""
+
+#~ msgid "Name of the module that created the news entry"
+#~ msgstr ""
+
+#~ msgid "Enum for the message type."
+#~ msgstr ""
+
+#~ msgid "Action message (0)"
+#~ msgstr ""
+
+#~ msgid "Debug message (1)"
+#~ msgstr ""
+
+#~ msgid "Info message (2)"
+#~ msgstr ""
+
+#~ msgid "Hint message (3)"
+#~ msgstr ""
+
+#~ msgid "Warning message (4)"
+#~ msgstr ""
+
+#~ msgid "Contains the pull request entry."
+#~ msgstr ""
+
+#~ msgid "Stores the pull request details."
+#~ msgstr ""
+
+#~ msgid "The ros2 type of the pull request entry"
+#~ msgstr ""
+
+#~ msgid "Unique identifier for the pull request"
+#~ msgstr ""
+
+#~ msgid "User who acknowledged the pull request"
+#~ msgstr ""
+
+#~ msgid "Date when the pull request was acknowledged"
+#~ msgstr ""
+
+#~ msgid "Structure of the request"
+#~ msgstr ""
+
+#~ msgid "Date when the request was made"
+#~ msgstr ""
+
+#~ msgid "Description of the request"
+#~ msgstr ""
+
+#~ msgid "Response to the request"
+#~ msgstr ""
+
+#~ msgid "Action requested in the pull request"
+#~ msgstr ""
+
+#~ msgid "Arguments for the requested action"
+#~ msgstr ""
+
+#~ msgid "Unique identifier for the module associated with the pull request"
+#~ msgstr ""
+
+#~ msgid "Color code for visual representation in GUI"
+#~ msgstr ""
+
+#~ msgid "Contains the state entry."
+#~ msgstr ""
+
+#~ msgid "Stores the state details for life cycle overview of the module."
+#~ msgstr ""
+
+#~ msgid "The ros2 type of the state entry"
+#~ msgstr ""
+
+#~ msgid "Current state of the module"
+#~ msgstr ""
+
+#~ msgid "Trigger that caused the state change"
+#~ msgstr ""
+
+#~ msgid "Name of the module"
+#~ msgstr ""
+
+#~ msgid "Timestamp of when the state was recorded"
+#~ msgstr ""
+
+#~ msgid "Previous state of the module (default: 'N/A')"
+#~ msgstr ""
+
+#~ msgid "Contains the module entry."
+#~ msgstr ""
+
+#~ msgid "Stores the module details."
+#~ msgstr ""
+
+#~ msgid "Template identifier for the module"
+#~ msgstr ""
+
+#~ msgid "Description of the module"
+#~ msgstr ""
+
+#~ msgid "Version of the module (semantic versioning, e.g. '1.0.0')"
+#~ msgstr ""
+
+#~ msgid "Returns the dictionary representation of the ModuleEntry."
+#~ msgstr ""
+
+#~ msgid "Dictionary containing the module details."
+#~ msgstr ""
+
+#~ msgid "Generates a new UUID for the module entry in hex format"
+#~ msgstr ""
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
+#~ msgstr ""
+
+#~ msgid "Converts the UUID string to a UUID object."
+#~ msgstr ""
+
+#~ msgid "UUID object of the module entry."
+#~ msgstr ""
+
+#~ msgid "Not used in the current implementation."
+#~ msgstr ""
+
+#~ msgid "Bases: :py:class:`Exception`"
+#~ msgstr ""
+
+#~ msgid "Exception raised for errors in the feeder."
+#~ msgstr ""
+
+#~ msgid "Explanation of the error."
+#~ msgstr ""
+
+#~ msgid "Initialize FeederException."
+#~ msgstr ""
+
+#~ msgid "Info about the development team."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Contains nested :py:class:`dataclasses` classes "
+#~ "which are logically related to the "
+#~ "AuthorInfo class. It adds some "
+#~ "additional information about the development"
+#~ " team and the company behind the "
+#~ "software solution."
+#~ msgstr ""
+
+#~ msgid "Author class for setting Author information."
+#~ msgstr ""
+
+#~ msgid "Name of the creator or team."
+#~ msgstr ""
+
+#~ msgid "Contact phone number."
+#~ msgstr ""
+
+#~ msgid "Contact email address."
+#~ msgstr ""
+
+#~ msgid "File change class for setting file change information."
+#~ msgstr ""
+
+#~ msgid "Date of the file change."
+#~ msgstr ""
+
+#~ msgid "Time of the file change."
+#~ msgstr ""
+
+#~ msgid "Version class for setting version information."
+#~ msgstr ""
+
+#~ msgid "Major version number."
+#~ msgstr ""
+
+#~ msgid "Minor version number."
+#~ msgstr ""
+
+#~ msgid "Patch version number."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This module provides default constants, "
+#~ "entries, exceptions, and author information"
+#~ " for the vyra_base package."
+#~ msgstr ""
+
+#~ msgid "author"
+#~ msgstr ""
+
+#~ msgid "See AuthorInfo"
+#~ msgstr ""
+

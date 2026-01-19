@@ -1,0 +1,521 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../com/feeders.rst:2 f6d04f5b9897443fb50c1b3da9afb6ac
+msgid "Feeders - Automatic Data Publication"
+msgstr "Feeder - Automatische Daten-Publikation"
+
+#: ../../com/feeders.rst:4 71225408f2604d2b82cfd154ea1fc45a
+msgid ""
+"Feeders are special publishers that automatically publish data on ROS2 "
+"topics. VYRA provides pre-built feeders for States, News, and Errors."
+msgstr ""
+
+#: ../../com/feeders.rst:8 4c337bf99e26498b9bd40d41d07ae67f
+msgid "Concept"
+msgstr "Konzept"
+
+#: ../../com/feeders.rst:10 0bf45391b1d242328beeef95933799e3
+msgid "Feeders automate the publication of standardized data:"
+msgstr "Feeder automatisieren die Publikation von standardisierten Daten:"
+
+#: ../../com/feeders.rst:12 c577359908d240dd8187f49a2dc640cc
+msgid "**StateFeeder**: Publishes state machine state changes"
+msgstr ""
+
+#: ../../com/feeders.rst:13 f954e1dc9f624942ba92c6bb3a078cc0
+msgid "**NewsFeeder**: Publishes informative messages (logs, events)"
+msgstr ""
+
+#: ../../com/feeders.rst:14 b85217a6fbfe40149dde6b202e470f90
+msgid "**ErrorFeeder**: Publishes error messages and warnings"
+msgstr ""
+
+#: ../../com/feeders.rst:16 fa116b8b9c0e44a6a67afb600d7776bc
+msgid "**Advantages:**"
+msgstr ""
+
+#: ../../com/feeders.rst:18 df92573d6784430dbea5de91cafd927e
+msgid "✅ Automatic topic management"
+msgstr ""
+
+#: ../../com/feeders.rst:19 6ccfca50caf3460ca52797bad89c0ac5
+msgid "✅ Consistent message format"
+msgstr ""
+
+#: ../../com/feeders.rst:20 e4cf4dce422c4968b92b0d04b2ea8acf
+msgid "✅ Integrated with Entity and State Machine"
+msgstr ""
+
+#: ../../com/feeders.rst:21 41ef93f0ec044ead82083d91b8b290f9
+msgid "✅ No manual topic setup required"
+msgstr ""
+
+#: ../../com/feeders.rst:24 42927c5aecaf42d19ea041e015523319
+msgid "StateFeeder"
+msgstr ""
+
+#: ../../com/feeders.rst:26 e315d12e2ef645579e52b72fc9035f10
+msgid "The StateFeeder automatically publishes state machine state changes:"
+msgstr ""
+
+#: ../../com/feeders.rst:29 ../../com/feeders.rst:78 ../../com/feeders.rst:131
+#: 340e33cc2ade4e84a6f57731b4a4a7b3 3b2045202d464062b1336fdd7227efe0
+#: dd3bd26d594f4bda81f1d58a47faecec
+msgid "Usage"
+msgstr "Verwendung"
+
+#: ../../com/feeders.rst:54 6a244cb1eb0d4cde8c45e4e22aba88c4
+msgid "Integration with State Machine"
+msgstr ""
+
+#: ../../com/feeders.rst:56 93dce6c7bcc14864b5c12c41706f03f2
+msgid "The State Machine uses the StateFeeder automatically:"
+msgstr ""
+
+#: ../../com/feeders.rst:64 ef4f0ccf920f47da8007d81765947233
+msgid "**Published Information:**"
+msgstr ""
+
+#: ../../com/feeders.rst:66 b644b4d809c6448aaad99492d1093adb
+msgid "Lifecycle State (IDLE, READY, RUNNING, etc.)"
+msgstr ""
+
+#: ../../com/feeders.rst:67 9cf0231229df4c3f8f84f3830669c29d
+msgid "Operational State (IDLE, INITIALIZING, OPERATIONAL, etc.)"
+msgstr ""
+
+#: ../../com/feeders.rst:68 b6b5d21092014e749152fab69fc06ce3
+msgid "Health State (HEALTHY, DEGRADED, UNHEALTHY, etc.)"
+msgstr ""
+
+#: ../../com/feeders.rst:69 674e6158bb78457299d3185117e0a7b9
+msgid "Timestamp"
+msgstr ""
+
+#: ../../com/feeders.rst:70 63ae6a54ed9e4764b91ad0d9fb3e424e
+msgid "Module-Namespace"
+msgstr ""
+
+#: ../../com/feeders.rst:73 2f09596cf49949ba8603fb96d64b07cf
+msgid "NewsFeeder"
+msgstr ""
+
+#: ../../com/feeders.rst:75 db65d4dbbf8b451291321d444e016d7e
+msgid "The NewsFeeder publishes informative messages and events:"
+msgstr ""
+
+#: ../../com/feeders.rst:100 f06c0bc3471340d3bf52126cfbd613fa
+msgid "Publish Messages"
+msgstr ""
+
+#: ../../com/feeders.rst:118 ../../com/feeders.rst:171
+#: ea6260d29799440daa89a38a61409247 edf441e860d04ce2a2a7817a6e7f8280
+msgid "**Use Cases:**"
+msgstr ""
+
+#: ../../com/feeders.rst:120 93d6ab99aa2d46ceadbace78e702aed3
+msgid "Status messages for monitoing"
+msgstr ""
+
+#: ../../com/feeders.rst:121 cd3b49c4e34a4e338d369454f5f1c13c
+msgid "Important events (Start, Stop, Calibration)"
+msgstr ""
+
+#: ../../com/feeders.rst:122 4f0ab3e792814fc1bb9fe32e0d777515
+msgid "Progress reports for long-running operations"
+msgstr ""
+
+#: ../../com/feeders.rst:123 4bc575a278bb4132ae063a28d04c0928
+msgid "Informative logs for other modules"
+msgstr ""
+
+#: ../../com/feeders.rst:126 30829b8e2f194094adf451e5c144c183
+msgid "ErrorFeeder"
+msgstr ""
+
+#: ../../com/feeders.rst:128 f89d44a5b9384ba39ef67a1be4ae14a1
+msgid "The ErrorFeeder publishes errors and warnings:"
+msgstr ""
+
+#: ../../com/feeders.rst:153 a1008271ef0843eba75b80cc83b2ff85
+msgid "Publish Errors"
+msgstr ""
+
+#: ../../com/feeders.rst:173 44146c1b94b24616a52a4bd64510aebb
+msgid "Error notifications for monitoing systems"
+msgstr ""
+
+#: ../../com/feeders.rst:174 afe2babcb05048ecaaa27798aab22d50
+msgid "Warning messages for critical states"
+msgstr ""
+
+#: ../../com/feeders.rst:175 6343a5769a194c27aab38a05be4ed1d5
+msgid "Exception logging via ROS2"
+msgstr ""
+
+#: ../../com/feeders.rst:176 92573a8ed93346738e5c14a63603a517
+msgid "Central error collection via topics"
+msgstr ""
+
+#: ../../com/feeders.rst:179 f06c0bc3471340d3bf52126cfbd613fa
+msgid "Practical Examples"
+msgstr ""
+
+#: ../../com/feeders.rst:182 ce19729609024bcf982a4f17ff9ed65a
+msgid "Monitoing Dashboard"
+msgstr ""
+
+#: ../../com/feeders.rst:184 909c25b03a8d44648841730681daeae6
+msgid "A central dashboard can subscribe to all feeder topics:"
+msgstr ""
+
+#: ../../com/feeders.rst:231 a1008271ef0843eba75b80cc83b2ff85
+msgid "Automatic Error Logging"
+msgstr ""
+
+#: ../../com/feeders.rst:233 58e8ad3e565849d297f37a4b2953021c
+msgid "Feeders can be integrated with the standard logger:"
+msgstr ""
+
+#: ../../com/feeders.rst:259 10406ec0f0774c658a2864b7e992b2b1
+msgid "Custom Feeder"
+msgstr ""
+
+#: ../../com/feeders.rst:261 b037ff2b2c564fd08ebca048368e5212
+msgid "You can also create your own feeders:"
+msgstr ""
+
+#: ../../com/feeders.rst:297 7fae4b29b55d40f39d49595c9930f9ae
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../com/feeders.rst:299 a1a44d89e5954e13b07d15854c5420c0
+msgid "✅ **Recommended:**"
+msgstr ""
+
+#: ../../com/feeders.rst:301 90052316a4854bf083bc2e15de49310e
+msgid "Use feeders for standardized data (State, News, Error)"
+msgstr ""
+
+#: ../../com/feeders.rst:302 917097d3ac684c2382d1851fa2fa45b6
+msgid "Integrate feeders in Entity initialization"
+msgstr ""
+
+#: ../../com/feeders.rst:303 296c3f2387aa4d9b95c9b43b28c48f22
+msgid "Use ``entity.publish_*()`` for easy access"
+msgstr ""
+
+#: ../../com/feeders.rst:304 6be1eb50e8ea4da398de8b2e53178072
+msgid "Subscribe to feeder topics for central monitoing"
+msgstr ""
+
+#: ../../com/feeders.rst:305 114dc7d1514845799a9c63f9be86a86f
+msgid "Use meaningful messages"
+msgstr ""
+
+#: ../../com/feeders.rst:307 a1a44d89e5954e13b07d15854c5420c0
+msgid "❌ **Avoid:**"
+msgstr ""
+
+#: ../../com/feeders.rst:309 cceb0b3487a74d4caaf73b350f6c3aa5
+msgid "High-frequency publication (> 10 Hz, use normal topics)"
+msgstr ""
+
+#: ../../com/feeders.rst:310 0e5bd66bba3746bb9b4109c3cb3b0124
+msgid "Very large messages via feeders"
+msgstr ""
+
+#: ../../com/feeders.rst:311 d2d4a5dc32be4d6e8e08d76bc3767461
+msgid "Sensitive data without encryption"
+msgstr ""
+
+#: ../../com/feeders.rst:312 58e8ad3e565849d297f37a4b2953021c
+msgid "Feeders for binary data (use normal publishers)"
+msgstr ""
+
+#: ../../com/feeders.rst:315 66ffec78854b45a1aaed6bfc9e6b0f4f
+msgid "Performance Notes"
+msgstr ""
+
+#: ../../com/feeders.rst:317 0a98ef176c6f4e53b5c6c52a18a56805
+msgid "**Typical Publication Rates:**"
+msgstr ""
+
+#: ../../com/feeders.rst:319 f7bf5b5f130244f881755891bcab1213
+msgid "StateFeeder: On state change (~0.1 - 1 Hz)"
+msgstr ""
+
+#: ../../com/feeders.rst:320 2d589041061c4c5899d5b5b89a43198d
+msgid "NewsFeeder: On events (~0.01 - 0.1 Hz)"
+msgstr ""
+
+#: ../../com/feeders.rst:321 e985c842078c461da3dd2254246e40de
+msgid "ErrorFeeder: On errors (~0.001 - 0.01 Hz)"
+msgstr ""
+
+#: ../../com/feeders.rst:324 b1d4b5ea379a46f2986bbebd4906856a
+msgid ""
+"Feeders are not optimized for high-frequency data. For sensor data with >"
+" 10 Hz, use normal ROS2 publishers."
+msgstr ""
+
+#: ../../com/feeders.rst:328 a6b42363bd904af2b574832cdcf3f6cb
+msgid "Further Information"
+msgstr ""
+
+#: ../../com/feeders.rst:330 bfec5930303646d6b1c796ce8176c611
+msgid ":doc:`ros2_communication` - ROS2 Publisher/Subscriber Details"
+msgstr ""
+
+#: ../../com/feeders.rst:331 09b971b79aa3463d8b70d8f875df5023
+msgid ":doc:`../vyra_base.com.feeder` - API Reference"
+msgstr ""
+
+#: ../../com/feeders.rst:332 718aa92059494daf9b16656ac63f99fc
+msgid ":class:`~vyra_base.com.feeder.feeder.BaseFeeder` - Base Class"
+msgstr ""
+
+#: ../../com/feeders.rst:333 289ce4b27db543b19c333a949a11729a
+msgid ":class:`~vyra_base.com.feeder.state_feeder.StateFeeder` - State Feeder"
+msgstr ""
+
+#: ../../com/feeders.rst:334 2db403a27dfc4c828f8c957b1f007a0a
+msgid ":class:`~vyra_base.com.feeder.news_feeder.NewsFeeder` - News Feeder"
+msgstr ""
+
+#: ../../com/feeders.rst:335 e969d1021ad44ad38559ff99cc9d8b16
+msgid ":class:`~vyra_base.com.feeder.error_feeder.ErrorFeeder` - Error Feeder"
+msgstr ""
+
+#~ msgid "Feeder - Automatische Daten-Publikation"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Feeder sind spezielle Publisher, die "
+#~ "automatisch Daten auf ROS2-Topics "
+#~ "veröffentlichen. VYRA bietet vorgefertigte "
+#~ "Feeder für States, News und Errors."
+#~ msgstr ""
+
+#~ msgid "Konzept"
+#~ msgstr ""
+
+#~ msgid "Feeder automatisieren die Publikation von standardisierten Daten:"
+#~ msgstr ""
+
+#~ msgid "**StateFeeder**: Veröffentlicht State Machine Zustandsänderungen"
+#~ msgstr ""
+
+#~ msgid "**NewsFeeder**: Veröffentlicht informative Nachrichten (Logs, Events)"
+#~ msgstr ""
+
+#~ msgid "**ErrorFeeder**: Veröffentlicht Fehlermeldungen und Warnungen"
+#~ msgstr ""
+
+#~ msgid "**Vorteile:**"
+#~ msgstr ""
+
+#~ msgid "✅ Automatische Topic-Verwaltung"
+#~ msgstr ""
+
+#~ msgid "✅ Konsistentes Message-Format"
+#~ msgstr ""
+
+#~ msgid "✅ Integriert mit Entity und State Machine"
+#~ msgstr ""
+
+#~ msgid "✅ Kein manuelles Topic-Setup nötig"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Der StateFeeder veröffentlicht automatisch "
+#~ "Zustandsänderungen der State Machine:"
+#~ msgstr ""
+
+#~ msgid "Verwendung"
+#~ msgstr ""
+
+#~ msgid "Der NewsFeeder veröffentlicht informative Nachrichten und Events:"
+#~ msgstr ""
+
+#~ msgid "**Anwendungsfälle:**"
+#~ msgstr ""
+
+#~ msgid "Der ErrorFeeder veröffentlicht Fehler und Warnungen:"
+#~ msgstr ""
+
+#~ msgid ":doc:`../vyra_base.com.feeder` - API-Referenz"
+#~ msgstr ""
+
+#~ msgid ":class:`~vyra_base.com.feeder.feeder.BaseFeeder` - Basis-Klasse"
+#~ msgstr ""
+
+#~ msgid "✅ Consistent message format"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Der StateFeeder publishes automatisch "
+#~ "Zustandsänderungen der State Machine:"
+#~ msgstr ""
+
+#~ msgid "Integration mit State Machine"
+#~ msgstr ""
+
+#~ msgid "Die State Machine nutzt den StateFeeder automatisch:"
+#~ msgstr ""
+
+#~ msgid "**Veröffentlichte Informationen:**"
+#~ msgstr ""
+
+#~ msgid "Der NewsFeeder publishes informative Nachrichten und Events:"
+#~ msgstr ""
+
+#~ msgid "Nachrichten veröffentlichen"
+#~ msgstr ""
+
+#~ msgid "Statusmeldungen für Monitoring"
+#~ msgstr ""
+
+#~ msgid "Wichtige Events (Start, Stop, Kalibrierung)"
+#~ msgstr ""
+
+#~ msgid "Fortschrittsberichte bei langläufigen Operationen"
+#~ msgstr ""
+
+#~ msgid "Informative Logs für andere Module"
+#~ msgstr ""
+
+#~ msgid "Der ErrorFeeder publishes Fehler und Warnungen:"
+#~ msgstr ""
+
+#~ msgid "Fehler veröffentlichen"
+#~ msgstr ""
+
+#~ msgid "Fehlerbenachrichtigungen für Monitoring-Systeme"
+#~ msgstr ""
+
+#~ msgid "Warn-Meldungen bei kritischen Zuständen"
+#~ msgstr ""
+
+#~ msgid "Exception-Logging über ROS2"
+#~ msgstr ""
+
+#~ msgid "Zentrale Fehlersammlung über Topics"
+#~ msgstr ""
+
+#~ msgid "Praktische Beispiele"
+#~ msgstr ""
+
+#~ msgid "Monitoring-Dashboard"
+#~ msgstr ""
+
+#~ msgid "Ein zentrales Dashboard kann alle Feeder-Topics abonnieren:"
+#~ msgstr ""
+
+#~ msgid "Automatisches Error-Logging"
+#~ msgstr ""
+
+#~ msgid "Feeder können mit dem Standard-Logger integriert werden:"
+#~ msgstr ""
+
+#~ msgid "Sie können auch eigene Feeder erstellen:"
+#~ msgstr ""
+
+#~ msgid "✅ **Empfohlen:**"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie Feeder für standardisierte Daten (State, News, Error)"
+#~ msgstr ""
+
+#~ msgid "Integrieren Sie Feeder in die Entity-Initialisierung"
+#~ msgstr ""
+
+#~ msgid "Nutzen Sie ``entity.publish_*()`` für einfachen Zugriff"
+#~ msgstr ""
+
+#~ msgid "Abonnieren Sie Feeder-Topics für zentrales Monitoring"
+#~ msgstr ""
+
+#~ msgid "Verwenden Sie aussagekräftige Nachrichten"
+#~ msgstr ""
+
+#~ msgid "❌ **Vermeiden:**"
+#~ msgstr ""
+
+#~ msgid "Hochfrequente Publikation (> 10 Hz, nutzen Sie normale Topics)"
+#~ msgstr ""
+
+#~ msgid "Sehr große Nachrichten über Feeder"
+#~ msgstr ""
+
+#~ msgid "Sensible Daten ohne Verschlüsselung"
+#~ msgstr ""
+
+#~ msgid "Feeder für binäre Daten (nutzen Sie normale Publisher)"
+#~ msgstr ""
+
+#~ msgid "Performance-Hinweise"
+#~ msgstr ""
+
+#~ msgid "**Typische Publikationsraten:**"
+#~ msgstr ""
+
+#~ msgid "StateFeeder: Bei Zustandsänderung (~0.1 - 1 Hz)"
+#~ msgstr ""
+
+#~ msgid "NewsFeeder: Bei Events (~0.01 - 0.1 Hz)"
+#~ msgstr ""
+
+#~ msgid "ErrorFeeder: Bei Fehlern (~0.001 - 0.01 Hz)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Feeder sind nicht für hochfrequente "
+#~ "Daten optimiert. Für Sensor-Daten mit"
+#~ " > 10 Hz nutzen Sie normale "
+#~ "ROS2 Publisher."
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid ":doc:`../vyra_base.com.feeder` - API-Reference"
+#~ msgstr ""
+
+#~ msgid ":class:`~vyra_base.com.feeder.feeder.BaseFeeder` - Basis-Class"
+#~ msgstr ""
+
+#~ msgid "✅ Consisent message format"
+#~ msgstr ""
+
+#~ msgid "Status messages for monitoring"
+#~ msgstr ""
+
+#~ msgid "Error notifications for monitoring systems"
+#~ msgstr ""
+
+#~ msgid "Monitoring Thehboard"
+#~ msgstr ""
+
+#~ msgid "Subscribe to feeder topics for central monitoring"
+#~ msgstr ""
+

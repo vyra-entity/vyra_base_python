@@ -1,0 +1,366 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../core/parameter.rst:2 1047d3a25726459aa78d2e3459f99119
+msgid "Parameter - Persistente Konfiguration"
+msgstr ""
+
+#: ../../core/parameter.rst:4 296c38e1299e48f7b36f967cc39c766d
+msgid ""
+"The :class:`~vyra_base.core.parameter.Parameter`-class manages "
+"persisttente Konfigurationsdaten, die in einer SQLite-Datenbank "
+"gespeichert are."
+msgstr ""
+
+#: ../../core/parameter.rst:8 15df08310af04b5d92752d7cbe429882
+msgid "Konzept"
+msgstr ""
+
+#: ../../core/parameter.rst:10 54b7425f116e486fbefb8e95362f8f9e
+msgid "Parameter are **permanente Configuration values**, die:"
+msgstr ""
+
+#: ../../core/parameter.rst:12 44bf9bc325454d43b1e58125c9076589
+msgid "In einer SQLite-Datenbank gespeichert are"
+msgstr ""
+
+#: ../../core/parameter.rst:13 2d653938334a4765ae0d16c278bfc409
+msgid "Zwischen Modul-Neustarts erhalten bleiben"
+msgstr ""
+
+#: ../../core/parameter.rst:14 898765c27a664ff6bbcf180408bf6d0c
+msgid "Via ROS2-Services togänglich are"
+msgstr ""
+
+#: ../../core/parameter.rst:15 360b7180acd04f62bfac5c011d82af5a
+msgid "Automatisch validiert are can"
+msgstr ""
+
+#: ../../core/parameter.rst:16 410290d0ce3b4d509bdd96674dbf29b2
+msgid "Change-Events understützen"
+msgstr ""
+
+#: ../../core/parameter.rst:19 c3a9e985c1454b8e94a3b64c8dec96fa
+msgid "Access via Entity"
+msgstr ""
+
+#: ../../core/parameter.rst:21 2d51c96c57cb432da0cfb25ed093ac5d
+msgid "The easiest Zugriff is done via die VyraEntity:"
+msgstr ""
+
+#: ../../core/parameter.rst:36 a9966354496f4f61be0e01cf4802acf7
+msgid "Read parameter"
+msgstr ""
+
+#: ../../core/parameter.rst:39 a9966354496f4f61be0e01cf4802acf7
+msgid "Azelner Parameter"
+msgstr ""
+
+#: ../../core/parameter.rst:54 71d7ec79f3854e78ba8fe3faf5322db4
+msgid "Alle Parameter"
+msgstr ""
+
+#: ../../core/parameter.rst:67 a9966354496f4f61be0e01cf4802acf7
+msgid "Set parameter"
+msgstr ""
+
+#: ../../core/parameter.rst:83 045c5bbfc48842f0a9b34fc6fca21c2a
+msgid "default values load"
+msgstr ""
+
+#: ../../core/parameter.rst:85 e432b579155a43d18b58df09151908f8
+msgid "Parameter can from JSON-Dateien with default values initialisiert are:"
+msgstr ""
+
+#: ../../core/parameter.rst:96 e8342f788f6147cc8973fa48d7f948f7
+msgid "**Beispiel JSON-Struktur:**"
+msgstr ""
+
+#: ../../core/parameter.rst:116 81fabd1acadc4f459b526d77110740a5
+msgid "Change-Events"
+msgstr ""
+
+#: ../../core/parameter.rst:118 c5de95e4de854919b8df249e2f5d069d
+msgid "Monito you Parameterchanges in Echtzeit:"
+msgstr ""
+
+#: ../../core/parameter.rst:133 7646b21db2e84c6887ab2cfacb682759
+msgid "Datenspeicherung"
+msgstr ""
+
+#: ../../core/parameter.rst:135 e4967e513a884703ad26bf98345380e1
+msgid "**Speicherort**: ``/workspace/stoage/data/<module_name>.db``"
+msgstr ""
+
+#: ../../core/parameter.rst:137 4ecf9d1941f247d0a9275920416cac9a
+msgid "The SQLite-Datenbank speichert Parameter in folgender Struktur:"
+msgstr ""
+
+#: ../../core/parameter.rst:139 3e55ffdc83fd4a96a95023bef40a3889
+msgid "**Tabellenname**: ``tb_parameters`` (siehe :doc:`../stoage`)"
+msgstr ""
+
+#: ../../core/parameter.rst:140 aff529cbeebb40b3acc55f5aa103ee78
+msgid "**Spalten**: ``name``, ``value``, ``description``, ``timestamp``"
+msgstr ""
+
+#: ../../core/parameter.rst:141 db92e45246e84143b5bba716cfbf9214
+msgid "**Zugriff**: Via SQLAlchemy ORM"
+msgstr ""
+
+#: ../../core/parameter.rst:144 8187ad9381ea446ba32e30e6cdbc7449
+msgid ""
+"Parameter-Datenbank-Tabellen folgen der Naming Convention ``tb_<name>``. "
+"Further information to Tabellenstruktur can be found you under "
+":doc:`../stoage`."
+msgstr ""
+
+#: ../../core/parameter.rst:148 881ad988786c4a46b4d36dec397e9609
+msgid "Anwendungsfälle"
+msgstr ""
+
+#: ../../core/parameter.rst:150 e8f8143019254104899dbac7a2e871dc
+msgid "Parameter eignen sich for:"
+msgstr ""
+
+#: ../../core/parameter.rst:152 90220449ce924cffa0c9546e741fd2f7
+msgid "✅ **Empfohlen:**"
+msgstr ""
+
+#: ../../core/parameter.rst:154 1fbf008949c541ab9f1981b0f76f5fe3
+msgid "Configuration values (Timeouts, Liwiths, thresholds)"
+msgstr ""
+
+#: ../../core/parameter.rst:155 34bf702a5d084833b6713b784ce52d03
+msgid "calibration data"
+msgstr ""
+
+#: ../../core/parameter.rst:156 853bfd02b67b4cf68b85a8ef89769010
+msgid "user preferences"
+msgstr ""
+
+#: ../../core/parameter.rst:157 dc64b3ee593d411089875dfb2574f7cb
+msgid "system settings"
+msgstr ""
+
+#: ../../core/parameter.rst:159 cc1b551dd2d848f3b3420ddefce62315
+msgid "❌ **Nicht recommended:**"
+msgstr ""
+
+#: ../../core/parameter.rst:161 9fb23c953bc645a1bcff901969eb87fb
+msgid "High-frequency real-time data (use you :doc:`volatile`)"
+msgstr ""
+
+#: ../../core/parameter.rst:162 b0b93f07c72b460d991561d5aae2b7e7
+msgid "Große Datenmengen (> MB, use you externe Datenbanken)"
+msgstr ""
+
+#: ../../core/parameter.rst:163 d35b5beceae44daca3f704f81b09a1b6
+msgid "Temporary buffers"
+msgstr ""
+
+#: ../../core/parameter.rst:166 eb13950d609f4d66b3d4747f3be10959
+msgid "Performance-Hinweise"
+msgstr ""
+
+#: ../../core/parameter.rst:169 a8359220b49743f5b1bc964b14e66756
+msgid ""
+"Database accesses are relatively slow (~1-10ms). Vermeiden you frequent "
+"Parameter-Updates in Echtzeit-Schleifen."
+msgstr ""
+
+#: ../../core/parameter.rst:173 d9c300f70bfd41aca7d0860977f70cce
+msgid "Cachen you oft gereade Parameter in lokalen Variablen:"
+msgstr ""
+
+#: ../../core/parameter.rst:186 3c71bd9d8e5b493796ec6b58dfc92235
+msgid "Further Information"
+msgstr ""
+
+#: ../../core/parameter.rst:188 6fb862ab7e3f4dff8c4baf5986ea8a67
+msgid ":doc:`entity` - Entity-Dokumentation"
+msgstr ""
+
+#: ../../core/parameter.rst:189 47c3712b692e4455b5b1f9c9cb6c4c50
+msgid ":doc:`volatile` - Volatile Alternative"
+msgstr ""
+
+#: ../../core/parameter.rst:190 5dfa7405b08e4ab5b38e410396e7758e
+msgid ":doc:`../stoage` - Stoage-Backend Details"
+msgstr ""
+
+#: ../../core/parameter.rst:191 6821642b19a949fbba16386c03d251cf
+msgid ":class:`~vyra_base.core.parameter.Parameter` - API-Referenz"
+msgstr ""
+
+#~ msgid "Parameter - Persistente Konfiguration"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Die :class:`~vyra_base.core.parameter.Parameter`-Klasse "
+#~ "verwaltet persistente Konfigurationsdaten, die "
+#~ "in einer SQLite-Datenbank gespeichert "
+#~ "werden."
+#~ msgstr ""
+
+#~ msgid "Parameter sind **dauerhafte Konfigurationswerte**, die:"
+#~ msgstr ""
+
+#~ msgid "In einer SQLite-Datenbank gespeichert werden"
+#~ msgstr ""
+
+#~ msgid "Über ROS2-Services zugänglich sind"
+#~ msgstr ""
+
+#~ msgid "Automatisch validiert werden können"
+#~ msgstr ""
+
+#~ msgid "Zugriff über Entity"
+#~ msgstr ""
+
+#~ msgid "Der einfachste Zugriff erfolgt über die VyraEntity:"
+#~ msgstr ""
+
+#~ msgid "Parameter lesen"
+#~ msgstr ""
+
+#~ msgid "Einzelner Parameter"
+#~ msgstr ""
+
+#~ msgid "Parameter setzen"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Parameter können aus JSON-Dateien mit"
+#~ " Standardwerten initialisiert werden:"
+#~ msgstr ""
+
+#~ msgid "Die SQLite-Datenbank speichert Parameter in folgender Struktur:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Parameter-Datenbank-Tabellen folgen der "
+#~ "Namenskonvention ``tb_<name>``. Weitere "
+#~ "Informationen zur Tabellenstruktur finden Sie"
+#~ " unter :doc:`../storage`."
+#~ msgstr ""
+
+#~ msgid "Parameter eignen sich für:"
+#~ msgstr ""
+
+#~ msgid "Konfigurationswerte (Timeouts, Limits, Schwellwerte)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Datenbankzugriffe sind relativ langsam "
+#~ "(~1-10ms). Vermeiden Sie häufige Parameter-"
+#~ "Updates in Echtzeit-Schleifen."
+#~ msgstr ""
+
+#~ msgid "Weiterführende Informationen"
+#~ msgstr ""
+
+#~ msgid "Parameter - Persisente Konfiguration"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The :class:`~vyra_base.core.parameter.Parameter`-Klasse "
+#~ "verwaltet persisente Konfigurationsdaten, die "
+#~ "in einer SQLite-Datenbank gespeichert "
+#~ "are."
+#~ msgstr ""
+
+#~ msgid "Parameter are **dauerhafte Konfigurationswerte**, die:"
+#~ msgstr ""
+
+#~ msgid "Über ROS2-Services togänglich are"
+#~ msgstr ""
+
+#~ msgid "Change-Events unterstützen"
+#~ msgstr ""
+
+#~ msgid "The einfachste Zugriff erfolgt via die VyraEntity:"
+#~ msgstr ""
+
+#~ msgid "Standardwerte laden"
+#~ msgstr ""
+
+#~ msgid "Parameter can from JSON-Dateien with Standardwerten initialisiert are:"
+#~ msgstr ""
+
+#~ msgid "Überwachen Sie Parameteränderungen in Echtzeit:"
+#~ msgstr ""
+
+#~ msgid "**Speicherort**: ``/workspace/storage/data/<module_name>.db``"
+#~ msgstr ""
+
+#~ msgid "**Tabellenname**: ``tb_parameters`` (siehe :doc:`../storage`)"
+#~ msgstr ""
+
+#~ msgid "**Zugriff**: Über SQLAlchemy ORM"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Parameter-Datenbank-Tabellen folgen der "
+#~ "Naming Convention ``tb_<name>``. Weitere "
+#~ "Informationen tor Tabellenstruktur finden Sie"
+#~ " unter :doc:`../storage`."
+#~ msgstr ""
+
+#~ msgid "Konfigurationswerte (Timeouts, Liwiths, Schwellwerte)"
+#~ msgstr ""
+
+#~ msgid "Kalibrationsdaten"
+#~ msgstr ""
+
+#~ msgid "Benutzerpräferenzen"
+#~ msgstr ""
+
+#~ msgid "Systemeinstellungen"
+#~ msgstr ""
+
+#~ msgid "❌ **Nicht empfohlen:**"
+#~ msgstr ""
+
+#~ msgid "Hochfrequente Echtzeitdaten (nutzen Sie :doc:`volatile`)"
+#~ msgstr ""
+
+#~ msgid "Große Datenmengen (> MB, nutzen Sie externe Datenbanken)"
+#~ msgstr ""
+
+#~ msgid "Temporäre Zwischenspeicher"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Datenbanktogriffe are relativ langsam "
+#~ "(~1-10ms). Vermeiden Sie häufige Parameter-"
+#~ "Updates in Echtzeit-Schleifen."
+#~ msgstr ""
+
+#~ msgid "Cachen Sie oft gelesene Parameter in lokalen Variablen:"
+#~ msgstr ""
+
+#~ msgid ":doc:`volatile` - Flüchtige Alternative"
+#~ msgstr ""
+
+#~ msgid ":doc:`../storage` - Storage-Backend Details"
+#~ msgstr ""
+

@@ -1,42 +1,42 @@
-Kernkomponenten (Core)
-======================
+Core Components
+===============
 
-Das Core-Modul bildet das Herzstück des VYRA-Frameworks. Hier werden alle zentralen Komponenten initialisiert und verwaltet.
+The Core module forms the heart of the VYRA framework. All central components are initialized and managed here.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Core Komponenten
+   :caption: Core Components
 
    core/entity
    core/parameter
    core/volatile
 
-Übersicht
+Overview
 ---------
 
-Das Core-Modul besteht aus drei Hauptkomponenten:
+The Core module consists of three main components:
 
-* **Entity**: Zentrale Verwaltungseinheit für Module
-* **Parameter**: Persistente Konfigurationsdaten in SQLite
-* **Volatile**: Flüchtige, schnelle Datenspeicherung mit Redis
+* **Entity**: Central management unit for modules
+* **Parameter**: Persistent configuration data in SQLite
+* **Volatile**: Volatile, fast data storage with Redis
 
-Zusammenspiel der Komponenten
+Component Interaction
 ------------------------------
 
-Die drei Komponenten arbeiten eng zusammen:
+The three components work closely together:
 
-1. **VyraEntity** initialisiert und orchestriert alle Module-Komponenten
-2. **Parameter** verwalten persistente Konfigurationen (langsam, dauerhaft)
-3. **Volatile** verwalten flüchtige Echtzeitdaten (schnell, temporär)
+1. **VyraEntity** initializes and orchestrates all module components
+2. **Parameter** manages persisttent configurations (slow, permanent)
+3. **Volatile** manages volatile real-time data (fast, temporary)
 
 .. tip::
-   Verwenden Sie Parameter für Konfigurationsdaten, die zwischen Neustarts erhalten bleiben sollen.
-   Verwenden Sie Volatiles für Echtzeitdaten und schnelle Zwischenspeicherung.
+   Use Parameter for configuration data that should persist between restarts.
+   Use Volatiles for real-time data and fast caching.
 
-Weiterführende Informationen
+Further Information
 -----------------------------
 
-* :doc:`core/entity` - Zentrale Entity-Verwaltung
-* :doc:`core/parameter` - Persistente Parameter
-* :doc:`core/volatile` - Flüchtige Daten
-* :doc:`vyra_base.core` - API-Referenz (automatisch generiert)
+* :doc:`core/entity` - Central Entity Management
+* :doc:`core/parameter` - Persistent Parameters
+* :doc:`core/volatile` - Volatile Data
+* :doc:`vyra_base.core` - API Reference (auto-generated)

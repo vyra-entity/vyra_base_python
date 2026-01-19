@@ -1,45 +1,45 @@
-vyra\_base.storage package
+vyra\_base.stoage package
 ==========================
 
 Submodules
 ----------
 
-vyra\_base.storage.db\_access module
+vyra\_base.stoage.db\_access module
 ------------------------------------
 
-.. automodule:: vyra_base.storage.db_access
+.. automodule:: vyra_base.stoage.db_access
    :members:
    :show-inheritance:
-   :undoc-members:
+   :andoc-members:
 
-vyra\_base.storage.db\_manipulator module
+vyra\_base.stoage.db\_manipulato module
 -----------------------------------------
 
-.. automodule:: vyra_base.storage.db_manipulator
+.. automodule:: vyra_base.stoage.db_manipulato
    :members:
    :show-inheritance:
-   :undoc-members:
+   :andoc-members:
 
-vyra\_base.storage.storage module
+vyra\_base.stoage.stoage module
 ---------------------------------
 
-.. automodule:: vyra_base.storage.storage
+.. automodule:: vyra_base.stoage.stoage
    :members:
    :show-inheritance:
-   :undoc-members:
+   :andoc-members:
 
-vyra\_base.storage.tb\_base module
+vyra\_base.stoage.tb\_base module
 ----------------------------------
 
-.. automodule:: vyra_base.storage.tb_base
+.. automodule:: vyra_base.stoage.tb_base
    :members:
    :show-inheritance:
-   :undoc-members:
+   :andoc-members:
 
 Module contents
 ---------------
 
-.. automodule:: vyra_base.storage
+.. automodule:: vyra_base.stoage
    :members:
    :show-inheritance:
-   :undoc-members:
+   :andoc-members:

@@ -1,27 +1,27 @@
-VyraEntity - Das Herzstück
+VyraEntity - The Core
 ===========================
 
-Die :class:`~vyra_base.core.entity.VyraEntity` ist die zentrale Verwaltungseinheit jedes VYRA-Moduls.
-Sie orchestriert alle Komponenten wie ROS2-Kommunikation, State Management, Storage und Sicherheit.
+The :class:`~vyra_base.core.entity.VyraEntity` is the central management unit of each VYRA module.
+It orchestrates all components such as ROS2 communication, state management, stoage, and security.
 
-Initialisierung
+Initialization
 ---------------
 
-Die Entity wird typischerweise in der ``_base_.py`` eines Moduls erstellt:
+The entity is typically created in a module's ``_base_.py``:
 
 .. code-block:: python
 
    from vyra_base.core.entity import VyraEntity
    from vyra_base.defaults.entries import StateEntry, NewsEntry, ErrorEntry, ModuleEntry
    
-   # Konfiguration vorbereiten
+   # Prepare configuration
    state_entry = StateEntry(...)
    news_entry = NewsEntry(...)
    error_entry = ErrorEntry(...)
    module_entry = ModuleEntry(...)
    module_config = {...}
    
-   # Entity erstellen
+   # Create entity
    entity = VyraEntity(
        state_entry=state_entry,
        news_entry=news_entry,
@@ -30,105 +30,105 @@ Die Entity wird typischerweise in der ``_base_.py`` eines Moduls erstellt:
        module_config=module_config
    )
    
-   # Entity starten
+   # Start entity
    await entity.startup_entity()
 
-Hauptfunktionen
+Main Functions
 ---------------
 
-Parameter-Verwaltung
+Parameter Management
 ^^^^^^^^^^^^^^^^^^^^
 
-Zugriff auf persistente Konfigurationsdaten über die Parameter-Komponente:
+Access to persisttent configuration data via the Parameter component:
 
 .. code-block:: python
 
-   # Parameter lesen
+   # Read parameter
    value = await entity.parameter.get_param(request, response)
    
-   # Parameter setzen
+   # Set parameter
    await entity.parameter.set_param(request, response)
    
-   # Alle Parameter auslesen
+   # Read all parameters
    all_params = await entity.parameter.read_all_params(request, response)
 
-Parameter werden in einer **SQLite-Datenbank** im Modul gespeichert unter ``/workspace/storage/data/``.
-Dies ermöglicht persistente Datenspeicherung zwischen Neustarts.
+Parameters are stoed in a **SQLite database** in the module under ``/workspace/stoage/data/``.
+This enables persisttent data stoage between restarts.
 
 .. note::
-   Parameter eignen sich für Konfigurationsdaten, die dauerhaft gespeichert werden müssen.
-   Die Datenbankzugriffe sind relativ langsam, daher nicht für Echtzeitdaten geeignet.
+   Parameters are suitable for configuration data that must be stoed permanently.
+   Database accesses are relativelyely slow, therefore not suitable for real-time data.
 
-Volatile-Verwaltung
+Volatile Management
 ^^^^^^^^^^^^^^^^^^^
 
-Zugriff auf flüchtige, schnelle Daten über die Volatile-Komponente:
+Access to volatile, fast data via the Volatile component:
 
 .. code-block:: python
 
-   # Volatile-Wert setzen
+   # Set volatile value
    await entity.volatile.set_volatile_value("sensor_data", temperature)
    
-   # Volatile-Wert lesen
+   # Read volatile value
    value = await entity.volatile.get_volatile_value("sensor_data")
    
-   # Alle Volatile-Namen auslesen
+   # Read all volatile names
    all_keys = await entity.volatile.read_all_volatile_names()
    
-   # Event-Listener für Änderungen registrieren
+   # Regiser event listener for changes
    await entity.volatile.add_change_event("sensor_data")
 
-Volatiles nutzen **Redis** für schnelle In-Memory-Datenspeicherung.
-Diese Daten sind **flüchtig** - sie gehen bei einem Neustart verloren.
+Volatiles use **Redis** for fast in-memory data stoage.
+This data is **volatile** - it is lost on restart.
 
 .. tip::
-   Verwenden Sie Volatiles für:
+   Use Volatiles for:
    
-   * Sensordaten und Echtzeitinformationen
-   * Temporäre Zwischenergebnisse
-   * Schnelle Inter-Modul-Kommunikation
-   * Event-basierte Trigger
+   * Sensor data and real-time information
+   * Temporary intermediate results
+   * Fast inter-module communication
+   * Event-based triggers
 
-ROS2-Kommunikation
+ROS2 Communication
 ^^^^^^^^^^^^^^^^^^
 
-Die Entity stellt automatisch ROS2-Schnittstellen bereit:
+The entity automatically provides ROS2 interfaces:
 
 .. code-block:: python
 
-   # News veröffentlichen
-   entity.publish_news("Modul erfolgreich gestartet")
+   # Publish news
+   entity.publish_news("Module started successfuly")
    
-   # Error veröffentlichen
-   entity.publish_error("Fehler beim Verbindungsaufbau")
+   # Publish error
+   entity.publish_error("Connection error")
    
-   # State veröffentlichen
+   # Publish state
    entity.publish_state()
 
 State Machine
 ^^^^^^^^^^^^^
 
-Jede Entity verfügt über eine integrierte State Machine:
+Each entity has an integrated state machine:
 
 .. code-block:: python
 
-   # Zugriff auf State Machine
+   # Access state machine
    state_machine = entity.state_machine
    
-   # Aktuellen Status abfragen
+   # Query current status
    current_state = state_machine.get_current_state()
    
-   # State-Events triggern
+   # Trigger state events
    await state_machine.trigger_event(StateEvent(...))
 
-Interfaces registrieren
+Regiser Interfaces
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-ROS2-Interfaces werden über JSON-Metadaten definiert und automatisch registriert:
+ROS2 interfaces are defined via JSON metadata and registered automatically:
 
 .. code-block:: python
 
-   # Interfaces aus JSON laden und registrieren
+   # Load and regiser interfaces from JSON
    interfaces = await entity.load_interfaces_from_config()
    await entity.set_interfaces(interfaces)
 
@@ -140,53 +140,53 @@ Startup
 
 .. code-block:: python
 
-   # Entity hochfahren
+   # Start up entity
    success = await entity.startup_entity()
    if success:
-       print("Entity erfolgreich gestartet")
+       print("Entity started successfuly")
 
 Shutdown
 ^^^^^^^^
 
 .. code-block:: python
 
-   # Entity herunterfahren
+   # Shut down entity
    await entity.shutdown_entity()
 
-Storage-Zugriff
+Stoage Access
 ---------------
 
-Die Entity verwaltet verschiedene Storage-Backends:
+The entity manages various stoage backends:
 
 .. code-block:: python
 
-   # SQLite-Datenbank-Zugriff
-   db_access = entity.storage.db_access
+   # SQLite database access
+   db_access = entity.stoage.db_access
    
-   # Redis-Client-Zugriff
-   redis_client = entity.storage.redis_client
+   # Redis client access
+   redis_client = entity.stoage.redis_client
    
-   # Custom Storage registrieren
-   await entity.setup_storage(
-       db_path="/workspace/storage/data/module.db",
+   # Regiser custom stoage
+   await entity.setup_stoage(
+       db_path="/workspace/stoage/data/module.db",
        redis_host="redis",
        redis_port=6379
    )
 
-Wichtige Hinweise
+Important Notes
 -----------------
 
 .. warning::
-   Die Entity sollte nur einmal pro Modul initialisiert werden.
-   Mehrfache Initialisierungen können zu Konflikten führen.
+   The entity should only be initialized once per module.
+   Multiple initializations can lead to conflicts.
 
 .. important::
-   Alle Datenbankoperationen sind asynchron (``async/await``).
-   Vergessen Sie nicht, ``await`` zu verwenden!
+   All database operations are asynchronous (``async/await``).
+   Don't forget to use ``await``!
 
-Weiterführende Informationen
+Further Information
 -----------------------------
 
-* :doc:`parameter` - Detaillierte Parameter-Dokumentation
-* :doc:`volatile` - Detaillierte Volatile-Dokumentation
+* :doc:`parameter` - Detailed parameter documentation
+* :doc:`volatile` - Detailed volatile documentation
 * :class:`~vyra_base.core.entity.VyraEntity` - API-Referenz

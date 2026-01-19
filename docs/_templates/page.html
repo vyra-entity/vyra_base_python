@@ -1,0 +1,7 @@
+{% extends "!page.html" %}
+
+{# Override the page header to include language switcher #}
+{% block header %}
+  {{ super() }}
+  {% include "language_switcher.html" %}
+{% endblock %}
