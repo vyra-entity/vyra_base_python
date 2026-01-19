@@ -1,12 +1,12 @@
-Kommunikation (COM)
-===================
+Communication
+=============
 
-The COM-Modul bildet die Kommunikationsschicht des VYRA-Frameworks ab.
-Es enables ROS2 Communication, IPC via gRPC and automaticallye Daten-Feeds.
+The COM-Module represents the communication layer of the VYRA framework.
+It enables ROS2 communication, IPC via gRPC, and automatic data feeds.
 
 .. toctree::
    :maxdepth: 2
-   :caption: COM Komponenten
+   :caption: COM Components
 
    com/ros2_communication
    com/ipc_communication
@@ -16,26 +16,25 @@ Es enables ROS2 Communication, IPC via gRPC and automaticallye Daten-Feeds.
 Overview
 ---------
 
-The COM-Modul besteht from drei Hauptbereichen:
+The COM-Module consists of three main areas:
 
-1. **ROS2 Kommunikation**: Services, Topics, Actions
+1. **ROS2 Communication**: Services, Topics, Actions
    
-   * **Job** (Service Client): Ruft Services on underen Modulen on
-   * **Callable** (Service Server): Stellt Services for undere Module bereit
-   * **Speaker** (Publisher): Publishes Daten on Topics
-   * **Listener** (Subscriber): Empfängt Daten of Topics
+   * **Job** (Service Client): Calls services on other modules
+   * **Callable** (Service Server): Provides services for other modules
+   * **Speaker** (Publisher): Publishes data on Topics
+   * **Listener** (Subscriber): Receives data from Topics
 
 2. **IPC (Inter-Process Communication)**: Unix Domain Socket via gRPC
    
-   * Schnelle Kommunikation **innerhalb** eines Moduls
-   * Prozess-crossing Aufrufe without Netzwerk-Overhead
+   * Fast communication **within** a module
+   * Cross-process calls without network overhead
 
-3. **Feeder**: Automatische Daten-Publikation
+3. **Feeder**: Automatic Data Publication
    
-   * **StateFeeder**: Automatische State-Updates
-   * **NewsFeeder**: Automatische News-Notifications
-   * **ErrorFeeder**: Automatische Error-Meldungen
-
+   * **StateFeeder**: Automatic State Updates
+   * **NewsFeeder**: Automatic News Notifications
+   * **ErrorFeeder**: Automatic Error Messages
 Quick Start
 -----------
 
@@ -44,7 +43,7 @@ Call ROS2 Service
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factoy import create_vyra_job
+   from vyra_base.com.datalayer.interface_factory import create_vyra_job
    
    # Job (Service Client) create
    job = create_vyra_job(
@@ -61,12 +60,12 @@ Provide ROS2 Service
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factoy import remote_callable
+   from vyra_base.com.datalayer.interface_factory import remote_callable
    
    class MyComponent:
        @remote_callable
        async def my_service(self, request, response):
-           # Service-Logik
+           # Service-Logic
            response.result = "Success"
            return response
 
@@ -84,7 +83,7 @@ Topic publish
        topic_type=SensorData
    )
    
-   # Nachricht publish
+   # Publish message
    speaker.shout(message)
 
 Further Information
@@ -92,7 +91,7 @@ Further Information
 
 * :doc:`com/ros2_communication` - ROS2 Details (Job, Callable, Speaker)
 * :doc:`com/ipc_communication` - IPC via gRPC
-* :doc:`com/feeders` - Automatische Feeder
-* :doc:`com/overview` - Complete API-Overview
-* :doc:`vyra_base.com.datalayer` - Datalayer API-Referenz
-* :doc:`vyra_base.com.feeder` - Feeder API-Referenz
+* :doc:`com/feeders` - Automatic Feeders
+* :doc:`com/overview` - Complete API Overview
+* :doc:`vyra_base.com.datalayer` - Datalayer API Reference
+* :doc:`vyra_base.com.feeder` - Feeder API Reference

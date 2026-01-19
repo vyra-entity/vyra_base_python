@@ -28,7 +28,7 @@ ROS2 has three main communication patterns:
    * With feedback and cancel capability
 
 Services: Job & Callable
--------------------------
+------------------------
 
 Job - Service Client
 ^^^^^^^^^^^^^^^^^^^^
@@ -43,7 +43,7 @@ A **Job** calls services on other modules:
    # Create job
    job = create_vyra_job(
        node=entity.node,
-       service_name="/calculato/add_two_ints",
+       service_name="/calculator/add_two_ints",
        service_type=AddTwoInts
    )
    
@@ -63,7 +63,7 @@ A **Job** calls services on other modules:
 * ``service_type``: ROS2 service type (imported from ``*_interfaces.srv``)
 
 Callable - Service Server
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A **Callable** provides a service for other modules.
 Use the ``@remote_callable`` decorato:
@@ -100,7 +100,7 @@ when the JSON metadata is correctly defined (see :doc:`../interfaces`).
 * ``response``: Outgoing service response (returned)
 
 Topics: Speaker & Listener
----------------------------
+--------------------------
 
 Speaker - Publisher
 ^^^^^^^^^^^^^^^^^^^
@@ -133,7 +133,7 @@ A **Speaker** publishes messages on a topic:
 * ``qos_profile``: Quality of Service (queue size or QoS object)
 
 Listener - Subscriber
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 A **Listener** receives messages from a topic:
 
@@ -164,10 +164,10 @@ A **Listener** receives messages from a topic:
 * Other parameters same as Speaker
 
 Practical Examples
---------------------
+------------------
 
 Inter-Module Service Call
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Module A (Server)**:
 
@@ -207,7 +207,7 @@ Inter-Module Service Call
        print("Robot moved successfuly")
 
 Topic-based Status Messages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Publisher (Module A)**:
 
@@ -332,7 +332,7 @@ Best Practices
 * Blocking calls without timeout
 
 Error Handling
-----------------
+--------------
 
 .. code-block:: python
 
@@ -350,7 +350,7 @@ Error Handling
        logger.error(f"Service error: {e}")
 
 Further Information
------------------------------
+-------------------
 
 * :doc:`ipc_communication` - IPC within a module
 * :doc:`feeders` - Automatic feeders

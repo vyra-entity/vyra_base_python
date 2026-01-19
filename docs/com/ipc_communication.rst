@@ -1,13 +1,13 @@
-IPC - Inter-Process Communication
+IPC - Inter Process Communication
 ==================================
 
-VYRA supports IPC (Inter-Process Communication) via **gRPC with Unix Domain Sockets**.
-This enables fast inter-process communication **within a module**.
+VYRA supports IPC (Inter Process Communication) via **gRPC with Unix Domain Sockets**.
+This enables fast inter process communication **within a module**.
 
 Concept
 -------
 
-IPC eignet sich for:
+IPC used for:
 
 ✅ **Use Cases:**
 
@@ -19,7 +19,7 @@ IPC eignet sich for:
 ❌ **Not suitable for:**
 
 * Inter-module communication (use ROS2)
-* Communication across container boandaries
+* Communication across container boundaries
 * External API access
 
 .. note::
@@ -29,7 +29,7 @@ IPC eignet sich for:
 gRPC via Unix Domain Socket
 -----------------------------
 
-VYRA nutzt **Unix Domain Sockets** statt TCP for gRPC-Kommunikation:
+VYRA uses **Unix Domain Sockets** instead of TCP for gRPC communication:
 
 **Advantages:**
 
@@ -38,15 +38,15 @@ VYRA nutzt **Unix Domain Sockets** statt TCP for gRPC-Kommunikation:
 * 🎯 No port conflicts
 * 💾 Less overhead than TCP/IP
 
-**Socket-Pfad:** ``/tmp/<module_name>_ipc.sock``
+**Socket Path:** ``/tmp/<module_name>_ipc.sock``
 
 Setup
 -----------
 
-Server-Seite (Backend)
+Server-Side (Backend)
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Erstellen you einen gRPC-Server with Unix Domain Socket:
+Create a gRPC server with Unix Domain Socket:
 
 .. code-block:: python
 
@@ -56,42 +56,41 @@ Erstellen you einen gRPC-Server with Unix Domain Socket:
    
    # gRPC Server with Unix Domain Socket
    socket_path = "/tmp/my_module_ipc.sock"
-   server = grpc.server(futures.ThreadPoolExecuto(max_workers=10))
+   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
    
-   # Service register (Ihr gRPC Service)
+   # Service register (Your gRPC Service)
    MyServiceServicer.add_to_server(MyServiceImpl(), server)
    
-   # Unix Domain Socket binden
+   # Bind Unix Domain Socket
    server.add_insecure_port(f'unix://{socket_path}')
    server.start()
-   print(f"IPC Server läuft on {socket_path}")
+   print(f"IPC Server running on {socket_path}")
 
-Client-Seite (Frontend/undere Prozesse)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Client-Side (Frontend/and other Processes)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Verbinden you sich with dem gRPC-Server:
+Connect to the gRPC server:
 
 .. code-block:: python
 
    import grpc
    
-   # Verbindung via Unix Domain Socket
+   # Connect via Unix Domain Socket
    socket_path = "/tmp/my_module_ipc.sock"
    channel = grpc.insecure_channel(f'unix://{socket_path}')
    
    # Client-Stub create
    stub = MyServiceStub(channel)
    
-   # RPC-Aufruf
+   # RPC call
    request = MyRequest(data="Hello")
    response = stub.CallMethod(request)
-   print(f"Antwort: {response.result}")
+   print(f"Response: {response.result}")
 
-Praktisches Example
---------------------
-
-Szenario: Frontend-Backend-Kommunikation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Practical Example
+-----------------
+Scenario: Frontend-Backend Communication
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Backend (Python gRPC Server)**:
 
@@ -109,18 +108,18 @@ Szenario: Frontend-Backend-Kommunikation
    
    class BackendServiceImpl(BackendServiceServicer):
        def GetStatus(self, request, context):
-           # Backend-Logik
+           # Backend logic
            return StatusResponse(
                status="running",
                uptime_seconds=12345
            )
        
        def ProcessData(self, request, context):
-           # Datenverarattung
+           # Data processing
            result = process(request.data)
            return DataResponse(result=result)
    
-   # Server starten
+   # Start server
    def start_ipc_server():
        socket_path = "/tmp/my_module_ipc.sock"
        server = grpc.server(futures.ThreadPoolExecuto(max_workers=10))
@@ -164,7 +163,7 @@ Szenario: Frontend-Backend-Kommunikation
 gRPC Proto-Definitionen
 -----------------------
 
-Definieren you Ihre gRPC-Services in ``.proto``-Dateien:
+Define your gRPC services in ``.proto`` files:
 
 .. code-block:: protobuf
 
@@ -179,7 +178,7 @@ Definieren you Ihre gRPC-Services in ``.proto``-Dateien:
        rpc GetData(DataRequest) returns (DataResponse);
    }
    
-   // Message-Definitionen
+   // Message-Definitions
    message InitRequest {
        string config_path = 1;
    }
@@ -199,21 +198,21 @@ Definieren you Ihre gRPC-Services in ``.proto``-Dateien:
        string result = 2;
    }
 
-Kompilieren der Proto-Dateien:
+Compiling the Proto Files:
 
 .. code-block:: bash
 
-   # Python gRPC Code generieren
+   # Generate Python gRPC code
    python -m grpc_tools.protoc \
        -I. \
        --python_out=. \
        --grpc_python_out=. \
        module_service.proto
 
-IPCHandler-Class
+IPCHandler Class
 -----------------
 
-VYRA bietet eine Helper-Class for IPC-Verbindungen:
+VYRA provides a helper class for IPC connections:
 
 .. code-block:: python
 
@@ -228,47 +227,47 @@ VYRA bietet eine Helper-Class for IPC-Verbindungen:
    # Establish connection
    await ipc.connect()
    
-   # RPC-Aufruf
+   # RPC call
    response = await ipc.call_method("GetStatus", request)
    
-   # Verbindung schließen
+   # Close connection
    await ipc.disconnect()
 
 .. note::
-   Further Details to IPCHandler-Implementierung can be found you in der
-   :class:`~vyra_base.com.handler.ipc.IPCHandler` API-Reference.
+   Further details to IPCHandler implementation can be found in the
+   :class:`~vyra_base.com.handler.ipc.IPCHandler` API Reference.
 
 Performance
 -----------
 
-**Typische Latenzzeiten:**
+**Typical Latencies:**
 
 * Unix Domain Socket: ~0.05 - 0.2 ms
 * TCP localhost: ~0.2 - 1 ms
 * ROS2 Service: ~1 - 5 ms
 
-➡️ IPC is **10-100x fastr** als ROS2 for lokale Kommunikation.
+➡️ IPC is **10-100x faster** than ROS2 for local communication.
 
 Best Practices
 --------------
 
 ✅ **Recommended:**
 
-* Use you IPC nur innerhalb eines Moduls
-* Definieren you klare Proto-Definitionen
-* Implementieren you Error Handling and Timeouts
-* Räumen you Socket-Dateien on Shutdown on
-* Use you Connection-Pooling for frequent Calls
+* Use IPC only within a module
+* Define clear Proto definitions
+* Implement error handling and timeouts
+* Clean up socket files on shutdown
+* Use connection pooling for frequent calls
 
 ❌ **Avoid:**
 
-* IPC for Inter-module communication (use ROS2)
-* Sehr große messages (> 10 MB, use you Shared Memory)
-* Blocking-Calls without Timeout
-* Hardcodierte Socket-Pfade (use you Konfiguration)
+* IPC for inter-module communication (use ROS2)
+* Very large messages (> 10 MB, use shared memory)
+* Blocking calls without timeout
+* Hardcoded socket paths (use your configuration)
 
 Error Handling
-----------------
+--------------
 
 .. code-block:: python
 
@@ -278,25 +277,25 @@ Error Handling
        channel = grpc.insecure_channel(f'unix://{socket_path}')
        stub = MyServiceStub(channel)
        
-       # Mit Timeout
+       # With timeout
        response = stub.CallMethod(
            request,
            timeout=5.0  # 5 seconds Timeout
        )
    except grpc.RpcError as e:
        if e.code() == grpc.StatusCode.UNAVAILABLE:
-           print("Server not erreichbar")
+           print("Server not reachable")
        elif e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
            print("Timeout")
        else:
            print(f"gRPC-Error: {e}")
    except Exception as e:
-       print(f"Unerwarteter Error: {e}")
+       print(f"Unexpected error: {e}")
 
 Cleanup
 -------
 
-Socket-Dateien should on Shutdown gelöscht are:
+Socket files should be deleted on shutdown:
 
 .. code-block:: python
 
@@ -306,9 +305,9 @@ Socket-Dateien should on Shutdown gelöscht are:
    def cleanup_socket(socket_path):
        if os.path.exists(socket_path):
            os.remove(socket_path)
-           print(f"Socket {socket_path} entfernt")
+           print(f"Socket {socket_path} removed")
    
-   # Beim Shutdown onräumen
+   # Clean up on shutdown
    def shutdown_handler(signum, frame):
        cleanup_socket("/tmp/my_module_ipc.sock")
        server.stop(grace_period=5)
@@ -318,9 +317,9 @@ Socket-Dateien should on Shutdown gelöscht are:
    signal.signal(signal.SIGTERM, shutdown_handler)
 
 Further Information
------------------------------
+-------------------
 
-* :doc:`ros2_communication` - ROS2 for Inter-Modul-Kommunikation
-* :doc:`../vyra_base.com` - API-Reference
-* gRPC Dokumentation: https://grpc.io/docs/languages/python/
+* :doc:`ros2_communication` - ROS2 for Inter-Module Communication
+* :doc:`../vyra_base.com` - API Reference
+* gRPC Documentation: https://grpc.io/docs/languages/python/
 * Protocol Buffers: https://protobuf.dev/

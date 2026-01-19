@@ -24,16 +24,40 @@ msgid "Getting Started"
 msgstr "Erste Schritte"
 
 #: ../../index.rst:19
+msgid "Core"
+msgstr "Kern"
+
+#: ../../index.rst:19
 msgid "Core Framework"
 msgstr "Kern-Framework"
 
+#: ../../index.rst:19
+msgid "State Machine"
+msgstr "Statusmaschine"
+
+#: ../../index.rst:19
+msgid "Communication"
+msgstr "Kommunikation"
+
+#: ../../index.rst:19
+msgid "Data Storage"
+msgstr "Datenspeicherung"
+
+#: ../../index.rst:19
+msgid "Helper"
+msgstr "Hilfsfunktionen"
+
+#: ../../index.rst:19
+msgid "Interface"
+msgstr "Schnittstelle"
+
 #: ../../index.rst:30
 msgid "Security Framework"
-msgstr "Sicherheits-Framework"
+msgstr "Sicherheits Framework"
 
 #: ../../index.rst:36
 msgid "API Reference"
-msgstr "API-Referenz"
+msgstr "API Referenz"
 
 #: ../../index.rst:7 b34a7b46438e4afa8d370fb623ec8eff
 #, fuzzy

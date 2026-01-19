@@ -106,8 +106,8 @@ Feeder
      - Automatic error publication
      - :class:`~vyra_base.com.feeder.error_feeder.ErrorFeeder`
 
-IPC (Inter-Process Communication)
-----------------------------------
+IPC (Inter Process Communication)
+---------------------------------
 
 .. list-table::
    :header-rows: 1
@@ -127,7 +127,7 @@ Factoy Functions
 -----------------
 
 Interface Creation
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -154,10 +154,10 @@ Interface Creation
      - Decorato for automatic service regisration
 
 Usage Examples
---------------------
+--------------
 
 Service Call (Job)
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -172,7 +172,7 @@ Service Call (Job)
    response = await job.call_async(request)
 
 Provide Service (Callable)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -185,7 +185,7 @@ Provide Service (Callable)
            return response
 
 Publish Topic (Speaker)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -200,7 +200,7 @@ Publish Topic (Speaker)
    speaker.shout(message)
 
 Use Feeders
-^^^^^^^^^^^^^
+^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -210,7 +210,7 @@ Use Feeders
    entity.publish_error("Connection failed")
 
 Use IPC
-^^^^^^^^^^^^^
+^^^^^^^
 
 .. code-block:: python
 
@@ -221,14 +221,14 @@ Use IPC
    response = await client.call_unary("MethodName", request)
 
 Complete API Reference
---------------------------
+----------------------
 
 * :doc:`../vyra_base.com.datalayer` - Datalayer (ROS2) API
 * :doc:`../vyra_base.com.feeder` - Feeder API
 * :doc:`../vyra_base.com` - Complete COM API
 
 Further Documentation
------------------------------
+---------------------
 
 * :doc:`ros2_communication` - ROS2 Details
 * :doc:`ipc_communication` - IPC Details
