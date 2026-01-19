@@ -1,10 +1,10 @@
 Storage - Data Storage
-==========================
+======================
 
 The Storage module provides access to persisttent (SQLite) and volatile (Redis) data storage.
 
 Overview
----------
+--------
 
 VYRA supports two storage backends:
 
@@ -26,10 +26,10 @@ VYRA supports two storage backends:
      - :class:`~vyra_base.storage.redis_client.RedisClient`
 
 Database Access (SQLite)
----------------------------
+------------------------
 
 DbAccess Class
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 The :class:`~vyra_base.storage.db_access.DbAccess` class manages SQLite databases:
 
@@ -59,7 +59,7 @@ The :class:`~vyra_base.storage.db_access.DbAccess` class manages SQLite database
 * ``session``: Session maker for queries
 
 Table Definition
------------------
+----------------
 
 Naming Convention
 ^^^^^^^^^^^^^^^^^
@@ -80,7 +80,7 @@ Naming Convention
        pass
 
 Create Table
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -117,7 +117,7 @@ Create Table
 * ``UUID``: Unique Identifier (recommended for IDs)
 
 Example-Tabellen
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 **Parameter Table**:
 
@@ -146,10 +146,10 @@ Example-Tabellen
        timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 Database-Operationen
----------------------
+--------------------
 
 DbManipulato-class
-^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD Operations:
 
@@ -164,7 +164,7 @@ The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD
    )
 
 Insert Data (Create)
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -179,7 +179,7 @@ Insert Data (Create)
        print(f"Agefügt with ID: {result.Details['id']}")
 
 Daten read (Read)
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -206,7 +206,7 @@ Daten read (Read)
    )
 
 Update Data (Update)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -220,7 +220,7 @@ Update Data (Update)
        print(f"{result.Details} Aträge aktualisiert")
 
 Delete Data (Delete)
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -233,10 +233,10 @@ Delete Data (Delete)
    })
 
 Redis-Access
--------------
+------------
 
 RedisClient-class
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages Redis-Verbindungen:
 
@@ -267,7 +267,7 @@ The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages Redis-Ver
    not direkt via RedisClient. youhe :doc:`core/volatile` for Details.
 
 Integration with Entity
-------------------------
+-----------------------
 
 Via VyraEntity
 ^^^^^^^^^^^^^^^
@@ -340,7 +340,7 @@ Redis
 * Persistent data in Redis
 
 Error Handling
-----------------
+--------------
 
 .. code-block:: python
 
@@ -377,7 +377,7 @@ For schema changes:
    Further information: https://alembic.sqlalchemy.org/
 
 Storage Locations
-------------
+-----------------
 
 **SQLite-Databases**: ``/workspace/storage/data/*.db``
 
@@ -386,7 +386,7 @@ Storage Locations
 **Redis Certificates**: ``/workspace/storage/certificates/redis/``
 
 Further Information
------------------------------
+-------------------
 
 * :doc:`core/parameter` - Parameter with SQLite
 * :doc:`core/volatile` - Volatiles with Redis

@@ -38,7 +38,7 @@ msgstr "API-Referenz"
 #: ../../index.rst:7 b34a7b46438e4afa8d370fb623ec8eff
 #, fuzzy
 msgid "Vyra-Base Documentation"
-msgstr "vyra_base Dokumentation"
+msgstr "Vyra-Base Dokumentation"
 
 #: ../../index.rst:9 af556936a19b409796095364aee79ea2
 msgid ""
