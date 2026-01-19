@@ -147,7 +147,7 @@ The framework consists of four main components:
    - Generates SafetyMetadata
    - Signs messages automatically
 
-3. **SecurityValidato** (Server-side)
+3. **SecurityValidator** (Server-side)
    
    - Validates SafetyMetadata
    - Checks signatures
@@ -366,7 +366,7 @@ Benchmarks
 
 Typical overhead per operation:
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
 
    * - Level

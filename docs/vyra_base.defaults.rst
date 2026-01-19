@@ -10,7 +10,7 @@ vyra\_base.defaults.constants module
 .. automodule:: vyra_base.defaults.constants
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.defaults.entries module
 ----------------------------------
@@ -18,7 +18,7 @@ vyra\_base.defaults.entries module
 .. automodule:: vyra_base.defaults.entries
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.defaults.exceptions module
 -------------------------------------
@@ -26,7 +26,7 @@ vyra\_base.defaults.exceptions module
 .. automodule:: vyra_base.defaults.exceptions
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.defaults.info module
 -------------------------------
@@ -34,7 +34,7 @@ vyra\_base.defaults.info module
 .. automodule:: vyra_base.defaults.info
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 Module contents
 ---------------
@@ -42,4 +42,4 @@ Module contents
 .. automodule:: vyra_base.defaults
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:

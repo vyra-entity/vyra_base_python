@@ -21,7 +21,7 @@ Verfügbare Interfaces
 Messages (msg/)
 ^^^^^^^^^^^^^^^
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
    :widths: 30 70
 
@@ -37,7 +37,7 @@ Messages (msg/)
 Services (srv/)
 ^^^^^^^^^^^^^^^
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
    :widths: 30 70
 
@@ -55,7 +55,7 @@ Services (srv/)
 Actions (action/)
 ^^^^^^^^^^^^^^^^^
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
    :widths: 30 70
 

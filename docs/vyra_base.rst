@@ -20,4 +20,4 @@ Module contents
 .. automodule:: vyra_base
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:

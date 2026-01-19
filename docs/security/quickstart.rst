@@ -248,13 +248,13 @@ Add validation to server-side service callbacks.
 
 .. code-block:: python
 
-    from vyra_base.security.security_validato import SecurityValidato
+    from vyra_base.security.security_validator import SecurityValidator
 
     def __init__(self):
         # ... previous initialization ...
         
         # Create validato
-        self.validato = SecurityValidato(
+        self.validato = SecurityValidator(
             security_manager=self,
             strict_mode=True
         )
@@ -295,7 +295,7 @@ Here's a minimal working example combining all steps.
     import rclpy
     from rclpy.node import Node
     from vyra_base.security.security_manager import SecurityManager
-    from vyra_base.security.security_validato import SecurityValidato
+    from vyra_base.security.security_validator import SecurityValidator
     from vyra_base.security.security_levels import SecurityLevel
     from vyra_base.interfaces.srv import VBASERequestAccess
     import asyncio
@@ -311,7 +311,7 @@ Here's a minimal working example combining all steps.
                 self.handle_access
             )
             
-            self.validato = SecurityValidato(self, strict_mode=True)
+            self.validato = SecurityValidator(self, strict_mode=True)
             print("Server ready on 'quick_server/request_access'")
         
         def handle_access(self, request, response):
@@ -462,7 +462,7 @@ Now that you have a working secure system:
 
 2. **Implement Validation**
    
-   - Add SecurityValidato to services
+   - Add SecurityValidator to services
    - Handle SecurityError exceptions
    - Test with invalid credentials
 

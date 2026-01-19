@@ -17,7 +17,7 @@ Overview
 
 The framework implements a 5-level security model:
 
-.. lis-table:: Security Levels
+.. list-table:: Security Levels
    :header-rows: 1
    :widths: 10 30 30 30
 
@@ -116,7 +116,7 @@ The VYRA Security Framework follows a client-server architecture:
 
 1. **Client Module** (SecurityClient) - Requests authentication and sends secure messages
 2. **Server Module** (SecurityManager) - Provides authentication service and manages sessions
-3. **SecurityValidato** - Validates incoming messages on the server side
+3. **SecurityValidator** - Validates incoming messages on the server side
 
 **Flow:**
 

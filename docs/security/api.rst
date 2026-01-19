@@ -15,17 +15,17 @@ Classes
 
 .. autoclass:: SecurityLevel
    :members:
-   :andoc-members:
+   :members:
    :no-index:
 
 .. autoclass:: AccessStatus
    :members:
-   :andoc-members:
+   :members:
    :no-index:
 
 .. autoclass:: AlgorithmId
    :members:
-   :andoc-members:
+   :members:
    :no-index:
 
 Exceptions
@@ -56,12 +56,12 @@ Classes
 
 .. autoclass:: SecuritySession
    :members:
-   :andoc-members:
+   :members:
    :show-inheritance:
 
 .. autoclass:: SecurityManager
    :members:
-   :andoc-members:
+   :members:
    :show-inheritance:
 
 Security Client
@@ -74,20 +74,20 @@ Classes
 
 .. autoclass:: SecurityContext
    :members:
-   :andoc-members:
+   :members:
 
 .. autoclass:: SafetyMetadataBuilder
    :members:
-   :andoc-members:
+   :members:
 
 .. autoclass:: SecurePublisher
    :members:
-   :andoc-members:
+   :members:
    :show-inheritance:
 
 .. autoclass:: SecureServiceClient
    :members:
-   :andoc-members:
+   :members:
    :show-inheritance:
 
 Functions
@@ -99,19 +99,19 @@ Functions
 Security Validato
 ------------------
 
-.. currentmodule:: vyra_base.security.security_validato
+.. currentmodule:: vyra_base.security.security_validator
 
 Classes
 ~~~~~~~
 
-.. autoclass:: SecurityValidato
+.. autoclass:: SecurityValidator
    :members:
-   :andoc-members:
+   :members:
    :show-inheritance:
 
 .. autoclass:: MessageSecurityFilter
    :members:
-   :andoc-members:
+   :members:
    :show-inheritance:
 
 Functions
@@ -316,9 +316,9 @@ Validation
 
 .. code-block:: python
 
-    from vyra_base.security.security_validato import SecurityValidato
+    from vyra_base.security.security_validator import SecurityValidator
 
-    validato = SecurityValidato(security_manager, strict_mode=True)
+    validato = SecurityValidator(security_manager, strict_mode=True)
 
     def callback(self, request, response):
         try:
@@ -372,7 +372,7 @@ Type Hints
     ) -> Tuple[bool, str, str, str, str, datetime, int]:
         ...
 
-    # SecurityValidato
+    # SecurityValidator
     def validate_metadata(
         self,
         metadata: Any,

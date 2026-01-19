@@ -6,7 +6,7 @@ This section provides complete, working examples of the VYRA Security Framework.
 Example Overview
 ----------------
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
    :widths: 30 50 20
 
@@ -375,11 +375,11 @@ Implementing a secure service with validation.
     
     Demonstrates:
     - Service with security validation
-    - SecurityValidato usage
+    - SecurityValidator usage
     - Error handling
     """
 
-    from vyra_base.security.security_validato import SecurityValidato
+    from vyra_base.security.security_validator import SecurityValidator
     from vyra_base.security.security_levels import (
         SecurityLevel,
         SecurityError
@@ -392,7 +392,7 @@ Implementing a secure service with validation.
             super().__init__()
             
             # Create validato
-            self.validato = SecurityValidato(
+            self.validato = SecurityValidator(
                 security_manager=self,
                 strict_mode=True
             )
@@ -598,7 +598,7 @@ Integrating security into a VYRA module.
 
     from vyra_base.com.entity import VyraEntity
     from vyra_base.security.security_manager import SecurityManager
-    from vyra_base.security.security_validato import SecurityValidato
+    from vyra_base.security.security_validator import SecurityValidator
     from vyra_base.security.security_levels import SecurityLevel
 
     class SecureVyraModule(VyraEntity, SecurityManager):
@@ -616,7 +616,7 @@ Integrating security into a VYRA module.
             )
             
             # Create validato
-            self.security_validato = SecurityValidato(
+            self.security_validator = SecurityValidator(
                 security_manager=self,
                 strict_mode=True
             )
@@ -634,7 +634,7 @@ Integrating security into a VYRA module.
         def validate_incoming_request(self, request):
             """Validate request security metadata."""
             try:
-                session = self.security_validato.validate_metadata(
+                session = self.security_validator.validate_metadata(
                     request.safety_metadata,
                     required_level=SecurityLevel.HMAC
                 )

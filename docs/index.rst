@@ -25,6 +25,7 @@ including state management, ROS2 integration, security, and communication utilit
    storage
    helper
    interfaces
+   interfaces_guide
 
 .. toctree::
    :maxdepth: 2

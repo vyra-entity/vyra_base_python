@@ -315,17 +315,29 @@ def security_required(
     
     1. SafetyMetadata is present in the request
     2. Security level meets the minimum requirement
-    3. Session token is valid (if applicable)
-    4. Signature is valid (for Level 4+)
+    3. Session token is valid (if SecurityManager is available)
+    4. Module has sufficient access level (from granted session)
     
-    Usage::
+    The decorator integrates with entity.security_manager to validate
+    that the calling module has been granted sufficient access level.
     
+    Usage with @remote_callable::
+    
+        @remote_callable
         @security_required(security_level=SecurityLevel.HMAC)
         def my_service_callback(self, request, response):
             # Service implementation
             return response
     
-    :param security_level: Minimum required security level
+    Configuration in interface JSON::
+    
+        {
+            "functionname": "my_service_callback",
+            "access_level": 4,  // SecurityLevel.HMAC
+            ...
+        }
+    
+    :param security_level: Minimum required security level (1-5)
     :param validate_metadata: Whether to validate SafetyMetadata
     :return: Decorator function
     """
@@ -335,32 +347,62 @@ def security_required(
             if not validate_metadata:
                 return func(self, request, response)
             
+            # Check if security is enabled on entity
+            entity = getattr(self, 'entity', self)
+            security_manager = getattr(entity, 'security_manager', None)
+            
+            if security_manager is None:
+                Logger.debug(
+                    f"Security not enabled for {func.__name__}, "
+                    f"skipping access level check (required: {security_level.value})"
+                )
+                return func(self, request, response)
+            
             # Check if request has SafetyMetadata
             if not hasattr(request, 'safety_metadata'):
                 Logger.warn(f"Service call to {func.__name__} missing SafetyMetadata")
                 response.success = False
-                response.message = "Missing SafetyMetadata"
+                response.message = "Missing SafetyMetadata - authentication required"
                 return response
             
             metadata = request.safety_metadata
             
-            # Check security level
-            if metadata.security_level < security_level.value:
-                Logger.warn(
-                    f"Service call to {func.__name__} has insufficient security level "
-                    f"(got {metadata.security_level}, required {security_level.value})"
+            # Validate session token and get granted level
+            session_token = metadata.session_token
+            session = security_manager.get_session(session_token)
+            
+            if session is None:
+                Logger.error(
+                    f"No valid session found for service call to {func.__name__} "
+                    f"(module_id: {metadata.module_id})"
                 )
                 response.success = False
-                response.message = f"Insufficient security level (required: {security_level.name})"
+                response.message = "Invalid or expired session"
                 return response
             
-            # Additional validation can be added here
-            # (timestamp check, nonce check, signature validation)
-            # This would require access to SecurityManager
+            # Check if session's granted level is sufficient
+            granted_level = session.security_level
+            if granted_level < security_level.value:
+                Logger.warning(
+                    f"Access denied: Module {metadata.module_id} (granted level {granted_level}) "
+                    f"attempted to call {func.__name__} (requires level {security_level.value})"
+                )
+                response.success = False
+                response.message = (
+                    f"Insufficient access level: {SecurityLevel.get_name(granted_level)} "
+                    f"(required: {SecurityLevel.get_name(security_level.value)})"
+                )
+                return response
             
-            Logger.debug(f"Service call to {func.__name__} passed security check (SL{metadata.security_level})")
+            Logger.debug(
+                f"Access granted: Module {metadata.module_id} (level {granted_level}) "
+                f"calling {func.__name__} (requires {security_level.value})"
+            )
             
             return func(self, request, response)
+        
+        # Mark the required access level for introspection
+        setattr(wrapper, '_required_access_level', security_level.value)
         
         return wrapper
     return decorator

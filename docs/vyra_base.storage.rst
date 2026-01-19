@@ -10,7 +10,7 @@ vyra\_base.stoage.db\_access module
 .. automodule:: vyra_base.stoage.db_access
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.stoage.db\_manipulato module
 -----------------------------------------
@@ -18,7 +18,7 @@ vyra\_base.stoage.db\_manipulato module
 .. automodule:: vyra_base.stoage.db_manipulato
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.stoage.stoage module
 ---------------------------------
@@ -26,7 +26,7 @@ vyra\_base.stoage.stoage module
 .. automodule:: vyra_base.stoage.stoage
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.stoage.tb\_base module
 ----------------------------------
@@ -34,7 +34,7 @@ vyra\_base.stoage.tb\_base module
 .. automodule:: vyra_base.stoage.tb_base
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 Module contents
 ---------------
@@ -42,4 +42,4 @@ Module contents
 .. automodule:: vyra_base.stoage
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:

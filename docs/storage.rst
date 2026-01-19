@@ -11,7 +11,7 @@ VYRA supports two stoage backends:
 1. **SQLite-Datenbank**: Persistent stoage (permanent)
 2. **Redis**: Volatile in-memory stoage (fast)
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
    :widths: 20 40 40
 
@@ -59,10 +59,10 @@ The :class:`~vyra_base.stoage.db_access.DbAccess` class manages SQLite databases
 * ``session``: Session maker for queries
 
 Table Definition
--------------------
+-----------------
 
 Naming Convention
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 **All database tables must start with** ``tb_`` **start with!**
 
@@ -267,7 +267,7 @@ The :class:`~vyra_base.stoage.redis_client.RedisClient`-class manages Redis-Verb
    not direkt via RedisClient. youhe :doc:`core/volatile` for Details.
 
 Integration with Entity
-----------------------
+------------------------
 
 Via VyraEntity
 ^^^^^^^^^^^^^^^

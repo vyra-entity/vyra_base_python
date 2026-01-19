@@ -10,7 +10,7 @@ vyra\_base.com.datalayer.action\_client module
 .. automodule:: vyra_base.com.datalayer.action_client
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
    :no-index:
 
 vyra\_base.com.datalayer.action\_server module
@@ -19,7 +19,7 @@ vyra\_base.com.datalayer.action\_server module
 .. automodule:: vyra_base.com.datalayer.action_server
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
    :no-index:
 
 vyra\_base.com.datalayer.callable module
@@ -28,7 +28,7 @@ vyra\_base.com.datalayer.callable module
 .. automodule:: vyra_base.com.datalayer.callable
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.interface\_factoy module
 --------------------------------------------------
@@ -36,7 +36,7 @@ vyra\_base.com.datalayer.interface\_factoy module
 .. automodule:: vyra_base.com.datalayer.interface_factoy
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.job module
 -----------------------------------
@@ -44,7 +44,7 @@ vyra\_base.com.datalayer.job module
 .. automodule:: vyra_base.com.datalayer.job
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.node module
 ------------------------------------
@@ -52,7 +52,7 @@ vyra\_base.com.datalayer.node module
 .. automodule:: vyra_base.com.datalayer.node
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.publisher module
 -----------------------------------------
@@ -60,7 +60,7 @@ vyra\_base.com.datalayer.publisher module
 .. automodule:: vyra_base.com.datalayer.publisher
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.service\_client module
 -----------------------------------------------
@@ -68,7 +68,7 @@ vyra\_base.com.datalayer.service\_client module
 .. automodule:: vyra_base.com.datalayer.service_client
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
    :no-index:
 
 vyra\_base.com.datalayer.service\_server module
@@ -77,7 +77,7 @@ vyra\_base.com.datalayer.service\_server module
 .. automodule:: vyra_base.com.datalayer.service_server
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.speaker module
 ---------------------------------------
@@ -85,7 +85,7 @@ vyra\_base.com.datalayer.speaker module
 .. automodule:: vyra_base.com.datalayer.speaker
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.subscriber module
 ------------------------------------------
@@ -93,7 +93,7 @@ vyra\_base.com.datalayer.subscriber module
 .. automodule:: vyra_base.com.datalayer.subscriber
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 vyra\_base.com.datalayer.typeconverter module
 ---------------------------------------------
@@ -101,7 +101,7 @@ vyra\_base.com.datalayer.typeconverter module
 .. automodule:: vyra_base.com.datalayer.typeconverter
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:
 
 Module contents
 ---------------
@@ -109,4 +109,4 @@ Module contents
 .. automodule:: vyra_base.com.datalayer
    :members:
    :show-inheritance:
-   :andoc-members:
+   :members:

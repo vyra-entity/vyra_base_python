@@ -45,7 +45,7 @@ from vyra_base.storage.storage import Storage
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
 from vyra_base.helper.error_handler import ErrorTraceback
-from vyra_base.security.access import AccessManager
+from vyra_base.security import SecurityManager, SecurityLevel
 
 
 class VyraEntity:
@@ -65,7 +65,9 @@ class VyraEntity:
     :ivar error_feeder: Feeder for error updates.
     :vartype error_feeder: ErrorFeeder
     :ivar state_machine: State machine for managing entity states.
-    :vartype state_machine: StateMachine
+    :vartype state_machine: UnifiedStateMachine
+    :ivar security_manager: Security manager for authentication and session management (optional).
+    :vartype security_manager: Optional[SecurityManager]
 
     :cvar _interface_list: List of interface configurations.
     :vartype _interface_list: list[FunctionConfigEntry]
@@ -134,10 +136,11 @@ class VyraEntity:
 
         self.state_machine: UnifiedStateMachine = self._init_state_machine(state_entry)
 
-        self.access_manager: AccessManager = self._init_security_access()
+        self.security_manager: Optional[SecurityManager] = None
+        if module_config.get('security', {}).get('enabled', False):
+            self.security_manager = self._init_security_manager(module_config)
 
         VyraEntity.register_callables_callbacks(self)
-        VyraEntity.register_callables_callbacks(self.access_manager)
 
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
@@ -548,16 +551,51 @@ class VyraEntity:
         Logger.warning("Using legacy state machine initialization (deprecated)")
         return self._init_state_machine(state_entry)
 
-    def _init_security_access(self) -> AccessManager:
+    def _init_security_manager(self, module_config: dict[str, Any]) -> SecurityManager:
         """
-        Initialize the security access for the entity.
+        Initialize the security manager for the entity.
 
-        This method sets up the security access manager for the entity.
-        It should be called during the initialization of the entity.
-        """
-        Logger.debug("Initializing security access for the entity.")
+        This method sets up the security manager based on the module configuration.
+        The security manager provides authentication, session management, and
+        cryptographic validation for inter-module communication.
         
-        return AccessManager()
+        Configuration example:
+        {
+            'security': {
+                'enabled': True,
+                'max_level': 4,  # SecurityLevel.HMAC
+                'session_duration': 3600,  # seconds
+                'ca_key_path': '/path/to/ca.key',  # required for level 5
+                'ca_cert_path': '/path/to/ca.cert',  # required for level 5
+                'module_passwords': {'module_id': 'password'}  # for level 3+
+            }
+        }
+        
+        :param module_config: Module configuration dictionary
+        :type module_config: dict[str, Any]
+        :returns: Initialized SecurityManager instance
+        :rtype: SecurityManager
+        """
+        security_config = module_config.get('security', {})
+        
+        max_level = security_config.get('max_level', SecurityLevel.BASIC_AUTH)
+        session_duration = security_config.get('session_duration', 3600)
+        ca_key_path = security_config.get('ca_key_path')
+        ca_cert_path = security_config.get('ca_cert_path')
+        module_passwords = security_config.get('module_passwords', {})
+        
+        Logger.info(
+            f"Initializing SecurityManager with max level: "
+            f"{SecurityLevel.get_name(max_level)}"
+        )
+        
+        return SecurityManager(
+            max_security_level=max_level,
+            session_duration_seconds=session_duration,
+            ca_key_path=ca_key_path,
+            ca_cert_path=ca_cert_path,
+            module_passwords=module_passwords
+        )
 
     async def setup_storage(
             self, config: dict[str, Any], 

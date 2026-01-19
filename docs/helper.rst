@@ -7,7 +7,7 @@ Error Handling, Kryptografie and Datei-Operationen.
 Overview
 ---------
 
-.. lis-table::
+.. list-table::
    :header-rows: 1
    :widths: 30 70
 
