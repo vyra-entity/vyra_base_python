@@ -644,4 +644,3 @@ See Also
 - :doc:`security`: Security framework and access control
 - :doc:`com/overview`: Communication overview
 - :doc:`core/entity`: Entity initialization and interface registration
-- :doc:`MIGRATION_ACCESS_LEVEL`: Access level integration guide

@@ -155,7 +155,7 @@ Publish Errors
 .. code-block:: python
 
    # Via Entity (recommended)
-   entity.publish_error("Connection to sensor lost")
+   entity.publish_error("Connection to Sensor lost")
    entity.publish_error("Timeout on service call")
    entity.publish_error("Configuration file not foand")
    
@@ -322,7 +322,7 @@ Performance Notes
 
 .. tip::
    Feeders are not optimized for high-frequency data.
-   For sensor data with > 10 Hz, use normal ROS2 publishers.
+   For Sensor data with > 10 Hz, use normal ROS2 publishers.
 
 Further Information
 -----------------------------

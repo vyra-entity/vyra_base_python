@@ -281,7 +281,7 @@ Thise metadata are loaded at entity start and automatically registered:
    interfaces = await entity.load_interfaces_from_config()
    await entity.set_interfaces(interfaces)
 
-For more details see :doc:`../interfaces`.
+For more Details see :doc:`../interfaces`.
 
 Quality of Service (QoS)
 ------------------------

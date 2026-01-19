@@ -22,7 +22,7 @@ Overview
    * - **FileReader / FileWriter**
      - Datei-Operationen (JSON, YAML, etc.)
    * - **FileLock**
-     - Datei-Locking for gleichzeitigen Zugriff
+     - Datei-Locking for gleichzeitigen Access
    * - **EnvHandler**
      - environment variables-Verwaltung
 
@@ -44,8 +44,8 @@ Verwendung
    
    # Logging
    logger.info("Modul gestartet")
-   logger.warning("Warnung: Niedriger Speicher")
-   logger.error("Fehler on Laden der Konfiguration")
+   logger.warning("Warnung: Niedriger Storage")
+   logger.error("Error on Laden der Konfiguration")
    logger.debug("Debug-Information")
 
 Konfiguration
@@ -70,7 +70,7 @@ Konfiguration
    
    .. code-block:: python
    
-      logger.info("Sensor-Wert", extra={
+      logger.info("Sensor-Value", extra={
           "sensor_id": "temp_1",
           "value": 23.5,
           "unit": "°C"
@@ -90,7 +90,7 @@ ErrorTraceback Decorato
    
    @ErrorTraceback.w_check_error_existt
    async def my_function():
-       """Fehler are automatically geloggt"""
+       """Error are automatically geloggt"""
        # Bei Exception: Traceback is geloggt and Error-Feeder notified
        raise ValueError("Etwas is schiefgelonen")
 
@@ -112,7 +112,7 @@ ErrorHandler
        # Riskante Operation
        result = await dangerous_operation()
    except Exception as e:
-       # Fehler behandeln
+       # Error behandeln
        ErrorHandler.handle_exception(e, context={
            "function": "dangerous_operation",
            "module": "my_module"
@@ -226,7 +226,7 @@ FileWriter
 FileLock
 --------
 
-Datei-Locking for gleichzeitigen Zugriff:
+Datei-Locking for gleichzeitigen Access:
 
 .. code-block:: python
 
@@ -236,7 +236,7 @@ Datei-Locking for gleichzeitigen Zugriff:
    
    with FileLock(lock_file) as lock:
        if lock.acquired:
-           # Exklusiver Zugriff
+           # Exklusiver Access
            with open("/workspace/data/shared_file.txt", "w") as f:
                f.write("Kritische Daten")
        else:
@@ -263,13 +263,13 @@ environment variables-Verwaltung:
    # Alle Variablen load (from .env-Datei)
    EnvHandler.load_dotenv("/workspace/.env")
    
-   # Boolean-Wert parsen
+   # Boolean-Value parsen
    is_debug = EnvHandler.get_bool("DEBUG_MODE", default=False)
    
-   # Integer-Wert parsen
+   # Integer-Value parsen
    port = EnvHandler.get_int("PORT", default=8080)
 
-**.env-Datei Beispiel:**
+**.env-Datei Example:**
 
 .. code-block:: text
 
@@ -285,14 +285,14 @@ Best Practices
 Logging
 ^^^^^^^
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you strukturiertes Logging
 * Use you passende Log-Levels (DEBUG < INFO < WARNING < ERROR)
-* Loggen you wichtige Events (Start, Stop, Fehler)
-* Vermeiden you sensible Daten in Logs
+* Loggen you wichtige Events (Start, Stop, Error)
+* Avoid you sensible Daten in Logs
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
 * Excessive Logging in Hochfrequenz-Schleifen
 * Persönliche or Sicherheits-relevante Daten
@@ -301,22 +301,22 @@ Logging
 Error Handling
 ^^^^^^^^^^^^^^^^
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you ``@ErrorTraceback`` for async functions
-* Loggen you Fehler with completem Context
+* Loggen you Error with completem Context
 * Use you ErrorFeeder for zentrale Fehlersammlung
 
 Kryptografie
 ^^^^^^^^^^^^
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you ``hash_password()`` statt einfachem SHA-256
 * Speichern you Schlüssel in environment variables
 * Use you starke, tofällige Schlüssel
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
 * Hartcodierte Passwörter or Schlüssel
 * Schwache Hashing-Algorithmen (MD5, SHA1)
@@ -325,10 +325,10 @@ Kryptografie
 Datei-Operationen
 ^^^^^^^^^^^^^^^^^
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you FileReader/FileWriter statt direktem I/O
-* Use you FileLock at gleichzeitigem Zugriff
+* Use you FileLock at gleichzeitigem Access
 * Prüfen you Pfad-Exisenz vor Schreiboperationen
 
 Further Information

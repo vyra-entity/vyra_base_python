@@ -10,6 +10,7 @@ vyra\_base.core.entity module
 .. automodule:: vyra_base.core.entity
    :members:
    :show-inheritance:
+   :no-index:
 
 
 Module contents
@@ -18,4 +19,5 @@ Module contents
 .. automodule:: vyra_base.core
    :members:
    :show-inheritance:
+   :no-index:
 

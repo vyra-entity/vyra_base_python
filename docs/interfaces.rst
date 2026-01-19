@@ -15,7 +15,7 @@ ROS2-Interfaces in VYRA bestehen from drei Typen:
 
 Alle VYRA-Module can diese Basis-Interfaces use, um standardisierte Kommunikation to gewährleisen.
 
-Verfügbare Interfaces
+Available Interfaces
 ---------------------
 
 Messages (msg/)
@@ -32,7 +32,7 @@ Messages (msg/)
    * - **VBASEVolatileLis.msg**
      - Lise aller Volatile-Keys
    * - **VBASEVolatileHash.msg**
-     - Hash-Wert for Volatile-Daten
+     - Hash-Value for Volatile-Daten
 
 Services (srv/)
 ^^^^^^^^^^^^^^^
@@ -50,7 +50,7 @@ Services (srv/)
    * - **VBASEStateResume.srv**
      - State Machine fortset (for Pause/Resume-Functionality)
    * - **VBASESecurityRequestAccess.srv**
-     - Sicherheits-Zugriff anfordern (Security Framework)
+     - Sicherheits-Access anfordern (Security Framework)
 
 Actions (action/)
 ^^^^^^^^^^^^^^^^^
@@ -70,7 +70,7 @@ Interface-Metadaten
 Interfaces are via JSON-Konfigurationsdateien beschrieben.
 Thise becan be found sich in ``config/*.json`` and definieren, wie Interfaces verwendet are.
 
-Beispiel-Metadaten
+Example-Metadaten
 ^^^^^^^^^^^^^^^^^^
 
 **Parameter-Service-Definition** (``config/parameter_metadata.json``):
@@ -82,7 +82,7 @@ Beispiel-Metadaten
            {
                "name": "set_param",
                "type": "vyra_base_interfaces/srv/VBASESetParam",
-               "description": "Setzt einen Parameter-Wert",
+               "description": "Setzt einen Parameter-Value",
                "implementation": "vyra_base.core.parameter.Parameter.set_param"
            },
            {
@@ -103,7 +103,7 @@ Beispiel-Metadaten
 Interface-Definition
 --------------------
 
-Beispiel: Service definieren
+Example: Service definieren
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **VBASESetParam.srv**:
@@ -124,7 +124,7 @@ Beispiel: Service definieren
 * Unterhalb of ``---``: Response-Struktur
 * Kommentare with ``#``
 
-Beispiel: Message definieren
+Example: Message definieren
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **VBASEUpdateParamEvent.msg**:
@@ -240,7 +240,7 @@ Entity lädt and regisriert Interfaces automatically:
 Best Practices
 --------------
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you VYRA-Basis-Interfaces wo möglich
 * Erstellen you eigene Interface-Pakete for modulspezifische Typen
@@ -248,7 +248,7 @@ Best Practices
 * Use you Namespaces for Interface-Namen (z.B. ``VBASE``, ``MM``)
 * Versionieren you Interface-Änderungen
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
 * Direkte Verwendung of ROS2-Standard-Interfaces without Wrapper
 * Viamäßig komplexe messages (> 1 KB)
@@ -267,7 +267,7 @@ Interfaces must with ``colcon build`` kompiliert are:
    colcon build --packages-select vyra_base_interfaces
    source install/setup.bash
 
-Nach dem Build are die Interfaces in Python verfügbar:
+Nach dem Build are die Interfaces in Python Available:
 
 .. code-block:: python
 

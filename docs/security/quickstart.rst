@@ -458,7 +458,7 @@ Now that you have a working secure system:
    
    - Define messages with SafetyMetadata
    - Use SecurePublisher for automatic signing
-   - See :doc:`overview` for details
+   - See :doc:`overview` for Details
 
 2. **Implement Validation**
    

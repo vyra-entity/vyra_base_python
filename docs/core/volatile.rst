@@ -9,8 +9,8 @@ Konzept
 
 Volatiles are **temporäre, fast Datenspeicher**, die:
 
-* In Redis (In-Memory-Datenbank) gespeichert are
-* Sehr fastn Zugriff bieten (~0.1ms)
+* In Redis (In-Memory-Database) gespeichert are
+* Sehr fastn Access bieten (~0.1ms)
 * Bei Neustart verloren gehen (volatile)
 * Change-Events understützen
 * Pub/Sub-Mechanismen use
@@ -41,7 +41,7 @@ Access via Entity
    
    entity = VyraEntity(...)
    
-   # Volatile-Zugriff
+   # Volatile-Access
    volatile = entity.volatile
 
 Werte set
@@ -49,7 +49,7 @@ Werte set
 
 .. code-block:: python
 
-   # Afachen Wert set
+   # Afachen Value set
    await entity.volatile.set_volatile_value("temperature", 23.5)
    
    # Komplexe Daten (are automatically serialisiert)
@@ -67,7 +67,7 @@ Werte read
 
 .. code-block:: python
 
-   # Azelnen Wert read
+   # Azelnen Value read
    temperature = await entity.volatile.get_volatile_value("temperature")
    print(f"Aktuelle Temperatur: {temperature}°C")
    
@@ -134,7 +134,7 @@ Für fortgeschrittene Pub/Sub-Kommunikation:
    
    # Jetzt are alle messages on 'sensor_channel' empfangen
 
-Praktisches Beispiel
+Praktisches Example
 --------------------
 
 Sensor-Daten with Event-Reaktion
@@ -188,7 +188,7 @@ Redis-Backend
 
 **Verbindung**: Automatisch via ``entity.storage.redis_client``
 
-**Speicherort**: In-Memory (RAM des Redis-Servers)
+**Storage Location**: In-Memory (RAM des Redis-Servers)
 
 **Persisenz**: Keine - Daten gehen at Redis-Neustart verloren
 
@@ -213,7 +213,7 @@ Performance
 Best Practices
 --------------
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 .. code-block:: python
 
@@ -228,7 +228,7 @@ Best Practices
    # Change-Events for kritische Werte
    await volatile.add_change_event("emergency_stop")
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
 .. code-block:: python
 

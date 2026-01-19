@@ -8,7 +8,7 @@ Overview
 
 VYRA supports two storage backends:
 
-1. **SQLite-Datenbank**: Persistent storage (permanent)
+1. **SQLite-Database**: Persistent storage (permanent)
 2. **Redis**: Volatile in-memory storage (fast)
 
 .. list-table::
@@ -91,7 +91,7 @@ Create Table
    from datetime import datetime
    
    class tb_sensor_data(Base):
-       """Table for sensor data"""
+       """Table for Sensor data"""
        __tablename__ = 'tb_sensor_data'
        
        # Primary Key (UUID recommended)
@@ -103,23 +103,23 @@ Create Table
        unit: Mapped[str] = mapped_column(String(20))
        timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
        
-       # Optional: String-Repräsentation
+       # Optional: String representation
        def __repr__(self):
-           return f"<SensorData(sensor={self.sensor_name}, value={self.value})>"
+           return f"<SensorData(Sensor={self.sensor_name}, value={self.value})>"
 
-**Feldtypen:**
+**Field Types:**
 
 * ``String(length)``: Text with fester Länge
 * ``Integer``: integer
-* ``Float``: Gleitkommazahl
+* ``Float``: Floating point number
 * ``Boolean``: True/False
 * ``DateTime``: timestamp
 * ``UUID``: Unique Identifier (recommended for IDs)
 
-Beispiel-Tabellen
+Example-Tabellen
 ^^^^^^^^^^^^^^^^^
 
-**Parameter-Tabelle**:
+**Parameter Table**:
 
 .. code-block:: python
 
@@ -132,7 +132,7 @@ Beispiel-Tabellen
        description: Mapped[str] = mapped_column(String(500))
        updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-**Log-Tabelle**:
+**Log Table**:
 
 .. code-block:: python
 
@@ -145,13 +145,13 @@ Beispiel-Tabellen
        module: Mapped[str] = mapped_column(String(100))
        timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-Datenbank-Operationen
+Database-Operationen
 ---------------------
 
 DbManipulato-class
 ^^^^^^^^^^^^^^^^^^^^
 
-The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD-Operationen:
+The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD Operations:
 
 .. code-block:: python
 
@@ -163,7 +163,7 @@ The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD
        table_structure=tb_sensor_data
    )
 
-Daten einfügen (Create)
+Insert Data (Create)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -176,25 +176,25 @@ Daten einfügen (Create)
    })
    
    if result.success:
-       print(f"Agefügt with ID: {result.details['id']}")
+       print(f"Agefügt with ID: {result.Details['id']}")
 
 Daten read (Read)
 ^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Nach ID
+   # By ID
    result = await manipulato.get_by_id(sensor_id)
    if result.success:
-       sensor = result.details
-       print(f"Sensor: {sensor.sensor_name}, Wert: {sensor.value}")
+       Sensor = result.Details
+       print(f"Sensor: {Sensor.sensor_name}, Value: {Sensor.value}")
    
    # Alle Aträge
    result = await manipulato.get_all()
-   for sensor in result.details:
-       print(f"{sensor.sensor_name}: {sensor.value} {sensor.unit}")
+   for Sensor in result.Details:
+       print(f"{Sensor.sensor_name}: {Sensor.value} {Sensor.unit}")
    
-   # Mit Filtern
+   # With Filters
    result = await manipulato.get_all(filters={
        "sensor_name": "temperature_1"
    })
@@ -205,34 +205,34 @@ Daten read (Read)
        liwith=10
    )
 
-Daten aktualisieren (Update)
+Update Data (Update)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Nach Filter aktualisieren
+   # By Filter aktualisieren
    result = await manipulato.update(
        data={"value": 25.0},
        filters={"sensor_name": "temperature_1"}
    )
    
    if result.success:
-       print(f"{result.details} Aträge aktualisiert")
+       print(f"{result.Details} Aträge aktualisiert")
 
-Daten löschen (Delete)
+Delete Data (Delete)
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Nach ID löschen
+   # By ID löschen
    result = await manipulato.delete_by_id(sensor_id)
    
-   # Nach Filter löschen
+   # By Filter löschen
    result = await manipulato.delete(filters={
        "sensor_name": "old_sensor"
    })
 
-Redis-Zugriff
+Redis-Access
 -------------
 
 RedisClient-class
@@ -253,10 +253,10 @@ The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages Redis-Ver
        ssl_ca_certs="/workspace/storage/certificates/redis/ca-cert.pem"
    )
    
-   # Wert set
+   # Value set
    await redis.set("key", "value")
    
-   # Wert read
+   # Value read
    value = await redis.get("key")
    
    # Alle Keys onlisen
@@ -276,10 +276,10 @@ Entity stellt automatically Storage Access bereit:
 
 .. code-block:: python
 
-   # Datenbank-Zugriff
+   # Database-Access
    db = entity.storage.db_access
    
-   # Redis-Zugriff
+   # Redis-Access
    redis = entity.storage.redis_client
    
    # Custom Tabelle register
@@ -305,39 +305,39 @@ Storage-Setup
 Best Practices
 --------------
 
-Datenbank
+Database
 ^^^^^^^^^
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you ``tb_`` Prefix for alle Tabellen
 * Use you UUID for Primary Keys
 * Fügen you ``timestamp`` Felder hinto
-* Use you ``DbManipulato`` for CRUD-Operationen
+* Use you ``DbManipulato`` for CRUD Operations
 * Definieren you Constraints (unique, nullable)
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
 * Tabellen without ``tb_`` Prefix
-* Sehr große Textfelder (> 10 KB, use you Dateien)
-* Blocking-Operationen (immer ``await`` use)
-* SQL-Injection-anfällige Raw-Queries
+* Very large text fields (> 10 KB, use you Dateien)
+* Blocking operations (always ``await`` use)
+* SQL injection vulnerable raw queries
 
 Redis
 ^^^^^
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
-* Use you Volatiles (siehe :doc:`core/volatile`)
+* Use you Volatiles (See :doc:`core/volatile`)
 * Use you kurze, fromsagekräftige Keys
 * Implementieren you TTL for temporäre Daten
 * Use you TLS for Verbindungen
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
-* Direkter RedisClient-Zugriff (use you Volatile)
-* Sehr große Werte (> 1 MB)
-* Persistente Daten in Redis
+* Direkter RedisClient-Access (use you Volatile)
+* Very large values (> 1 MB)
+* Persistent data in Redis
 
 Error Handling
 ----------------
@@ -347,18 +347,18 @@ Error Handling
    result = await manipulato.get_by_id(sensor_id)
    
    if result.success:
-       # Erfolg
-       data = result.details
+       # Success
+       data = result.Details
        print(f"Gefanden: {data}")
    else:
-       # Fehler
-       print(f"Fehler: {result.message}")
-       print(f"Details: {result.details}")
+       # Error
+       print(f"Error: {result.message}")
+       print(f"Details: {result.Details}")
 
-Migration & Schema-Updates
+Migration & Schema Updates
 --------------------------
 
-Bei Schema-Änderungen:
+For schema changes:
 
 .. code-block:: python
 
@@ -371,19 +371,19 @@ Bei Schema-Änderungen:
    # Oder: Alembic for Migrationen use (recommended)
 
 .. tip::
-   Für Produktionsumgebungen should you Alembic for Datenbank-Migrationen use.
+   Für Produktionsumgebungen should you Alembic for Database-Migrationen use.
    This enables versionierte Schema-Updates without data loss.
    
    Further information: https://alembic.sqlalchemy.org/
 
-Speicherorte
+Storage Locations
 ------------
 
-**SQLite-Datenbanken**: ``/workspace/storage/data/*.db``
+**SQLite-Databases**: ``/workspace/storage/data/*.db``
 
 **Redis-Daten**: In-Memory (temporär)
 
-**Redis-Zertifikate**: ``/workspace/storage/certificates/redis/``
+**Redis Certificates**: ``/workspace/storage/certificates/redis/``
 
 Further Information
 -----------------------------
@@ -391,8 +391,8 @@ Further Information
 * :doc:`core/parameter` - Parameter with SQLite
 * :doc:`core/volatile` - Volatiles with Redis
 * :doc:`vyra_base.storage` - API-Referenz
-* :class:`~vyra_base.storage.db_access.DbAccess` - Datenbank-Zugriff
-* :class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD-Operationen
+* :class:`~vyra_base.storage.db_access.DbAccess` - Database-Access
+* :class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD Operations
 * :class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client
 * SQLAlchemy Dokumentation: https://docs.sqlalchemy.org/
 * Redis Dokumentation: https://redis.io/docs/

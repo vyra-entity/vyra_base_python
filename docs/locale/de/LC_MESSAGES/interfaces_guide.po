@@ -764,8 +764,3 @@ msgstr ""
 #: ../../interfaces_guide.rst:646 00798c86c93b4630afd2b4ba2d325877
 msgid ":doc:`core/entity`: Entity initialization and interface registration"
 msgstr ""
-
-#: ../../interfaces_guide.rst:647 4c535e63f2e344cb82868415cdd06022
-msgid ":doc:`MIGRATION_ACCESS_LEVEL`: Access level integration guide"
-msgstr ""
-

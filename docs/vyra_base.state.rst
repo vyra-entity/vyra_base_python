@@ -41,7 +41,6 @@ vyra\_base.state.state\_machine module
 
 .. automodule:: vyra_base.state.state_machine
    :members:
-   :members:
    :show-inheritance:
 
 vyra\_base.state.state\_types module
@@ -65,5 +64,4 @@ Module contents
 
 .. automodule:: vyra_base.state
    :members:
-   :members:
-   :exclude-members: StateMachine, StateMachineConfig, StateMachineError, InvalidTransitionError, LayerViolationError, StateTransition, LifecycleState, OperationalState, HealthState, StateEvent, EventType, LifecycleLayer, OperationalLayer, HealthLayer, UnifiedStateMachine
+   :show-inheritance:

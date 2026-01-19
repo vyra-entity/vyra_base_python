@@ -34,7 +34,7 @@ The COM-Modul besteht from drei Hauptbereichen:
    
    * **StateFeeder**: Automatische State-Updates
    * **NewsFeeder**: Automatische News-Notifications
-   * **ErrorFeeder**: Automatische Fehler-Meldungen
+   * **ErrorFeeder**: Automatische Error-Meldungen
 
 Quick Start
 ---------------

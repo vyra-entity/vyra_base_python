@@ -2,14 +2,14 @@ Parameter - Persistente Konfiguration
 ======================================
 
 The :class:`~vyra_base.core.parameter.Parameter`-class manages persisttente Konfigurationsdaten,
-die in einer SQLite-Datenbank gespeichert are.
+die in einer SQLite-Database gespeichert are.
 
 Konzept
 -------
 
 Parameter are **permanente Configuration values**, die:
 
-* In einer SQLite-Datenbank gespeichert are
+* In einer SQLite-Database gespeichert are
 * Zwischen Modul-Neustarts erhalten bleiben
 * Via ROS2-Services togänglich are
 * Automatisch validiert are can
@@ -18,7 +18,7 @@ Parameter are **permanente Configuration values**, die:
 Access via Entity
 -------------------
 
-The easiest Zugriff is done via die VyraEntity:
+The easiest Access is done via die VyraEntity:
 
 .. code-block:: python
 
@@ -48,7 +48,7 @@ Azelner Parameter
    
    # Parameter abrufen
    await entity.parameter.get_param(request, response)
-   print(f"Wert: {response.parameter_value}")
+   print(f"Value: {response.parameter_value}")
 
 Alle Parameter
 ^^^^^^^^^^^^^^
@@ -93,7 +93,7 @@ Parameter can from JSON-Dateien with default values initialisiert are:
        reset=False  # True = bestehende Werte overwrite
    )
 
-**Beispiel JSON-Struktur:**
+**Example JSON-Struktur:**
 
 .. code-block:: json
 
@@ -132,16 +132,16 @@ Monito you Parameterchanges in Echtzeit:
 Datenspeicherung
 ----------------
 
-**Speicherort**: ``/workspace/storage/data/<module_name>.db``
+**Storage Location**: ``/workspace/storage/data/<module_name>.db``
 
-The SQLite-Datenbank speichert Parameter in folgender Struktur:
+The SQLite-Database speichert Parameter in folgender Struktur:
 
-* **Tabellenname**: ``tb_parameters`` (siehe :doc:`../storage`)
+* **Tabellenname**: ``tb_parameters`` (See :doc:`../storage`)
 * **Spalten**: ``name``, ``value``, ``description``, ``timestamp``
-* **Zugriff**: Via SQLAlchemy ORM
+* **Access**: Via SQLAlchemy ORM
 
 .. note::
-   Parameter-Datenbank-Tabellen folgen der Naming Convention ``tb_<name>``.
+   Parameter-Database-Tabellen folgen der Naming Convention ``tb_<name>``.
    Further information to Tabellenstruktur can be found you under :doc:`../storage`.
 
 Anwendungsfälle
@@ -149,7 +149,7 @@ Anwendungsfälle
 
 Parameter eignen sich for:
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Configuration values (Timeouts, Liwiths, thresholds)
 * calibration data
@@ -159,7 +159,7 @@ Parameter eignen sich for:
 ❌ **Nicht recommended:**
 
 * High-frequency real-time data (use you :doc:`volatile`)
-* Große Datenmengen (> MB, use you externe Datenbanken)
+* Große Datenmengen (> MB, use you externe Databases)
 * Temporary buffers
 
 Performance-Hinweise
@@ -167,7 +167,7 @@ Performance-Hinweise
 
 .. warning::
    Database accesses are relatively slow (~1-10ms).
-   Vermeiden you frequent Parameter-Updates in Echtzeit-Schleifen.
+   Avoid you frequent Parameter-Updates in Echtzeit-Schleifen.
 
 .. tip::
    Cachen you oft gereade Parameter in lokalen Variablen:
@@ -177,7 +177,7 @@ Performance-Hinweise
       # Amal on Start load
       max_speed = await entity.parameter.get_param(...)
       
-      # In Schleife use (without DB-Zugriff)
+      # In Schleife use (without DB-Access)
       for i in range(1000):
           if speed > max_speed:
               # ...

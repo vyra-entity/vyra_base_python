@@ -87,7 +87,7 @@ Verbinden you sich with dem gRPC-Server:
    response = stub.CallMethod(request)
    print(f"Antwort: {response.result}")
 
-Praktisches Beispiel
+Praktisches Example
 --------------------
 
 Szenario: Frontend-Backend-Kommunikation
@@ -252,7 +252,7 @@ Performance
 Best Practices
 --------------
 
-✅ **Empfohlen:**
+✅ **Recommended:**
 
 * Use you IPC nur innerhalb eines Moduls
 * Definieren you klare Proto-Definitionen
@@ -260,7 +260,7 @@ Best Practices
 * Räumen you Socket-Dateien on Shutdown on
 * Use you Connection-Pooling for frequent Calls
 
-❌ **Vermeiden:**
+❌ **Avoid:**
 
 * IPC for Inter-module communication (use ROS2)
 * Sehr große messages (> 10 MB, use you Shared Memory)
@@ -289,9 +289,9 @@ Error Handling
        elif e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
            print("Timeout")
        else:
-           print(f"gRPC-Fehler: {e}")
+           print(f"gRPC-Error: {e}")
    except Exception as e:
-       print(f"Unerwarteter Fehler: {e}")
+       print(f"Unerwarteter Error: {e}")
 
 Cleanup
 -------
