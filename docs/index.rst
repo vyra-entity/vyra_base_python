@@ -6,9 +6,8 @@
 vyra_base documentation
 =======================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+VYRA Base Python Library provides core functionality for the VYRA Framework,
+including state management, ROS2 integration, security, and communication utilities.
 
 .. toctree::
    :maxdepth: 2
@@ -19,7 +18,13 @@ documentation for details.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Security Framework
+
+   security
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Reference
 
    modules
 

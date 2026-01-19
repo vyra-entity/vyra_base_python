@@ -4,88 +4,88 @@
         "type": "callable",
         "functionname": "request_access",
         "displayname": "Request Access",
-        "description": "Request access to this module to read parameters, control the module, or perform other actions.",
-        "filetype": "VBASESecurityRequestAccess.srv",
+        "description": "Request access to this module with a specific security level. This service is used by Module A to authenticate with Module B. The latest successful authentication replaces all previous sessions.",
+        "filetype": "VBASERequestAccess.srv",
         "params": [
             {
                 "displayname": "module_name",
                 "datatype": "string",
-                "description": "The name of the module to access"
+                "description": "The name of the module requesting access (e.g., 'v2_modulemanager')"
             },
             {
-                "datatype": "uuid",
+                "datatype": "unique_identifier_msgs/UUID",
                 "displayname": "module_id",
-                "description": "The ID of the module to access"
+                "description": "Unique identifier (UUID) of the requesting module"
             },
             {
-                "datatype": "int",
-                "displayname": "requested_level",
-                "description": "The requested access level (1: Read, 2: Extended Read, 3: Control and Parameter, 4: Extended Control, 5: Full Access)"
+                "datatype": "string",
+                "displayname": "requested_role",
+                "description": "Custom role identifier for the requesting module (e.g., 'operator', 'supervisor', 'maintenance')"
+            },
+            {
+                "datatype": "uint8",
+                "displayname": "requested_sl",
+                "description": "Requested security level (1=NONE, 2=BASIC_AUTH, 3=EXTENDED_AUTH, 4=HMAC, 5=DIGITAL_SIGNATURE)"
             },
             {
                 "datatype": "string",
                 "displayname": "password",
-                "description": "Password for access levels 2-4 (optional)"
+                "description": "Password for Level 3+ authentication (required for EXTENDED_AUTH and higher security levels)"
             },
             {
                 "datatype": "string",
-                "displayname": "level_5_passkey",
-                "description": "Passkey for level 5 access (optional)"
-            },
-            {
-                "datatype": "string",
-                "displayname": "certificate",
-                "description": "The certificate to use for authentication (sl5)"
+                "displayname": "certificate_csr",
+                "description": "Certificate Signing Request (CSR) for Level 5 authentication (base64 encoded PEM format, required only for SL5)"
             }
         ],
         "returns": [
             {
-                "name": "access_status",
-                "datatype": "int",
-                "displayname": "Access Status",
-                "description": "The access status, e.g., '0:ACCESS_GRANTED', '1:ACCESS_DENIED', '2:MISSING_ACCESS_PARAMETERS', '3:INTERNAL_ERROR'"
-            },
-            {
-                "name": "granted_level",
-                "datatype": "int",
-                "displayname": "Granted Level",
-                "description": "The granted access level"
-            },
-            {
-                "name": "expiry_timestamp",
-                "datatype": "int64",
-                "displayname": "Expiry Timestamp",
-                "description": "The timestamp (in epoch format) when the access expires"
-            },
-            {
-                "name": "access_token",
-                "datatype": "string",
-                "displayname": "Access Token",
-                "description": "The access token to be used for subsequent authenticated requests"
-            },
-            {
-                "name": "refresh_token",
-                "datatype": "string",
-                "displayname": "Refresh Token",
-                "description": "The refresh token to renew the access token when it expires"
-            },
-            {
-                "name": "token_type",
-                "datatype": "string",
-                "displayname": "Token Type",
-                "description": "The type of the access token (e.g., 'Bearer')"
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates if access was granted"
             },
             {
                 "name": "message",
                 "datatype": "string",
                 "displayname": "Message",
-                "description": "Additional information about the access request"
+                "description": "Human-readable message about the access request result"
+            },
+            {
+                "name": "session_token",
+                "datatype": "string",
+                "displayname": "Session Token",
+                "description": "Session token for subsequent authenticated requests (JWT or UUID, valid until expires_at)"
+            },
+            {
+                "name": "hmac_key",
+                "datatype": "string",
+                "displayname": "HMAC Key",
+                "description": "HMAC key for Level 4 security (hex-encoded shared secret for HMAC-SHA256, empty for SL<4)"
+            },
+            {
+                "name": "certificate",
+                "datatype": "string",
+                "displayname": "Certificate",
+                "description": "Certificate for Level 5 security (PEM format signed by module CA, empty for SL<5)"
+            },
+            {
+                "name": "expires_at",
+                "datatype": "builtin_interfaces/Time",
+                "displayname": "Expires At",
+                "description": "Timestamp when the session token expires"
+            },
+            {
+                "name": "granted_sl",
+                "datatype": "uint8",
+                "displayname": "Granted Security Level",
+                "description": "Granted security level (may differ from requested if downgraded)"
             }
         ],
         "access_level": 1,
         "displaystyle": {
             "visible": true,
-            "published": false
+            "published": true
         }
     }
 ]
