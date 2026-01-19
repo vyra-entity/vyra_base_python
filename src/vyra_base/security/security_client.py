@@ -142,7 +142,8 @@ class SecurePublisher:
     This class wraps a standard ROS2 publisher and automatically adds
     SafetyMetadata to each published message based on the security level.
     
-    Usage:
+    Usage::
+    
         publisher = SecurePublisher(
             node,
             MessageType,
@@ -224,7 +225,8 @@ class SecureServiceClient:
     
     Similar to SecurePublisher, but for service calls.
     
-    Usage:
+    Usage::
+    
         client = SecureServiceClient(
             node,
             ServiceType,
@@ -310,12 +312,14 @@ def security_required(
     Decorator for service callbacks requiring authentication.
     
     This decorator checks that:
+    
     1. SafetyMetadata is present in the request
     2. Security level meets the minimum requirement
     3. Session token is valid (if applicable)
     4. Signature is valid (for Level 4+)
     
-    Usage:
+    Usage::
+    
         @security_required(security_level=SecurityLevel.HMAC)
         def my_service_callback(self, request, response):
             # Service implementation

@@ -8,11 +8,7 @@ Complete API documentation for the VYRA Security Framework.
 Security Levels
 ---------------
 
-.. automodule:: vyra_base.security.security_levels
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :special-members: __init__
+.. currentmodule:: vyra_base.security.security_levels
 
 Classes
 ~~~~~~~
@@ -20,34 +16,40 @@ Classes
 .. autoclass:: SecurityLevel
    :members:
    :undoc-members:
+   :no-index:
 
 .. autoclass:: AccessStatus
    :members:
    :undoc-members:
+   :no-index:
 
 .. autoclass:: AlgorithmId
    :members:
    :undoc-members:
+   :no-index:
 
 Exceptions
 ~~~~~~~~~~
 
 .. autoexception:: SecurityError
+   :no-index:
 .. autoexception:: InvalidSecurityLevelError
+   :no-index:
 .. autoexception:: SignatureValidationError
+   :no-index:
 .. autoexception:: CertificateValidationError
+   :no-index:
 .. autoexception:: TimestampValidationError
+   :no-index:
 .. autoexception:: SessionExpiredError
+   :no-index:
 .. autoexception:: NonceValidationError
+   :no-index:
 
 Security Manager
 ----------------
 
-.. automodule:: vyra_base.security.security_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :special-members: __init__
+.. currentmodule:: vyra_base.security.security_manager
 
 Classes
 ~~~~~~~
@@ -57,30 +59,15 @@ Classes
    :undoc-members:
    :show-inheritance:
 
-   .. automethod:: is_expired
-   .. automethod:: add_nonce
-   .. automethod:: has_nonce
-
 .. autoclass:: SecurityManager
    :members:
    :undoc-members:
    :show-inheritance:
 
-   .. automethod:: __init__
-   .. automethod:: handle_request_access
-   .. automethod:: get_session
-   .. automethod:: cleanup_expired_sessions
-   .. automethod:: get_session_count
-   .. automethod:: get_active_modules
-
 Security Client
 ---------------
 
-.. automodule:: vyra_base.security.security_client
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :special-members: __init__
+.. currentmodule:: vyra_base.security.security_client
 
 Classes
 ~~~~~~~
@@ -93,25 +80,15 @@ Classes
    :members:
    :undoc-members:
 
-   .. automethod:: build
-
 .. autoclass:: SecurePublisher
    :members:
    :undoc-members:
    :show-inheritance:
 
-   .. automethod:: __init__
-   .. automethod:: publish
-   .. automethod:: destroy
-
 .. autoclass:: SecureServiceClient
    :members:
    :undoc-members:
    :show-inheritance:
-
-   .. automethod:: __init__
-   .. automethod:: call_async
-   .. automethod:: destroy
 
 Functions
 ~~~~~~~~~
@@ -122,11 +99,7 @@ Functions
 Security Validator
 ------------------
 
-.. automodule:: vyra_base.security.security_validator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :special-members: __init__
+.. currentmodule:: vyra_base.security.security_validator
 
 Classes
 ~~~~~~~
@@ -136,16 +109,10 @@ Classes
    :undoc-members:
    :show-inheritance:
 
-   .. automethod:: __init__
-   .. automethod:: validate_metadata
-
 .. autoclass:: MessageSecurityFilter
    :members:
    :undoc-members:
    :show-inheritance:
-
-   .. automethod:: __init__
-   .. automethod:: wrap_callback
 
 Functions
 ~~~~~~~~~
@@ -155,10 +122,7 @@ Functions
 Crypto Helpers
 --------------
 
-.. automodule:: vyra_base.helper.crypto_helper
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. currentmodule:: vyra_base.helper.crypto_helper
 
 HMAC Functions
 ~~~~~~~~~~~~~~

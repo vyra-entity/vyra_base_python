@@ -112,65 +112,32 @@ For detailed documentation, see:
 Architecture
 ------------
 
-.. graphviz::
+The VYRA Security Framework follows a client-server architecture:
 
-   digraph security_architecture {
-       rankdir=LR;
-       node [shape=box, style=rounded];
-       
-       client [label="Client Module\n(SecurityClient)"];
-       server [label="Server Module\n(SecurityManager)"];
-       validator [label="SecurityValidator"];
-       
-       client -> server [label="1. RequestAccess"];
-       server -> client [label="2. Token + Key"];
-       client -> server [label="3. Secure Message\n(SafetyMetadata)"];
-       server -> validator [label="4. Validate"];
-       validator -> server [label="5. Pass/Fail"];
-   }
+1. **Client Module** (SecurityClient) - Requests authentication and sends secure messages
+2. **Server Module** (SecurityManager) - Provides authentication service and manages sessions
+3. **SecurityValidator** - Validates incoming messages on the server side
+
+**Flow:**
+
+1. Client → Server: RequestAccess
+2. Server → Client: Token + HMAC Key
+3. Client → Server: Secure Message (with SafetyMetadata)
+4. Server → Validator: Validate metadata
+5. Validator → Server: Pass/Fail result
 
 Modules
 -------
 
-Security Levels
-~~~~~~~~~~~~~~~
+The Security Framework consists of the following modules:
 
-.. automodule:: vyra_base.security.security_levels
-   :members:
-   :undoc-members:
-   :show-inheritance:
+* **Security Levels** - Defines the 5 security levels and related enums
+* **Security Manager** - Server-side authentication and session management
+* **Security Client** - Client-side wrappers for secure communication
+* **Security Validator** - Validates incoming messages and signatures
+* **Crypto Helpers** - Cryptographic operations (HMAC, RSA, certificates)
 
-Security Manager
-~~~~~~~~~~~~~~~~
-
-.. automodule:: vyra_base.security.security_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Security Client
-~~~~~~~~~~~~~~~
-
-.. automodule:: vyra_base.security.security_client
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Security Validator
-~~~~~~~~~~~~~~~~~~
-
-.. automodule:: vyra_base.security.security_validator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Crypto Helpers
-~~~~~~~~~~~~~~
-
-.. automodule:: vyra_base.helper.crypto_helper
-   :members:
-   :undoc-members:
-   :show-inheritance:
+For detailed API documentation, see :doc:`security/api`.
 
 Indices and tables
 ==================

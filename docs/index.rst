@@ -18,6 +18,16 @@ including state management, ROS2 integration, security, and communication utilit
 
 .. toctree::
    :maxdepth: 2
+   :caption: Core Framework
+
+   core
+   com
+   storage
+   helper
+   interfaces
+
+.. toctree::
+   :maxdepth: 2
    :caption: Security Framework
 
    security

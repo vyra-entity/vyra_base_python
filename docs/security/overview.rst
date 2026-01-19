@@ -425,7 +425,7 @@ Error Handling
 Exception Hierarchy
 ~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
+.. code-block:: text
 
     SecurityError
     ├── InvalidSecurityLevelError

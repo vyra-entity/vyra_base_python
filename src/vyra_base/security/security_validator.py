@@ -47,7 +47,8 @@ class SecurityValidator:
     This class works in conjunction with SecurityManager to provide
     comprehensive validation of security metadata.
     
-    Usage:
+    Usage::
+    
         validator = SecurityValidator(security_manager)
         
         # In service callback:
@@ -287,7 +288,8 @@ class MessageSecurityFilter:
     This class can be used as a subscription callback wrapper to automatically
     validate SafetyMetadata before processing messages.
     
-    Usage:
+    Usage::
+    
         def my_callback(msg):
             # Process message
             pass

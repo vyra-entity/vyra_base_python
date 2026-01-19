@@ -13,6 +13,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',        # Add source code links
     'sphinx.ext.githubpages',     # GitHub Pages compatibility
+    'sphinx.ext.graphviz',        # Graphviz diagrams
     'sphinx_autodoc_typehints',
 ]
 
