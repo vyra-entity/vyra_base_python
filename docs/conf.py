@@ -78,6 +78,27 @@ html_theme_options = {
     },
 }
 
+# Language selector for multilingual documentation
+html_context = {
+    'languages': [
+        ('en', 'English', '../en/'),
+        ('de', 'Deutsch', '../de/'),
+    ],
+    'current_language': language,
+}
+
+# Add language selector template to sidebar
+html_sidebars = {
+    '**': [
+        'sidebar/language.html',
+        'sidebar/scroll-start.html',
+        'sidebar/brand.html',
+        'sidebar/search.html',
+        'sidebar/navigation.html',
+        'sidebar/scroll-end.html',
+    ]
+}
+
 # -- Path Setup (damit src importierbar ist) ---------------------------------
 import os
 import sys

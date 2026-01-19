@@ -1,0 +1,12 @@
+<div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">{{ _('Language') }}</span></p>
+  <ul>
+    {% for lang_code, lang_name, lang_url in languages %}
+      {% if lang_code == current_language %}
+        <li class="toctree-l1 current"><a class="reference internal current" href="{{ lang_url }}">{{ lang_name }}</a></li>
+      {% else %}
+        <li class="toctree-l1"><a class="reference internal" href="{{ lang_url }}">{{ lang_name }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</div>

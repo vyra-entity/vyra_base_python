@@ -280,7 +280,7 @@ msgstr ""
 
 #: ../../com/feeders.rst:328 a6b42363bd904af2b574832cdcf3f6cb
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../com/feeders.rst:330 bfec5930303646d6b1c796ce8176c611
 msgid ":doc:`ros2_communication` - ROS2 Publisher/Subscriber Details"

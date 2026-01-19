@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -20,29 +20,65 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../storage.rst:2 b8b1fbc2fbd945cc9c11f64a2b18f4cb
-msgid "Stoage - Data Stoage"
+msgid "Storage - Data Storage"
 msgstr ""
 
 #: ../../storage.rst:4 9a81265a7af84fc2b1c770df6711c156
 msgid ""
-"The Stoage module provides access to persisttent (SQLite) and volatile "
-"(Redis) data stoage."
+"The Storage module provides access to persisttent (SQLite) and volatile "
+"(Redis) data storage."
 msgstr ""
 
 #: ../../storage.rst:7 fc1cffc6c4b84840a6d2161a808ba43a
 msgid "Overview"
-msgstr ""
+msgstr "Überblick"
 
 #: ../../storage.rst:9 da41dc2e5d2940758e65911e9c819b96
-msgid "VYRA supports two stoage backends:"
+msgid "VYRA supports two storage backends:"
 msgstr ""
 
 #: ../../storage.rst:11 f6f8aee867284d159810d68351738467
-msgid "**SQLite-Datenbank**: Persistent stoage (permanent)"
+msgid "**SQLite-Datenbank**: Persistent storage (permanent)"
 msgstr ""
 
 #: ../../storage.rst:12 aeedb46d5d3046998b09f2d0b686874c
-msgid "**Redis**: Volatile in-memory stoage (fast)"
+msgid "**Redis**: Volatile in-memory storage (fast)"
+msgstr ""
+
+#: ../../storage.rst:18 1db5ddc900594edcacb39fa258b82784
+msgid "Backend"
+msgstr ""
+
+#: ../../storage.rst:19 c16eaa07b7a44c70a716d6489ed59406
+msgid "Use Case"
+msgstr ""
+
+#: ../../storage.rst:20 c16eaa07b7a44c70a716d6489ed59406
+msgid "Access via"
+msgstr ""
+
+#: ../../storage.rst:21 58c321bef6a240bdbbb022cb45efbf16
+msgid "**SQLite**"
+msgstr ""
+
+#: ../../storage.rst:22 dd2a9b2d5ac44532891a399c255910c6
+msgid "Parameters, configuration, logs"
+msgstr ""
+
+#: ../../storage.rst:23 5966cb9f5c7c4ce3bd92c0bc943295db
+msgid ":class:`~vyra_base.storage.db_access.DbAccess`"
+msgstr ""
+
+#: ../../storage.rst:24 58c321bef6a240bdbbb022cb45efbf16
+msgid "**Redis**"
+msgstr ""
+
+#: ../../storage.rst:25 ccc4bbd4924d4214add31c131411f6c2
+msgid "Volatiles, real-time data, caching"
+msgstr ""
+
+#: ../../storage.rst:26 bed319fd22dc47e89ab9eba55a6139eb
+msgid ":class:`~vyra_base.storage.redis_client.RedisClient`"
 msgstr ""
 
 #: ../../storage.rst:29 327b55bc530746f6b0ffe5d65d182066
@@ -55,7 +91,7 @@ msgstr ""
 
 #: ../../storage.rst:34 117d7d3bfced48f890e8f0e09bfe77ef
 msgid ""
-"The :class:`~vyra_base.stoage.db_access.DbAccess` class manages SQLite "
+"The :class:`~vyra_base.storage.db_access.DbAccess` class manages SQLite "
 "databases:"
 msgstr ""
 
@@ -153,7 +189,7 @@ msgstr ""
 
 #: ../../storage.rst:154 003ba91f7cad4fc0a11ee3c9d14c72d1
 msgid ""
-"The :class:`~vyra_base.stoage.db_manipulato.DbManipulato`-class "
+"The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class "
 "simplifies CRUD-Operationen:"
 msgstr ""
 
@@ -183,7 +219,7 @@ msgstr ""
 
 #: ../../storage.rst:241 05cb3a8d0b2b4dbf86f07b0308e53e2e
 msgid ""
-"The :class:`~vyra_base.stoage.redis_client.RedisClient`-class manages "
+"The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages "
 "Redis-Verbindungen:"
 msgstr ""
 
@@ -202,11 +238,11 @@ msgid "Via VyraEntity"
 msgstr ""
 
 #: ../../storage.rst:275 f6a924e204244084bf757a0365cecb4e
-msgid "Entity stellt automatically Stoage Access bereit:"
+msgid "Entity stellt automatically Storage Access bereit:"
 msgstr ""
 
 #: ../../storage.rst:294 6ee8614b541e47dcbb378bb6b7b83d8c
-msgid "Stoage-Setup"
+msgid "Storage-Setup"
 msgstr ""
 
 #: ../../storage.rst:306 e1a765cc5fff426cabc6b74e5d25705b
@@ -320,7 +356,7 @@ msgid "Speicherorte"
 msgstr ""
 
 #: ../../storage.rst:382 dde04c2526884c1283b7c37c363f7d20
-msgid "**SQLite-Datenbanken**: ``/workspace/stoage/data/*.db``"
+msgid "**SQLite-Datenbanken**: ``/workspace/storage/data/*.db``"
 msgstr ""
 
 #: ../../storage.rst:384 18b1000e1ece4e0496a45eed59a9712d
@@ -328,12 +364,12 @@ msgid "**Redis-Daten**: In-Memory (temporär)"
 msgstr ""
 
 #: ../../storage.rst:386 16da0b3313ac4d3e921651bdbcb2bf28
-msgid "**Redis-Zertifikate**: ``/workspace/stoage/certificates/redis/``"
+msgid "**Redis-Zertifikate**: ``/workspace/storage/certificates/redis/``"
 msgstr ""
 
 #: ../../storage.rst:389 2d4f866bed774477b904897e34eece00
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../storage.rst:391 d5c1db23b61e4d9bb01b67a577c817b1
 msgid ":doc:`core/parameter` - Parameter with SQLite"
@@ -344,19 +380,19 @@ msgid ":doc:`core/volatile` - Volatiles with Redis"
 msgstr ""
 
 #: ../../storage.rst:393 b3949c261acf49fba63babc13f849190
-msgid ":doc:`vyra_base.stoage` - API-Referenz"
+msgid ":doc:`vyra_base.storage` - API-Referenz"
 msgstr ""
 
 #: ../../storage.rst:394 5966cb9f5c7c4ce3bd92c0bc943295db
-msgid ":class:`~vyra_base.stoage.db_access.DbAccess` - Datenbank-Zugriff"
+msgid ":class:`~vyra_base.storage.db_access.DbAccess` - Datenbank-Zugriff"
 msgstr ""
 
 #: ../../storage.rst:395 74a1a8480bbd44b08363e4f82e636e71
-msgid ":class:`~vyra_base.stoage.db_manipulato.DbManipulato` - CRUD-Operationen"
+msgid ":class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD-Operationen"
 msgstr ""
 
 #: ../../storage.rst:396 bed319fd22dc47e89ab9eba55a6139eb
-msgid ":class:`~vyra_base.stoage.redis_client.RedisClient` - Redis-Client"
+msgid ":class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client"
 msgstr ""
 
 #: ../../storage.rst:397 d1c6bcc5455e40b9a3dd1b88f60f0a95

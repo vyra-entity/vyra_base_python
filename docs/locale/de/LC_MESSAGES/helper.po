@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -21,25 +21,83 @@ msgstr ""
 
 #: ../../helper.rst:2 c1606a910bc8411e80647131fa242ed4
 msgid "Helper-functions"
-msgstr ""
+msgstr "Hilfsfunktionen"
 
 #: ../../helper.rst:4 06eaee46a4ef468494dc5e5554432eaf
 msgid ""
 "The Helper-Modul bietet Hilfsfunktionen for wiederkehrende Aufgaben wie "
 "Logging, Error Handling, Kryptografie and Datei-Operationen."
 msgstr ""
+"Das Helper-Modul bietet Hilfsfunktionen für wiederkehrende Aufgaben wie "
+"Logging, Error Handling, Kryptografie und Datei-Operationen."
 
 #: ../../helper.rst:8 b79ad7ab5eb245c7ab65d8e2a6a164fa
 msgid "Overview"
-msgstr ""
+msgstr "Überblick"
+
+#: ../../helper.rst:14 bca4b201a6ee4ba1a07921d7a833238b
+msgid "Helper-Modul"
+msgstr "Helper-Modul"
+
+#: ../../helper.rst:15 c1606a910bc8411e80647131fa242ed4
+msgid "Description"
+msgstr "Beschreibung"
+
+#: ../../helper.rst:16 4ec3758c1f5b4eec84ee82fb40292ca9
+msgid "**Logger**"
+msgstr "**Logger**"
+
+#: ../../helper.rst:17 636843f750c048cf9e383911bd8aa3a1
+msgid "Konfigurierbares Logging-System"
+msgstr "Konfigurierbares Logging-System"
+
+#: ../../helper.rst:18 5d71b38edef14cdd944c3ac85286e403
+msgid "**ErrorHandler / ErrorTraceback**"
+msgstr "**ErrorHandler / ErrorTraceback**"
+
+#: ../../helper.rst:19 9a091bb13712411caa5b201b0cd39c12
+msgid "Error Handling and Exception-Tracking"
+msgstr "Fehlerbehandlung und Exception-Tracking"
+
+#: ../../helper.rst:20 6dfd6209ee104c66ae4a7cedbe1a5795
+msgid "**CryptoHelper**"
+msgstr "**CryptoHelper**"
+
+#: ../../helper.rst:21 2fdd04a147684a7ab582d3da19925281
+msgid "Kryptografische functions (Hashing, encryption)"
+msgstr "Kryptografische Funktionen (Hashing, Verschlüsselung)"
+
+#: ../../helper.rst:22 f1602423bcec4b629e8a319028619c5b
+msgid "**FileReader / FileWriter**"
+msgstr "**FileReader / FileWriter**"
+
+#: ../../helper.rst:23 fa759a85f39c45f1b7f172c4585b4ac2
+msgid "Datei-Operationen (JSON, YAML, etc.)"
+msgstr "Datei-Operationen (JSON, YAML, etc.)"
+
+#: ../../helper.rst:24 f951b24336274b3a9991ea0a8199104e
+msgid "**FileLock**"
+msgstr "**FileLock**"
+
+#: ../../helper.rst:25 8cc66054069942738dbadb85636796f7
+msgid "Datei-Locking for gleichzeitigen Zugriff"
+msgstr "Datei-Sperren für gleichzeitigen Zugriff"
+
+#: ../../helper.rst:26 c2f5c3b2e0054acaaf7a14318e2ca738
+msgid "**EnvHandler**"
+msgstr "**EnvHandler**"
+
+#: ../../helper.rst:27 b36f2f5c4e0b4a3f8adf9ea239f4bfdf
+msgid "environment variables-Verwaltung"
+msgstr "Verwaltung von Umgebungsvariablen"
 
 #: ../../helper.rst:30 d28608425b37481cacb55de1aa2f4e0d
 msgid "Logger"
-msgstr ""
+msgstr "Logger"
 
 #: ../../helper.rst:32 636843f750c048cf9e383911bd8aa3a1
 msgid "Konfigu rierbares Logging with ROS2-Integration:"
-msgstr ""
+msgstr "Konfigurierbares Logging mit ROS2-Integration:"
 
 #: ../../helper.rst:35 7a181689cd3c45b291b9ee428c23d29f
 msgid "Verwendung"
@@ -288,7 +346,7 @@ msgstr ""
 
 #: ../../helper.rst:335 4031f425eafe4d1093f19edc0d17469d
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../helper.rst:337 2c61d3e5f6e54b759eaf2212b68f8793
 msgid ":doc:`vyra_base.helper` - API-Referenz"

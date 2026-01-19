@@ -186,7 +186,7 @@ Inter-Modul-Kommunikation
 Redis-Backend
 -------------
 
-**Verbindung**: Automatisch via ``entity.stoage.redis_client``
+**Verbindung**: Automatisch via ``entity.storage.redis_client``
 
 **Speicherort**: In-Memory (RAM des Redis-Servers)
 
@@ -261,6 +261,6 @@ Further Information
 
 * :doc:`entity` - Entity-Dokumentation
 * :doc:`parameter` - Persistente Alternative
-* :doc:`../stoage` - Stoage-Backend Details
+* :doc:`../storage` - Storage-Backend Details
 * :class:`~vyra_base.core.volatile.Volatile` - API-Referenz
 * Redis Dokumentation: https://redis.io/docs/

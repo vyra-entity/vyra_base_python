@@ -35,7 +35,7 @@ msgstr ""
 
 #: ../../com.rst:17 ce78c9951005465ab3bf5e3ff2715ba8
 msgid "Overview"
-msgstr ""
+msgstr "Überblick"
 
 #: ../../com.rst:19 d6b07a63c4d949afa214a4172ea4de61
 msgid "The COM-Modul besteht from drei Hauptbereichen:"
@@ -107,7 +107,7 @@ msgstr ""
 
 #: ../../com.rst:91 8b42fc39a651455db5e566a8bc1ab895
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../com.rst:93 27d09a30375a4b0eb830697d2647cd03
 msgid ":doc:`com/ros2_communication` - ROS2 Details (Job, Callable, Speaker)"

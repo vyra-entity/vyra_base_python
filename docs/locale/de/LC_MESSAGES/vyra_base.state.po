@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"POT-Creation-Date: 2026-01-19 14:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -19,43 +19,1272 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../vyra_base.state.rst:2 48496397321c4c88beb7e7412224b361
+#: ../../vyra_base.state.rst:2 ba28e2ce7c564fada7f8ad7eb48f9408
 msgid "vyra\\_base.state package"
 msgstr ""
 
-#: ../../vyra_base.state.rst:5 1ebdb97d518d425bb73e7f7c31b78bb6
+#: ../../vyra_base.state.rst:5 dbf01e4798494e8890bf52625b159e1a
 msgid "Submodules"
 msgstr ""
 
-#: ../../vyra_base.state.rst:8 8332addfa1134c58bb7724038ea49318
+#: ../../vyra_base.state.rst:8 cb636ebf4d8a4d109147dc8fdbd453b0
 msgid "vyra\\_base.state.health\\_layer module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:16 92c90b78463c43639c8169f2a0fdce25
+#: 0309336fbce543f2adc143c06fae3fca of vyra_base.state.health_layer:1
+msgid "Health Layer - High-level API for system health monitoring and management."
+msgstr ""
+
+#: 7d8f2dc335e04b1ea02e464364677839 of vyra_base.state.health_layer:3
+msgid ""
+"This layer monitors system integrity: - Health status tracking (OK, "
+"Warning, Overloaded, Faulted, Critical) - Warning and fault reporting - "
+"Load management - Recovery coordination - Escalation to lifecycle layer"
+msgstr ""
+
+#: 7eab63075fdd4876ae8794b00059096e of vyra_base.state.health_layer:10
+msgid "Thread-safe wrapper around StateMachine for health management."
+msgstr ""
+
+#: 225eace321f2424e84248176f8c1985c 28d9ea9a9d584b1eae310c9db09fe802
+#: 7d1558b053ad4faa99e9fbd155f2b51a 997c80f32e7341d4b21e0081da369597
+#: d9c8e43c4f1346769f3251430582e940 of
+#: vyra_base.state.health_layer.HealthLayer:1
+#: vyra_base.state.lifecycle_layer.LifecycleLayer:1
+#: vyra_base.state.operational_layer.OperationalLayer:1
+#: vyra_base.state.state_events.StateEvent:1
+#: vyra_base.state.unified.UnifiedStateMachine:1
+msgid "Bases: :py:class:`object`"
+msgstr ""
+
+#: 0c7bd23e51254099ad84e3714062713f of
+#: vyra_base.state.health_layer.HealthLayer:1
+msgid "High-level API for health state management."
+msgstr ""
+
+#: 66a123b9859143529116d899fb17864b of
+#: vyra_base.state.health_layer.HealthLayer:3
+msgid ""
+"Provides intuitive methods for health monitoring: - report_warning() - "
+"Report non-critical issues - recover() - Attempt recovery - escalate() - "
+"Escalate to critical state"
+msgstr ""
+
+#: 92ff2151f02b405e8516e7e03d5d94fd a5b062e007434909a704827ba59f91dc
+#: b6769d233f734df6b52e663fb7315ada d906d93d3ef3418191f5f1a51ebbe7d2
+#: f695817788a74bb9bd369823f22881f9 of
+#: vyra_base.state.health_layer.HealthLayer:9
+#: vyra_base.state.health_layer.HealthLayer.check_and_report:12
+#: vyra_base.state.lifecycle_layer.LifecycleLayer:10
+#: vyra_base.state.operational_layer.OperationalLayer:10
+#: vyra_base.state.unified.UnifiedStateMachine:7
+msgid "Example"
+msgstr "Beispiel"
+
+#: ../../vyra_base.state.rst 02f28f25736749619e79ed91307cc04c
+#: 06e1b8db29154567aed8b16bf873faf1 0cae89d7c00b4fd9bd1f52679d7ccede
+#: 0ee9700e24714a268157e0e6d2c4362d 13c8e9629b1645388f2b888eb543bc96
+#: 1444f85bf85f4153aa9fd3dbf97144d5 194345dc4e894f7bbbbbf11623c228e0
+#: 1e032d2aee3d4a8e9aa8074cee264523 25c51b8ed04344f59155fdbc8eb8a080
+#: 2a78ed1b3e6647628dff3475308630e5 2cc75bb0830b4c099e29d10988696ed3
+#: 31232a9532114666979a30e373f0eb3d 343afe2bb5b84ccc81f7310885454cc6
+#: 37d44b6518ff49d6bffa82bdb52f75d7 3b1ce1ad1de44a6f891a70379cf855d7
+#: 410e04913d474df1a055e04f4c649855 467ca6bb20064cc69da87a1cedf56f38
+#: 4a0becab5b9042c3a7998f78bbd9867d 56925f9e80804b3f8cb813b3bcce2e98
+#: 5d38d478b5c5498ba65637ac31946cf5 6304c51f1d5a43eab2e46f73b56a52e9
+#: 67eed951f4f747838fd73d38a5d56798 68faa140d5034ae3afee378455cd9524
+#: 71c712d411fc42c7bf5cc51b434f3135 738c5515579b40b4b6de3d26a89faa3e
+#: 74357e18a38e4133bcb2433ca1547661 74bb72c75ea343a6931c2e334545c91d
+#: 84b4c7c36b344d758605a2044fefc830 85015a34e8184ef8bccecb825be39ee2
+#: 87b0efe60aba48a2b0e7a46d5249d5c2 8c38243321034916ab4c14e7d3fbd910
+#: 8d0d2afd6c7a4aec9c3f5ba9ad115d29 8d26677265bc4b9ca4108e56163da597
+#: 8dd2eade6ae84afa9ece9dd5a9f003cd 8ff59326b0f044f09335c656fe2d107d
+#: 942e64f9dbc44d2d8fd345fc80fd81b7 9c690f9ca8cb4d5d88abb6e19c6248b3
+#: a273938190194cc887305ae9eff04a82 a349bdb0777c44b6aa451bd079255cef
+#: a6191e4de3f64a90bc4586d1bbaabf68 b2b604d42c40460ca8a9d32b815e2a97
+#: b40150e084a24fdaad916d283a3fc225 b70f50e0a70447d5a7012e7171f353f3
+#: ba1b5addcc014292801620e9102ba589 c841c9cb54d8442ebd3cd0d1acf3dc3f
+#: cdbe6681aad8498e8a0e9f21fbfa07f3 d382f3ccfb834ab795b42d5d1c3a03d6
+#: d7e8986efc08499f8a4a86e1b53ee890 e3008e4f0a6d44e49a63c7e13d45576c
+#: e44ec3683dda47f8a1d6c52de30868c1 e6e9cf4f47d746afa7ee02918d44dd6d
+#: eea2d865912f456a8d3600714d4dbd16 f49f212f92a54a0ea05ff52c5566d6cb
+#: f7db1ff2fa1d427aadaab3d71d51f7a1 ff17022df95e4f7892adf1ccb9a31c61 of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report
+#: vyra_base.state.unified.UnifiedStateMachine.get_history
+#: vyra_base.state.unified.UnifiedStateMachine.on_any_change
+#: vyra_base.state.unified.UnifiedStateMachine.on_health_change
+#: vyra_base.state.unified.UnifiedStateMachine.on_lifecycle_change
+#: vyra_base.state.unified.UnifiedStateMachine.on_operational_change
+msgid "Parameters"
+msgstr "Parameter"
+
+#: 87833cc1aa5f4239aeab89c3ff938232 of
+#: vyra_base.state.health_layer.HealthLayer.__init__:1
+msgid "Initialize health layer."
+msgstr ""
+
+#: 7f07cfdfb3564ab78ede9d496df3b924 e419e25a7041434580dfe41f3fcf40d7 of
+#: vyra_base.state.health_layer.HealthLayer.__init__:4
+#: vyra_base.state.operational_layer.OperationalLayer.__init__:4
+msgid "StateMachine instance to control"
+msgstr ""
+
+#: ac6c9cd304844aaabffef36624c02b32 of
+#: vyra_base.state.health_layer.HealthLayer.get_state:1
+msgid "Get current health state."
+msgstr ""
+
+#: ../../vyra_base.state.rst 0ebdb95094434f93b7b470435a90982c
+#: 11f8d34e2df948e3a92a68f8173bd995 15a0e026175b45fcb492a1d0bbecc9f8
+#: 160b7d65491f46d9ab0b760f2bc3f8bf 1c94c5d8e3844ccc837695443021db2b
+#: 1e89345e18564970a6cae613a239475f 20cb7d2937114ba99fd71e110a64c7ba
+#: 2182ec7e030745d1b5e8d3369993c19c 2547bc99f52043bb9286bbdfb5a2a529
+#: 296e61a5de33469f8b3012208fef18c8 2c8d0c76fbdf474086a5b1a5b8d0f6cb
+#: 2f9b969d8f38434880d5d1c5f5ccba8e 3220222f4a0f48dfae7db70ce659bb0e
+#: 32c48c222d914e4d87e0aeb6ddb0569f 3ff6a18d081e4109ace30e57e3213113
+#: 4092c85f6b684aee9190fd43c9323bb6 44a86aba730e468fbec2d292de6079e0
+#: 4756aa844768429884160cb2d539bd80 4954f56923054ad4aec9f5511d9a77d5
+#: 4ae940b3ee5e4cd08eb9255f92af9a0c 4bc32ed3c52948da8a69f73baf0348de
+#: 51bd539e651a4835952a5eeca76ef9e9 531880abadb5473698f5eb2929d6ec6c
+#: 54166340110242a3adfcf0bc54c94e3a 5683c5fcb23f4424aef267782e5ab92a
+#: 574127a021a148449663b9edcff75268 58280db71fb245088d2242696ab24dcf
+#: 5b48431a8f99479c96ed467e71eb9eb5 5cf5fec64410405b8cd22374086bd9af
+#: 5d2e975fdb3744c3833a3662b0836692 5d500117e7f04e1c80026c85956445fe
+#: 61a1165128684bbc9121f9ba335a4abb 7476f9d3fad2477dabd9796802b837b3
+#: 749a48c6e3414071b6b7a56836bdc19b 74eb299e3a6c45b1922fa6c1f24c2ee3
+#: 7960c3112f97489a91343d01be90abee 7ac3a24a607440ad87951f09152d4777
+#: 7c2af0df59074d7a9164cb89dceb89a6 806b8d0a6001408ba23992d88534ee8e
+#: 80964a5df4dd4d97a7f5ab5586073d4b 88de7c244b4d4082a10f5320b37ea2b7
+#: 8d6a5bfa2fa14f72a82a240b473e6a0f 8f1f649c575844d894c8d192a5d03f4d
+#: 90ae4afc8d624d798cf7cf873c75eb45 96302a916d9940dcb79a6e0b4ea6f7c5
+#: 9b9c996add03466bacf780ec82a67509 9e4d0646956544bbaed7630ae671499e
+#: a21597b8562a40b58ffcb575766ba6ca a6fb9b96631f424a9d4aacc9d27cc69f
+#: a777083f1d504b9dbaeb71b5e297b7af a80b2873a8d04b428d54c4594bbb497d
+#: a8ec68bfa6b54e1d9196520656608cb7 aa8dc0096b7640a88be59eab96738cb7
+#: ad86b50affde4c438f164b812b641db9 b3140989c5e54dc889abc701a1b7d83d
+#: ba7418dfd1fe4ac4a305249351b4a83c bc865a529e6b4cf196a78592066516df
+#: bd3e17af7dcd4655ae462c7e2067d842 be2192bfb01b4402b888df524acd41d7
+#: bed8e6d1049c47e6b7698df253c4a1d5 c3fc92582b464cd9a94f1a8555bc23a1
+#: c49e9cfc3113494f92486b01c2ebda35 c52c3ef330f54d94ae071feac350919b
+#: c7df72311a9448768c90ed9372347326 cb85741323394194876ebea2ba5bdd3c
+#: cdb2e2b8db364ea78ed274c9e7249610 d261cbf9a03241fa9e34ddae56ca412d
+#: d71c72b50337424f8b94644a0f9c8b8c dc61f0e954cd491da0019cf9fc977b70
+#: e02c6f2e3ec74c7eba0943785aff42da e075efa807094d4196a448641691378d
+#: e43aa3ef40ec4720b1f03a50801ceeae e99e7a024cb44c7c90ccd737cdd7f1b0
+#: ebd7744c535a45b4a7672e7432fa94d6 f30a411db3474d24aefecb88b41a11bf
+#: f3b663be3ab94e3f913f44f9bdacd0fe f401293cbfe54a84820e6d8ae69a653f
+#: f95b93998bf8435286d736923165917e fc3d12feca984d2bb235e873fb48ead7
+#: fc502101f894489e838c232c38d651b5 fd869a41a88d402ab04d0f1a6b936656
+#: ff85f9c166b949f5829e9d88dd3de813 of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report
+msgid "Return type"
+msgstr ""
+
+#: 0077b08d31d948f5b19d65e8ff76804c 1ecdd9432bf04d34a869779678b192d2
+#: 2277fca2bbb646c9baf5dfd17dbe28c9 3ac8980401ad4449af804174703419a8
+#: 68ca13d59bcd4c1bba1572b50b243e8c 88e8966600d64f25a486deaee0fd6ed3
+#: 967fad9231644f48b157c1e34a5b7a3d d3e1249a9efb4556840f13cef045bd4a
+#: d554e2fe11cb47e7a011d5d8b00df5af d89746077e7842e7b0a416aedbe74c19 of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report:8
+#: vyra_base.state.health_layer.HealthLayer.clear_warning:8
+#: vyra_base.state.health_layer.HealthLayer.get_state:4
+#: vyra_base.state.health_layer.HealthLayer.recover:8
+#: vyra_base.state.health_layer.HealthLayer.report_fault:8
+#: vyra_base.state.health_layer.HealthLayer.report_warning:8
+#: vyra_base.state.unified.UnifiedStateMachine.get_health_state:4
+#: vyra_base.state.unified.UnifiedStateMachine.recover:4
+#: vyra_base.state.unified.UnifiedStateMachine.report_fault:4
+#: vyra_base.state.unified.UnifiedStateMachine.report_warning:4
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_types.HealthState\\``"
+msgstr ""
+
+#: 91c5989749f04fcaaf2018be2b30c338 of
+#: vyra_base.state.health_layer.HealthLayer.get_state_name:1
+msgid "Get current health state as string."
+msgstr ""
+
+#: 54952bca580946339576d0bc1bb0142f 645f5af2401343588cf2a9f54e971cb7
+#: acc2720f090b49bdbbd7deb28c3a48c7 d5971f9620a84faf9d7cd8ac90f03974 of
+#: vyra_base.state.health_layer.HealthLayer.get_state_name:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_state_name:4
+#: vyra_base.state.operational_layer.OperationalLayer.get_state_name:4
+#: vyra_base.state.state_events.get_event_target_layer:4
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
+msgstr ""
+
+#: 16d1dabe03f746abb42a212f51cf7b8f of
+#: vyra_base.state.health_layer.HealthLayer.is_healthy:1
+msgid "Check if health is OK."
+msgstr ""
+
+#: 1a84576269144d5e8ea1bf2c3db8d997 1e884d0da8cb4894a321cfde0f451c0d
+#: 254dde47e56d44f89ef9bc5d8ece4a31 4d766c5ff84f44b69cc912a46082611c
+#: 4e1d2a74f3484a48a9a0205ca2cb74f1 4e6f192a97f64319af63e91a265b0ca4
+#: 54450bccab4f4042b4ded0da1b2f2ae4 5e2f3cf0d82d48f9bbe862cdbc4866fb
+#: 6e0fb300cd3747599741d23b5219e077 7587b17c9b114b2a9d844bcce0c36cb1
+#: 87807cd3e56548948e9571616381bcd5 9876330b2ebb4eeba10127d7844a8da3
+#: 9c8c5d6009c64a9f833ce6250e78ea74 a5133a70b1a24718b0fb4ca61f0d5c89
+#: a9dc52a6e0124234879f510f54e766cc af314d6d55844f809ed068d9bd510542
+#: be13b9133a9c44169698e11dde034465 c5595f96e0994bcc8b92d6077d5c314a
+#: c5a31cdd7ded455fa4984580d1481b2a c67edc86b65e41959457bcfd9038a97a
+#: dbf7203c62a04c2db8f4d94d2e493f78 e22bffe05a78425483d100bf84af9538
+#: e25058fc51d440f4966e9d5373d8dd9a ea1fd453be894baf9930e794283d9db9
+#: ec546230cfe04fa9b1639bb6030cdfd4 f1cc86c4dc6b400e883856a037d86cae
+#: fe232709b4e9424689f08c83391e4376 of
+#: vyra_base.state.health_layer.HealthLayer.is_critical:4
+#: vyra_base.state.health_layer.HealthLayer.is_degraded:4
+#: vyra_base.state.health_layer.HealthLayer.is_healthy:4
+#: vyra_base.state.health_layer.HealthLayer.is_operational_safe:4
+#: vyra_base.state.health_layer.HealthLayer.is_warning:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.can_accept_tasks:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_active:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_initializing:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_offline:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_recovering:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_shutting_down:4
+#: vyra_base.state.operational_layer.OperationalLayer.can_start_task:4
+#: vyra_base.state.operational_layer.OperationalLayer.is_busy:4
+#: vyra_base.state.operational_layer.OperationalLayer.is_idle:4
+#: vyra_base.state.operational_layer.OperationalLayer.is_paused:4
+#: vyra_base.state.operational_layer.OperationalLayer.is_ready:4
+#: vyra_base.state.operational_layer.OperationalLayer.is_running:4
+#: vyra_base.state.operational_layer.OperationalLayer.is_stopped:4
+#: vyra_base.state.state_events.is_interrupt_event:4
+#: vyra_base.state.state_types.is_operational_allowed_in_lifecycle:4
+#: vyra_base.state.state_types.is_valid_health_transition:4
+#: vyra_base.state.state_types.is_valid_lifecycle_transition:4
+#: vyra_base.state.state_types.is_valid_operational_transition:4
+#: vyra_base.state.unified.UnifiedStateMachine.is_healthy:4
+#: vyra_base.state.unified.UnifiedStateMachine.is_operational:4
+#: vyra_base.state.unified.UnifiedStateMachine.standard_shutdown:8
+#: vyra_base.state.unified.UnifiedStateMachine.standard_startup:8
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\``"
+msgstr ""
+
+#: c4620bf1930b48d1a2702efb550de18a of
+#: vyra_base.state.health_layer.HealthLayer.is_warning:1
+msgid "Check if there are warnings."
+msgstr ""
+
+#: ae4ee54595ef442d9b183527c130e247 of
+#: vyra_base.state.health_layer.HealthLayer.is_critical:1
+msgid "Check if health is critical."
+msgstr ""
+
+#: 65d5102fce7347578c0fdf7958aec2ee of
+#: vyra_base.state.health_layer.HealthLayer.is_degraded:1
+msgid "Check if health is degraded (warning or worse)."
+msgstr ""
+
+#: f3ace231b45344ab93a9b8f3d76413fd of
+#: vyra_base.state.health_layer.HealthLayer.is_operational_safe:1
+msgid "Check if safe for operational tasks."
+msgstr ""
+
+#: c6db02aebd3444cebe7d3106509ac056 e8cd3dfe43874033b1741f9f616b6190 of
+#: vyra_base.state.health_layer.HealthLayer.report_warning:1
+#: vyra_base.state.unified.UnifiedStateMachine.report_warning:1
+msgid "Report non-critical warning."
+msgstr ""
+
+#: 0378469ce73d42438ed897f587547c4f of
+#: vyra_base.state.health_layer.HealthLayer.report_warning:3
+msgid "Transitions: OK → Warning"
+msgstr ""
+
+#: 88c0f9fc123e499587460021b2c13c79 of
+#: vyra_base.state.health_layer.HealthLayer.report_warning:6
+msgid "Warning details (metrics, thresholds, etc.)"
+msgstr ""
+
+#: ../../vyra_base.state.rst 1138a06e1c5047fe84e971e7eaf5f0f3
+#: 15d3bc46d551437495ff08cb90911733 30d2d394d8fd42f0987fe87c73a14840
+#: 33ebe8681e5044809966eed80a3847b1 36b7f9e38bdb405a9a86900b15170098
+#: 4602222846e8402e9fe4d607df75fd75 49518fbf044c4120b0359e1ca81b954e
+#: 51d57b89d47e4d048ce1354de8a8c20f 5aa919d0de4e4537bcf11a793aba7042
+#: 67cf0f199b7f458a9a799d950d76848a 6bcc2f41931c482e904fecf8ef3d06e8
+#: 710f0c3bc0e94510b4ef3bbeb9c6c3f0 7a4858c432264a0ba7aa90346bea95f7
+#: 8a8eebd62eec4d4596b6b252683d0674 93de776c36e444f4b98da32afc0c4a83
+#: 95ec886f591d4b71b1c2890c251ca02c a95b65b7aab4466aacc7127c0749d623
+#: ab31066802c84e3aa301db2222af5844 b132747b7d634abcaf8a129921ac6e1e
+#: bacbaef3e26a48acbada303067cdf716 c1c022e1d6284aeea8ce619dddb45556
+#: dd2c2f3fdd584e9cb2faa61c0f88a6ab df2fa0f5a3284e10a26c0921236ecdaa
+#: eaea6189eb0b45449f2eecf1bf0417b9 ee24579aa48d4ca1be795fd96955c10f
+#: eead9bb81d054424bae19a71288fc8db ef8b05770dba4303b172aed018d3f018
+#: fece1ab7c97e43fbac27331cd4b6524a of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report
+msgid "Returns"
+msgstr "Rückgabe"
+
+#: 238c46c1db4c4ddb87e411b3ff0c6683 a863ef65711443adacfaf3bb9d30610d
+#: dcb9927e342f4a6fb8705d47474f2d5c e61d270752c44098b7ce7187a9314fda of
+#: vyra_base.state.health_layer.HealthLayer.clear_warning:9
+#: vyra_base.state.health_layer.HealthLayer.recover:9
+#: vyra_base.state.health_layer.HealthLayer.report_fault:9
+#: vyra_base.state.health_layer.HealthLayer.report_warning:9
+msgid "New health state"
+msgstr ""
+
+#: 5d1cd3e9e751423f91b95bbcabe4d588 of
+#: vyra_base.state.health_layer.HealthLayer.clear_warning:1
+msgid "Clear active warnings."
+msgstr ""
+
+#: db5ee29325894bc38132da676496cbc5 of
+#: vyra_base.state.health_layer.HealthLayer.clear_warning:3
+msgid "Transitions: Warning → OK"
+msgstr ""
+
+#: 37c9388aeb8344e28ff84fc29a9b3184 of
+#: vyra_base.state.health_layer.HealthLayer.clear_warning:6
+msgid "Clearance details"
+msgstr ""
+
+#: 306a211f7eef47f18b090dde30b97c80 5af861258c954d5394a51966735a6e86 of
+#: vyra_base.state.health_layer.HealthLayer.report_fault:1
+#: vyra_base.state.unified.UnifiedStateMachine.report_fault:1
+msgid "Report critical fault."
+msgstr ""
+
+#: 6a8fb514f3c34a5581616d6e58741830 of
+#: vyra_base.state.health_layer.HealthLayer.report_fault:3
+msgid "Transitions: OK/Warning → Critical"
+msgstr ""
+
+#: 56acad99d3024baea585b7eae45806aa of
+#: vyra_base.state.health_layer.HealthLayer.report_fault:6
+msgid "Fault details"
+msgstr ""
+
+#: c87ce684a10546bf915f3b77cedc1d2e edbb4c3ca4ae4b7595f8c2a306e1dc72 of
+#: vyra_base.state.health_layer.HealthLayer.recover:1
+#: vyra_base.state.unified.UnifiedStateMachine.recover:1
+msgid "Attempt recovery from fault."
+msgstr ""
+
+#: 2ca1b027b6d64675b675c86614c88b82 of
+#: vyra_base.state.health_layer.HealthLayer.recover:3
+msgid "Transitions: Critical → OK/Warning"
+msgstr ""
+
+#: 740e3cbec52a448087f0840292652553 b01fecc41efb46a3a09aa221a2b3eab0 of
+#: vyra_base.state.health_layer.HealthLayer.recover:6
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_recovery:6
+msgid "Recovery details"
+msgstr ""
+
+#: 83ae9086161346a8b9ff19c74fcb9221 of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report:1
+msgid "Check metrics and automatically report appropriate health state."
+msgstr ""
+
+#: 95ee31792f79418b9d204a60617459c5 of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report:4
+msgid "System metrics to evaluate"
+msgstr ""
+
+#: 8bed9d48d16f4cb6a4ebf2de5d8e47fe of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report:6
+msgid "Threshold for warning state"
+msgstr ""
+
+#: 0db7864b502448c39f49914bbde66c32 of
+#: vyra_base.state.health_layer.HealthLayer.check_and_report:9
+msgid "New health state after evaluation"
+msgstr ""
+
+#: d82924423e5b43a1aab82d5bbda12a8e of
+#: vyra_base.state.health_layer.HealthLayer.emergency_stop:1
+msgid "Trigger emergency stop (affects all layers)."
+msgstr ""
+
+#: 8669974174574ff995ff899c503f87e6 of
+#: vyra_base.state.health_layer.HealthLayer.emergency_stop:3
+msgid ""
+"This is an interrupt event that immediately: - Sets lifecycle to "
+"Deactivated - Sets operational to Idle - Sets health to Warning"
+msgstr ""
+
+#: 83ae153750b341b48cbb84e93044a0ea of
+#: vyra_base.state.health_layer.HealthLayer.emergency_stop:9
+msgid "Emergency stop reason"
+msgstr ""
+
+#: 9e317e878ca14f14ad0707caea60c216 aefbdbfba7b741d698e4593d606bee75
+#: fe4b7113c6fd4630a20f2f5533cb19b2 of
+#: vyra_base.state.health_layer.HealthLayer.emergency_stop:11
+#: vyra_base.state.unified.UnifiedStateMachine.emergency_stop:4
+#: vyra_base.state.unified.UnifiedStateMachine.get_all_states:4
+msgid ""
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:class\\:\\`str\\`\\]`"
+msgstr ""
+
+#: e4948025caae4ec583e2483ef007c5f6 of
+#: vyra_base.state.health_layer.HealthLayer.emergency_stop:12
+msgid "New state of all layers"
+msgstr ""
+
+#: 84fdd2811e2f4f14b794caad4d7fe383 of
+#: vyra_base.state.health_layer.HealthLayer.on_state_change:1
+msgid "Register callback for health state changes."
+msgstr ""
+
+#: 171869866dd042eb9d83c0ab0955073b 42c52f967a874cec8df0cec3c9b05249
+#: e20f13cf8de34dfdbdecad09fa16e950 of
+#: vyra_base.state.health_layer.HealthLayer.on_state_change:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.on_state_change:4
+#: vyra_base.state.operational_layer.OperationalLayer.on_state_change:4
+msgid "Function(layer, old_state, new_state)"
+msgstr ""
+
+#: 087e9cc2cb0e447ebbf4220a947760fb 2c0e743627954f01b7fb5a27a1a40ad0
+#: 5fb8b1bcb8414336a141cc09b456f5ca of
+#: vyra_base.state.health_layer.HealthLayer.on_state_change:6
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.on_state_change:6
+#: vyra_base.state.operational_layer.OperationalLayer.on_state_change:6
+msgid "Callback priority (higher = earlier execution)"
+msgstr ""
+
+#: c3de42651e3c490bb65a5409724b42a4 of
+#: vyra_base.state.health_layer.HealthLayer.get_info:1
+msgid "Get health layer information."
+msgstr ""
+
+#: 0dd9bf80aa564aef81ec5ca4cf9b4487 2e6dc3f2d2964b0bb2571580d5f79d8e
+#: 3d93c749a6bf4de99a4d7450a9629dc5 f818c32152244592ab08381db78a4a30
+#: f9f580bbe1474067850a3539dd6e0c06 of
+#: vyra_base.state.health_layer.HealthLayer.get_info:3
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_info:3
+#: vyra_base.state.operational_layer.OperationalLayer.get_info:3
+#: vyra_base.state.state_events.StateEvent.to_dict:4
+#: vyra_base.state.unified.UnifiedStateMachine.get_diagnostic_info:4
+msgid ""
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
+msgstr ""
+
+#: 107fc9e6457c408ca6eecf179439c548 of
+#: vyra_base.state.health_layer.HealthLayer.get_info:4
+msgid "Dictionary with state and status info"
+msgstr ""
+
+#: c2381ee25c6a48eeb5013bb0f3983040 of
+#: vyra_base.state.health_layer.HealthLayer.get_severity_level:1
+msgid "Get health severity as numeric level."
+msgstr ""
+
+#: ef94f30b51304a698267475987a3d25d of
+#: vyra_base.state.health_layer.HealthLayer.get_severity_level:3
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`int\\``"
+msgstr ""
+
+#: 151e291cf6524ff3821ca844370a37e2 of
+#: vyra_base.state.health_layer.HealthLayer.get_severity_level:4
+msgid "0 = HEALTHY, 1 = Warning, 2 = Critical"
+msgstr ""
+
+#: ../../vyra_base.state.rst:16 664a2c11944c4679ace3fdf8bde1448d
 msgid "vyra\\_base.state.lifecycle\\_layer module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:24 081d5ee7235b45b89a9b033460ab4bed
+#: 31222aabe6c343698c9b6349b983e956 of vyra_base.state.lifecycle_layer:1
+msgid "Lifecycle Layer - High-level API for module lifecycle management."
+msgstr ""
+
+#: 02f3fd011c9d4eb2ad741983faa26912 of vyra_base.state.lifecycle_layer:3
+msgid ""
+"This layer controls module existence states: - Startup and initialization"
+" - Activation and deactivation - Recovery from failures - Controlled "
+"shutdown"
+msgstr ""
+
+#: 79d7e7e79a494ceca609ec67c18a75bf of vyra_base.state.lifecycle_layer:9
+msgid "Thread-safe wrapper around StateMachine for lifecycle operations."
+msgstr ""
+
+#: 27d7a647f60043bf863cd939447c1f38 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer:1
+msgid "High-level API for lifecycle state management."
+msgstr ""
+
+#: 9e1f9f90b1be43beb69e6814c1d61a85 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer:3
+msgid ""
+"Provides intuitive methods for module lifecycle control: - start() - "
+"Begin initialization - activate() - Enter active state - shutdown() - "
+"Controlled deactivation - recover() - Recover from faults"
+msgstr ""
+
+#: e80e43624b454771ac6653c44769072b of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.__init__:1
+msgid "Initialize lifecycle layer."
+msgstr ""
+
+#: 7dffea2c07f046ad92975abb2bc0724c of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.__init__:4
+msgid "Existing StateMachine instance. Creates new if None."
+msgstr ""
+
+#: 9a1cf76aab9644f0b431f5047b9971a0 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_state:1
+msgid "Get current lifecycle state."
+msgstr ""
+
+#: 37b470c2572b48a5b9773f5243634218 46f4a240c8624009882c0cda76e826c0
+#: 4d1b20b2165c4180ae31960b6422eab0 50a33f5289654a8a88d82d25351c43b9
+#: 5ab59b3a1bcd46eca87c010a17edce20 633cfed4bd3945be8ddc4fa019098feb
+#: 73004af7468d477d940576d8583afc73 87ced8ed24934215b0a4ea90f55645a8
+#: 8c9cfe6383bf4fa1872482da75d147c3 a926c2ae9f3449a2934f160e25d7a78c
+#: b0cf8d66e6db4d53b1cd986f9f4f5293 bcaf7fa095d342d992a4d97948e065b0
+#: c6c7ce7722ab4b5e9e4b9e9b0f722349 c96488437e6c404d8f22015d76da688f
+#: d95f44db24544a058c48ebbc6df26e91 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_initialization:8
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_recovery:8
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_shutdown:5
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.enter_recovery:8
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_initialization:8
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_recovery:8
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_state:4
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.shutdown:8
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.start:8
+#: vyra_base.state.unified.UnifiedStateMachine.complete_initialization:4
+#: vyra_base.state.unified.UnifiedStateMachine.complete_shutdown:4
+#: vyra_base.state.unified.UnifiedStateMachine.fail_initialization:4
+#: vyra_base.state.unified.UnifiedStateMachine.get_lifecycle_state:4
+#: vyra_base.state.unified.UnifiedStateMachine.shutdown:4
+#: vyra_base.state.unified.UnifiedStateMachine.start:4
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_types.LifecycleState\\``"
+msgstr ""
+
+#: 65b6a72894ba4047a596c3c6b9e19dc2 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_state_name:1
+msgid "Get current lifecycle state as string."
+msgstr ""
+
+#: 9b1193cf122b43d89c7f2d076c5cbdea of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_initializing:1
+msgid "Check if module is initializing."
+msgstr ""
+
+#: 64a0a428cd104539b58e166a1211f112 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_active:1
+msgid "Check if module is active."
+msgstr ""
+
+#: ae5e2d338d264877a80ff79305d8a18d of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_recovering:1
+msgid "Check if module is recovering."
+msgstr ""
+
+#: 9cbdbbdf40034ab6bb9e074601322295 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_shutting_down:1
+msgid "Check if module is shutting down."
+msgstr ""
+
+#: c14d3e48c6124493b0ce5b55ae05a684 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.is_offline:1
+msgid "Check if module is offline."
+msgstr ""
+
+#: 854cfa00070441b8b331d00c3eea8682 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.can_accept_tasks:1
+msgid "Check if module can accept operational tasks."
+msgstr ""
+
+#: 097fa8c1dbf74488b56138bff987c6fe 8372a8ad8db04b91b9e6d96187928445 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.start:1
+#: vyra_base.state.unified.UnifiedStateMachine.start:1
+msgid "Start module initialization."
+msgstr ""
+
+#: 0f6b8c4dd4f2492abd4c526de9620f39 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.start:3
+msgid "Transitions: Offline → Initializing"
+msgstr ""
+
+#: cfbf3c0168174a1ebe7d0831a22bbee5 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.start:6
+msgid "Optional initialization parameters"
+msgstr ""
+
+#: 475ae6aee06c4b37b0a4af31ab505674 575a5eeba104433b8f03eb83e220ffba
+#: 57c82af2d4634bf9bfd9d5c4e5d0e4d0 aeed3dcd81374afbb19f1ce4150d0068
+#: b10d325bee8d4a38bff9e701f7727fca da89ed45dfc34b268192a9a9ed590954
+#: e50a78f9bbaf4482aed5d4e360de8f92 eed3ec1350d74616911f9a0293de50ab of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_initialization:9
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_recovery:9
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_shutdown:6
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.enter_recovery:9
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_initialization:9
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_recovery:9
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.shutdown:9
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.start:9
+msgid "New lifecycle state"
+msgstr ""
+
+#: ../../vyra_base.state.rst 9f2bf31b6cb6495b8e79c7546f2df9b9
+msgid "Raises"
+msgstr "Auslöser"
+
+#: 2601a9cbb5764d399249fc0545472ab4 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.start:11
+msgid "If not in Offline state"
+msgstr ""
+
+#: 260ef67de86549ad9cae41336854c7fb of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_initialization:1
+msgid "Mark initialization as successful."
+msgstr ""
+
+#: a2d5d61830a94d22b94b084a7a34f098 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_initialization:3
+msgid "Transitions: Initializing → Active"
+msgstr ""
+
+#: 6aa86960735c49eab92c56c3bc6ebfd6 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_initialization:6
+msgid "Optional initialization results"
+msgstr ""
+
+#: d0584a3be82f4685b8c48a26f876bbd7 d83ec49a835e4589975eb2c5c10e31bb of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_initialization:1
+#: vyra_base.state.unified.UnifiedStateMachine.fail_initialization:1
+msgid "Mark initialization as failed."
+msgstr ""
+
+#: 8f20c94e11b44d01915e7fadd18e09e4 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_initialization:3
+msgid "Transitions: Initializing → Recovering"
+msgstr ""
+
+#: ee083f18cb824d0786e5e701953f3138 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_initialization:6
+msgid "Error description"
+msgstr ""
+
+#: 828c8025080944a8ac7090c5a2c25013 93b108d08be140c7ba430e14c02cbdcb of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.shutdown:1
+#: vyra_base.state.unified.UnifiedStateMachine.shutdown:1
+msgid "Begin controlled shutdown."
+msgstr ""
+
+#: 15ec585f4a95414e9629e293fe1a21db of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.shutdown:3
+msgid "Transitions: Active → ShuttingDown"
+msgstr ""
+
+#: dda2b4fbd0d648f0939371f3157e73df of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.shutdown:6
+msgid "Shutdown reason"
+msgstr ""
+
+#: 5a8ad1ce840c435e85a692d13e1b3fa9 8894b331a27a465bace8a64a37359b8a of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_shutdown:1
+#: vyra_base.state.unified.UnifiedStateMachine.complete_shutdown:1
+msgid "Complete shutdown process."
+msgstr ""
+
+#: 6b8b43e0c9ae44a3a60c3c9b9cee1253 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_shutdown:3
+msgid "Transitions: ShuttingDown → Offline"
+msgstr ""
+
+#: 484c47302a3f4798b2aec4e2ea33ff3b of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.enter_recovery:1
+msgid "Enter recovery mode due to fault."
+msgstr ""
+
+#: bbac24b947f748a1a8e8bd4ce2575535 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.enter_recovery:3
+msgid "Transitions: Active → Recovering"
+msgstr ""
+
+#: e9562c4ac8374f479284ee46dd340d69 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.enter_recovery:6
+msgid "Fault description and context"
+msgstr ""
+
+#: ad4da0826579466cb47ef36afa281dc7 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_recovery:1
+msgid "Complete recovery successfully."
+msgstr ""
+
+#: 42f8c84285a948e1a4108931b43a14b8 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.complete_recovery:3
+msgid "Transitions: Recovering → Active"
+msgstr ""
+
+#: fa6ad4165db448a3817fef05ce31ab6b of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_recovery:1
+msgid "Mark recovery as failed."
+msgstr ""
+
+#: 8182b1ac6d2142b09e4225a68d30acc7 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_recovery:3
+msgid "Transitions: Recovering → Deactivated"
+msgstr ""
+
+#: cced9d97073f48d8997acafa478998c8 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.fail_recovery:6
+msgid "Recovery failure reason"
+msgstr ""
+
+#: 2663bf86ad904b4583ae3bbf4312e5fe of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.on_state_change:1
+msgid "Register callback for lifecycle state changes."
+msgstr ""
+
+#: 4622ccdf191b48dda6f2bb41c65d21b7 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_info:1
+msgid "Get lifecycle layer information."
+msgstr ""
+
+#: 3ffa6a58f24f486e83146738a017eab0 827e1ded1be1408e89a30910ddd04ce3 of
+#: vyra_base.state.lifecycle_layer.LifecycleLayer.get_info:4
+#: vyra_base.state.operational_layer.OperationalLayer.get_info:4
+msgid "Dictionary with state and capability info"
+msgstr ""
+
+#: ../../vyra_base.state.rst:24 d623c692b9cd4233aeba5d61bdbbf65e
 msgid "vyra\\_base.state.operational\\_layer module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:32 d41b98fbe97d4bf38f5d58acf9f39a2b
+#: 8295b43f536841ebb44f0e69fecb123a of vyra_base.state.operational_layer:1
+msgid "Operational Layer - High-level API for task and activity management."
+msgstr ""
+
+#: af5318a354c14695bca31c8621de2dd7 of vyra_base.state.operational_layer:3
+msgid ""
+"This layer controls operational states: - Task lifecycle (ready, running,"
+" paused, completed) - Processing and delegation - Blocking and unblocking"
+" - Auto-reset mechanisms"
+msgstr ""
+
+#: 632530ff51de413997b72789d6f328e9 of vyra_base.state.operational_layer:9
+msgid "Thread-safe wrapper around StateMachine for operational control."
+msgstr ""
+
+#: 178e88660c86485bbb561e2694eee5dd of
+#: vyra_base.state.operational_layer.OperationalLayer:1
+msgid "High-level API for operational state management."
+msgstr ""
+
+#: 70da65bb66184669bfc997cee938f91e of
+#: vyra_base.state.operational_layer.OperationalLayer:3
+msgid ""
+"Provides intuitive methods for task control: - ready() - Signal readiness"
+" for tasks - start_task() - Begin task execution - pause() / resume() - "
+"Pause and resume tasks - complete() - Mark task completion"
+msgstr ""
+
+#: 03eca7fbda374c9c9350fc651465d7b8 of
+#: vyra_base.state.operational_layer.OperationalLayer.__init__:1
+msgid "Initialize operational layer."
+msgstr ""
+
+#: ab04621be9e045f9bf016ee677313715 of
+#: vyra_base.state.operational_layer.OperationalLayer.get_state:1
+msgid "Get current operational state."
+msgstr ""
+
+#: 26863057b40a44ad8e82064bcfd1555d 29eb99bb960d48d3a4170ec4a7996a41
+#: 37be812341154280925c1a5325cab9ef 40b59e8622cb4d7f9ccc34572add6e68
+#: 439d032557004b9bb8719a4f9a91cffe 648b4c14d2814840838abdf7c6a3543a
+#: 79e5eb151fcb4840895f5e3a641c345d 7d2992142ee24954941b4daaa038ee37
+#: 964d4873acd746989730a1c9f51c40c9 ba2f4b82f084493fa4628cee24b3c9f5
+#: bdbece238a9447f6bac592d2fd047786 c662d03e19ca41adb2a46ce0a7930879
+#: cb2ecca2ae7a433997f1a34584f39187 e2935ab5d5404520bcc3b9342f0d523e
+#: eed9cf97689047ab8fd74643727f8cf4 ef8632b8ec4a4f13a8e9da14a449abc4 of
+#: vyra_base.state.operational_layer.OperationalLayer.get_state:4
+#: vyra_base.state.operational_layer.OperationalLayer.pause:8
+#: vyra_base.state.operational_layer.OperationalLayer.reset:5
+#: vyra_base.state.operational_layer.OperationalLayer.resume:5
+#: vyra_base.state.operational_layer.OperationalLayer.return_to_foreground:5
+#: vyra_base.state.operational_layer.OperationalLayer.set_ready:8
+#: vyra_base.state.operational_layer.OperationalLayer.start_background_processing:8
+#: vyra_base.state.operational_layer.OperationalLayer.start_task:8
+#: vyra_base.state.operational_layer.OperationalLayer.stop:8
+#: vyra_base.state.unified.UnifiedStateMachine.get_operational_state:4
+#: vyra_base.state.unified.UnifiedStateMachine.pause:4
+#: vyra_base.state.unified.UnifiedStateMachine.reset:4
+#: vyra_base.state.unified.UnifiedStateMachine.resume:4
+#: vyra_base.state.unified.UnifiedStateMachine.set_ready:4
+#: vyra_base.state.unified.UnifiedStateMachine.start_task:4
+#: vyra_base.state.unified.UnifiedStateMachine.stop:4
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~vyra\\_base.state.state\\_types.OperationalState\\``"
+msgstr ""
+
+#: ac0cf8b6f95a41d49ea0e227a269b7fa of
+#: vyra_base.state.operational_layer.OperationalLayer.get_state_name:1
+msgid "Get current operational state as string."
+msgstr ""
+
+#: 75ca45fe67594ebbb4d1114105e79a0e of
+#: vyra_base.state.operational_layer.OperationalLayer.is_idle:1
+msgid "Check if operational is idle."
+msgstr ""
+
+#: 9b619accfcec4daeb4306e2ef20e7b69 of
+#: vyra_base.state.operational_layer.OperationalLayer.is_ready:1
+msgid "Check if operational is ready for tasks."
+msgstr ""
+
+#: f87057ce82524d95acafc5f7929238cd of
+#: vyra_base.state.operational_layer.OperationalLayer.is_running:1
+msgid "Check if task is running."
+msgstr ""
+
+#: 6f77ba33d02e4b8fabdc2f92f0b5cc49 of
+#: vyra_base.state.operational_layer.OperationalLayer.is_paused:1
+msgid "Check if task is paused."
+msgstr ""
+
+#: bc7e738270b1411da0678b7d4f75c085 of
+#: vyra_base.state.operational_layer.OperationalLayer.is_stopped:1
+msgid "Check if task is stopped."
+msgstr ""
+
+#: 0dc73e4ea74445bdb6b63da1f7609d15 of
+#: vyra_base.state.operational_layer.OperationalLayer.can_start_task:1
+msgid "Check if new task can be started."
+msgstr ""
+
+#: 61a2042d31a048c4bee8ae3f0085fd93 of
+#: vyra_base.state.operational_layer.OperationalLayer.is_busy:1
+msgid "Check if actively working (running, processing, delegating)."
+msgstr ""
+
+#: b4b6c73c2d4f4546a99c884003832141 of
+#: vyra_base.state.operational_layer.OperationalLayer.set_ready:1
+msgid "Signal readiness for task execution."
+msgstr ""
+
+#: 895aa9cfd1e049b7aa5e9efccfb9c232 of
+#: vyra_base.state.operational_layer.OperationalLayer.set_ready:3
+msgid "Transitions: Idle → Ready"
+msgstr ""
+
+#: ec5bcaead5bc4ebbae670ff88db48837 of
+#: vyra_base.state.operational_layer.OperationalLayer.set_ready:6
+msgid "Optional readiness metadata"
+msgstr ""
+
+#: 0411ec22edae4ce4875a013130dcc992 309c3f783a554f4dbcd6fb4aec99733a
+#: 32cabff11b8142c4a06f81e1dd46d2cf 35f5cb4ccfcb4d5da03eefe4bd9a279a
+#: 4f8a092578bc4cb29b19b05d9e403895 5d975419880648c58e71749b0512c2be
+#: 656b22aad3cb48108f526d8443bf47c2 e682665591c641e69254ecf3e467a1af of
+#: vyra_base.state.operational_layer.OperationalLayer.pause:9
+#: vyra_base.state.operational_layer.OperationalLayer.reset:6
+#: vyra_base.state.operational_layer.OperationalLayer.resume:6
+#: vyra_base.state.operational_layer.OperationalLayer.return_to_foreground:6
+#: vyra_base.state.operational_layer.OperationalLayer.set_ready:9
+#: vyra_base.state.operational_layer.OperationalLayer.start_background_processing:9
+#: vyra_base.state.operational_layer.OperationalLayer.start_task:9
+#: vyra_base.state.operational_layer.OperationalLayer.stop:9
+msgid "New operational state"
+msgstr ""
+
+#: 214270940b0246ee9130ce87ed6d2b1e a4085ade93d94b90af8ebc4eb9a20965 of
+#: vyra_base.state.operational_layer.OperationalLayer.start_task:1
+#: vyra_base.state.unified.UnifiedStateMachine.start_task:1
+msgid "Start task execution."
+msgstr ""
+
+#: c1e44bea530f48ee9a6973100a9d85c2 of
+#: vyra_base.state.operational_layer.OperationalLayer.start_task:3
+msgid "Transitions: Ready → Running"
+msgstr ""
+
+#: c2d28c9a289a4ae89ce307ea2bfd3b8c of
+#: vyra_base.state.operational_layer.OperationalLayer.start_task:6
+msgid "Task description and parameters"
+msgstr ""
+
+#: 854a8850eb7d47f7a647a4595a3655ae f9bdd602995644c69e9cf62fde7f5741 of
+#: vyra_base.state.operational_layer.OperationalLayer.pause:1
+#: vyra_base.state.unified.UnifiedStateMachine.pause:1
+msgid "Pause current task."
+msgstr ""
+
+#: 5e8710e83f22441b86e31d89320b3906 of
+#: vyra_base.state.operational_layer.OperationalLayer.pause:3
+msgid "Transitions: Running → Paused"
+msgstr ""
+
+#: 41fb9a8c1c564be9bc400d87444e1807 of
+#: vyra_base.state.operational_layer.OperationalLayer.pause:6
+msgid "Pause reason"
+msgstr ""
+
+#: c5cf40798ee8467fbf76ac3732888626 e9a3e67b75a449eb897b50de20c8f0b8 of
+#: vyra_base.state.operational_layer.OperationalLayer.resume:1
+#: vyra_base.state.unified.UnifiedStateMachine.resume:1
+msgid "Resume paused task."
+msgstr ""
+
+#: 7e98a4b1d284498cb9ac74b358e20dbb of
+#: vyra_base.state.operational_layer.OperationalLayer.resume:3
+msgid "Transitions: Paused → Running"
+msgstr ""
+
+#: d2b7f1dc1559434091ee648d872e65a3 f9b3175607564997bd19ff81362cefc7 of
+#: vyra_base.state.operational_layer.OperationalLayer.stop:1
+#: vyra_base.state.unified.UnifiedStateMachine.stop:1
+msgid "Mark task as completed."
+msgstr ""
+
+#: cc974a78d0044ce1b7da53ec14a8317f of
+#: vyra_base.state.operational_layer.OperationalLayer.stop:3
+msgid "Transitions: Running → Completed"
+msgstr ""
+
+#: edacb6efb66e47ffbb100dd535809909 of
+#: vyra_base.state.operational_layer.OperationalLayer.stop:6
+msgid "Task results and metrics"
+msgstr ""
+
+#: 574971693e554ecba2e179e85421579a of
+#: vyra_base.state.operational_layer.OperationalLayer.reset:1
+msgid "Reset from Completed to Ready state."
+msgstr ""
+
+#: 45f6278986b1401ea8dbf78bc21ac60c of
+#: vyra_base.state.operational_layer.OperationalLayer.reset:3
+msgid "Transitions: Completed → Ready"
+msgstr ""
+
+#: 48015fbfff1d4cf2b77b50ef594a9d9b of
+#: vyra_base.state.operational_layer.OperationalLayer.start_background_processing:1
+msgid "Enter background processing mode."
+msgstr ""
+
+#: e5d77148e41e41ad9268c4c730df33b4 of
+#: vyra_base.state.operational_layer.OperationalLayer.start_background_processing:3
+msgid "Transitions: Running → Processing"
+msgstr ""
+
+#: afa920ae90284a05b416bf442f04b424 of
+#: vyra_base.state.operational_layer.OperationalLayer.start_background_processing:6
+msgid "Processing task details"
+msgstr ""
+
+#: 4d1ff1adc0c44d59bb86d4caeab46f57 of
+#: vyra_base.state.operational_layer.OperationalLayer.return_to_foreground:1
+msgid "Complete background processing."
+msgstr ""
+
+#: 9def88ddb663460c9e1ee59d95b4ba6c of
+#: vyra_base.state.operational_layer.OperationalLayer.return_to_foreground:3
+msgid "Transitions: Processing → Running"
+msgstr ""
+
+#: 56ccb0a6adfe4942805e5aa9abead207 of
+#: vyra_base.state.operational_layer.OperationalLayer.on_state_change:1
+msgid "Register callback for operational state changes."
+msgstr ""
+
+#: 3d27ed0843da4e7586fc032a488d5b61 of
+#: vyra_base.state.operational_layer.OperationalLayer.get_info:1
+msgid "Get operational layer information."
+msgstr ""
+
+#: ../../vyra_base.state.rst:32 c7ae69ea6a514573a37bf9a34899f857
 msgid "vyra\\_base.state.state\\_events module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:40 8cbaba1f701e4e37b9029d87c82b8446
+#: a7c3ca2c559c4ce6875ac600c9d2a641 of vyra_base.state.state_events:1
+msgid "Event definitions for the 3-layer state machine."
+msgstr ""
+
+#: 00e080cbbb2e4eaea23052f352fa57b1 of vyra_base.state.state_events:3
+msgid ""
+"Events trigger state transitions according to the industrial automation "
+"event-driven architecture pattern."
+msgstr ""
+
+#: 1394fba9eb4e4051a367285e55022ddf 1e69a9d221984b1ca966b045180995fe
+#: 6e6140f8d0ff48fb888337ca7d5e8374 d0382d0307114ce4b853cabee8213a85 of
+#: vyra_base.state.state_events.EventType:1
+#: vyra_base.state.state_types.HealthState:1
+#: vyra_base.state.state_types.LifecycleState:1
+#: vyra_base.state.state_types.OperationalState:1
+msgid "Bases: :py:class:`~enum.Enum`"
+msgstr ""
+
+#: e5e3992b16b946368ba0cec027ae0a5f of vyra_base.state.state_events.EventType:1
+msgid "Event types for state transitions."
+msgstr ""
+
+#: 0db641cc2153439f921c91078ef27bf7 of
+#: vyra_base.state.state_events.StateEvent:1
+msgid "Immutable event for state machine transitions."
+msgstr ""
+
+#: ebbcf1cfc31248eba6c4eb7d959ad272 of
+#: vyra_base.state.state_events.StateEvent:3
+msgid ""
+"Contains all information about a state transition event including "
+"timestamp, origin, and optional payload for tracing and debugging."
+msgstr ""
+
+#: 7f606bbfbceb473dbb82ef01b8fc233e of
+#: vyra_base.state.state_events.StateEvent.to_dict:1
+msgid "Convert event to dictionary for serialization."
+msgstr ""
+
+#: d26ede5e8ca54b06b781a4ae1ee173e1 of
+#: vyra_base.state.state_events.get_event_target_layer:1
+msgid "Get the primary layer affected by an event."
+msgstr ""
+
+#: 574177c8479848aa90486ef95d8086f5 of
+#: vyra_base.state.state_events.is_interrupt_event:1
+msgid "Check if event is a system interrupt."
+msgstr ""
+
+#: ../../vyra_base.state.rst:40 9b086e21038c4fc483af0709571730af
 msgid "vyra\\_base.state.state\\_machine module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:48 7ff6f1207a3c46918f282696b7c9d905
+#: ../../vyra_base.state.rst:48 df940458cde24011a49ece2077cb695b
 msgid "vyra\\_base.state.state\\_types module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:56 87134d3683f0497a9be5097e23ad51b2
+#: 0f160f4d5fb8469d85438a95220acf8a of vyra_base.state.state_types:1
+msgid "State type definitions for the 3-layer state machine."
+msgstr ""
+
+#: d48f06bd985b410e8fe82b1b1dfa29e6 of vyra_base.state.state_types:3
+msgid ""
+"This module defines the valid states for each layer according to "
+"industrial automation standards (ISO 13849, IEC 61508)."
+msgstr ""
+
+#: ca3a1ebfc0da475f9712cf22211dd5fb of
+#: vyra_base.state.state_types.LifecycleState:1
+msgid "Lifecycle states define the existence and high-level life of a module."
+msgstr ""
+
+#: 1eecc786bb9a4728afa0f4530cffe8c2 of
+#: vyra_base.state.state_types.LifecycleState:3
+msgid "Similar to ROS2 Lifecycle nodes and IEC 61131-3 PLC states."
+msgstr ""
+
+#: 798e00dcc1044400a8c2c4531dacf84c of
+#: vyra_base.state.state_types.OperationalState:1
+msgid "Operational states define the runtime activity of a module."
+msgstr ""
+
+#: 212c52c838e14781903950c49704a316 of
+#: vyra_base.state.state_types.OperationalState:3
+msgid "Represents what the module is currently doing during normal operation."
+msgstr ""
+
+#: 3bf284f6cdb9499ea34f5c0059bb3df3 of
+#: vyra_base.state.state_types.HealthState:1
+msgid "Health states describe the integrity and error conditions of a module."
+msgstr ""
+
+#: 542cc87c11fc4be6bfd8ece9eddb952a of
+#: vyra_base.state.state_types.HealthState:3
+msgid "Follows safety integrity levels (SIL) from IEC 61508."
+msgstr ""
+
+#: 13c671bc46264ea2b1a96e83fef20da0 of
+#: vyra_base.state.state_types.is_valid_lifecycle_transition:1
+msgid "Check if lifecycle transition is valid."
+msgstr ""
+
+#: c4e9978445e24991a69e3abd1a93d691 of
+#: vyra_base.state.state_types.is_valid_operational_transition:1
+msgid "Check if operational transition is valid."
+msgstr ""
+
+#: 03d955ca441e486baa1df843cde29060 of
+#: vyra_base.state.state_types.is_valid_health_transition:1
+msgid "Check if health transition is valid."
+msgstr ""
+
+#: 15afd4bc12e344e2aaa4a94ba786d631 of
+#: vyra_base.state.state_types.is_operational_allowed_in_lifecycle:1
+msgid "Check if operational state is allowed in current lifecycle state."
+msgstr ""
+
+#: ../../vyra_base.state.rst:56 2a647655029447efb2aaeb520b9f636e
 msgid "vyra\\_base.state.unified module"
 msgstr ""
 
-#: ../../vyra_base.state.rst:64 942c727b181d440eac19db8edff55f48
+#: 7025f3412fbf49aa9c488635d85a9b5f of vyra_base.state.unified:1
+msgid "Integration module for easy unified state machine access."
+msgstr ""
+
+#: 7974a7c28bad42788416b7276c868652 of vyra_base.state.unified:3
+msgid ""
+"Provides a simple API that combines all three layers into a single "
+"unified interface for module state management."
+msgstr ""
+
+#: a0836b3be0fd4ce09bfa3c1ffd211978 of
+#: vyra_base.state.unified.UnifiedStateMachine:1
+msgid "Unified interface for 3-layer state machine."
+msgstr ""
+
+#: f43ad4e396174d6182207f31d48e40d6 of
+#: vyra_base.state.unified.UnifiedStateMachine:3
+msgid ""
+"Combines Lifecycle, Operational, and Health layers into a single easy-to-"
+"use API. Recommended for most use cases."
+msgstr ""
+
+#: d68a95a5f2d74f9fbb55025fe4013162 of
+#: vyra_base.state.unified.UnifiedStateMachine.__init__:1
+msgid "Initialize unified state machine."
+msgstr ""
+
+#: 390e0137a11643f9935e651436bc8073 of
+#: vyra_base.state.unified.UnifiedStateMachine.__init__:4
+msgid "Configuration for state machine behavior"
+msgstr ""
+
+#: 350a89f8b7cc4e8aad4e10a85f23dc3c of
+#: vyra_base.state.unified.UnifiedStateMachine.get_all_states:1
+msgid "Get current state of all layers."
+msgstr ""
+
+#: 950979d5cd1e4dc0bbc1f03f06370051 of
+#: vyra_base.state.unified.UnifiedStateMachine.get_lifecycle_state:1
+msgid "Get lifecycle state."
+msgstr ""
+
+#: 07669cb531dc436b8de7fc2d146d6a33 of
+#: vyra_base.state.unified.UnifiedStateMachine.get_operational_state:1
+msgid "Get operational state."
+msgstr ""
+
+#: 0c22b94aa6c04973ae3da895a6dd4eef of
+#: vyra_base.state.unified.UnifiedStateMachine.get_health_state:1
+msgid "Get health state."
+msgstr ""
+
+#: 6d319d58ef8745d6a1f967b1ecd560ec of
+#: vyra_base.state.unified.UnifiedStateMachine.is_operational:1
+msgid "Check if module can execute tasks."
+msgstr ""
+
+#: 11c3ad22299c4527bbc9a88f39045f16 of
+#: vyra_base.state.unified.UnifiedStateMachine.is_healthy:1
+msgid "Check if module health is OK."
+msgstr ""
+
+#: 60acfe845a5049ce99449eb1a7d7d32a of
+#: vyra_base.state.unified.UnifiedStateMachine.complete_initialization:1
+msgid "Complete initialization successfully."
+msgstr ""
+
+#: 880fac3505b74e0d837902e14042a3df of
+#: vyra_base.state.unified.UnifiedStateMachine.set_ready:1
+msgid "Signal readiness for tasks."
+msgstr ""
+
+#: 9ce75654806d4d5d9148e701d8a18c5b of
+#: vyra_base.state.unified.UnifiedStateMachine.reset:1
+msgid "Reset operational state to Idle."
+msgstr ""
+
+#: 73fa2b815fa043298c3b6d8dadc1f81a of
+#: vyra_base.state.unified.UnifiedStateMachine.emergency_stop:1
+msgid "Trigger emergency stop."
+msgstr ""
+
+#: 34305e548a094d0394bf00a2d0a584de of
+#: vyra_base.state.unified.UnifiedStateMachine.on_lifecycle_change:1
+msgid "Subscribe to lifecycle state changes."
+msgstr ""
+
+#: dc386010997e4358867ef64f15d64805 of
+#: vyra_base.state.unified.UnifiedStateMachine.on_operational_change:1
+msgid "Subscribe to operational state changes."
+msgstr ""
+
+#: 60e5c72a129842c1896eaa9f656d6568 of
+#: vyra_base.state.unified.UnifiedStateMachine.on_health_change:1
+msgid "Subscribe to health state changes."
+msgstr ""
+
+#: f6bffe81bc324f83b03051cef9a95ed3 of
+#: vyra_base.state.unified.UnifiedStateMachine.on_any_change:1
+msgid "Subscribe to any state change across all layers."
+msgstr ""
+
+#: ead8559bc218412daac183ef61935fde of
+#: vyra_base.state.unified.UnifiedStateMachine.get_diagnostic_info:1
+msgid "Get comprehensive diagnostic information."
+msgstr ""
+
+#: 55acc94d7807440cb78ab11abe4ceedf of
+#: vyra_base.state.unified.UnifiedStateMachine.get_history:1
+msgid "Get state transition history."
+msgstr ""
+
+#: b037c81ac95a4132bf458bdf22b9e3ca of
+#: vyra_base.state.unified.UnifiedStateMachine.clear_history:1
+msgid "Clear transition history."
+msgstr ""
+
+#: 6a3c46aadcd34ae29b20d0f093ee2818 of
+#: vyra_base.state.unified.UnifiedStateMachine.send_event:1
+msgid "Send an event to the state machine."
+msgstr ""
+
+#: 1b7b98a0d9dd424c899b057f5207c19d of
+#: vyra_base.state.unified.UnifiedStateMachine.send_event:3
+msgid ""
+"This method is required for compatibility with OperationalStateMachine "
+"which calls _state_machine.send_event(event)."
+msgstr ""
+
+#: 30cf742bf942405a8d14fa7391d2dcfb of
+#: vyra_base.state.unified.UnifiedStateMachine.send_event:7
+msgid "StateEvent to send to the FSM"
+msgstr ""
+
+#: b1867bdafa42457a8af1b66a2472ae13 of
+#: vyra_base.state.unified.UnifiedStateMachine.standard_startup:1
+msgid "Execute standard module startup sequence."
+msgstr ""
+
+#: ae303ae595a543eda4cb1d47d8112d8c of
+#: vyra_base.state.unified.UnifiedStateMachine.standard_startup:3
+msgid ""
+"Sequence: 1. Start initialization 2. Complete initialization 3. Set "
+"operational ready"
+msgstr ""
+
+#: 6217c4585e174e4f9043a7732cce3cb2 of
+#: vyra_base.state.unified.UnifiedStateMachine.standard_startup:9
+msgid "True if startup successful, False otherwise"
+msgstr ""
+
+#: 62e5afc86ab748fc867d6e08faa2415b of
+#: vyra_base.state.unified.UnifiedStateMachine.standard_shutdown:1
+msgid "Execute standard module shutdown sequence."
+msgstr ""
+
+#: e902aa89e3394097bf55acdfda1fa6c4 of
+#: vyra_base.state.unified.UnifiedStateMachine.standard_shutdown:3
+msgid ""
+"Sequence: 1. Begin shutdown 2. Complete any pending tasks (module "
+"responsibility) 3. Complete shutdown"
+msgstr ""
+
+#: 2bfbf0c836ce4de78a344cd60e379105 of
+#: vyra_base.state.unified.UnifiedStateMachine.standard_shutdown:9
+msgid "True if shutdown successful, False otherwise"
+msgstr ""
+
+#: ../../vyra_base.state.rst:64 c02614a1ac594fc1bd36493424ca38d8
 msgid "Module contents"
 msgstr ""
 

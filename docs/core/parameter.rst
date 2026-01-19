@@ -132,17 +132,17 @@ Monito you Parameterchanges in Echtzeit:
 Datenspeicherung
 ----------------
 
-**Speicherort**: ``/workspace/stoage/data/<module_name>.db``
+**Speicherort**: ``/workspace/storage/data/<module_name>.db``
 
 The SQLite-Datenbank speichert Parameter in folgender Struktur:
 
-* **Tabellenname**: ``tb_parameters`` (siehe :doc:`../stoage`)
+* **Tabellenname**: ``tb_parameters`` (siehe :doc:`../storage`)
 * **Spalten**: ``name``, ``value``, ``description``, ``timestamp``
 * **Zugriff**: Via SQLAlchemy ORM
 
 .. note::
    Parameter-Datenbank-Tabellen folgen der Naming Convention ``tb_<name>``.
-   Further information to Tabellenstruktur can be found you under :doc:`../stoage`.
+   Further information to Tabellenstruktur can be found you under :doc:`../storage`.
 
 Anwendungsfälle
 ---------------
@@ -187,5 +187,5 @@ Further Information
 
 * :doc:`entity` - Entity-Dokumentation
 * :doc:`volatile` - Volatile Alternative
-* :doc:`../stoage` - Stoage-Backend Details
+* :doc:`../storage` - Storage-Backend Details
 * :class:`~vyra_base.core.parameter.Parameter` - API-Referenz

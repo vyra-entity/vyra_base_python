@@ -1,0 +1,771 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, Holger Schernewski
+# This file is distributed under the same license as the vyra_base package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: vyra_base \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: de\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../interfaces_guide.rst:2 1066011973584d42b8ab4572522fa7d6
+msgid "Interfaces"
+msgstr "Schnittstellen"
+
+#: ../../interfaces_guide.rst:5 ff385d75d11b47948e3ef36116c8b5ea
+msgid "Interface Configuration Guide"
+msgstr "Interface-Konfigurations-Leitfaden"
+
+#: ../../interfaces_guide.rst:7 ca9d1c8b30a241a4b9bfcefcd89d8454
+msgid ""
+"VYRA uses JSON configuration files to define ROS2 interfaces (services, "
+"topics, and actions) for modules. These configuration files are located "
+"in ``src/<module_name>_interfaces/config/`` and automatically generate "
+"the corresponding ROS2 message types and service endpoints."
+msgstr ""
+"VYRA verwendet JSON-Konfigurationsdateien zur Definition von ROS2-Schnittstellen "
+"(Services, Topics und Actions) für Module. Diese Konfigurationsdateien befinden "
+"sich in ``src/<module_name>_interfaces/config/`` und generieren automatisch die "
+"entsprechenden ROS2-Nachrichtentypen und Service-Endpunkte."
+
+#: ../../interfaces_guide.rst:10 de068ea38cfd4b5c963678b70bd08802
+msgid "Overview"
+msgstr "Überblick"
+
+#: ../../interfaces_guide.rst:12 51f7ebc0ec3d4563aadced8820fbec84
+msgid "Each module requires interface definitions for:"
+msgstr "Jedes Modul benötigt Interface-Definitionen für:"
+
+#: ../../interfaces_guide.rst:14 39106336f4594b05896d2460801909ba
+msgid ""
+"**Services/Callables**: ROS2 services for synchronous request-response "
+"communication"
+msgstr ""
+"**Services/Callables**: ROS2-Services für synchrone Request-Response-Kommunikation"
+
+#: ../../interfaces_guide.rst:15 80a762e30239476da3716dc7e74d6ec8
+msgid ""
+"**Topics/Speakers**: ROS2 topics for asynchronous publish-subscribe "
+"communication"
+msgstr ""
+"**Topics/Speakers**: ROS2-Topics für asynchrone Publish-Subscribe-Kommunikation"
+
+#: ../../interfaces_guide.rst:16 607e7b3760b14a84aa4b36b35717546b
+msgid ""
+"**Actions/Jobs**: ROS2 actions for long-running tasks with feedback "
+"(future feature)"
+msgstr ""
+"**Actions/Jobs**: ROS2-Actions für langläufige Aufgaben mit Feedback "
+"(zukünftiges Feature)"
+
+#: ../../interfaces_guide.rst:19 23ffaef266974b8bbe9999fcec0d1147
+msgid "File Structure"
+msgstr "Dateistruktur"
+
+#: ../../interfaces_guide.rst:21 995b02ba96954d97afc7c4e9c0f7d304
+msgid ""
+"Interface configuration files are JSON arrays containing interface "
+"definitions:"
+msgstr ""
+"Interface-Konfigurationsdateien sind JSON-Arrays, die Interface-Definitionen "
+"enthalten:"
+
+#: ../../interfaces_guide.rst:33 4a4341c9793a4dc4814bb892f8f5201e
+msgid ""
+"Each JSON file contains an array of interface definitions that share "
+"common characteristics."
+msgstr ""
+"Jede JSON-Datei enthält ein Array von Interface-Definitionen, die gemeinsame "
+"Eigenschaften aufweisen."
+
+#: ../../interfaces_guide.rst:36 d90d1c3b9d35493d951376b69090e5eb
+msgid "Services/Callables"
+msgstr "Services/Callables"
+
+#: ../../interfaces_guide.rst:38 ffdc3eb71ceb4b9eae04828342a8ef52
+msgid ""
+"Services provide synchronous request-response communication between "
+"modules. They are defined with the ``callable`` type."
+msgstr ""
+"Services ermöglichen synchrone Request-Response-Kommunikation zwischen "
+"Modulen. Sie werden mit dem Typ ``callable`` definiert."
+
+#: ../../interfaces_guide.rst:41 ../../interfaces_guide.rst:187
+#: ../../interfaces_guide.rst:309 30419cb6fbfa4082ac882af1d73bc828
+#: 4d22b09224144b419c1dfa8f407f9b0e a320d2cbc7104356b39583f5243209cf
+msgid "Structure"
+msgstr "Struktur"
+
+#: ../../interfaces_guide.rst:43 c70c8ee50cab4275a70c456e06e544e8
+msgid "Service/Callable Fields"
+msgstr "Service/Callable-Felder"
+
+#: ../../interfaces_guide.rst:47 ../../interfaces_guide.rst:90
+#: ../../interfaces_guide.rst:193 ../../interfaces_guide.rst:315
+#: 20169350412a4b0ebc908b3fe934f996 5127ec372514466bbc9fc9b3ecb9462c
+#: bd82f9fd636946fd854b1a5968bd321a d011cea29266488cbe615f8b5e6b3fa4
+msgid "Field"
+msgstr "Feld"
+
+#: ../../interfaces_guide.rst:48 ../../interfaces_guide.rst:91
+#: ../../interfaces_guide.rst:194 ../../interfaces_guide.rst:316
+#: 28515f4c977c4e48974404598e315f57 b66fa99208694cc586f8c0280a3f7f7e
+#: bc2381e207664d8caabdbe585d894126 dad5d88ed7ff4613931b190d2e6ea5e1
+msgid "Required"
+msgstr "Erforderlich"
+
+#: ../../interfaces_guide.rst:49 ../../interfaces_guide.rst:92
+#: ../../interfaces_guide.rst:195 ../../interfaces_guide.rst:317
+#: ../../interfaces_guide.rst:464 ../../interfaces_guide.rst:490
+#: ../../interfaces_guide.rst:515 2b07259acc514f3d87751db7fb31b950
+#: 3df5cdcb09dc458c88b6d6ea1cc64c97 4a489a125e0c47e0a00dc4ac559af3f2
+#: 6084e4eb224d47a2b8b3c32673a586af 69c8faaada6a41ae82921b5dc1dbf50a
+#: b6964754491e41e9b4e5882a51ea55a5 d7a3f89b41f74859ab455895f2599858
+msgid "Description"
+msgstr "Beschreibung"
+
+#: ../../interfaces_guide.rst:50 ../../interfaces_guide.rst:196
+#: ../../interfaces_guide.rst:318 6f99518bf2174da1b66377627ce755d9
+#: 878d12b3e1ef46feb3d86fb9e38600f9 c9ff0e09838c4589bd38354060eea82d
+msgid "``tags``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:51 ../../interfaces_guide.rst:54
+#: ../../interfaces_guide.rst:57 ../../interfaces_guide.rst:60
+#: ../../interfaces_guide.rst:63 ../../interfaces_guide.rst:66
+#: ../../interfaces_guide.rst:69 ../../interfaces_guide.rst:72
+#: ../../interfaces_guide.rst:75 ../../interfaces_guide.rst:94
+#: ../../interfaces_guide.rst:97 ../../interfaces_guide.rst:100
+#: ../../interfaces_guide.rst:103 ../../interfaces_guide.rst:197
+#: ../../interfaces_guide.rst:200 ../../interfaces_guide.rst:203
+#: ../../interfaces_guide.rst:206 ../../interfaces_guide.rst:209
+#: ../../interfaces_guide.rst:212 ../../interfaces_guide.rst:218
+#: ../../interfaces_guide.rst:319 ../../interfaces_guide.rst:322
+#: ../../interfaces_guide.rst:325 ../../interfaces_guide.rst:328
+#: ../../interfaces_guide.rst:331 ../../interfaces_guide.rst:334
+#: ../../interfaces_guide.rst:337 ../../interfaces_guide.rst:340
+#: ../../interfaces_guide.rst:343 ../../interfaces_guide.rst:346
+#: 0d11c5683e424450b2857063c2c82534 0d660f32223a447ebacfe5dd90505987
+#: 10d93abf08034332ae8bfa3514269944 1d26c2a229034826a01eda3980e27ab2
+#: 28b9a59a2a224d39b258aaf0fbbb0e95 312f05c0553a4b1786fbcb049236bf1e
+#: 35a86a1497514a63ae2d8a13b2587975 3614bcd3da3741ea96bdb8be34347c8a
+#: 3a46bb89ac9a4f7ba288a8fd932ffc02 3f44a367c7594d839e0d2a68f3280cdc
+#: 52fa9215a6244445b583761b4caeb189 538b6c7ca4414d87b77ee59f4f26896f
+#: 6d4a466f987642a49ca1ad8bf051dca4 75dd6db2977742a1847543af75147950
+#: 7689a81ffb4c44b0a19489b44a54722e 7e2c9d3eb95f4831bcbe00bd156cf20f
+#: 88290243c48843158fe81ab56a96d23e 8d11353c627b421f984312b5a4efa02e
+#: 8ec0d61daca344bb9c20f6dcef74dfdf 93cd5f1cc63a4bc1b20e7f22f5a74a37
+#: 96e3ec5de65046458f5cb984e1648bda b253d3d5041b44938a97f4526358977a
+#: b96ef91f5d3d44059f53825f5f953d74 c63293fee364484f9ad0c1b6b6d13b65
+#: cbd695fda0444401b4d7b5690aa1ce4b d08d183c6c2a4ce39394a00be890aca9
+#: d252348fae1847f1a6a318847a55863f e81fa5f646e34aa6bfeb02d530948163
+#: ed6a2d1e1b5f49fd9b5aea90d7ed75d2 f7df006f9e2c407985ba7c785d5055db
+msgid "Yes"
+msgstr ""
+
+#: ../../interfaces_guide.rst:52 92366e7be9b44d879721f6fd99279a75
+msgid "Array containing ``[\"ros2_srv\"]``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:53 ../../interfaces_guide.rst:199
+#: ../../interfaces_guide.rst:321 87d15c672547414bbb2ada112689386c
+#: a533b651dd7e455a9cb9e3ff7f3ed8d2 add17f3f7fde4049a1ff1d8dff10421a
+msgid "``type``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:55 f60a182fdaae4718a2cabae22ed63535
+msgid "Must be ``\"callable\"``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:56 ../../interfaces_guide.rst:202
+#: ../../interfaces_guide.rst:324 97fd2d2f6ad74056870fd1035d456d56
+#: b4b1e2cfb7e3424483d5bac4977f6d7d d93c5ccf0acb4064a8044dd875eab665
+msgid "``functionname``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:58 ac81b9df9c184234ae8eea49c2752103
+msgid "Python method name (snake_case)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:59 ../../interfaces_guide.rst:99
+#: ../../interfaces_guide.rst:205 ../../interfaces_guide.rst:327
+#: 541ee5c83a20496582707063ef376e38 9a7f6c5b851749f8a86105a06134ef90
+#: a3ab868d2b5f4f479e5eb81cb3b87fb0 af120a4bff4a4572a58a12058fd41ec2
+msgid "``displayname``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:61 d3d308cbf4d04294b0b6cb8db598e38c
+msgid "Human-readable name for UI"
+msgstr ""
+
+#: ../../interfaces_guide.rst:62 ../../interfaces_guide.rst:102
+#: ../../interfaces_guide.rst:208 ../../interfaces_guide.rst:330
+#: 2a9233283de94719a7630a455977b0b9 372f037b72d14535b565ecf10eb21f37
+#: 8ccade4d41ab45b6831b6972f0930791 e43a9503426f4400830c676ec395d2d0
+msgid "``description``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:64 01af28d5518e49aa949c62cf126fe25d
+msgid "Detailed description of the service"
+msgstr ""
+
+#: ../../interfaces_guide.rst:65 ../../interfaces_guide.rst:211
+#: ../../interfaces_guide.rst:333 075438877a9b46c19356582aa8eedb2c
+#: 84926d1c026c46d2bae328e4aa34913f ab72bc5d5a70479e8040f8da2fd18bf3
+msgid "``filetype``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:67 55c616e8d9c64175acfb820ea05d1c9d
+msgid "ROS2 service type name (ends with ``.srv``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:68 ../../interfaces_guide.rst:336
+#: 475a918671a541af98cca2f959858564 abe1fa5181e04bb5ab2efbc1cec8922a
+msgid "``access_level``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:70 ../../interfaces_guide.rst:338
+#: 1eedf63c35c54effb0889e0f87533798 8fc8cafd7d58481ba31b07ab8d61401c
+msgid "Security level required (1-5)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:71 ../../interfaces_guide.rst:217
+#: a9d531d6d0804828828ed0739e3c728a c90466186716440b8186d8f52fc5efb2
+msgid "``params``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:73 1e9621f430f34bf19022fbd6016762a1
+msgid "Array of input parameters"
+msgstr ""
+
+#: ../../interfaces_guide.rst:74 3dd116750972462f9649bbc63f30d8b4
+msgid "``returns``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:76 1eb11bfe66984a6e948ee141ed605518
+msgid "Array of return values"
+msgstr ""
+
+#: ../../interfaces_guide.rst:77 ../../interfaces_guide.rst:220
+#: ../../interfaces_guide.rst:348 8c58e48f260640f8bafa2a79eeac7ab4
+#: a1d93d2b1f324b3ba06351b20251c7c4 b48c073c78314c29b09eba4dd58609d1
+msgid "``displaystyle``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:78 ../../interfaces_guide.rst:215
+#: ../../interfaces_guide.rst:221 ../../interfaces_guide.rst:349
+#: 0e4dbc7fa6e34d29bc37a5b118348647 5df163b9d65a423ea6dec5c190e51433
+#: be13e2b013134b49a76636d68a71cc6e db4df50001304ee6b3091ad7c879600f
+msgid "No"
+msgstr ""
+
+#: ../../interfaces_guide.rst:79 ../../interfaces_guide.rst:222
+#: ../../interfaces_guide.rst:350 4a213841e9504c9197e524be041b882c
+#: 4e4ad636981444be8d071b5e6c9c80d8 815ccc6bae8d4ee8a3dc16688204c905
+msgid "UI display configuration"
+msgstr ""
+
+#: ../../interfaces_guide.rst:82 f0bfde1a717045f6ad01fc1d373ca8e5
+msgid "Parameter/Return Structure"
+msgstr ""
+
+#: ../../interfaces_guide.rst:84 eceac7fa72a743c6863fea72c77ff86c
+msgid "Each parameter and return value has:"
+msgstr ""
+
+#: ../../interfaces_guide.rst:93 12db95ac0539469ba9ac7965ca83735b
+msgid "``name``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:95 042c24c2c2d34fddbc32bfaf837f21fd
+msgid "Parameter name (snake_case)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:96 b2c897f6719840f4bc306d8676e71acb
+msgid "``datatype``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:98 c915089ef7994f269b0b0842da639f6c
+msgid "ROS2 data type (e.g., ``string``, ``int32``, ``bool``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:101 ../../interfaces_guide.rst:207
+#: ../../interfaces_guide.rst:329 57cd22196b7646e09daef774a0c2865d
+#: 8c747644bd5a49bbaacf8acbe0a4449c a239d7d9d169465db9218bc3519a42e7
+msgid "Human-readable name"
+msgstr ""
+
+#: ../../interfaces_guide.rst:104 0e025f7d4595450f94ad467d7bceb8eb
+msgid "Parameter description"
+msgstr ""
+
+#: ../../interfaces_guide.rst:107 df01c25c4a08412c80edddfb8e7d864c
+msgid "Example: Service Definition"
+msgstr ""
+
+#: ../../interfaces_guide.rst:154 ../../interfaces_guide.rst:270
+#: 531a34338eba49c99db9b8d25d30bbfe 94ede52d9c094c24bd5c236786a223bc
+msgid "Implementation"
+msgstr ""
+
+#: ../../interfaces_guide.rst:156 6e98869752274b2bb8aca6a281a1d427
+msgid "After defining the service in JSON, implement it in your application:"
+msgstr ""
+
+#: ../../interfaces_guide.rst:182 e47da8f850bb470394af42e934722d9e
+msgid "Topics/Speakers"
+msgstr ""
+
+#: ../../interfaces_guide.rst:184 be4a444384df4a3eaf3da82e84d5147f
+msgid ""
+"Topics provide asynchronous publish-subscribe communication. Publishers "
+"send messages without waiting for responses, and multiple subscribers can"
+" listen to the same topic."
+msgstr ""
+
+#: ../../interfaces_guide.rst:189 f9f86c6866594b40a448a83cdf00012a
+msgid "Topic/Speaker Fields"
+msgstr ""
+
+#: ../../interfaces_guide.rst:198 3c5c4f7b328145d687e2d87fee31ce7a
+msgid "Array containing ``[\"ros2_topic\"]`` or ``[\"ros2_pub\"]``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:201 6ee21379b0c0402897e61c8927d8893c
+msgid "Must be ``\"speaker\"``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:204 1e4eb7f51d05479c949fc9383e3d8971
+msgid "Topic name (snake_case)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:210 e611b6a2e94a499cbc9f2c7f278926a1
+msgid "Topic purpose description"
+msgstr ""
+
+#: ../../interfaces_guide.rst:213 10563c0bf1774b69938331a064bff6ca
+msgid "ROS2 message type name (ends with ``.msg``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:214 4c0627aa63e74b5b885f3b909192beaa
+msgid "``frequency``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:216 1da602905fe144d6986acfd48df8c0f9
+msgid "Publishing frequency in Hz (default: 10.0)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:219 4f95e80e504b4ad28094f08ebcd4417f
+msgid "Array of message fields"
+msgstr ""
+
+#: ../../interfaces_guide.rst:225 99e44cb25f0042c9b834e3e3e0a8ee47
+msgid "Example: Topic Definition"
+msgstr ""
+
+#: ../../interfaces_guide.rst:301 53af853b391f4a678f4a7b6dc2ca9dae
+msgid "Actions/Jobs"
+msgstr ""
+
+#: ../../interfaces_guide.rst:303 14d1ccc82f51421a83bd7067030e755d
+msgid ""
+"Actions provide long-running operations with feedback. They are useful "
+"for tasks that take time to complete and need to report progress."
+msgstr ""
+
+#: ../../interfaces_guide.rst:306 2ceaa572a4c5495bb66fc781848e9e18
+msgid ""
+"Action support is planned for future releases. Current implementation "
+"uses simplified job pattern."
+msgstr ""
+
+#: ../../interfaces_guide.rst:311 4a3d5395ad69493891ee6c6254d3aed4
+msgid "Action/Job Fields"
+msgstr ""
+
+#: ../../interfaces_guide.rst:320 610f27f6ba7d4f3c8b0b61b77f9492aa
+msgid "Array containing ``[\"ros2_action\"]`` or ``[\"job\"]``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:323 be569916ecbc4d8fa6bd9e0eda0884aa
+msgid "Must be ``\"job\"``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:326 456ea9cf2eea4948b33dba13e96a5127
+msgid "Action name (snake_case)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:332 e3bea5630b6d445fa9841801c275a79a
+msgid "Action purpose description"
+msgstr ""
+
+#: ../../interfaces_guide.rst:335 75b63c718bb64fdf8cbe00f2d403e871
+msgid "ROS2 action type name (ends with ``.action``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:339 b8ea9e751c5543a2b36d861fab535f0c
+msgid "``goal``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:341 a94ea11ada9141ef82ca44484de9bc25
+msgid "Array of goal parameters"
+msgstr ""
+
+#: ../../interfaces_guide.rst:342 c4afc8b6c5584a04940fd58b45a9a6fc
+msgid "``result``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:344 aaf3da6f06ef43d7811d9350f1a24d36
+msgid "Array of result fields"
+msgstr ""
+
+#: ../../interfaces_guide.rst:345 6192cc6627a1434990e6da62a2659b45
+msgid "``feedback``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:347 e75d87071de7421f9bf31a13ba39584d
+msgid "Array of feedback fields"
+msgstr ""
+
+#: ../../interfaces_guide.rst:353 19e5c6cc71ab4f70bba6ff6f73d8e957
+msgid "Example: Action Definition"
+msgstr ""
+
+#: ../../interfaces_guide.rst:414 18803d02ce99421dacc9fca373e29568
+msgid "Implementation (Simplified)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:454 d8a4f9e1988543698dbc446e8afbb8b7
+msgid "Common Data Types"
+msgstr ""
+
+#: ../../interfaces_guide.rst:457 a61dff2b1f224037977bbee073c36da5
+msgid "ROS2 Standard Types"
+msgstr ""
+
+#: ../../interfaces_guide.rst:463 ../../interfaces_guide.rst:489
+#: a288f3e4e8974a9e9eabedcee6ef8fff acbacce689fe4526b5c5a7210d777a28
+msgid "Type"
+msgstr "Typ"
+
+#: ../../interfaces_guide.rst:465 352ad1c03c554a2ba93c3e16d58c99c0
+msgid "``bool``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:466 5385e50bea0f4f059414be1d1c7f4f15
+msgid "Boolean (true/false)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:467 86c5d6e6b0a74a3a8e95d00212c5e9ee
+msgid "``int8``, ``int16``, ``int32``, ``int64``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:468 22d56c2a6e084c188858e57f6409966f
+msgid "Signed integers"
+msgstr ""
+
+#: ../../interfaces_guide.rst:469 5f9885db48fc4b1fa62ca6d0e8794e8b
+msgid "``uint8``, ``uint16``, ``uint32``, ``uint64``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:470 7c8d48b40dc745e9b423352fd2543ba7
+msgid "Unsigned integers"
+msgstr ""
+
+#: ../../interfaces_guide.rst:471 f61f8fed552346f9a5ed9870c86efbe5
+msgid "``float32``, ``float64``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:472 b15539a437464a6ba1291586bd779708
+msgid "Floating point numbers"
+msgstr ""
+
+#: ../../interfaces_guide.rst:473 3dde5825b4e74880b1d721d8b188d2de
+msgid "``string``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:474 9be22f9044cc46ca8d5075e9b8d89abe
+msgid "UTF-8 string"
+msgstr ""
+
+#: ../../interfaces_guide.rst:475 769cedb3ff824e2484bb812887c5c62e
+msgid "``byte``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:476 8721ae95ab314f15b47de9e0777d1688
+msgid "Raw byte data"
+msgstr ""
+
+#: ../../interfaces_guide.rst:477 e63a59633a0c4d84b73783ea19c29aad
+msgid "``type[]``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:478 f5cf5d701e58450db02bc747a47677ee
+msgid "Unbounded array (e.g., ``string[]``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:479 b122724ec7814b72b2dd3f3eaf9890ac
+msgid "``type[n]``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:480 a367588e7b2048de91f4a69fb976f7e4
+msgid "Fixed-size array (e.g., ``float32[3]``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:483 0999fe1751414455a6f7e8c06a6798b7
+msgid "Common ROS2 Message Types"
+msgstr ""
+
+#: ../../interfaces_guide.rst:491 ca5dc1f40b914c7784c1dc617e302ffd
+msgid "``builtin_interfaces/Time``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:492 44be58272dd544bd9b8146701f02ac1e
+msgid "ROS timestamp (seconds + nanoseconds)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:493 dc5ffbb4ca0b485f80db49e232047e7f
+msgid "``builtin_interfaces/Duration``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:494 ebfcb671037b4b3cb03421bbf3474c51
+msgid "Time duration"
+msgstr ""
+
+#: ../../interfaces_guide.rst:495 454e2e8153044a99902d9cdcf847bff8
+msgid "``std_msgs/Header``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:496 6e8f64c3c8344c8b8c3160154a0642d0
+msgid "Message header with timestamp and frame_id"
+msgstr ""
+
+#: ../../interfaces_guide.rst:497 9bb7c6946ab244f79da53c6f7ecf2e22
+msgid "``geometry_msgs/Point``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:498 0d9cbf619f104e48b1ea5dd824f03ae3
+msgid "3D point (x, y, z)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:499 ad0f6c7dc4204f03907de17631cf9f9a
+msgid "``geometry_msgs/Pose``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:500 9483260a6327409d81d3c85a9b17b2ea
+msgid "Position and orientation"
+msgstr ""
+
+#: ../../interfaces_guide.rst:501 9a58c5e5646d4d0ba1e93846f8f9f1a4
+msgid "``unique_identifier_msgs/UUID``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:502 9056b1f467234caabbdc304f442bf5ed
+msgid "UUID (16 bytes)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:505 a62579ac61384dd3aa6125190a65284d
+msgid "Access Levels"
+msgstr ""
+
+#: ../../interfaces_guide.rst:507 c19547ea971e44759bfee0dc40134942
+msgid ""
+"Every interface must specify an ``access_level`` (1-5) that determines "
+"which modules can call it:"
+msgstr ""
+
+#: ../../interfaces_guide.rst:513 cbcd1f64452849c796809eef9c9881b0
+msgid "Level"
+msgstr ""
+
+#: ../../interfaces_guide.rst:514 ae868299e7ca48409fa9526c0e8619ea
+msgid "Name"
+msgstr "Name"
+
+#: ../../interfaces_guide.rst:516 10015d34431048fd92c158b96e36bdd3
+msgid "1"
+msgstr ""
+
+#: ../../interfaces_guide.rst:517 b3b2c0c33ad043bcb8e163a6cbe84512
+msgid "NONE"
+msgstr ""
+
+#: ../../interfaces_guide.rst:518 dfd8b191134d44c9893b171c63a18247
+msgid "Public access, no authentication required"
+msgstr ""
+
+#: ../../interfaces_guide.rst:519 29508cdae63e41c5b1c72048eb0ee385
+msgid "2"
+msgstr ""
+
+#: ../../interfaces_guide.rst:520 cbb42b4ab36445be88fd1d4e729bd137
+msgid "BASIC_AUTH"
+msgstr ""
+
+#: ../../interfaces_guide.rst:521 eea1901f423c4cfca5720c1b616e49f3
+msgid "Module ID verification required"
+msgstr ""
+
+#: ../../interfaces_guide.rst:522 e32cf101070141d5978caa8726aa3716
+msgid "3"
+msgstr ""
+
+#: ../../interfaces_guide.rst:523 8200a8784d294d43b15c1672dd2e6b35
+msgid "EXTENDED_AUTH"
+msgstr ""
+
+#: ../../interfaces_guide.rst:524 2753327c02c2477ca0945e0507819b83
+msgid "Module ID + password authentication"
+msgstr ""
+
+#: ../../interfaces_guide.rst:525 43d35600b3cd4060a6ba973998c70def
+msgid "4"
+msgstr ""
+
+#: ../../interfaces_guide.rst:526 1a06388feb6d42cc878f1f94eb3944a9
+msgid "HMAC"
+msgstr ""
+
+#: ../../interfaces_guide.rst:527 c1304c5c63c6488bb728a14ac08d383a
+msgid "HMAC-SHA256 message integrity check"
+msgstr ""
+
+#: ../../interfaces_guide.rst:528 93192e854b454beeb9f97e6c1fdd7399
+msgid "5"
+msgstr ""
+
+#: ../../interfaces_guide.rst:529 deb1000f831842bba4ad3b5489d64afe
+msgid "DIGITAL_SIGNATURE"
+msgstr ""
+
+#: ../../interfaces_guide.rst:530 02eff09f792649e4bba3ebe8a89c96f3
+msgid "Certificate-based PKI authentication"
+msgstr ""
+
+#: ../../interfaces_guide.rst:532 93a5914d8684445bad23b4c91674f797
+msgid "See :doc:`security` for detailed security documentation."
+msgstr ""
+
+#: ../../interfaces_guide.rst:535 28e8755954604b05b3d1d62c9329bd1d
+msgid "Best Practices"
+msgstr "Best Practices"
+
+#: ../../interfaces_guide.rst:538 8da35d15f28b41aa9c32ab3117cc9fd0
+msgid "Naming Conventions"
+msgstr ""
+
+#: ../../interfaces_guide.rst:540 30cc9c3277c34acab46aadc55ec7a1d0
+msgid ""
+"**Function names**: Use ``snake_case`` (e.g., ``set_parameter``, "
+"``get_status``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:541 4cf078447ff8492b873dcf50559f9d05
+msgid ""
+"**Display names**: Use Title Case (e.g., ``\"Set Parameter\"``, ``\"Get "
+"Status\"``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:542 d200dc35931c48dabab01d83b7fdfb4e
+msgid ""
+"**File types**: Use PascalCase with suffix (e.g., ``VBASESetParam.srv``, "
+"``ModuleStatus.msg``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:543 53cb22b0dcc54508828302bb36de27bb
+msgid "**Parameter names**: Use ``snake_case``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:546 e36b359918984bf896e7b41ce8a4f4ce
+msgid "Organization"
+msgstr ""
+
+#: ../../interfaces_guide.rst:548 644ab63c9ec343c3a7cc49842d4c9078
+msgid ""
+"**Group related interfaces**: Put core services in ``*_core_meta.json``, "
+"state management in ``*_state_meta.json``"
+msgstr ""
+
+#: ../../interfaces_guide.rst:549 9fd2e696f5674d34abe3cc46fa8456b8
+msgid ""
+"**Consistent naming**: Use module prefix for custom types (e.g., "
+"``V2MMSetConfig.srv`` for v2_modulemanager)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:550 389a39917f3c4ab7abc54f96e3d304e3
+msgid ""
+"**Access levels**: Start with level 2 (BASIC_AUTH) as minimum for non-"
+"public services"
+msgstr ""
+
+#: ../../interfaces_guide.rst:551 45e4b9aabb1143819f747b7dff840e64
+msgid ""
+"**Documentation**: Provide clear descriptions for all interfaces and "
+"parameters"
+msgstr ""
+
+#: ../../interfaces_guide.rst:554 9d0abeb71d26463d8128ab677ed5123f
+msgid "Interface Versioning"
+msgstr ""
+
+#: ../../interfaces_guide.rst:556 05af686d5e2a43e68bc925742e202b95
+msgid "When modifying existing interfaces:"
+msgstr ""
+
+#: ../../interfaces_guide.rst:558 5a054344640e493da37ed2224eaa2a4d
+msgid "**Non-breaking changes**: Add optional parameters at the end"
+msgstr ""
+
+#: ../../interfaces_guide.rst:559 ae2643b2bc924968920a97ee0f4458b9
+msgid ""
+"**Breaking changes**: Create new interface with version suffix (e.g., "
+"``SetParamV2.srv``)"
+msgstr ""
+
+#: ../../interfaces_guide.rst:560 08fea9b34e634f669851a43ac644083b
+msgid "**Deprecation**: Mark old interfaces as deprecated in description"
+msgstr ""
+
+#: ../../interfaces_guide.rst:561 532aad3db4424c93a855c4e4dcd20781
+msgid "**Migration**: Provide migration guide in module documentation"
+msgstr ""
+
+#: ../../interfaces_guide.rst:564 a712359e31114a33954ceed3e5f34939
+msgid "Example: Complete Module Interfaces"
+msgstr ""
+
+#: ../../interfaces_guide.rst:566 d48ee76c5a894a369d5aededfd46434b
+msgid "Complete example for a module with multiple interface types:"
+msgstr ""
+
+#: ../../interfaces_guide.rst:642 6a522fc57051450bb01055a3f6c06900
+msgid "See Also"
+msgstr ""
+
+#: ../../interfaces_guide.rst:644 34cc517426bc431ea7306e3cdd69a0ae
+msgid ":doc:`security`: Security framework and access control"
+msgstr ""
+
+#: ../../interfaces_guide.rst:645 c97d03297b9c492180b5420297eca8c7
+msgid ":doc:`com/overview`: Communication overview"
+msgstr ""
+
+#: ../../interfaces_guide.rst:646 00798c86c93b4630afd2b4ba2d325877
+msgid ":doc:`core/entity`: Entity initialization and interface registration"
+msgstr ""
+
+#: ../../interfaces_guide.rst:647 4c535e63f2e344cb82868415cdd06022
+msgid ":doc:`MIGRATION_ACCESS_LEVEL`: Access level integration guide"
+msgstr ""
+

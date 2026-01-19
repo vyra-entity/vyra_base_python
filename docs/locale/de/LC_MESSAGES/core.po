@@ -21,79 +21,84 @@ msgstr ""
 
 #: ../../core.rst:2 ../../core.rst:6 7fa9618d64e94322b9356295bfbce84d
 msgid "Core Components"
-msgstr ""
+msgstr "Kern-Komponenten"
 
 #: ../../core.rst:4 4dd5da0f84f247d5a8e53cd06823dee7
 msgid ""
 "The Core module forms the heart of the VYRA framework. All central "
 "components are initialized and managed here."
 msgstr ""
+"Das Core-Modul bildet das Herz des VYRA-Frameworks. Hier werden alle "
+"zentralen Komponenten initialisiert und verwaltet."
 
 #: ../../core.rst:15 f096c8f632984439bffb77a24cfd9b2f
 msgid "Overview"
-msgstr ""
+msgstr "Überblick"
 
 #: ../../core.rst:17 665dfcef366e4ea09cca03ef58d0a7a1
 msgid "The Core module consists of three main components:"
-msgstr ""
+msgstr "Das Core-Modul besteht aus drei Hauptkomponenten:"
 
 #: ../../core.rst:19 dc50051deeda4e47b09d994179fde5ff
 msgid "**Entity**: Central management unit for modules"
-msgstr ""
+msgstr "**Entity**: Zentrale Verwaltungseinheit für Module"
 
 #: ../../core.rst:20 0fb56a8b10a4495f843266663be5d1f1
 msgid "**Parameter**: Persistent configuration data in SQLite"
-msgstr ""
+msgstr "**Parameter**: Persistente Konfigurationsdaten in SQLite"
 
 #: ../../core.rst:21 f2ecb133c761439eb63b27457d45b376
 msgid "**Volatile**: Volatile, fast data storage with Redis"
-msgstr ""
+msgstr "**Volatile**: Flüchtiger, schneller Datenspeicher mit Redis"
 
 #: ../../core.rst:24 8a070962578641269d84e3fac35de8df
 msgid "Component Interaction"
-msgstr ""
+msgstr "Komponenten-Interaktion"
 
 #: ../../core.rst:26 f9a624b46dac491987412ec5f04049ce
 msgid "The three components work closely together:"
-msgstr ""
+msgstr "Die drei Komponenten arbeiten eng zusammen:"
 
 #: ../../core.rst:28 1b849f9982554f92b51917574daa587a
 msgid "**VyraEntity** initializes and orchestrates all module components"
-msgstr ""
+msgstr "**VyraEntity** initialisiert und orchestriert alle Modulkomponenten"
 
 #: ../../core.rst:29 88354b683c8c4a8d91bd5faa6ed50169
 msgid "**Parameter** manages persisttent configurations (slow, permanent)"
-msgstr ""
+msgstr "**Parameter** verwaltet persistente Konfigurationen (langsam, permanent)"
 
 #: ../../core.rst:30 1df1c90424e1456a9509a49c7025409e
 msgid "**Volatile** manages volatile real-time data (fast, temporary)"
-msgstr ""
+msgstr "**Volatile** verwaltet flüchtige Echtzeitdaten (schnell, temporär)"
 
 #: ../../core.rst:33 2d0779d77a5e49feb929b2cebdc58e2e
 msgid ""
 "Use Parameter for configuration data that should persist between "
 "restarts. Use Volatiles for real-time data and fast caching."
 msgstr ""
+"Verwenden Sie Parameter für Konfigurationsdaten, die zwischen Neustarts "
+"erhalten bleiben sollen. Verwenden Sie Volatiles für Echtzeitdaten und "
+"schnelles Caching."
 
 #: ../../core.rst:37 8a070962578641269d84e3fac35de8df
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../core.rst:39 659b09589c694acb8e151a9947e3373d
 msgid ":doc:`core/entity` - Central Entity Management"
-msgstr ""
+msgstr ":doc:`core/entity` - Zentrale Entity-Verwaltung"
 
 #: ../../core.rst:40 ed424e64406a4c87812ae643d13be9ce
 msgid ":doc:`core/parameter` - Persistent Parameters"
-msgstr ""
+msgstr ":doc:`core/parameter` - Persistente Parameter"
 
 #: ../../core.rst:41 46321f539b534479b766020b28de1d82
 msgid ":doc:`core/volatile` - Volatile Data"
-msgstr ""
+msgstr ":doc:`core/volatile` - Flüchtige Daten"
 
 #: ../../core.rst:42 804425860f25441786b1076f228a2a76
 msgid ":doc:`vyra_base.core` - API Reference (auto-generated)"
-msgstr ""
+msgstr ":doc:`vyra_base.core` - API-Referenz (automatisch generiert)"
 
 #~ msgid "Core Komponenten"
 #~ msgstr ""

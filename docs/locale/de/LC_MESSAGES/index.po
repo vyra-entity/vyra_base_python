@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:12+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -27,22 +27,26 @@ msgstr "Erste Schritte"
 msgid "Core Framework"
 msgstr "Kern-Framework"
 
-#: ../../index.rst:29
+#: ../../index.rst:30
 msgid "Security Framework"
 msgstr "Sicherheits-Framework"
 
-#: ../../index.rst:35
+#: ../../index.rst:36
 msgid "API Reference"
 msgstr "API-Referenz"
 
-#: ../../index.rst:7 c1112a4fa3da40689a8accf162a59f95
-msgid "vyra_base documentation"
+#: ../../index.rst:7 b34a7b46438e4afa8d370fb623ec8eff
+#, fuzzy
+msgid "Vyra-Base Documentation"
 msgstr "vyra_base Dokumentation"
 
-#: ../../index.rst:9 c6755303ba5f45b293482e4e0c153867
+#: ../../index.rst:9 af556936a19b409796095364aee79ea2
 msgid ""
 "VYRA Base Python Library provides core functionality for the VYRA "
 "Framework, including state management, ROS2 integration, security, and "
 "communication utilities."
 msgstr ""
+"Die VYRA Base Python Bibliothek bietet Kernfunktionalität für das VYRA "
+"Framework, einschließlich Zustandsverwaltung, ROS2-Integration, Sicherheit "
+"und Kommunikationsdienstprogrammen."
 

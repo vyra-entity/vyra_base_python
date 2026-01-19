@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -31,6 +31,79 @@ msgstr ""
 
 #: ../../security/examples.rst:7 8975d809282541fbac322880a6037a04
 msgid "Example Overview"
+msgstr ""
+
+#: ../../security/examples.rst:13 471a54dd0a264e2f888b7d2ce8ab6a70
+msgid "Example"
+msgstr "Beispiel"
+
+#: ../../security/examples.rst:14 cad161c79ecc406abb6c723ba8405762
+msgid "Description"
+msgstr "Beschreibung"
+
+#: ../../security/examples.rst:15 da916a81c2e04e4fb093ef2d3165217a
+msgid "Level"
+msgstr ""
+
+#: ../../security/examples.rst:16 48f3c9a6c1684982b197671aee4cad24
+msgid ":ref:`basic-server`"
+msgstr ""
+
+#: ../../security/examples.rst:17 58162c42dd0b4c88ab64db1b7c05ce5d
+msgid "Minimal secure server"
+msgstr ""
+
+#: ../../security/examples.rst:18 ../../security/examples.rst:21
+#: ../../security/examples.rst:24 ../../security/examples.rst:27
+#: ../../security/examples.rst:33 4398191d4897481b8add2ff6b815106f
+#: 7cf8447c558849958337a080ec8177e5 b240633c614342a99bf4f5868ddcf6b0
+#: b760622a30294402bb4a54fea0664014 dc3eafc6f417465ea642392612b06e79
+msgid "4 (HMAC)"
+msgstr ""
+
+#: ../../security/examples.rst:19 926f8f2008004e1081292d98b0e67482
+msgid ":ref:`basic-client`"
+msgstr ""
+
+#: ../../security/examples.rst:20 96429e3c4777428cbd7e78bde9cc436c
+msgid "Minimal secure client"
+msgstr ""
+
+#: ../../security/examples.rst:22 71260c61cbcf4824b16960ce8f26a5ea
+msgid ":ref:`secure-publisher`"
+msgstr ""
+
+#: ../../security/examples.rst:23 da54c5c8df8d4372812ed1407e62a491
+msgid "Secure message publishing"
+msgstr ""
+
+#: ../../security/examples.rst:25 58162c42dd0b4c88ab64db1b7c05ce5d
+msgid ":ref:`secure-service`"
+msgstr ""
+
+#: ../../security/examples.rst:26 95290f4828da4536a27264cc47ca0efa
+msgid "Secure service implementation"
+msgstr ""
+
+#: ../../security/examples.rst:28 e1f6d383690b4f9dae1db15ef1d5c456
+msgid ":ref:`certificate-auth`"
+msgstr ""
+
+#: ../../security/examples.rst:29 b5787ec6b73f4217937ee1d21242419f
+msgid "Certificate-based auth"
+msgstr ""
+
+#: ../../security/examples.rst:30 da5492da8a3d4b0aac1f39e962ae9f7d
+msgid "5 (Digital)"
+msgstr ""
+
+#: ../../security/examples.rst:31 802f331ef8da4ea09e93c5dd50d5b984
+msgid ":ref:`vyra-integration`"
+msgstr ""
+
+#: ../../security/examples.rst:32 ../../security/examples.rst:584
+#: be0da363c042486586519e3dd78c7cf3
+msgid "Integration with VyraEntity"
 msgstr ""
 
 #: ../../security/examples.rst:38 58162c42dd0b4c88ab64db1b7c05ce5d
@@ -71,10 +144,6 @@ msgstr ""
 
 #: ../../security/examples.rst:445 2b4cfe02e7cf4527a4a9da414be4dd57
 msgid "Using digital signatures with certificates."
-msgstr ""
-
-#: ../../security/examples.rst:584 be0da363c042486586519e3dd78c7cf3
-msgid "Integration with VyraEntity"
 msgstr ""
 
 #: ../../security/examples.rst:586 81b1f70eb19f4e8485bb3cc43681a124

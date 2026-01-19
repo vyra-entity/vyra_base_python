@@ -165,7 +165,7 @@ msgid "Redis-Backend"
 msgstr ""
 
 #: ../../core/volatile.rst:189 48c8558d2357406486195112b6e29989
-msgid "**Verbindung**: Automatisch via ``entity.stoage.redis_client``"
+msgid "**Verbindung**: Automatisch via ``entity.storage.redis_client``"
 msgstr ""
 
 #: ../../core/volatile.rst:191 64a8c0d78de24882ae0bcd820c191877
@@ -227,7 +227,7 @@ msgstr ""
 
 #: ../../core/volatile.rst:260 bfaadc4c147b4381b26365c69acdf4de
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../core/volatile.rst:262 5ee76b3aa5dd42ef986344f6d5a44605
 msgid ":doc:`entity` - Entity-Dokumentation"
@@ -238,7 +238,7 @@ msgid ":doc:`parameter` - Persistente Alternative"
 msgstr ""
 
 #: ../../core/volatile.rst:264 0aa351efba82406e86255a554cd1f249
-msgid ":doc:`../stoage` - Stoage-Backend Details"
+msgid ":doc:`../storage` - Storage-Backend Details"
 msgstr ""
 
 #: ../../core/volatile.rst:265 60f0a13d27624496bbbd7c11470da478

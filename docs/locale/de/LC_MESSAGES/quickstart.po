@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:12+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -19,7 +19,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../quickstart.rst:2 84d091fc38ba4fe2b4a75c9b21b07b32
-msgid "quickstart"
+#: ../../quickstart.rst:2 2d95d7e8a52a4f3c99515ed9618d4497
+#, fuzzy
+msgid "Quickstart"
 msgstr "Schnellstart"
 

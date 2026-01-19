@@ -27,7 +27,7 @@ msgstr ""
 msgid ""
 "The :class:`~vyra_base.core.entity.VyraEntity` is the central management "
 "unit of each VYRA module. It orchestrates all components such as ROS2 "
-"communication, state management, stoage, and security."
+"communication, state management, storage, and security."
 msgstr ""
 
 #: ../../core/entity.rst:8 228890ff762748b8aa8b5770b5acf3c2
@@ -53,7 +53,7 @@ msgstr ""
 #: ../../core/entity.rst:55 89f6caedb6f745a49025a53a38c03def
 msgid ""
 "Parameters are stoed in a **SQLite database** in the module under "
-"``/workspace/stoage/data/``. This enables persisttent data stoage between"
+"``/workspace/storage/data/``. This enables persisttent data storage between"
 " restarts."
 msgstr ""
 
@@ -74,7 +74,7 @@ msgstr ""
 
 #: ../../core/entity.rst:81 1ead3bfc230e4e0590110d3eb51824ca
 msgid ""
-"Volatiles use **Redis** for fast in-memory data stoage. This data is "
+"Volatiles use **Redis** for fast in-memory data storage. This data is "
 "**volatile** - it is lost on restart."
 msgstr ""
 
@@ -138,11 +138,11 @@ msgstr ""
 
 #: ../../core/entity.rst:157 dfc7d43493624c948cdf0ca16cba6c57
 #, fuzzy
-msgid "Stoage Access"
+msgid "Storage Access"
 msgstr "Zustandsmaschine"
 
 #: ../../core/entity.rst:159 b37d216a5c3c4347b16eafff8ec2127a
-msgid "The entity manages various stoage backends:"
+msgid "The entity manages various storage backends:"
 msgstr ""
 
 #: ../../core/entity.rst:177 0989c52b5fb341e69883eb952458accc
@@ -163,7 +163,7 @@ msgstr ""
 
 #: ../../core/entity.rst:188 adb673419e7349259d6206faf4b44e07
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../core/entity.rst:190 eeba832c46a84e8f8a57aadb45f319c9
 msgid ":doc:`parameter` - Detailed parameter documentation"

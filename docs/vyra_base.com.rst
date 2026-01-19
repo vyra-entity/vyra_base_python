@@ -19,7 +19,7 @@ vyra\_base.com.handler module
 .. automodule:: vyra_base.com.handler
    :members:
    :show-inheritance:
-   :members:
+
 
 Module contents
 ---------------
@@ -27,4 +27,4 @@ Module contents
 .. automodule:: vyra_base.com
    :members:
    :show-inheritance:
-   :members:
+

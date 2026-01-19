@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 14:07+0100\n"
+"POT-Creation-Date: 2026-01-19 14:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -19,8 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../installation.rst:2 abc7108f5f904f339e6b8869f0a01c46
-#, fuzzy
-msgid "Installation"
-msgstr "Installation"
+#: ../../_templates/sidebar/language.html:2 29d6b036aa454e91b5e37f7006db49e3
+msgid "Language"
+msgstr ""
 

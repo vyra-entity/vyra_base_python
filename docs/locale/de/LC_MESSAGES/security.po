@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -39,6 +39,107 @@ msgstr "Übersicht"
 
 #: ../../security.rst:18 280df60515184c7b8ffebe089f6f6811
 msgid "The framework implements a 5-level security model:"
+msgstr ""
+
+#: ../../security.rst:20 331606ba132742c1a4930b954d2de34b
+#, fuzzy
+msgid "Security Levels"
+msgstr "Sicherheits-Framework"
+
+#: ../../security.rst:24 091f9f0aa0584c249ff748f7978852a8
+msgid "Level"
+msgstr ""
+
+#: ../../security.rst:25 61a90073490c42b2b71ddeef18005c4e
+msgid "Name"
+msgstr "Name"
+
+#: ../../security.rst:26 a64bb702a29f402dad46dd7634afbcda
+msgid "Features"
+msgstr ""
+
+#: ../../security.rst:27 f1cc8a7272ad4b5083f7cb5474cb47c2
+msgid "Use Case"
+msgstr ""
+
+#: ../../security.rst:28 f60baa63dab648418c378bac1ca5cdbe
+msgid "1"
+msgstr ""
+
+#: ../../security.rst:29 a8a054a5f07848dabccf691f2a334243
+msgid "NONE"
+msgstr ""
+
+#: ../../security.rst:30 0a5ed00b2c5749cd8dc0670d87ac167f
+msgid "No security"
+msgstr ""
+
+#: ../../security.rst:31 6b6b7d48824b432e8e7f19f944669dff
+msgid "Public information"
+msgstr ""
+
+#: ../../security.rst:32 33631b75d5764a22aef713e875debd6c
+msgid "2"
+msgstr ""
+
+#: ../../security.rst:33 b3dd974a7a8744c5ba9ec9f58dc5cfd5
+msgid "BASIC_AUTH"
+msgstr ""
+
+#: ../../security.rst:34 c1c20a45941c4275b3dda6e0bc4f15e8
+msgid "Module ID verification"
+msgstr ""
+
+#: ../../security.rst:35 d0a34c4646854b1c8d6429b08ee8e537
+msgid "Internal networks"
+msgstr ""
+
+#: ../../security.rst:36 ea4e9f13027a4255ae469cf99d182cc5
+msgid "3"
+msgstr ""
+
+#: ../../security.rst:37 9f9c7d7dca26439d89b0dd77513d9e8f
+msgid "TIMESTAMP"
+msgstr ""
+
+#: ../../security.rst:38 668378625b41490aabc0da9102f39243
+msgid "ID + timestamp validation"
+msgstr ""
+
+#: ../../security.rst:39 7b170e4f27154843b1a462dea3c34f85
+msgid "Replay attack prevention"
+msgstr ""
+
+#: ../../security.rst:40 2f2cf9dc6c704affbe59d25ba8eab395
+msgid "4"
+msgstr ""
+
+#: ../../security.rst:41 f179e98c150044a592225756f63e4f2b
+msgid "HMAC"
+msgstr ""
+
+#: ../../security.rst:42 69219cf23eaa40b6a4403b7db13155dc
+msgid "HMAC-SHA256 signatures"
+msgstr ""
+
+#: ../../security.rst:43 500fd65316d5497297940426c4a47e6c
+msgid "Message integrity"
+msgstr ""
+
+#: ../../security.rst:44 d98f813c1ca6410f8d9ca33fc7316d55
+msgid "5"
+msgstr ""
+
+#: ../../security.rst:45 a4247d05ce1a4568a5ec13fbb36427d8
+msgid "DIGITAL_SIGNATURE"
+msgstr ""
+
+#: ../../security.rst:46 552d778e6e804eca8075f536fe25c33f
+msgid "Certificate-based PKI"
+msgstr ""
+
+#: ../../security.rst:47 192bf10c0f354450b3a5de16df3ef76b
+msgid "Maximum security"
 msgstr ""
 
 #: ../../security.rst:50 a64bb702a29f402dad46dd7634afbcda
@@ -122,7 +223,7 @@ msgid ""
 msgstr ""
 
 #: ../../security.rst:119 b595138196344670a29f14443868580e
-msgid "**SecurityValidato** - Validates incoming messages on the server side"
+msgid "**SecurityValidator** - Validates incoming messages on the server side"
 msgstr ""
 
 #: ../../security.rst:121 dad1b68ffd914f7dadefb1b8ac96e77c
@@ -288,5 +389,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "**Security Validator** - Validates incoming messages and signatures"
+#~ msgstr ""
+
+#~ msgid "**SecurityValidato** - Validates incoming messages on the server side"
 #~ msgstr ""
 

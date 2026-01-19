@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-vyra_base documentation
+Vyra-Base Documentation
 =======================
 
 VYRA Base Python Library provides core functionality for the VYRA Framework,

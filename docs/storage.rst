@@ -1,15 +1,15 @@
-Stoage - Data Stoage
+Storage - Data Storage
 ==========================
 
-The Stoage module provides access to persisttent (SQLite) and volatile (Redis) data stoage.
+The Storage module provides access to persisttent (SQLite) and volatile (Redis) data storage.
 
 Overview
 ---------
 
-VYRA supports two stoage backends:
+VYRA supports two storage backends:
 
-1. **SQLite-Datenbank**: Persistent stoage (permanent)
-2. **Redis**: Volatile in-memory stoage (fast)
+1. **SQLite-Datenbank**: Persistent storage (permanent)
+2. **Redis**: Volatile in-memory storage (fast)
 
 .. list-table::
    :header-rows: 1
@@ -20,10 +20,10 @@ VYRA supports two stoage backends:
      - Access via
    * - **SQLite**
      - Parameters, configuration, logs
-     - :class:`~vyra_base.stoage.db_access.DbAccess`
+     - :class:`~vyra_base.storage.db_access.DbAccess`
    * - **Redis**
      - Volatiles, real-time data, caching
-     - :class:`~vyra_base.stoage.redis_client.RedisClient`
+     - :class:`~vyra_base.storage.redis_client.RedisClient`
 
 Database Access (SQLite)
 ---------------------------
@@ -31,16 +31,16 @@ Database Access (SQLite)
 DbAccess Class
 ^^^^^^^^^^^^^^^
 
-The :class:`~vyra_base.stoage.db_access.DbAccess` class manages SQLite databases:
+The :class:`~vyra_base.storage.db_access.DbAccess` class manages SQLite databases:
 
 .. code-block:: python
 
-   from vyra_base.stoage.db_access import DbAccess, DBTYPE
+   from vyra_base.storage.db_access import DbAccess, DBTYPE
    
    # Create database access
    db = DbAccess(
        db_type=DBTYPE.SQLITE,
-       db_path="/workspace/stoage/data/module.db"
+       db_path="/workspace/storage/data/module.db"
    )
    
    # Initialize connection
@@ -86,7 +86,7 @@ Create Table
 
    from sqlalchemy.orm import Mapped, mapped_column
    from sqlalchemy import String, Integer, DateTime
-   from vyra_base.stoage import Base
+   from vyra_base.storage import Base
    import uuid
    from datetime import datetime
    
@@ -151,11 +151,11 @@ Datenbank-Operationen
 DbManipulato-class
 ^^^^^^^^^^^^^^^^^^^^
 
-The :class:`~vyra_base.stoage.db_manipulato.DbManipulato`-class simplifies CRUD-Operationen:
+The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD-Operationen:
 
 .. code-block:: python
 
-   from vyra_base.stoage.db_manipulato import DbManipulato
+   from vyra_base.storage.db_manipulato import DbManipulato
    
    # Manipulato for eine Create Table
    manipulato = DbManipulato(
@@ -238,11 +238,11 @@ Redis-Zugriff
 RedisClient-class
 ^^^^^^^^^^^^^^^^^^
 
-The :class:`~vyra_base.stoage.redis_client.RedisClient`-class manages Redis-Verbindungen:
+The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages Redis-Verbindungen:
 
 .. code-block:: python
 
-   from vyra_base.stoage.redis_client import RedisClient
+   from vyra_base.storage.redis_client import RedisClient
    
    # Redis-Client create
    redis = RedisClient(
@@ -250,7 +250,7 @@ The :class:`~vyra_base.stoage.redis_client.RedisClient`-class manages Redis-Verb
        port=6379,
        ssl=True,  # TLS-encryption
        ssl_cert_reqs="required",
-       ssl_ca_certs="/workspace/stoage/certificates/redis/ca-cert.pem"
+       ssl_ca_certs="/workspace/storage/certificates/redis/ca-cert.pem"
    )
    
    # Wert set
@@ -272,32 +272,32 @@ Integration with Entity
 Via VyraEntity
 ^^^^^^^^^^^^^^^
 
-Entity stellt automatically Stoage Access bereit:
+Entity stellt automatically Storage Access bereit:
 
 .. code-block:: python
 
    # Datenbank-Zugriff
-   db = entity.stoage.db_access
+   db = entity.storage.db_access
    
    # Redis-Zugriff
-   redis = entity.stoage.redis_client
+   redis = entity.storage.redis_client
    
    # Custom Tabelle register
-   from vyra_base.stoage.db_manipulato import DbManipulato
+   from vyra_base.storage.db_manipulato import DbManipulato
    
    sensor_manipulato = DbManipulato(
-       db_access=entity.stoage.db_access,
+       db_access=entity.storage.db_access,
        table_structure=tb_sensor_data
    )
 
-Stoage-Setup
+Storage-Setup
 ^^^^^^^^^^^^^
 
 .. code-block:: python
 
    # In _base_.py or Entity-Initialization
-   await entity.setup_stoage(
-       db_path="/workspace/stoage/data/module.db",
+   await entity.setup_storage(
+       db_path="/workspace/storage/data/module.db",
        redis_host="redis",
        redis_port=6379
    )
@@ -379,20 +379,20 @@ Bei Schema-Änderungen:
 Speicherorte
 ------------
 
-**SQLite-Datenbanken**: ``/workspace/stoage/data/*.db``
+**SQLite-Datenbanken**: ``/workspace/storage/data/*.db``
 
 **Redis-Daten**: In-Memory (temporär)
 
-**Redis-Zertifikate**: ``/workspace/stoage/certificates/redis/``
+**Redis-Zertifikate**: ``/workspace/storage/certificates/redis/``
 
 Further Information
 -----------------------------
 
 * :doc:`core/parameter` - Parameter with SQLite
 * :doc:`core/volatile` - Volatiles with Redis
-* :doc:`vyra_base.stoage` - API-Referenz
-* :class:`~vyra_base.stoage.db_access.DbAccess` - Datenbank-Zugriff
-* :class:`~vyra_base.stoage.db_manipulato.DbManipulato` - CRUD-Operationen
-* :class:`~vyra_base.stoage.redis_client.RedisClient` - Redis-Client
+* :doc:`vyra_base.storage` - API-Referenz
+* :class:`~vyra_base.storage.db_access.DbAccess` - Datenbank-Zugriff
+* :class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD-Operationen
+* :class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client
 * SQLAlchemy Dokumentation: https://docs.sqlalchemy.org/
 * Redis Dokumentation: https://redis.io/docs/

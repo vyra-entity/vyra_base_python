@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:45+0100\n"
+"POT-Creation-Date: 2026-01-19 14:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -19,35 +19,453 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../vyra_base.com.feeder.rst:2 1a5dfd460e1c474d8e09a4c9da75fe8c
+#: ../../vyra_base.com.feeder.rst:2 5b29e1e76fee47618336441f06cd850d
 msgid "vyra\\_base.com.feeder package"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:5 97812b1004ca4b40a914eab275585f51
+#: ../../vyra_base.com.feeder.rst:5 d078f7021409488a9bf7ede3ccb27259
 msgid "Submodules"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:8 58fd7fb0578d490193d826456138da68
+#: ../../vyra_base.com.feeder.rst:8 80ca2af6e51543258c9b18ca350a3d2f
 msgid "vyra\\_base.com.feeder.available\\_module\\_feeder module"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:16 3946af8b9f6d44808672932164300403
+#: ../../vyra_base.com.feeder.rst:16 cfebff96dd794390a657b136a29f5ba3
 msgid "vyra\\_base.com.feeder.error\\_feeder module"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:24 8e94bc8ea4e24fe8949e685f8d794eae
+#: 2dad4979d33345b0b45e64cdf1a466f7 8d9eec13f70c4309b62e9d354859d4ca
+#: bc50dadb371f401aa1722cc777c9ec85 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:1
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:1
+#: vyra_base.com.feeder.state_feeder.StateFeeder:1
+msgid "Bases: :py:class:`~vyra_base.com.feeder.feeder.BaseFeeder`"
+msgstr ""
+
+#: c2496f1cf9e9470498d7de9c8572afc5 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:1
+msgid "Collection of the error messages."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst 0ad95fd6d216432ba9810136c428b16d
+#: 12f212f510904968b8c449c2512d35d2 1b17d8a4bc6447c882ba68cf09433fb6
+#: 2fc7cadb7ab645629e14e92b1906bbc0 4aa6bccfa10640e19b9e29287c7c91c6
+#: 4f0b60a293834f9e80e27fdae8700400 668c4882d4b2482ebbcfdcd403351f2c
+#: 6d1415ed803c451b8331bc27854d5dc6 6d330e0e87d24c17946cc5a81712d2e0
+#: 7c8b3e09e5834c31b7b53f4cb3a4f989 94e8c9227f0f4ff8b8815aba74a3c6a3
+#: a903060be8f44e5e9b8a52b07c6743fd af8e853df0894bbeb0521c9c07a31e2f
+#: b53053d644074199ae11cd51752e10f7 d04d728e5a9e4d2e8a29c68366a5273d
+#: f1395a4bb7ac439bae0e0dc0ef2f45bb of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.__init__
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.__init__
+msgid "Parameters"
+msgstr "Parameter"
+
+#: 839097ffbd5b4204bab5931ebd22b9cb 86f16700ff0a450e95ee5a9905384710
+#: 931e53dd13144f2cbd0036a665bf1eb9 f79ff5014c484c109c547e2b861ee701 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:4
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:4
+#: vyra_base.com.feeder.state_feeder.StateFeeder:4
+#: vyra_base.com.feeder.state_feeder.StateFeeder.__init__:4
+msgid "The ros2-msg type for the feeder."
+msgstr ""
+
+#: 1eacde92886248359ae1a4900b8a9e11 41e7c68c600a4aef9bf7ce25397d7e63
+#: 55d93333ed534153a559cbf11999db4c b140452f9b264931a55ffbcdf4054cbe of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:7
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:7
+#: vyra_base.com.feeder.state_feeder.StateFeeder:7
+#: vyra_base.com.feeder.state_feeder.StateFeeder.__init__:7
+msgid "The VyraNode instance associated with this feeder (ROS2 Node)."
+msgstr ""
+
+#: d8e5d155127946dca4c47c0e6fc083f4 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:10
+msgid "The module configuration entry."
+msgstr ""
+
+#: 28ab58186a5349d69ec81cc4ccd4f288 2e0b52269dac4100bd5664aa01e22925
+#: 3a61e6de78e24750818d8978c52c6e4e f4973903add34a48a713a258c1549e54 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:13
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:13
+#: vyra_base.com.feeder.state_feeder.StateFeeder:13
+#: vyra_base.com.feeder.state_feeder.StateFeeder.__init__:13
+msgid "Flag to enable or disable logging next to feeding. Defaults to False."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst 59c23bf5f28e43129efb88397ae23622
+#: 5ca553b344654ab788f513bd6ebff8e4 60d174e5dd0349f8896447cf5e6e1730
+#: 8f51c3de470c4bd6aa5e3560fb3b763e 93b7209c51ef4ef3bd3ccd7325129be8
+#: 9da74dc4e025466eb5760fbc0b2bf415 ab5c71683afe4ea69d41b1a6fb7af7e0
+#: d3a002f643784299b7a4190dd25b4d7c d84a5d6ffef34e5489a5dcfbe5cd74fc
+#: eab91481fb934324afecf637eec65eb9
+msgid "Raises"
+msgstr "Auslöser"
+
+#: 668e5e16fa244d869fc06263f7adb20f d12e06d677ec4323947f90ed642a1342
+#: d72d23e360514c65a80f112c57c1ebef f9f3cae015bb4fb98741af65122fcc25 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder:15
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:15
+#: vyra_base.com.feeder.state_feeder.StateFeeder:16
+#: vyra_base.com.feeder.state_feeder.StateFeeder.__init__:16
+msgid "If the VyraSpeaker cannot be created with the given type."
+msgstr ""
+
+#: 656656c496fc443e96433517baaa4969 c0f971eeb51646febca75798f46c1266
+#: f0498ade8f324e3ca22da06893af7f75 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.__init__:1
+#: vyra_base.com.feeder.feeder.BaseFeeder.__init__:1
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.__init__:1
+msgid "Initialize the BaseFeeder."
+msgstr ""
+
+#: 92f644949cf445c79f6660ead4c1f27a f8170670aea34ff4b4c5b714c25d2117 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.feed:1
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.feed:1
+msgid "Feed a news entry to the feeder."
+msgstr ""
+
+#: 5032b6c2e65b4491ad0c0fefc3fedc01 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.feed:3
+msgid ""
+"The content can either be a dictionary which will be processed into an "
+":class:`vyra_base.defaults.entries.ErrorEntry`, or an "
+":class:`vyra_base.defaults.entries.ErrorEntry` object itself. Use the "
+"method :meth:`build_errorfeed` to create an "
+":class:`vyra_base.defaults.entries.ErrorEntry` from a dict."
+msgstr ""
+
+#: f6a8bf79b0234330a4c0dda85376c3c4 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.feed:8
+msgid ""
+"The error entry to be fed. Can be a dictionary with error details or an "
+":class:`vyra_base.defaults.entries.ErrorEntry` object."
+msgstr ""
+
+#: 5fa81802c6fa42d195b101dcebb6454c of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.feed:10
+msgid ""
+"If the type of errorElement is neither a dict nor an "
+":class:`vyra_base.defaults.entries.ErrorEntry`."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst 1e81a24eecd849f68ebf69b2229b648e
+#: 2b0107b3241240a9aa74fb6b9cce4eec 4f30406aae454ba486fe8dd1fa5dc2fd
+#: 5f7781a1e5d94f3fa0eb670b275db6a7 6373790a44054952b88265d69a640bb0
+#: 8bec96ddc36f4ef58bfd77044fdc1c8b c17c52e26ea04feb80649fa31ae42bd3
+#: cd6051ff6b244da0bb0e5df2fb45c4e2 dc84cb74cc064f4cb86c3e6def516d2b
+#: e3a14c263f9e4502b6b5cb0f894fd51f f6550ff65a31415cb9cad11be47bc03f of
+#: vyra_base.com.feeder.feeder.BaseFeeder.__init__
+msgid "Return type"
+msgstr ""
+
+#: 17224e00e26547699934affceedbe5a8 1bce3dd18dc84ac1aa37c8680d3300d0
+#: 2f7ca74309b54eb6895d4c78cb0f66be 436ad45b0f8442c8a260543304efa365
+#: 90b45d402e714b56b8ba80ce692c2879 9d77f945ed744b9687249e773076df96 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.feed:12
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler_class:8
+#: vyra_base.com.feeder.feeder.BaseFeeder.create:11
+#: vyra_base.com.feeder.feeder.BaseFeeder.feed:7
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.feed:13
+#: vyra_base.com.feeder.state_feeder.StateFeeder.feed:9
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+msgstr ""
+
+#: 3b955c6cd3b74d1a84458b78988bec9d of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:1
+msgid "Build an error entry from the given keyword arguments."
+msgstr ""
+
+#: 0a2b515e402945f79c067269c372ad83 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:4
+msgid ""
+"A dictionary containing error details. Keys are:  - ``code``: int16 - "
+"Error code (default: 0x00000000) - ``uuid``: UUID - Unique identifier for"
+" the error (default: a new UUID) - ``description``: str - Description of "
+"the error (default: '') - ``solution``: str - Suggested solution for the "
+"error (default: '') - ``miscellaneous``: str - Additional information "
+"(default: '') - ``level``: ErrorEntry.ERROR_LEVEL - Level of the error "
+"(default: ErrorEntry.ERROR_LEVEL.MINOR_FAULT)"
+msgstr ""
+
+#: 5885bb56b854479dac29eafd95341b3e of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:4
+msgid "A dictionary containing error details. Keys are:"
+msgstr ""
+
+#: cffbecac95034822ac40599982aeda7d of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:6
+msgid "``code``: int16 - Error code (default: 0x00000000)"
+msgstr ""
+
+#: c138ccb544154150b13a101a2c0bc131 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:7
+msgid "``uuid``: UUID - Unique identifier for the error (default: a new UUID)"
+msgstr ""
+
+#: 4edc5aee808a44188e069991ac1768e6 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:8
+msgid "``description``: str - Description of the error (default: '')"
+msgstr ""
+
+#: 22b70de0f5e64656a45fbc7a9b913a57 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:9
+msgid "``solution``: str - Suggested solution for the error (default: '')"
+msgstr ""
+
+#: 88bf6908817043aaa8a4e582f5f3d900 of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:10
+msgid "``miscellaneous``: str - Additional information (default: '')"
+msgstr ""
+
+#: dd05ceb5f44c4119bb43325aed8926cb of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:11
+msgid ""
+"``level``: ErrorEntry.ERROR_LEVEL - Level of the error (default: "
+"ErrorEntry.ERROR_LEVEL.MINOR_FAULT)"
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst 074f955ad4bc4a489825e8d8fdfa5889
+#: 601b8dbe866a47d997039bd8595666cc c7faf453e3254a9a9dcef2a2b56ed9d0
+#: d6585a4db0a4402eb0dd5e3edcb023ed
+msgid "Returns"
+msgstr "Rückgabe"
+
+#: 7348b53d52e94c2ea653d51e3b1d2bba of
+#: vyra_base.com.feeder.error_feeder.ErrorFeeder.build_errorfeed:14
+msgid ""
+"An instance of :class:`vyra_base.defaults.entries.ErrorEntry` populated "
+"with the provided details."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:24 eb3fe71afbc74506ba2c7ae36d846cbd
 msgid "vyra\\_base.com.feeder.feeder module"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:32 4d06631e8fc9440a9759db9fcbdc9892
+#: cf625fd112cd4ae6bbded6b72b468a0d of vyra_base.com.feeder.feeder.BaseFeeder:1
+msgid "Bases: :py:class:`object`"
+msgstr ""
+
+#: f08567d987354a369761a8d70130864c of vyra_base.com.feeder.feeder.BaseFeeder:1
+msgid "Abstract class."
+msgstr ""
+
+#: 45dbe0540f9c4a4baf296389c7b255b0 of vyra_base.com.feeder.feeder.BaseFeeder:3
+msgid ""
+"Provides the required interface for the ``deque`` method all inheriting "
+"deque objects require to work."
+msgstr ""
+
+#: e984aba4ab344f19be9055b0bc3d0142 of
+#: vyra_base.com.feeder.feeder.BaseFeeder.create:1
+msgid ""
+"Create the feeder and its communication handlers. :raises "
+"FeederException: If the speaker could not be created. :raises TypeError: "
+"If a handler class is not a subclass of CommunicationHandler. :type "
+"loggingOn: :sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\`` "
+":param loggingOn: If True, enables logging in the base logger. :type "
+"loggingOn: bool :raises FeederException: If the speaker could not be "
+"created. :raises TypeError: If a handler class is not a subclass of "
+"CommunicationHandler."
+msgstr ""
+
+#: 5f65a885994a4bbfa4e9a8e77ff0bf6b of
+#: vyra_base.com.feeder.feeder.BaseFeeder.feed:1
+msgid "Feed a message to the feeder."
+msgstr ""
+
+#: 258e40f764cc46fba35b442bb7e59d9d of
+#: vyra_base.com.feeder.feeder.BaseFeeder.feed:4
+msgid "The message to feed."
+msgstr ""
+
+#: 4451dd095ccb4fb7bc9ee455f988158f of
+#: vyra_base.com.feeder.feeder.BaseFeeder.create_feeder:1
+msgid "Set the logger for the feeder."
+msgstr ""
+
+#: 9abb5bc0b06a4b07a8bde9a762ce2038 of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler:1
+msgid "Add a communication handler to the feeder."
+msgstr ""
+
+#: 84e4f118a83a49c190bb39909c570dcc of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler:4
+msgid "The communication handler to add."
+msgstr ""
+
+#: f2b1f10e0eaa44ae81f37a7bebc8f2be of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler:6
+msgid "If the handler is not a CommunicationHandler."
+msgstr ""
+
+#: 67fffdb5ae7c40208e0294df707f90f8 of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler:7
+msgid "True if the handler was added, False if it was already present."
+msgstr ""
+
+#: 9830786354064dd3811e699a3fd69a45 of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler_class:1
+msgid "Add a handler class to the feeder."
+msgstr ""
+
+#: b3c8f1e64a5544c5a82895893200da4c of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler_class:4
+msgid "The handler class to add."
+msgstr ""
+
+#: 04490d1ff7b94ed59c46318e4892b284 of
+#: vyra_base.com.feeder.feeder.BaseFeeder.add_handler_class:6
+msgid "If handler_class is not a subclass of CommunicationHandler."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:32 3b7632139b4048d9a3ff0ad24a3d2dac
 msgid "vyra\\_base.com.feeder.news\\_feeder module"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:40 82290821fb7947068e6316b946d510fb
+#: 11284175e7374f00adede00cf05a1513 of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:1
+msgid "Collection of the news messages."
+msgstr ""
+
+#: 2a4fbe00c4bc46b6b032969d57c392db 679a612e1e4048a1841f2c4d7f59b38b
+#: 79e3bd29ee6348319bc82bc584810f72 of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder:10
+#: vyra_base.com.feeder.state_feeder.StateFeeder:10
+#: vyra_base.com.feeder.state_feeder.StateFeeder.__init__:10
+msgid "Module configuration entry."
+msgstr ""
+
+#: c92dddc028c541c3bf0955da563bd85e of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.feed:3
+msgid ""
+"The content can either be a string which will be processed into a "
+"NewsEntry, or a NewsEntry object itself. Use the method "
+"``build_newsfeed`` to create a NewsEntry from a string or list."
+msgstr ""
+
+#: 1220bf3e73de42b9a024f668e56091bf of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.feed:8
+msgid ""
+"The news entry to be fed. Can be a string or list of strings to be "
+"processed into a NewsEntry, or a NewsEntry object."
+msgstr ""
+
+#: 8cc80b1c5db741858561274770d43c98 of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.feed:11
+msgid "If the type of newsElement is not supported."
+msgstr ""
+
+#: 1888a5b6178944a0bb8aedab15c7762f of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.build_newsfeed:1
+msgid ""
+"Build a well structured newsfeed entry from plain text and module "
+"information."
+msgstr ""
+
+#: 0ac5ab3aaf8345889d017c4683bda441 of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.build_newsfeed:4
+msgid ""
+"The arguments to be processed into a news entry. Can be a string or list "
+"of strings."
+msgstr ""
+
+#: a163e45de6a24bde8766ff9696eae994 of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.build_newsfeed:6
+msgid ""
+"A structured news entry containing the message, level, timestamp, UUID, "
+"module name, module ID, module template, and type."
+msgstr ""
+
+#: 98426d510df04e5d8690761dbc02d9fb of
+#: vyra_base.com.feeder.news_feeder.NewsFeeder.build_newsfeed:9
+msgid "If the type of the message level is not valid."
+msgstr ""
+
+#: cf211f2965a84fed8215d765086e5f04 of
+#: vyra_base.com.feeder.news_feeder.extract_level_from_msg:1
+msgid "Extract the message level from a given message string."
+msgstr ""
+
+#: d4537b4929fd4bef964f494635aeac88 of
+#: vyra_base.com.feeder.news_feeder.extract_level_from_msg:4
+msgid "The message string from which to extract the level."
+msgstr ""
+
+#: a12c3dcf05bb4078ba1c35c82eea3ec5 of
+#: vyra_base.com.feeder.news_feeder.extract_level_from_msg:6
+msgid "The extracted message level if found, otherwise None."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:40 03791406a0bc4ac8a5c7bb92b7d7f3fc
 msgid "vyra\\_base.com.feeder.state\\_feeder module"
 msgstr ""
 
-#: ../../vyra_base.com.feeder.rst:48 53a9155685284a66b8ea80b657ec8bda
+#: 333c4f6b00154821a4ec29a8cea2a51a of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:1
+msgid ""
+"Responsible for loading a ROS2 Handler and feeding StateEntry elements to"
+" this handler."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst a16f313080be408cb6cd3e637d16a3ca
+msgid "Variables"
+msgstr ""
+
+#: e1715b20410949d6bd83edc85065036b of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:18
+msgid "Name of the feeder."
+msgstr ""
+
+#: 35913237f35042868c3d7d24b9d683b4 of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:19
+msgid "Documentation string for the feeder."
+msgstr ""
+
+#: 4ab6a7892b004bd2b4543a67094354e3 of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:20
+msgid "Logging level."
+msgstr ""
+
+#: 294ab35e85904ddb92322b76869ff370 of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:21
+msgid "ROS2 message type."
+msgstr ""
+
+#: 9de6dae7aeee4b59b9563a7a3235401f of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:22
+msgid "VyraNode instance."
+msgstr ""
+
+#: bd1c81275c34497f8ee1e4728f55f632 of
+#: vyra_base.com.feeder.state_feeder.StateFeeder:23
+msgid "Module configuration."
+msgstr ""
+
+#: e90a9ce213c4474e8496c909c1631a41 of
+#: vyra_base.com.feeder.state_feeder.StateFeeder.__init__:1
+msgid ""
+"Initializes a StateFeeder instance for sending changes in state of a "
+"module."
+msgstr ""
+
+#: f796aebd383342eba7ba0e7e3d3ca9ac of
+#: vyra_base.com.feeder.state_feeder.StateFeeder.feed:1
+msgid "Adds value to the logger and the remote handler."
+msgstr ""
+
+#: fc035f8d0bb645239e82e0c9b33f10cc of
+#: vyra_base.com.feeder.state_feeder.StateFeeder.feed:4
+msgid "The state entry to feed."
+msgstr ""
+
+#: 5e5604b6910e418fab32173a56edf6b8 of
+#: vyra_base.com.feeder.state_feeder.StateFeeder.feed:7
+msgid "If the provided element is not of type StateEntry."
+msgstr ""
+
+#: ../../vyra_base.com.feeder.rst:48 90e276361f7c46b4a1be8e600d50da13
 msgid "Module contents"
 msgstr ""
 

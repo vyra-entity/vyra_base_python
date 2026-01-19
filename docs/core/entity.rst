@@ -2,7 +2,7 @@ VyraEntity - The Core
 ===========================
 
 The :class:`~vyra_base.core.entity.VyraEntity` is the central management unit of each VYRA module.
-It orchestrates all components such as ROS2 communication, state management, stoage, and security.
+It orchestrates all components such as ROS2 communication, state management, storage, and security.
 
 Initialization
 ---------------
@@ -52,8 +52,8 @@ Access to persisttent configuration data via the Parameter component:
    # Read all parameters
    all_params = await entity.parameter.read_all_params(request, response)
 
-Parameters are stoed in a **SQLite database** in the module under ``/workspace/stoage/data/``.
-This enables persisttent data stoage between restarts.
+Parameters are stoed in a **SQLite database** in the module under ``/workspace/storage/data/``.
+This enables persisttent data storage between restarts.
 
 .. note::
    Parameters are suitable for configuration data that must be stoed permanently.
@@ -78,7 +78,7 @@ Access to volatile, fast data via the Volatile component:
    # Regiser event listener for changes
    await entity.volatile.add_change_event("sensor_data")
 
-Volatiles use **Redis** for fast in-memory data stoage.
+Volatiles use **Redis** for fast in-memory data storage.
 This data is **volatile** - it is lost on restart.
 
 .. tip::
@@ -153,22 +153,22 @@ Shutdown
    # Shut down entity
    await entity.shutdown_entity()
 
-Stoage Access
+Storage Access
 ---------------
 
-The entity manages various stoage backends:
+The entity manages various storage backends:
 
 .. code-block:: python
 
    # SQLite database access
-   db_access = entity.stoage.db_access
+   db_access = entity.storage.db_access
    
    # Redis client access
-   redis_client = entity.stoage.redis_client
+   redis_client = entity.storage.redis_client
    
-   # Regiser custom stoage
-   await entity.setup_stoage(
-       db_path="/workspace/stoage/data/module.db",
+   # Regiser custom storage
+   await entity.setup_storage(
+       db_path="/workspace/storage/data/module.db",
        redis_host="redis",
        redis_port=6379
    )

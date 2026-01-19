@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"POT-Creation-Date: 2026-01-19 14:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -19,63 +19,1388 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../vyra_base.com.datalayer.rst:2 d153c8de7d0f4602b2f229e37c31454f
+#: ../../vyra_base.com.datalayer.rst:2 7e90ed411b1143fb86112ff922976135
 msgid "vyra\\_base.com.datalayer package"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:5 e9f59422ece14826ba7e6873acc92d0e
+#: ../../vyra_base.com.datalayer.rst:5 3738dce84e5347a2b3c1da782aff0f80
 msgid "Submodules"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:8 de22b1f3cea14e72b5016e77687673d9
+#: ../../vyra_base.com.datalayer.rst:8 4cd742fb19cf41788e53dad90492d8ec
 msgid "vyra\\_base.com.datalayer.action\\_client module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:17 5285c819d4f24d8e890a4c99e8a50691
+#: ../../vyra_base.com.datalayer.rst 17e79e440f524fdc875b8782fb13ccba
+#: 449c74e1facb4e49902b2a23e122fa97 70d0fefedb19456a8f41b1c6cc21180b
+msgid "no-index"
+msgstr ""
+
+#: 3685d18d4c7d4259a0879879a7fd0b91 429ea12cbe8b40fa86805c3d88930c66
+#: 42a3e6027b864455a1b738ad5b2cc002 4b96b2cc0ae74cb9b8d1a5f2025ce65e
+#: 4bc4ed53325b4255b68e250495594f7d 569fa1662245469fa1f267b69b8c4d31
+#: 59c6d2c3eb7c4c24861c49f7d21d2edd 60dadd82aec943de9a1f3664601b1cd1
+#: 64d45168def24b54a4c4502ca0d92c15 66963ae0e0ec4746a1f1da88963d89ef
+#: 6cb2ed6376144405886ada7fcae2e07d 7ff4c169acd847d0a97db8395c05e778
+#: 8026cc96f7ad4458bad66cd025b62419 a6e4020f89434ce28118f73bb15ae92a
+#: a7cfd9fb93f7404a8c7b9f07333888f2 bfaf1e3931fa40998c54d07f63c5637b
+#: cd8726821ad94bdaaa44966a2e990a95 d8c1f2f3d2964508b19860b735f78824
+#: d98419b402034212982d8291257970ef eadee8bdac2644c1b22c277a314e42ad
+#: f75866a510474cf780b5073cbe3979f5 of
+#: vyra_base.com.datalayer.action_client.ActionInfo:1
+#: vyra_base.com.datalayer.action_client.VyraActionClient:1
+#: vyra_base.com.datalayer.action_server.Action:1
+#: vyra_base.com.datalayer.action_server.VyraActionServer:1
+#: vyra_base.com.datalayer.callable.VyraCallable:1
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:1
+#: vyra_base.com.datalayer.job.VyraJob:1
+#: vyra_base.com.datalayer.job.VyraJobRunner:1
+#: vyra_base.com.datalayer.node.NodeSettings:1
+#: vyra_base.com.datalayer.publisher.PeriodicCaller:1
+#: vyra_base.com.datalayer.publisher.PublisherInfo:1
+#: vyra_base.com.datalayer.publisher.VyraPublisher:1
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:1
+#: vyra_base.com.datalayer.service_client.VyraServiceClient:1
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:1
+#: vyra_base.com.datalayer.service_server.VyraServiceServer:1
+#: vyra_base.com.datalayer.speaker.VyraSpeaker:1
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener:1
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:1
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber:1
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter:1
+msgid "Bases: :py:class:`object`"
+msgstr ""
+
+#: 270ca52cf4e4435a82ac3b023573dbe1 of
+#: vyra_base.com.datalayer.action_client.ActionInfo:1
+msgid "Action class to define the action name and type."
+msgstr ""
+
+#: a3feeb93449a464a97244a14d83c7ef7 of
+#: vyra_base.com.datalayer.action_client.ActionInfo:3
+msgid "This class is used to create an action client."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst e9dfb2dc7fd84f10966ded4d09e5b096
+#: eaff66cf5fee4045a443f57e3c2ed652
+msgid "Variables"
+msgstr ""
+
+#: 5f2355b3d5344f46b1eee00098c3f3e7 of
+#: vyra_base.com.datalayer.action_client.ActionInfo:5
+msgid "Name of the action client."
+msgstr ""
+
+#: 113f474ce51b497489fd05c6cd5105f6 8bcdac89ea19483da4fad702b4154ccd of
+#: vyra_base.com.datalayer.action_client.ActionInfo:7
+#: vyra_base.com.datalayer.action_server.Action:11
+msgid "Type of the action."
+msgstr ""
+
+#: f33db8fc590b4c6ca322f47624250679 of
+#: vyra_base.com.datalayer.action_client.ActionInfo:9
+msgid "Callback for the result."
+msgstr ""
+
+#: be56804f0b6b4cfb87cf58eb193a0925 of
+#: vyra_base.com.datalayer.action_client.ActionInfo:11
+msgid "Callback for feedback."
+msgstr ""
+
+#: 5d45c2649841436f9657c20de320f8aa of
+#: vyra_base.com.datalayer.action_client.ActionInfo:13
+msgid "The action client instance."
+msgstr ""
+
+#: 31abf758ff43490e8024da948dedc22f of
+#: vyra_base.com.datalayer.action_client.ActionInfo:15
+msgid "Timeout for action client in seconds."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst 024d205307124b0280d7a226024628b8
+#: 0709c6220b0c431db879fac612bc3ee6 0cc0b9e5773044be9ed327b358bb116d
+#: 0ea2a1f7c0c347c6b538aefa5e0999de 177f0ce1468d40f6af89f4ce34032788
+#: 1b737d4ccd974c0e88c843f74b5c82e8 1d83ebe19ec54cd680ef37091b654b2e
+#: 20e8049670b94929be319d81c21c7cdc 219a13968c07428e8435ac021753820c
+#: 2253de6c270f45229ab68f141a155d84 2d2781d7196f4bba8f8c2e499053297b
+#: 30e8375bba1f4e77b4b4bb1ed692fb1b 3852224198eb4b93abfeaea907a68b0b
+#: 4068fcd57cfd4933b17ecb4ab9e0cc2f 41ff4059c8574872af121ecdbd7786a0
+#: 4cec3ee38e9840fe88a270d76b451721 50a27bd6e19d44ef9afe6cf64d03bf10
+#: 51598c53d85c46cea24227739791ca71 51dcdd74ab0045249c60b45bd701bffa
+#: 5202cf8fc06e4c64abc32a9e2d176793 5fd1d812f89542a983621c69770d052c
+#: 608976d0dfea4888bb61b0063c3d028f 61c5b0d1a1f14823a1df62d70078a001
+#: 62ed9909b2a8434883ceca60baff291d 69f33fe01f9047dca8e07e7ad540cde8
+#: 71b11dd9a7fd4005bcf62a1d0b5b9929 78482017ae7342c4a15d2d0aacefd1e7
+#: 7a8c6e11899b40d9bf40e2658b76b075 81204089b6ae4873a771fdc5ed899dcd
+#: 81e8537e731249f8a2a8fce2a3e6d7e9 82639388b6454c22ae861fff59962f76
+#: 88cd02536fa340b39fb49cca2502590d 8cd48fa2a21e4f83ae3195f2a4905b48
+#: 8e68a00c9d18415da2b1721d5835da11 8f6359b7d587448b8ffab34396c7f405
+#: 93cace23715444779ce8f829f4a3a085 9a15a3c6a6074942985fdd361cecb07b
+#: 9a42d063faad440ba9594831e41c571c 9f56c3e21e0a4c1ca61c9b89a81b3bac
+#: a4bf1760e42c4089a50923e5392649dd a53031ec94ed44bab0bbda0eef7201b9
+#: a95e47510f464e97a7a622fbebe0a7ca adaa87f454b946df82121c5afe650199
+#: b0d2f93efd1f450ebebbe2d7f774e3bf b6e43f30b4314029aaf84d1f10e18eeb
+#: b738385b602e4d3e9499388673e1de8c b91b2be2674447a099466660c438691d
+#: b952b6ef51784be1b120aa1717bccd87 b96432258bc94303af9ba30dca4bd6a5
+#: bcd56a49e2bd4d939c4e420146f63ea8 bf87f887d8684e02a7f7bdb46ed201e9
+#: c1b2ca1753c8408cbeda4b97a7ede948 c46669166399441ca313d4156b023a2c
+#: c7078de26a4540f3baef91587d4350e8 cd201b695d3d48d3b335bc1cdd0559b6
+#: d063dfac9f0c48eb9d315d8fde2e2c7c d082b2937d3642e3bd3bc75276ad9abe
+#: d5b0f923ee4c4aeb93ab882e7dc34be3 d9ad2ccdb85b4bd6a32a4a4d62c4206c
+#: dc2667690a9644bdacf78b48c2a469ee e150cf6bb4cf41e8aff97dd5f0bb7c73
+#: e33d97f3e18d4287a48f4297d143dece e37da597b30846c0b2823d316a016ef6
+#: e48a0a42f12c41e1a7f953703e20301e ed192ea551344887ba5519ea08dbc9f4
+#: f6660b9a16f94535a2552c0719f2a1aa fbc7b560c68940b598a4e38e7cfd2974
+#: fdfbbd1cac134553abaa0403a307fa6e
+msgid "Parameters"
+msgstr "Parameter"
+
+#: 5dbcb52ab08f421fbeeed6f621fb6ec0 6464f61ef56746f1b7f5f6f11edb599b of
+#: vyra_base.com.datalayer.action_client._base_callback:1
+msgid "Default callback that raises an error if not overridden."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst 1fda9c012f494ed395d1e35215996633
+#: 219daf75f4444acdbaaaec43ca768ebf 267b9bd615f944fcb3c139da95028196
+#: 8a5febaecc0944d188d12758a38575c6 965f7032eb084c32a08eeb99d1243550
+#: 98e069f6bb3a469f87f54950d84d89b2 a1b7d759a6894b1faaf01bdbc2393156
+#: a5926543755a4515bfe35ee708f55681 c4e4283482f1404b951cc132e1e7d4ce
+#: f168c6f197064bdf83c282dd65584d3f f321da6cecb54bea92ad7761707b0b9b
+#: f7a43a4e2fe04ebd9b0a3e91925791c2 fbc648aea7d14f2c8603a5fc02fae7b0
+msgid "Raises"
+msgstr "Auslöser"
+
+#: 469962c470ba40cc8f8500e26c346b7c 631d75b90f68481ca98166f5c7cd442a of
+#: vyra_base.com.datalayer.action_client._base_callback:3
+msgid "Always raised to indicate the callback is not implemented."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst 01191be8747c40aa8c4e2e12de7c9144
+#: 0323e4958dbd49e185b6e991580924cf 04c8388779484dbc806bd31fb7099a92
+#: 068d6f77df934558a43915bead5454e3 0a727abe62c746f0a03c80fcf8982bf7
+#: 0ab6cac442cc47caa5e4cfb6413bb078 0dbbd685d3f94fa8b7622edaed97a57c
+#: 11d41b5ee072409b8b80f2d5f2292f10 1ce97ea6e01a45589e47be35e39678b3
+#: 1e570dfdd39847b2ab77440e2c532163 23136d6ae2bb4a798cc7be50c9d7c964
+#: 25bd087154c74f5aa650e8817a9ef606 2ae02d21616447cd9c9df159244aa13e
+#: 334524de11b04838ba5e66f2f7576d2d 35803c7700424304ade59c3acc16c0ad
+#: 3dee83fa1ec04249880a2d5649aaf7b3 4124bb45902d404ca7f91733d6078b92
+#: 4167359363184140ad13eb1687b79dd1 42259ae457144295b9a2221da9480f15
+#: 42bc9e1923554dd8bc308a019e206eed 44ece20976034be5ba9c5db1a5d86272
+#: 4aca09bfa8474ceb9a8906ca4ed1c487 4cbe9a7a063246cfb6beb1c10fb4f4fe
+#: 4e4c7503b38f4ff3a7900a280779ce3f 52e87423db2c4752b287ab2552722ad3
+#: 53cbf9b5cef844b181104d5fbf9d0326 57b649baa23049dfb860940c3a88ae77
+#: 5a413c354e524c63b4531c6eb77d4a88 5dfac6dc3d7c4761866a0f2979085306
+#: 62d67151681c420bbbd2f4f5805c95b1 6a96e946e671416db3275b198c8307b3
+#: 731b3aef26c34c8cb58cd7f0820e1940 7379ab9abf784b06878b8f3823fcd562
+#: 7c958e41ec4744888491006cf883c5d3 7e72ac6d01644079913974ced5b66a5e
+#: 82eb3c6832804b42b81807df264c24a1 85fcfe2e75d64adf8128786e43cf7520
+#: 8908ea6c13fb4b638ff6f1bb206e9cfd 8c0657a15be84b7ba4da2a0a677a9b3a
+#: 8d3a92a7e6494dcb90bb3a6ed028d2eb 91ac174a5ad7473aaef295be72830de4
+#: 9227bcb9aa7f47f28bec601dfe313b1b 9aaa9c31b43847cfb616eed65f8eac9e
+#: a03eb963f2bc4116b647568a05b4c0b9 a8cd2f644b6c47bd9dbaea17116c41b1
+#: abdb614ee1e749d7a34a33ab8441e82f b0d32c1728c94917966405d550d24fce
+#: b669a6eb2d4b408088a8e4406f66e01a b784a745227d4a6cb6f4a1c3ba34656f
+#: b82ca427fc90435a821d0a4ec99280c3 b84af799b13e4dd3bc4dfdafe99d2536
+#: beb45fbef1324649b2d5058d8e54a580 c54af8662b9044ab906a213250540e1a
+#: c6f5e1261b704c668ada1bacc9d7412d c770577c08b44f41bfb1129847f75163
+#: c8f12fea93c34005a06db0586dc3fc1b d52179dd5d3142128b8e4840d38eb11a
+#: d8dd18888ed64b079339c69db072da30 dc8df42ec59b48199d7f52c110961ab3
+#: ea938cc1c2da421a9f33d57c6ef450dc f096baae14f44607b34f7577be6f0a90
+#: f627e3d0ce9c4ea4bef55555b90f2db7
+msgid "Return type"
+msgstr ""
+
+#: 51a05c20c53243e4b7bea9b1ca308a6c 5f660ae7ab2345b2a3040b76e7cd59f9
+#: 83f06e3b2bd64dca9e6c5ee3886137b2 8e2f558e92ee44cf8618bd7d5e6485cc
+#: e345416e8ffd411fb791efaec5a19df2 f059a4ac5bd34616af912ff1afd84435 of
+#: vyra_base.com.datalayer.action_client._base_callback:6
+#: vyra_base.com.datalayer.action_server._base_callback:4
+#: vyra_base.com.datalayer.service_client._base_request:4
+#: vyra_base.com.datalayer.service_server._dummy_callback:6
+#: vyra_base.com.datalayer.subscriber._base_callback:6
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.NoReturn\\``"
+msgstr ""
+
+#: 26463d6b79944d83adf8ec23964eefda of
+#: vyra_base.com.datalayer.action_client.VyraActionClient:1
+msgid "Base class for ROS2 action client."
+msgstr ""
+
+#: c3d842b096f5402fa110aedb43a515d5 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient:3
+msgid "This class will be factory created to call specific action functionality."
+msgstr ""
+
+#: 52eaa9e21aad4015836d9cd8630ea314 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.__init__:1
+msgid "Initialize the VyraActionClient."
+msgstr ""
+
+#: 256da96dbdbd4495a5516adaaa7642f9 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.__init__:4
+msgid "Information about the action."
+msgstr ""
+
+#: 87df22d554a14af3b6b39c9fac284034 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.__init__:7
+msgid "The ROS2 node."
+msgstr ""
+
+#: 4a19f7240da34072a1b208acc4582798 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.create_action_client:1
+msgid "Create an action client in the ROS2 node."
+msgstr ""
+
+#: ac472eb485bb400f801532594c57b36e of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.create_action_client:3
+msgid ""
+"This method should be called to register the action client with the ROS2 "
+"node."
+msgstr ""
+
+#: 1374c470aeb341c3ac5105e30245776b 2c33125f221b4849bbef34f87230f300
+#: 2f49d1a41ab143b387aad74b39692ca5 48d7852a350f499fb89b7c897e4b3e4e
+#: 572fd69e194d4319882c5341aa9a018e 5b74cca42ca8491fa0ad0f33cb86e875
+#: 65782da96d254c568f6ea64d5c065c44 87e42dee7531492095996fc4f35abb89
+#: 930066a7d5054ee5be513b44e8d495ad abd74922edfc406890650a2cb2a990bc
+#: b557790f4c1d4a51a6d4161b96e601ca bcdc4afb1c8643c99f2c91ef6dc4a9f8
+#: bdc9e35e98154e6b8b265c1085c52256 c57b5ff8b1764e66ba4b715f317b1914
+#: d173cfafe14341b69200bb030c7f8ee0 e5db28e16be8450cb9fb04da1caceb7f of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.create_action_client:6
+#: vyra_base.com.datalayer.action_client.VyraActionClient.get_result_callback:7
+#: vyra_base.com.datalayer.action_client.VyraActionClient.goal_response_callback:7
+#: vyra_base.com.datalayer.action_server.VyraActionServer.create_action_server:6
+#: vyra_base.com.datalayer.action_server.VyraActionServer.execute_callback:9
+#: vyra_base.com.datalayer.node.VyraNode.set_reload:4
+#: vyra_base.com.datalayer.publisher.VyraPublisher.create_publisher:8
+#: vyra_base.com.datalayer.publisher.VyraPublisher.destroy:6
+#: vyra_base.com.datalayer.publisher.VyraPublisher.publish:10
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.create_service_caller:9
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.create_service:12
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.destroy_service:6
+#: vyra_base.com.datalayer.speaker.VyraSpeaker.shout:7
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.callback:9
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.create_subscription:6
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.remove_subscription:6
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+msgstr ""
+
+#: 8a80fee8826941deac6c60c48f501fcc a5ef465f3ed049ada1d09f3561a1b914 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.send_goal:1
+#: vyra_base.com.datalayer.job.VyraJobRunner.send_goal:1
+msgid "Send a goal to the action server."
+msgstr ""
+
+#: f3344374eefd432e91c2028d8874dc3d of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.send_goal:4
+msgid "The order to send as part of the goal."
+msgstr ""
+
+#: 0f5e28dcfcb64c2e812bc0651babc10b 403d785d8e104e01979128fbad5a5f52 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.send_goal:6
+#: vyra_base.com.datalayer.job.VyraJobRunner.send_goal:8
+msgid "If the action client has not been created."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst 059badf777ae4e0696399001806e0097
+#: 16c6c5d53ec1434b91041c4dd38f1e8a 171649b52e5a4923824d1535d3dccf63
+#: 2055f247572e4920a9d00de6c2ac3950 208d0de389f642648d78e7ba24a210d5
+#: 24e5d8521eef4c30aa51c690e6802fa7 3c084114fb004c24a6e26e277f72dafd
+#: 5945d5e903344dc495e2e22dbbfd9632 7745fcbf589a4a31ab2a36192d059925
+#: 92fc944dfca548cfb458a18dd484d27b 9380aea56e9a49929f7b0625e6a0f7c0
+#: aa5045dfe6864dbe8186c9edff0cac7e b5ca4a01857b4ff2941cd7d0de92f4f9
+#: b8aa1847fbc14fe1a4355f83b829bd8e db72d7532d394392a1b58d4ccfacfd67
+#: e5753bcec87f4ba59cbbda5a6f2e6c59 e80d6b76c5034ade85111aedc4934836
+#: f356ec22a5e14217a63a17ec4aa91d14
+msgid "Returns"
+msgstr "Rückgabe"
+
+#: dfc88b5d3b6645279852f1bac58dac86 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.send_goal:7
+msgid "A future representing the goal request."
+msgstr ""
+
+#: 6c0d803f9e7b4a8c87d32f8df3d1130f of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.goal_response_callback:1
+msgid "Callback for the goal response."
+msgstr ""
+
+#: d4f6dc64b9cb458ab919798491928eed of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.goal_response_callback:4
+msgid "The future containing the goal handle."
+msgstr ""
+
+#: df2bd8a22ea64bdf988ace2ae641d504 of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.get_result_callback:1
+msgid "Callback for receiving the result of the action."
+msgstr ""
+
+#: 26d0236dd17a4acbafd2f87511f14cbf of
+#: vyra_base.com.datalayer.action_client.VyraActionClient.get_result_callback:4
+msgid "The future containing the result."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:17 b95768d67e954325a689472bc62069c0
 msgid "vyra\\_base.com.datalayer.action\\_server module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:26 6300ff7ef47a4708bcc4d5c861f48aa8
+#: 4bf45a539fd44e2ba7846d3d49cdbd7d of
+#: vyra_base.com.datalayer.action_server.Action:1
+msgid "Represents an action for the VyraActionServer."
+msgstr ""
+
+#: b6a85b50bbba4f739d96cfc7b9118f7c of
+#: vyra_base.com.datalayer.action_server.Action:5
+msgid "Name of the action server."
+msgstr ""
+
+#: 22a7f0f1e9c14c7bb2a50091af3a97d2 2d6c36c374a04beca037920c54334e0e
+#: 6415f118555f4cbea355a8acf89bb4c1 6ae6d7d3c95e41b09f560d7f503926e8
+#: 873865e956ea46fd9e9ccc7bd2c96a81 8898d24d7b5a489a9361d6916bda1a61
+#: 9cd479267ca740bfb470dae88ba251c0 a976d3f9ccbf42ce9805acbb614a17a8
+#: b68494ecf75f4818975144183741a2d7 e88a643684774ba19216c4ec29be92f6
+#: ef7438a0a2ad425e9ddc3ba1f86b0d80 of
+#: vyra_base.com.datalayer.action_server.Action
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo
+msgid "type"
+msgstr ""
+
+#: 714e62e2ccf344688064416a4a9bbf41 d8c56e24e55044bc8849066e97fcdf6b of
+#: vyra_base.com.datalayer.action_server.Action:7
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:7
+msgid "str"
+msgstr ""
+
+#: 88ba8099b94d44be912a5b0e82208eb6 9a70faf4b27e42209cbb6efe6dec9893 of
+#: vyra_base.com.datalayer.action_server.Action:13
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:13
+msgid "Any"
+msgstr ""
+
+#: 0fabe797108b49d7b3eb57429859e3bc of
+#: vyra_base.com.datalayer.action_server.Action:17
+msgid "Callback function for the action."
+msgstr ""
+
+#: 069aeb621a94414e9b8c2062ed09b718 333814f9993543b69e077a83267beafa
+#: 7422256cfe6546ba813f755da4203464 of
+#: vyra_base.com.datalayer.action_server.Action:19
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:19
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:25
+msgid "Callable"
+msgstr ""
+
+#: af117fd906884b83a656aea961693b6d of
+#: vyra_base.com.datalayer.action_server.Action:23
+msgid "The ActionServer instance or None."
+msgstr ""
+
+#: 6ec90325f8514236928f4e8ff7cc30e3 of
+#: vyra_base.com.datalayer.action_server.Action:25
+msgid "Union[ActionServer, None]"
+msgstr ""
+
+#: ccd140202adb47a0a8dc0f5c36562c80 of
+#: vyra_base.com.datalayer.action_server._base_callback:1
+msgid "If no execute callback is provided for the action server."
+msgstr ""
+
+#: fefa5af1ded54f4db8a6a85bb1c31bf8 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer:1
+msgid "Base class for ROS2 actions."
+msgstr ""
+
+#: d38fd02f397941ef839af90d4cfcc1f6 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer:3
+msgid ""
+"This class is intended to be factory-created to implement specific action"
+" functionality."
+msgstr ""
+
+#: 8d05c336ffe647268d9e9d9f2c181c09 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.__init__:1
+msgid "Initialize the VyraActionServer."
+msgstr ""
+
+#: d7236c7a912b4d3f9f9de38f3c349fed of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.__init__:4
+msgid "The action configuration."
+msgstr ""
+
+#: 2e6000d41eac4cfbaea98767c04ae6b8 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.__init__:7
+msgid "The ROS2 node to attach the action server to."
+msgstr ""
+
+#: 57554a68d3a94f7681ce2fa3d3d9eedd of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.create_action_server:1
+msgid "Create and register the action server with the ROS2 node."
+msgstr ""
+
+#: e4777a204fce41c2bdb27799dd7aefca of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.create_action_server:3
+msgid ""
+"This method should be called to register the action server with the ROS2 "
+"node."
+msgstr ""
+
+#: 91135c9f33aa41fb987036d9487a1942 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.execute_callback:1
+msgid "Execute the action callback."
+msgstr ""
+
+#: 0f13d2c3e61d4bca975ec212cfbcfda1 ab545cf06b5f46dc93202ed83362f7fb
+#: f53a89899b084ad5aade44d86cebf752 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.execute_callback:3
+#: vyra_base.com.datalayer.publisher.VyraPublisher.publish:3
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.callback:3
+msgid ""
+"This method should be overridden in subclasses to provide specific "
+"functionality."
+msgstr ""
+
+#: bf72d8d6cb484c83bedc13de0b6ecb27 of
+#: vyra_base.com.datalayer.action_server.VyraActionServer.execute_callback:6
+msgid "The goal handle for the action."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:26 e6854e0971b349b2a83888aac5b1a352
 msgid "vyra\\_base.com.datalayer.callable module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:34 eae384f988b94c0a8e3d753edc5c0cf8
+#: 3a4a924d6432462f9b28efb95aae51cd a7e105897ae4433cb171676f126a9812 of
+#: vyra_base.com.datalayer.callable.VyraCallable:1
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:1
+msgid "Represents and stores all information about a Vyra callable."
+msgstr ""
+
+#: 0861fe3df4964fa5b9144fb3c82b21f1 4a4b619b62694c1ba6061dbe2bb4cd16 of
+#: vyra_base.com.datalayer.callable.VyraCallable:3
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:3
+msgid ""
+"A callable is a function that can be invoked with arguments and returns a"
+" result within a specified time limit. It is used to define quick "
+"responses to requests in Vyra."
+msgstr ""
+
+#: 25d579b752cf4768a07322145534104f 49b9eaf17adc4815b5b9bf1a853bf8ec of
+#: vyra_base.com.datalayer.callable.VyraCallable:7
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:7
+msgid "Name of the callable."
+msgstr ""
+
+#: 407294d504e14a46a97b7f61b880ec44 cb20b70051e0423f959d9da21f7c7c4e of
+#: vyra_base.com.datalayer.callable.VyraCallable:10
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:10
+msgid "Type of the callable, typically a ROS2 service type."
+msgstr ""
+
+#: 45765c9a5e85415698eb745626677afb c38210a146c945ca99db0bc43a999689 of
+#: vyra_base.com.datalayer.callable.VyraCallable:13
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:13
+msgid "Description of the callable."
+msgstr ""
+
+#: 8602ab8bb64b4589970eeaa0febb7de2 dffa76a004ee46b8b8dd6f3f19c372e1 of
+#: vyra_base.com.datalayer.callable.VyraCallable:16
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:16
+msgid "The last return value of the callable."
+msgstr ""
+
+#: 2bf20595f12748ef9c2f3d4463a7e9ab df7334b2f1b643d3a57adfbf9431948f of
+#: vyra_base.com.datalayer.callable.VyraCallable:19
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:18
+msgid "The associated VyraServiceServer instance."
+msgstr ""
+
+#: a2a61acac76b497fa86ee6f33da34844 bdd391b3f0e6410682264371f53e870f of
+#: vyra_base.com.datalayer.callable.VyraCallable:22
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor:20
+msgid "Callback function when connected."
+msgstr ""
+
+#: 3af6691f4b1d46b59b14a17f7de9eef6 f9975d04f5f84239bf7a6e5ab8912cf0 of
+#: vyra_base.com.datalayer.callable.VyraCallable.merge:1
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor.merge:1
+msgid "Merge another Callable into this one, combining their attributes."
+msgstr ""
+
+#: 14313d1c4c854578aba7837d779ffa86 6b57856137c7413e8a28d1bd23d3a0c6 of
+#: vyra_base.com.datalayer.callable.VyraCallable.merge:4
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor.merge:4
+msgid "Another Callable instance to merge with."
+msgstr ""
+
+#: 495e54be9e9d491b88f92444f5f22761 82ce599d71c04146bbf0877d1b4b319b of
+#: vyra_base.com.datalayer.callable.VyraCallable.merge:6
+#: vyra_base.com.datalayer.callable.VyraCallableExecutor.merge:6
+msgid "A new Callable instance with merged attributes."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:34 d90a6fbb0efe4ddeba2a0fbc74140911
 msgid "vyra\\_base.com.datalayer.interface\\_factoy module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:42 c5a16f86e0f44eb8829f6fde8dbf77eb
+#: ../../vyra_base.com.datalayer.rst:42 71544c344867493aaf731dc3d120fd21
 msgid "vyra\\_base.com.datalayer.job module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:50 4bd3eba3a90c43b0b666c0a85380010d
+#: ef7271b2a0064061b3dff95674385a05 of vyra_base.com.datalayer.job.VyraJob:1
+msgid "Represents and stores all information about a Vyra job."
+msgstr ""
+
+#: a6146e7a7da049069483f67d8cdcc32b of vyra_base.com.datalayer.job.VyraJob:3
+msgid ""
+"A job is a long-running operation that can provide feedback during "
+"execution. It is based on ROS2 actions and is used for operations that "
+"take time to complete, such as navigation, manipulation tasks, or other "
+"asynchronous operations."
+msgstr ""
+
+#: 097c51b4b7ea469b8cb4442938baf50c of vyra_base.com.datalayer.job.VyraJob:7
+msgid ""
+"Jobs are analogous to Callables but for long-running tasks: - "
+"VyraCallable -> ROS2 Service (quick request/response) - VyraJob -> ROS2 "
+"Action (long-running with feedback)"
+msgstr ""
+
+#: ba1f004ac3fd46c188b05cfbcc6744e1 of vyra_base.com.datalayer.job.VyraJob:12
+msgid "Name of the job."
+msgstr ""
+
+#: 2d892749ebce4be1bf8cdef51f9fd467 of vyra_base.com.datalayer.job.VyraJob:15
+msgid "Type of the job, typically a ROS2 action type."
+msgstr ""
+
+#: d4ccd9339e8c40bb98395ee100580648 of vyra_base.com.datalayer.job.VyraJob:18
+msgid "Description of the job."
+msgstr ""
+
+#: 450b93649bc54e59bd6a39e13634387b of vyra_base.com.datalayer.job.VyraJob:21
+msgid "The last return value of the job."
+msgstr ""
+
+#: c8c5dd0145e348899f9c983f0e8f95ca of vyra_base.com.datalayer.job.VyraJob:24
+msgid "The associated VyraActionServer instance (for server-side)."
+msgstr ""
+
+#: 8455074fe8074e85bd40719950843cd8 of vyra_base.com.datalayer.job.VyraJob:27
+msgid "Callback function for goal requests."
+msgstr ""
+
+#: 4a496d95b5fd4e8486729791762fe522 7d4a907ff836465081b00e573e4be744 of
+#: vyra_base.com.datalayer.job.VyraJob:30
+#: vyra_base.com.datalayer.job.VyraJobRunner:26
+msgid "Callback function for feedback updates."
+msgstr ""
+
+#: 13081288f48a4392ab80b78b4cd037c6 2cf2e93e8f1d4835884e7b8afd3488b2 of
+#: vyra_base.com.datalayer.job.VyraJob:33
+#: vyra_base.com.datalayer.job.VyraJobRunner:29
+msgid "Callback function for final results."
+msgstr ""
+
+#: 66ef900f5d8d4fc8b67e245fc2437dcc of
+#: vyra_base.com.datalayer.job.VyraJob.merge:1
+msgid "Merge another Job into this one, combining their attributes."
+msgstr ""
+
+#: 4cf4247f7d1b40d09196036a6ee4ea1e of
+#: vyra_base.com.datalayer.job.VyraJob.merge:4
+msgid "Another Job instance to merge with."
+msgstr ""
+
+#: 7b84571c0b254cb1b59c2845695fbdd7 of
+#: vyra_base.com.datalayer.job.VyraJob.merge:6
+msgid "A new Job instance with merged attributes."
+msgstr ""
+
+#: 75c059f007a9409e848c73689c4ce282 of
+#: vyra_base.com.datalayer.job.VyraJobRunner:1
+msgid "Represents a job runner (action client) in the data layer."
+msgstr ""
+
+#: 27e5025eca8c48988e6ac9d1b33b1d48 of
+#: vyra_base.com.datalayer.job.VyraJobRunner:3
+msgid ""
+"A job runner is used to send goals to action servers and receive "
+"feedback/results. This is the client-side counterpart to VyraJob (server-"
+"side)."
+msgstr ""
+
+#: 1a251bc548634ee0a87eee13d9bda0af of
+#: vyra_base.com.datalayer.job.VyraJobRunner:6
+msgid ""
+"JobRunner is analogous to CallableExecutor: - VyraCallableExecutor -> "
+"ROS2 Service Client (calls services) - VyraJobRunner -> ROS2 Action "
+"Client (sends goals to actions)"
+msgstr ""
+
+#: 446558f728934a179c849cc48e3686f2 of
+#: vyra_base.com.datalayer.job.VyraJobRunner:11
+msgid "The name of the job runner."
+msgstr ""
+
+#: ca26842a45b34ef780b3c28c16b7f767 of
+#: vyra_base.com.datalayer.job.VyraJobRunner:14
+msgid "The type of the action."
+msgstr ""
+
+#: d58b6b0664964257b1549d802fdb2085 of
+#: vyra_base.com.datalayer.job.VyraJobRunner:17
+msgid "The description of the job runner."
+msgstr ""
+
+#: 4341145852a44c429086a720cfe87bd1 of
+#: vyra_base.com.datalayer.job.VyraJobRunner:20
+msgid "The last return value of the job runner."
+msgstr ""
+
+#: a5e5750a93fb46e2875ff6d885205f5c of
+#: vyra_base.com.datalayer.job.VyraJobRunner:23
+msgid "The associated VyraActionClient instance."
+msgstr ""
+
+#: d40e2d7ea67741fd84a866b642feb0e5 of
+#: vyra_base.com.datalayer.job.VyraJobRunner.merge:1
+msgid "Merges another JobRunner into this one, combining their attributes."
+msgstr ""
+
+#: a6d11d5a1542440592dc5d3ab1b12351 of
+#: vyra_base.com.datalayer.job.VyraJobRunner.merge:4
+msgid "Another JobRunner instance to merge with."
+msgstr ""
+
+#: db07ebd25ce04833a09120cb4fbabf04 of
+#: vyra_base.com.datalayer.job.VyraJobRunner.merge:6
+msgid "A new JobRunner instance with merged attributes."
+msgstr ""
+
+#: c3b5018f1b454f98b36adfed395b4b6d of
+#: vyra_base.com.datalayer.job.VyraJobRunner.send_goal:4
+msgid "The goal message to send."
+msgstr ""
+
+#: 1d066c0b2983421188993e82e036286e of
+#: vyra_base.com.datalayer.job.VyraJobRunner.send_goal:6
+msgid "The result of the goal."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:50 ce0f1591415d4a22a45156b8b89eea7d
 msgid "vyra\\_base.com.datalayer.node module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:58 1864b312040b45f5a0c0dfbb28eef63e
+#: 27b99f3fbec14d7e8ec9d3c32e3e835e of
+#: vyra_base.com.datalayer.node.NodeSettings:1
+msgid "Settings for a Vyra node."
+msgstr ""
+
+#: 7c762cace9744782b9440e34f2021f07 of
+#: vyra_base.com.datalayer.node.NodeSettings:3
+msgid "Name of the node."
+msgstr ""
+
+#: 7ba5af44505c4cf985d406977bf2c740 of
+#: vyra_base.com.datalayer.node.NodeSettings:5
+msgid "Dictionary of parameters for the node."
+msgstr ""
+
+#: be3881cc851a4a99836bc360b1ca30ca ccc2968f609046fcadb6f2e66a471c76 of
+#: vyra_base.com.datalayer.node.CheckerNode:1
+#: vyra_base.com.datalayer.node.VyraNode:1
+msgid "Bases: :py:class:`~rclpy.node.Node`"
+msgstr ""
+
+#: 59e302425c554f34a475b6e591827545 of vyra_base.com.datalayer.node.VyraNode:1
+msgid "Vyra node class."
+msgstr ""
+
+#: 2ea5d7ff67c541bd8a8d7d041b326191 e4a07124c2ac4c768dea2e4e13831f11 of
+#: vyra_base.com.datalayer.node.VyraNode:4
+#: vyra_base.com.datalayer.node.VyraNode.node_settings:3
+msgid "NodeSettings object containing the node's settings."
+msgstr ""
+
+#: 9a442b50754b48ac93f2bc933f58f3b2 of
+#: vyra_base.com.datalayer.node.VyraNode.set_reload:1
+msgid "Set the reload event to notify that the node settings have changed."
+msgstr ""
+
+#: 3cc6ca7adffb42ef9e42c228159c890c of
+#: vyra_base.com.datalayer.node.VyraNode.node_settings:1
+msgid "Get the node settings."
+msgstr ""
+
+#: da3a2c37b3964d439ca7467bbc0eaa9d of
+#: vyra_base.com.datalayer.node.CheckerNode:1
+msgid "Node to check the availability of other nodes."
+msgstr ""
+
+#: 90cac23ca18148e4b4cf00f9fc205901 of
+#: vyra_base.com.datalayer.node.CheckerNode:3
+msgid ""
+"Note: Uses enable_rosout=False to avoid SROS2 permission issues with the "
+"/rosout topic during node availability checks. :type enable_rosout: "
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`bool\\`` :param "
+"enable_rosout: Whether to enable the rosout logger. :type enable_rosout: "
+"bool"
+msgstr ""
+
+#: 24ef142494c44e6bac893aec8b96537a of
+#: vyra_base.com.datalayer.node.CheckerNode.is_node_available:1
+msgid "Check if a node with the given name is available."
+msgstr ""
+
+#: 2a2a3655bc2346d4af3de353d73cba2b caefb2d52e3e45e29be5afbbb2b36ad3 of
+#: vyra_base.com.datalayer.node.CheckerNode.check_node_name:4
+#: vyra_base.com.datalayer.node.CheckerNode.is_node_available:4
+msgid "Name of the node to check."
+msgstr ""
+
+#: 69e00952c12f4f7e8cad1e12b44cfa94 of
+#: vyra_base.com.datalayer.node.CheckerNode.is_node_available:6
+msgid "True if the node is available, False otherwise."
+msgstr ""
+
+#: d8facaf761a846cc93c7eb45053ee509 of
+#: vyra_base.com.datalayer.node.CheckerNode.check_node_name:1
+msgid "Check if the node name is valid."
+msgstr ""
+
+#: 853191c746054d109409db13628a0d0c of
+#: vyra_base.com.datalayer.node.CheckerNode.check_node_name:6
+msgid "True if the node name is valid, False otherwise."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:58 a2921a82c3a94950b6ee41f46fa0fc5e
 msgid "vyra\\_base.com.datalayer.publisher module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:66 7c3112c7d6b94b4fb052d3acaea90f3a
+#: f009a37364074db7b9e3d8e622afbb45 of
+#: vyra_base.com.datalayer.publisher.PeriodicCaller:1
+msgid "Stores information for periodic function calls."
+msgstr ""
+
+#: e1e66335c8ab45d5851aaa70772b4960 of
+#: vyra_base.com.datalayer.publisher.PeriodicCaller:4
+msgid "Interval time in seconds between calls (default: 1.0)."
+msgstr ""
+
+#: 78ddbbe317dc4ed59f5c1a8afaa8529b of
+#: vyra_base.com.datalayer.publisher.PeriodicCaller:7
+msgid "Callable to be called periodically."
+msgstr ""
+
+#: d1cd6f5b693e45e6a625b83069847a85 of
+#: vyra_base.com.datalayer.publisher.PeriodicCaller:10
+msgid "ROS2 timer object."
+msgstr ""
+
+#: 7e16d22b5dcc4a6bb71f7cd1621ae71d of
+#: vyra_base.com.datalayer.publisher.PublisherInfo:1
+msgid "Stores information about a ROS2 publisher."
+msgstr ""
+
+#: b8c0285dcc8c4fa58dae27e311eb117f of
+#: vyra_base.com.datalayer.publisher.PublisherInfo:4
+msgid "Name of the publisher/topic."
+msgstr ""
+
+#: e8f4414f1c4c4d919e6a0e1ab9046fb1 of
+#: vyra_base.com.datalayer.publisher.PublisherInfo:7
+msgid "Message type for the publisher."
+msgstr ""
+
+#: 704084ea2c174eac9d848e1b0f4b6529 of
+#: vyra_base.com.datalayer.publisher.PublisherInfo:10
+msgid "PeriodicCaller instance for periodic publishing."
+msgstr ""
+
+#: 5954862facaf4113b4b661e35e9ee8da 98f6cf243e2e4e41bf7c346a78e9e037 of
+#: vyra_base.com.datalayer.publisher.PublisherInfo:13
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:13
+msgid "Quality of Service profile or depth."
+msgstr ""
+
+#: fd80670cf91b409b9f8eb9f979b97b59 of
+#: vyra_base.com.datalayer.publisher.PublisherInfo:16
+msgid "The actual ROS2 publisher object."
+msgstr ""
+
+#: 7e633d054e7d4c3bbdbc7e7480096969 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher:1
+msgid "Base class for ROS2 publishers."
+msgstr ""
+
+#: 26fd655365264571b401aa64eeafc28a of
+#: vyra_base.com.datalayer.publisher.VyraPublisher:3
+msgid ""
+"This class is intended to be factory-created to implement a specific "
+"publisher for a topic."
+msgstr ""
+
+#: 442fe5d6874d490cb625229189d9b6d0 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.__init__:1
+msgid "Initialize the VyraPublisher."
+msgstr ""
+
+#: 9c3b404f52f648278caeaf1500d70341 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.__init__:4
+msgid "PublisherInfo instance containing publisher configuration."
+msgstr ""
+
+#: 970ac6919d99440bb9cd9d79c652be48 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.__init__:7
+msgid "The ROS2 node to which the publisher belongs."
+msgstr ""
+
+#: f43ca32ea2104ab9981508d411fe119b of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.create_publisher:1
+msgid "Create a publisher in the ROS2 node."
+msgstr ""
+
+#: 2a71db59b02241358ac710bc2f94e695 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.create_publisher:3
+msgid ""
+"This method should be called to register the publisher within the ROS2 "
+"node."
+msgstr ""
+
+#: e24df1b8cfab4aca9fcfa9e35686a1ff of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.create_publisher:5
+msgid "If publisher type or name is not provided."
+msgstr ""
+
+#: fee2109a7e524213a0ec17801341d349 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.publish:1
+msgid "Publish a message to the topic."
+msgstr ""
+
+#: b99f74f9a4ea4482bf688cec2880b166 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.publish:6
+msgid "The message to publish."
+msgstr ""
+
+#: 9dc077c7b9d84667a5a21d3314c88c63 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.publish:8
+msgid "If publisher type, name, or publisher instance is not set."
+msgstr ""
+
+#: d6648be4ff0d4f71b1675cf9233321b9 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.destroy:1
+msgid "Destroy the publisher and clean up resources."
+msgstr ""
+
+#: 868dfc4642ea44999f6528e522a6d9b8 of
+#: vyra_base.com.datalayer.publisher.VyraPublisher.destroy:3
+msgid "This method should be called to properly shut down the publisher."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:66 d6c53234e3eb482eba273bb65458e4fe
 msgid "vyra\\_base.com.datalayer.service\\_client module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:75 d8287a6a22f4483789790e53a2b459b4
+#: 7772800c1cbf4482a0827825b0719311 d99cf79ce0b84ec8ab1f883b35eed59a of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:1
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:1
+msgid "Data class for storing service information."
+msgstr ""
+
+#: 0624b1b92b024f51b0cc2c8d1cb7dd0b b8ca6ac56b04446abeedb7b4b5f28eb3 of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:5
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:4
+msgid "Name of the service."
+msgstr ""
+
+#: 36241e9cf2024b36a51be1bdce152360 a31c7f5999884b2184533c8cca37bdee of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:11
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:7
+msgid "Type of the service."
+msgstr ""
+
+#: 1bb6c5cdcbdf4736859e62f8a01cbb5e of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:17
+msgid "Function to create a service request."
+msgstr ""
+
+#: 395cb43ac1ef4f8380dd5b106734cc26 c6eb34293e82468091dc12434878aef8 of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:23
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:10
+msgid "Callback function for the service."
+msgstr ""
+
+#: 0050ad45322c4df0a5231225c64ea7a8 of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:29
+msgid "ROS2 client instance or None."
+msgstr ""
+
+#: 1ea2812ddc1e4405ac1c1ef095d35d6e of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:31
+msgid "Union[Client, None]"
+msgstr ""
+
+#: 092eb74066a442d99d014f0effbb9330 of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:35
+msgid "Optional timeout for the service client."
+msgstr ""
+
+#: d29168b08b3c42d2ac3cfe81e9dd1f5e of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:37
+msgid "int | None"
+msgstr ""
+
+#: ce4df18e58f943cab90d46773eb7d8ad of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:41
+msgid "Number of calls to attempt at timeout before giving up."
+msgstr ""
+
+#: 2d7c6dad17a84a79a20b25e381f51095 of
+#: vyra_base.com.datalayer.service_client.ServiceClientInfo:43
+msgid "int"
+msgstr ""
+
+#: 1b969c355f2d4147a4847b1f00986bf9 of
+#: vyra_base.com.datalayer.service_client._base_request:1
+msgid "If no request function is provided for the service client."
+msgstr ""
+
+#: 06ad6393ae6e45ee8292ee888d80f2eb 11573230aaa840dd8e3977109e841dae of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient:1
+#: vyra_base.com.datalayer.service_server.VyraServiceServer:1
+msgid "Base class for ROS2 services."
+msgstr ""
+
+#: 3decd2eebafb4b90bbc22fd2795dccac 47ab3b44e67d40dcaa99b9561741b7bd of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient:3
+#: vyra_base.com.datalayer.service_server.VyraServiceServer:3
+msgid ""
+"This class is intended to be factory-created to implement specific "
+"service functionality."
+msgstr ""
+
+#: 9190e8015003404a99e7cb8647712861 of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.__init__:1
+msgid "Initialize the VyraServiceClient."
+msgstr ""
+
+#: 24edf1e6f61a499380eeb087b3a1c9a4 febaf648e19445168e7e38fbf4d3124b of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.__init__:4
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.__init__:4
+msgid "Information about the service."
+msgstr ""
+
+#: 219350eea5f4431cbb3d3407feff42b0 of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.__init__:7
+msgid "ROS2 node instance."
+msgstr ""
+
+#: ab65935711e84c3eb17d86adc7043573 of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.create_service_caller:1
+msgid "Create a service caller in the ROS2 node."
+msgstr ""
+
+#: d71a53a7faa94ddabe5e20582effa4eb of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.create_service_caller:3
+msgid ""
+"This method should be called to register the service caller with the ROS2"
+" node."
+msgstr ""
+
+#: 0cfd663b24dc48378f13bbb6d6fb134d 7009f564ec7d4e2888b524b646fa6d76 of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.create_service_caller:5
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.create_service:10
+msgid "If the service type or name is not provided."
+msgstr ""
+
+#: 3031509844b34306a7c88961b29e68ab of
+#: vyra_base.com.datalayer.service_client.VyraServiceClient.create_service_caller:6
+msgid "If the service is not available within the timeout period."
+msgstr ""
+
+#: f89b6447f92540b4964b14a00f4be27e of
+#: vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist.<locals>.async_wrapper:1
+msgid "Wrapper for asynchronous functions."
+msgstr ""
+
+#: cda99266a9e04e93a0069fc0e9f8c639 of
+#: vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist.<locals>.async_wrapper:4
+msgid "Positional arguments."
+msgstr ""
+
+#: 4182c7294c7a43eb9e752f6afeef3593 of
+#: vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist.<locals>.async_wrapper:6
+msgid "Keyword arguments."
+msgstr ""
+
+#: 6d09b3545f9f4574b9a8ea9b51823fd8 of
+#: vyra_base.helper.error_handler.ErrorTraceback.w_check_error_exist.<locals>.async_wrapper:7
+msgid "Result of the wrapped function."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:75 6e6ca4557a1c445784f68b0edaab930b
 msgid "vyra\\_base.com.datalayer.service\\_server module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:83 722281ed349349729ca00664121528be
+#: b0762694f23047ed8758370838e867a2 of
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:13
+msgid "The ROS2 service instance."
+msgstr ""
+
+#: a609ac89bed8466f9af5d4bbf3e95ab7 of
+#: vyra_base.com.datalayer.service_server.ServiceServerInfo:16
+msgid "Optional timeout for the callback."
+msgstr ""
+
+#: 8501f1b4d8b54e6e9264123497b15ed5 of
+#: vyra_base.com.datalayer.service_server._dummy_callback:1
+msgid "Dummy callback that raises a NotImplementedError."
+msgstr ""
+
+#: 30fa8a2a5d10476c808aaa2ee7af37ab 43ed59f8251f4d2e9ed8b8bcc994989c of
+#: vyra_base.com.datalayer.service_server._dummy_callback:3
+#: vyra_base.com.datalayer.subscriber._base_callback:3
+msgid "Always raised to indicate no callback is provided."
+msgstr ""
+
+#: a80e1949eafc44bbb475503558055d30 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.__init__:1
+msgid "Initialize the VyraServiceServer."
+msgstr ""
+
+#: d225cf33751e479097b080cefc1bb983 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.__init__:7
+msgid "The ROS2 node to attach the service to."
+msgstr ""
+
+#: 8ae72a25e84244a59baa2e7059da3e61 fe73b46835ea48c19ce57b3fa077d3ac of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.__init__:10
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.create_service:7
+msgid "Optional asyncio event loop."
+msgstr ""
+
+#: 20a57ce8b2214fa59138decfa55bd573 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.create_service:1
+msgid "Create and register a service in the ROS2 node."
+msgstr ""
+
+#: 980b58bb4f3c43148ba6dfb747acfd3c of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.create_service:4
+msgid "The callback function to handle service requests."
+msgstr ""
+
+#: 95fd54b301f84e4b9c19bbc22d9775d1 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.create_service:9
+msgid "If the callback is not callable."
+msgstr ""
+
+#: 7b5110f1c9d646d493621ac2f2dbff40 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.destroy_service:1
+msgid "Destroy the service in the ROS2 node."
+msgstr ""
+
+#: a6a8634817234265bdd5b5078172f971 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.destroy_service:3
+msgid "This method will remove the service if it exists."
+msgstr ""
+
+#: 9a5ea9e7fb7f4c3e90e5a201ef2e09ec of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.run_async_in_thread:1
+msgid "Execute an async coroutine in a separate thread with its own event loop."
+msgstr ""
+
+#: 4c84d91da76b4ee1932be0a4f973547d of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.run_async_in_thread:3
+msgid ""
+"Creates a new thread with a dedicated asyncio event loop to run async "
+"code from synchronous ROS2 service callbacks."
+msgstr ""
+
+#: 0493faa16e0343cfae827df8f8166f0d of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.run_async_in_thread:7
+msgid "Coroutine to execute."
+msgstr ""
+
+#: dcf0cf951387437c9354b01b2323cec3 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.run_async_in_thread:9
+msgid "Optional timeout in seconds."
+msgstr ""
+
+#: c8955e2bd94a4509b838d3199aaa6bd5 of
+#: vyra_base.com.datalayer.service_server.VyraServiceServer.run_async_in_thread:10
+msgid "Result from coroutine execution."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:83 b4835e37174e44328b99bb12faf5abf8
 msgid "vyra\\_base.com.datalayer.speaker module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:91 9dd36cbba79a49ec9cc4045cf05e6b37
+#: bb3757424d984d3fb92f8ee47d2cc160 of
+#: vyra_base.com.datalayer.speaker.VyraSpeaker:1
+msgid ""
+"Represents a speaker in the system. A speaker is responsible for sending "
+"messages or data to a topic using a publisher server. :type name: "
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` :param name: "
+"Name of the speaker. :type name: str :type type: "
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\`` "
+":param type: Type of the speaker, typically a ROS2 message type. :type "
+"type: Any :type description: "
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` :param "
+"description: Description of the speaker. :type description: str :type "
+"publisher_server: "
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
+" "
+"\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.datalayer.publisher.VyraPublisher\\`\\]`"
+" :param publisher_server: The publisher server associated with the "
+"speaker. :type publisher_server: VyraPublisher or None :type last_send: "
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\`` "
+":param last_send: The last sent message or data. :type last_send: Any"
+msgstr ""
+
+#: 722eeba2e48545f2a2372c2941a4e9f0 of
+#: vyra_base.com.datalayer.speaker.VyraSpeaker.merge:1
+msgid "Merges another speaker into this one, combining their attributes."
+msgstr ""
+
+#: 110bee77512b4db099ea3bb92a0bb37f of
+#: vyra_base.com.datalayer.speaker.VyraSpeaker.merge:4
+msgid "Another speaker instance to merge with."
+msgstr ""
+
+#: b54743daf79b45619883da28abd4aa40 of
+#: vyra_base.com.datalayer.speaker.VyraSpeaker.merge:6
+msgid "This speaker instance with merged attributes."
+msgstr ""
+
+#: 11b85d1d853e45c9b322739a509d7b20 of
+#: vyra_base.com.datalayer.speaker.VyraSpeaker.shout:1
+msgid "Sends a message using the speaker's publisher server."
+msgstr ""
+
+#: 0a608331d91243b29c2c24bf06f9b16c of
+#: vyra_base.com.datalayer.speaker.VyraSpeaker.shout:4
+msgid "The message to send."
+msgstr ""
+
+#: be367ee3ecf24effad3cbb84c9a92cba of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener:1
+msgid ""
+"Represents a speaker listener in the system. A speaker listener is "
+"responsible for receiving messages or data from a topic using a "
+"subscriber server. :type name: "
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` :param name: "
+"Name of the speaker listener. :type name: str :type type: "
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\`` "
+":param type: Type of the speaker listener, typically a ROS2 message type."
+" :type type: Any :type description: "
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\`` :param "
+"description: Description of the speaker listener. :type description: str "
+":param publisher_server: The publisher server associated with the speaker"
+" listener. :type publisher_server: VyraPublisher or None :type last_send:"
+" :sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Any\\`` "
+":param last_send: The last sent message or data. :type last_send: Any"
+msgstr ""
+
+#: 1414741b60cc4f4ebd2add4c0444a1a6 of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener.merge:1
+msgid "Merges another speaker listener into this one, combining their attributes."
+msgstr ""
+
+#: c644040ef40d4afeaf703f3d62f4466f of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener.merge:4
+msgid "Another speaker listener instance to merge with."
+msgstr ""
+
+#: c117ab834caf44fbbb4376f3795de8f1 of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener.merge:6
+msgid "This speaker listener instance with merged attributes."
+msgstr ""
+
+#: 9ba84b91cadf4affa786394593672d64 of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener.listen:1
+msgid "Listens for a message from the speaker's subscriber server."
+msgstr ""
+
+#: 78015f88971146a0a24283393525f1c4 of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener.listen:3
+msgid "The maximum time to wait for a message, in seconds."
+msgstr ""
+
+#: 13dc294c95584623828aca518b452296 of
+#: vyra_base.com.datalayer.speaker.VyraSpeakerListener.listen:5
+msgid ""
+"The received message, or None if no message was received within the "
+"timeout."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:91 e9217b03b2624ee19dabc20a2636f3b0
 msgid "vyra\\_base.com.datalayer.subscriber module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:99 841f8c3f61df47eda677319b99b25bfe
+#: dada8ff1ad864d68b223ca48403a025c of
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:1
+msgid "Data class for storing subscription information."
+msgstr ""
+
+#: a3a557295e1f43ffb3549392e1de440a of
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:4
+msgid "Name of the subscription."
+msgstr ""
+
+#: e12fc2a98a9c4de09cae32dca6351945 of
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:7
+msgid "Message type for the subscription."
+msgstr ""
+
+#: fa79a4ea96cb415c87d66ba5106d2331 of
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:10
+msgid "Callback function for the subscription."
+msgstr ""
+
+#: 4b6552d03c3546c29865f3efe7fa89c8 of
+#: vyra_base.com.datalayer.subscriber.SubscriptionInfo:16
+msgid "The actual ROS2 subscription object."
+msgstr ""
+
+#: 45d6d129c8b64b27aac94907d02cab88 of
+#: vyra_base.com.datalayer.subscriber._base_callback:1
+msgid "Default callback that raises a NotImplementedError."
+msgstr ""
+
+#: cdfe61fa3f514086ad7fc53b7216c8e4 of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber:1
+msgid "Base class for ROS2 subscriptions."
+msgstr ""
+
+#: 81e2bf6e31344e6e9c14a71a04c83246 of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber:3
+msgid ""
+"This class is intended to be factory-created to implement specific "
+"subscriptions for topics."
+msgstr ""
+
+#: 5cb31d17d1944f88bac2cfb207f67aed of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.__init__:1
+msgid "Initialize the VyraSubscription."
+msgstr ""
+
+#: 466bdd18aeb34ba9902b408a928099bc of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.__init__:4
+msgid "Information about the subscription."
+msgstr ""
+
+#: 48098a0041ac4f8ebfbbf121fe3fa0ba of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.__init__:7
+msgid "The ROS2 node to attach the subscription to."
+msgstr ""
+
+#: e608a78c30534a43a045b22de365a14a of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.create_subscription:1
+msgid "Create and register the subscription with the ROS2 node."
+msgstr ""
+
+#: bb19c408a0064daa8c19665c1371841c of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.create_subscription:3
+msgid "If the subscription type or name is not provided."
+msgstr ""
+
+#: 7c526ed73559486c983e3ead34a8a955 of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.remove_subscription:1
+msgid "Remove the subscription from the ROS2 node."
+msgstr ""
+
+#: e25187140421417c8e4ec8b8359cf3ff of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.remove_subscription:3
+msgid "This method will destroy the subscription if it exists."
+msgstr ""
+
+#: 0bfe28f610e14fdf8d167afd9b61d117 of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.callback:1
+msgid "Callback method for the subscription."
+msgstr ""
+
+#: cdc3e5b2d8114728b763d1c374a2aa93 of
+#: vyra_base.com.datalayer.subscriber.VyraSubscriber.callback:6
+msgid "The message received from the subscription."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:99 329d1becb3f0455faac28bdc395ce031
 msgid "vyra\\_base.com.datalayer.typeconverter module"
 msgstr ""
 
-#: ../../vyra_base.com.datalayer.rst:107 ec2b9513b11e4c4b803f16d2799e3900
+#: fa5d4c28a8e64376bbd8e9fe45ad2408 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter:1
+msgid "A class to convert various Python data types to ROS 2 compatible types."
+msgstr ""
+
+#: a700d33172e34bd7a69f815818760588 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.time_to_ros2buildintime:1
+msgid ""
+"Convert a :class:`datetime.datetime` object to a ROS 2 "
+":class:`builtin_interfaces.msg.Time`."
+msgstr ""
+
+#: bfde2aedac7248a3930df8d405154826 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.time_to_ros2buildintime:4
+msgid "The datetime object to convert."
+msgstr ""
+
+#: 5e36642ffe7643e795a75fa215abe16a of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.time_to_ros2buildintime:6
+msgid "The corresponding ROS 2 BuiltinTime message."
+msgstr ""
+
+#: bfc2d5b61ef3444d834b439089a2e3c3 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2buildintime_to_datetime:1
+msgid ""
+"Convert a ROS 2 :class:`builtin_interfaces.msg.Time` to a "
+":class:`datetime.datetime` object."
+msgstr ""
+
+#: 74d57d0868224cc7ac343b9d2baa4444 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2buildintime_to_datetime:4
+msgid "The ROS 2 BuiltinTime message to convert."
+msgstr ""
+
+#: e7ad207eeae94069a1c7d31576dd4a55 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2buildintime_to_datetime:6
+msgid "The corresponding datetime object (UTC)."
+msgstr ""
+
+#: 00eaf7c81df840bab2d61f2534aa6a15 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.uuid_to_ros2uuid:1
+msgid ""
+"Convert a :class:`uuid.UUID` to a ROS 2 "
+":class:`unique_identifier_msgs.msg.UUID`."
+msgstr ""
+
+#: d6ede386c8a04e66b87ab0d875d2bc01 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.uuid_to_ros2uuid:4
+msgid "The UUID to convert."
+msgstr ""
+
+#: 2bd7aaac90fd4a9183d6567dca9fd86c of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.uuid_to_ros2uuid:6
+msgid "The corresponding ROS 2 UUID message."
+msgstr ""
+
+#: 9117cdc3036942dbb0609d2edf9e81ee of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2uuid_to_uuid:1
+msgid ""
+"Convert a ROS 2 :class:`unique_identifier_msgs.msg.UUID` to a "
+":class:`uuid.UUID`."
+msgstr ""
+
+#: 594ff37a8874460784842a71c86e9702 of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2uuid_to_uuid:4
+msgid "The ROS 2 UUID message to convert."
+msgstr ""
+
+#: 73a6643f9a6f41ae8680b2aad580b36d of
+#: vyra_base.com.datalayer.typeconverter.Ros2TypeConverter.ros2uuid_to_uuid:6
+msgid "The corresponding UUID object."
+msgstr ""
+
+#: ../../vyra_base.com.datalayer.rst:107 c8965f6cb9944dbdbc24434b08935d82
 msgid "Module contents"
 msgstr ""
 

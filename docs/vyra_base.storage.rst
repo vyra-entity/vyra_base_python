@@ -1,45 +1,45 @@
-vyra\_base.stoage package
+vyra\_base.storage package
 ==========================
 
 Submodules
 ----------
 
-vyra\_base.stoage.db\_access module
+vyra\_base.storage.db\_access module
 ------------------------------------
 
-.. automodule:: vyra_base.stoage.db_access
+.. automodule:: vyra_base.storage.db_access
    :members:
    :show-inheritance:
-   :members:
 
-vyra\_base.stoage.db\_manipulato module
+
+vyra\_base.storage.db\_manipulato module
 -----------------------------------------
 
-.. automodule:: vyra_base.stoage.db_manipulato
+.. automodule:: vyra_base.storage.db_manipulato
    :members:
    :show-inheritance:
-   :members:
 
-vyra\_base.stoage.stoage module
+
+vyra\_base.storage.storage module
 ---------------------------------
 
-.. automodule:: vyra_base.stoage.stoage
+.. automodule:: vyra_base.storage.storage
    :members:
    :show-inheritance:
-   :members:
 
-vyra\_base.stoage.tb\_base module
+
+vyra\_base.storage.tb\_base module
 ----------------------------------
 
-.. automodule:: vyra_base.stoage.tb_base
+.. automodule:: vyra_base.storage.tb_base
    :members:
    :show-inheritance:
-   :members:
+
 
 Module contents
 ---------------
 
-.. automodule:: vyra_base.stoage
+.. automodule:: vyra_base.storage
    :members:
    :show-inheritance:
-   :members:
+

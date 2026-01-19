@@ -318,7 +318,7 @@ msgstr ""
 
 #: ../../com/ros2_communication.rst:353 63b8eee285904698933580da36d95a64
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../com/ros2_communication.rst:355 579eb99053db4cc382a6f7c882833152
 msgid ":doc:`ipc_communication` - IPC within a module"

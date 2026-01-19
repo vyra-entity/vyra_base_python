@@ -107,7 +107,7 @@ msgid "Datenspeicherung"
 msgstr ""
 
 #: ../../core/parameter.rst:135 e4967e513a884703ad26bf98345380e1
-msgid "**Speicherort**: ``/workspace/stoage/data/<module_name>.db``"
+msgid "**Speicherort**: ``/workspace/storage/data/<module_name>.db``"
 msgstr ""
 
 #: ../../core/parameter.rst:137 4ecf9d1941f247d0a9275920416cac9a
@@ -115,7 +115,7 @@ msgid "The SQLite-Datenbank speichert Parameter in folgender Struktur:"
 msgstr ""
 
 #: ../../core/parameter.rst:139 3e55ffdc83fd4a96a95023bef40a3889
-msgid "**Tabellenname**: ``tb_parameters`` (siehe :doc:`../stoage`)"
+msgid "**Tabellenname**: ``tb_parameters`` (siehe :doc:`../storage`)"
 msgstr ""
 
 #: ../../core/parameter.rst:140 aff529cbeebb40b3acc55f5aa103ee78
@@ -130,7 +130,7 @@ msgstr ""
 msgid ""
 "Parameter-Datenbank-Tabellen folgen der Naming Convention ``tb_<name>``. "
 "Further information to Tabellenstruktur can be found you under "
-":doc:`../stoage`."
+":doc:`../storage`."
 msgstr ""
 
 #: ../../core/parameter.rst:148 881ad988786c4a46b4d36dec397e9609
@@ -193,7 +193,7 @@ msgstr ""
 
 #: ../../core/parameter.rst:186 3c71bd9d8e5b493796ec6b58dfc92235
 msgid "Further Information"
-msgstr ""
+msgstr "Weitere Informationen"
 
 #: ../../core/parameter.rst:188 6fb862ab7e3f4dff8c4baf5986ea8a67
 msgid ":doc:`entity` - Entity-Dokumentation"
@@ -204,7 +204,7 @@ msgid ":doc:`volatile` - Volatile Alternative"
 msgstr ""
 
 #: ../../core/parameter.rst:190 5dfa7405b08e4ab5b38e410396e7758e
-msgid ":doc:`../stoage` - Stoage-Backend Details"
+msgid ":doc:`../storage` - Storage-Backend Details"
 msgstr ""
 
 #: ../../core/parameter.rst:191 6821642b19a949fbba16386c03d251cf

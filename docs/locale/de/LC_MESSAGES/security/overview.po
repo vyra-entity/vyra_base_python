@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -257,7 +257,7 @@ msgid "Signs messages automatically"
 msgstr ""
 
 #: ../../security/overview.rst:150 9f23ea5232b349fd8a111523c3cb4a32
-msgid "**SecurityValidato** (Server-side)"
+msgid "**SecurityValidator** (Server-side)"
 msgstr ""
 
 #: ../../security/overview.rst:152 bfb7128c4f924ddc81f2b495d652ee2b
@@ -423,6 +423,99 @@ msgstr ""
 
 #: ../../security/overview.rst:367 e20cf9d4ca644da08540d5220f86cd39
 msgid "Typical overhead per operation:"
+msgstr ""
+
+#: ../../security/overview.rst:372 fad923a10c6a457988d178824a6498ee
+msgid "Level"
+msgstr ""
+
+#: ../../security/overview.rst:373 06d3fbefd91e4c16bede410cb0838746
+msgid "CPU"
+msgstr ""
+
+#: ../../security/overview.rst:374 8736f97831a24b02acb0a4b9dc0a1615
+msgid "Latency"
+msgstr ""
+
+#: ../../security/overview.rst:375 33ab400e5be3476ba6022071e4b5e5d7
+msgid "Throughput Impact"
+msgstr ""
+
+#: ../../security/overview.rst:376 298b2d69e33841209ec10c4c0bce3bee
+msgid "1 (NONE)"
+msgstr ""
+
+#: ../../security/overview.rst:377 bec473fdebff491c86d2552d19454791
+msgid "0%"
+msgstr ""
+
+#: ../../security/overview.rst:378 ../../security/overview.rst:382
+#: 91d08ac6b6804a948d8d7e149e2c6eb1 ed150ebac02c42798aa4951820ca1750
+msgid "<1ms"
+msgstr ""
+
+#: ../../security/overview.rst:379 2affb1fe3ef54328864649d8e16c8201
+msgid "None"
+msgstr ""
+
+#: ../../security/overview.rst:380 b4173de7118142d697a74d44090e49d7
+msgid "2 (BASIC)"
+msgstr ""
+
+#: ../../security/overview.rst:381 24ee978fc390491d9df044731ba90cd9
+msgid "<1%"
+msgstr ""
+
+#: ../../security/overview.rst:383 2a6059edce9b423f879263e27206c9e1
+msgid "Negligible"
+msgstr ""
+
+#: ../../security/overview.rst:384 271c313d95704ce3933ac64c00cc41f8
+msgid "3 (TIMESTAMP)"
+msgstr ""
+
+#: ../../security/overview.rst:385 2aa7a9d71ca74155a63b395fea4a74ef
+msgid "~1%"
+msgstr ""
+
+#: ../../security/overview.rst:386 0e785057672e4ad8b48c996cb553b03b
+msgid "~1ms"
+msgstr ""
+
+#: ../../security/overview.rst:387 596a3fa1d3254da0aa19e9d99e8e61bc
+msgid "<5%"
+msgstr ""
+
+#: ../../security/overview.rst:388 f7dff42550724706a139ecc260aa56c6
+msgid "4 (HMAC)"
+msgstr ""
+
+#: ../../security/overview.rst:389 f4364a1760004a6faa675f15cfd9a944
+msgid "2-5%"
+msgstr ""
+
+#: ../../security/overview.rst:390 c6669d9ff9344c619a359b619b2a5192
+msgid "1-3ms"
+msgstr ""
+
+#: ../../security/overview.rst:391 2fe6c2e22174404f977a733b19555ba5
+msgid "10-15%"
+msgstr ""
+
+#: ../../security/overview.rst:392 da069ad6c7e14329917e7ffd66bacf51
+msgid "5 (SIGNATURE)"
+msgstr ""
+
+#: ../../security/overview.rst:393 80ea51ed51144c358c2be5c53df53f42
+msgid "10-20%"
+msgstr ""
+
+#: ../../security/overview.rst:394 6873e1d5fdf8413791a30651995a01d8
+msgid "5-10ms"
+msgstr ""
+
+#: ../../security/overview.rst:395 98b77239cf2b4da6a65754fc7d8be2b4
+msgid "30-40%"
 msgstr ""
 
 #: ../../security/overview.rst:398 e3365cac6adc47279ea6b9a2a024f3e5
@@ -671,5 +764,8 @@ msgstr ""
 #~ msgid ""
 #~ "`RFC 5280 <https://www.rfc-editor.org/rfc/rfc5280>`_"
 #~ " - X.509 certificates"
+#~ msgstr ""
+
+#~ msgid "**SecurityValidato** (Server-side)"
 #~ msgstr ""
 

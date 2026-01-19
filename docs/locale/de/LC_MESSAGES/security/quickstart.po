@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vyra_base \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 11:52+0100\n"
+"POT-Creation-Date: 2026-01-19 14:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -179,7 +179,7 @@ msgid "**Implement Validation**"
 msgstr ""
 
 #: ../../security/quickstart.rst:465 9de64a92734943ce848aeb33ae44a02d
-msgid "Add SecurityValidato to services"
+msgid "Add SecurityValidator to services"
 msgstr ""
 
 #: ../../security/quickstart.rst:466 37eb4b24b6214a01a66cc1cb85a4e9dd
@@ -286,5 +286,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Add SecurityValidator to services"
+#~ msgstr ""
+
+#~ msgid "Add SecurityValidato to services"
 #~ msgstr ""
 
