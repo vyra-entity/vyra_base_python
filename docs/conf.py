@@ -4,7 +4,7 @@
 project = 'vyra_base'
 copyright = '2025, Holger Schernewski'
 author = 'Holger Schernewski'
-release = '0.1.0'  # Should match __version__.py
+release = '0.1.8'  # Should match __version__.py
 
 # -- General configuration ---------------------------------------------------
 extensions = [
