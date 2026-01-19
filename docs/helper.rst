@@ -43,12 +43,12 @@ Verwendung
    logger = Logger.get_logger(__name__)
    
    # Logging
-   logger.info("Modul gestartet")
-   logger.warning("Warnung: Niedriger Storage")
-   logger.error("Error on Laden der Konfiguration")
-   logger.debug("Debug-Information")
+   logger.info("Module started")
+   logger.warning("Warning: Low storage")
+   logger.error("Error loading configuration")
+   logger.debug("Debug information")
 
-Konfiguration
+Configuration
 ^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -66,7 +66,7 @@ Konfiguration
    Logger.configure(log_config)
 
 .. tip::
-   Use you strukturiertes Logging for bessere Auswertbarkeit:
+   Use structured logging for better analysis:
    
    .. code-block:: python
    
@@ -79,9 +79,9 @@ Konfiguration
 ErrorHandler & ErrorTraceback
 ------------------------------
 
-Error Handling with automaticallyem Traceback:
+Error Handling with automatic Traceback:
 
-ErrorTraceback Decorato
+ErrorTraceback Decorator
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -121,7 +121,7 @@ ErrorHandler
 CryptoHelper
 ------------
 
-Kryptografische functions for Sicherheit:
+Cryptographic functions for security:
 
 Hashing
 ^^^^^^^
@@ -131,45 +131,45 @@ Hashing
    from vyra_base.helper.crypto_helper import CryptoHelper
    
    # SHA-256 Hash
-   hash_value = CryptoHelper.hash_sha256("mein_passwort")
+   hash_value = CryptoHelper.hash_sha256("my_password")
    print(f"Hash: {hash_value}")
    
-   # Passwort-Hashing with Salt (recommended)
-   hashed_password = CryptoHelper.hash_password("mein_passwort")
+   # Password Hashing with Salt (recommended)
+   hashed_password = CryptoHelper.hash_password("my_password")
    
-   # Passwort-Verifikation
-   is_valid = CryptoHelper.verify_password("mein_passwort", hashed_password)
+   # Password Verification
+   is_valid = CryptoHelper.verify_password("my_password", hashed_password)
 
 encryption
-^^^^^^^^^^^^^^^
+^^^^^^^^^^
 
 .. code-block:: python
 
-   # Daten encrypt
-   encrypted = CryptoHelper.encrypt("Geheime Nachricht", key="mein_schluessel")
+   # Data encrypt
+   encrypted = CryptoHelper.encrypt("Secret message", key="my_key")
    
-   # Daten decrypt
-   decrypted = CryptoHelper.decrypt(encrypted, key="mein_schluessel")
+   # Data decrypt
+   decrypted = CryptoHelper.decrypt(encrypted, key="my_key")
 
 .. warning::
-   Use you niemals hartcodierte Schlüssel in Produktionscode!
-   Use you environment variables or Secrets-Management.
+   Never use hardcoded keys in production code!
+   Use environment variables or secrets management.
 
-Zufallswerte
-^^^^^^^^^^^^
+Random Values
+^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Token generieren
+   # Generate token
    token = CryptoHelper.generate_token(length=32)
    
-   # UUID generieren
+   # UUID generate
    unique_id = CryptoHelper.generate_uuid()
 
 FileReader & FileWriter
 -----------------------
 
-Datei-Operationen with automaticallyer Format-Erkennung:
+File operations with automatic format detection:
 
 FileReader
 ^^^^^^^^^^
@@ -190,13 +190,13 @@ FileReader
    # Binär read
    binary_data = FileReader.read_binary("/workspace/data/image.png")
 
-**Unterstützte Formate:**
+**Supported Formats:**
 
 * JSON (``.json``)
 * YAML (``.yaml``, ``.yml``)
 * TOML (``.toml``)
 * Text (``.txt``, ``.md``, etc.)
-* Binär (alle underen)
+* Binary (all others)
 
 FileWriter
 ^^^^^^^^^^
@@ -205,28 +205,28 @@ FileWriter
 
    from vyra_base.helper.file_writer import FileWriter
    
-   # JSON schreiben
+   # JSON write
    FileWriter.write_json(
        "/workspace/config/output.json",
        {"key": "value", "number": 42}
    )
    
-   # YAML schreiben
+   # YAML write
    FileWriter.write_yaml(
        "/workspace/config/output.yaml",
        {"settings": {"debug": True}}
    )
    
-   # Text schreiben
+   # Text write
    FileWriter.write_text(
        "/workspace/log/output.txt",
-       "Log-Nachricht"
+       "Log message"
    )
 
 FileLock
 --------
 
-Datei-Locking for gleichzeitigen Access:
+File locking for concurrent access:
 
 .. code-block:: python
 
@@ -236,40 +236,40 @@ Datei-Locking for gleichzeitigen Access:
    
    with FileLock(lock_file) as lock:
        if lock.acquired:
-           # Exklusiver Access
+           # Exclusive access
            with open("/workspace/data/shared_file.txt", "w") as f:
-               f.write("Kritische Daten")
+               f.write("Critical data")
        else:
-           print("Datei is gesperrt durch underen Prozess")
+           print("File is locked by another process")
 
 .. tip::
-   FileLock verhindert Race-Conditions at gleichzeitigen Schreibaccessesn.
+   FileLock prevents race conditions during concurrent write access.
 
 EnvHandler
 ----------
 
-environment variables-Verwaltung:
+environment variables management:
 
 .. code-block:: python
 
    from vyra_base.helper.env_handler import EnvHandler
    
-   # Umgebungsvariable read
+   # Read environment variable
    module_name = EnvHandler.get("MODULE_NAME", default="unknown")
    
-   # Umgebungsvariable set
+   # Set environment variable
    EnvHandler.set("DEBUG_MODE", "true")
    
-   # Alle Variablen load (from .env-Datei)
+   # Load all variables (from .env file)
    EnvHandler.load_dotenv("/workspace/.env")
    
-   # Boolean-Value parsen
+   # Parse boolean value
    is_debug = EnvHandler.get_bool("DEBUG_MODE", default=False)
    
-   # Integer-Value parsen
+   # Parse integer value
    port = EnvHandler.get_int("PORT", default=8080)
 
-**.env-Datei Example:**
+**.env file Example:**
 
 .. code-block:: text
 
@@ -287,16 +287,16 @@ Logging
 
 ✅ **Recommended:**
 
-* Use you strukturiertes Logging
-* Use you passende Log-Levels (DEBUG < INFO < WARNING < ERROR)
-* Loggen you wichtige Events (Start, Stop, Error)
-* Avoid you sensible Daten in Logs
+* Use you structured logging
+* Use you appropriate log levels (DEBUG < INFO < WARNING < ERROR)
+* Log important events (start, stop, error)
+* Avoid sensitive data in logs
 
 ❌ **Avoid:**
 
-* Excessive Logging in Hochfrequenz-Schleifen
-* Persönliche or Sicherheits-relevante Daten
-* Logging without Context-information
+* Excessive logging in high-frequency loops
+* Personal or sensitive data
+* Logging without context information
 
 Error Handling
 ^^^^^^^^^^^^^^^^
@@ -304,41 +304,40 @@ Error Handling
 ✅ **Recommended:**
 
 * Use you ``@ErrorTraceback`` for async functions
-* Loggen you Error with completem Context
-* Use you ErrorFeeder for zentrale Fehlersammlung
+* Log errors with complete context
+* Use you ErrorFeeder for central error collection
 
-Kryptografie
+Cryptography
 ^^^^^^^^^^^^
 
 ✅ **Recommended:**
 
-* Use you ``hash_password()`` statt einfachem SHA-256
-* Speichern you Schlüssel in environment variables
-* Use you starke, tofällige Schlüssel
+* Use you ``hash_password()`` instead of simple SHA-256
+* Store your keys in environment variables
+* Use you strong, random keys
 
 ❌ **Avoid:**
 
-* Hartcodierte Passwörter or Schlüssel
-* Schwache Hashing-Algorithmen (MD5, SHA1)
-* Wiederverwendung of Salts
+* Hardcoded passwords or keys
+* Weak hashing algorithms (MD5, SHA1)
+* Reuse of salts
 
-Datei-Operationen
-^^^^^^^^^^^^^^^^^
-
+File Operations
+^^^^^^^^^^^^^^^
 ✅ **Recommended:**
 
-* Use you FileReader/FileWriter statt direktem I/O
-* Use you FileLock at gleichzeitigem Access
-* Prüfen you Pfad-Exisenz vor Schreiboperationen
+* Use you FileReader/FileWriter instead of direct I/O
+* Use you FileLock for concurrent access
+* Check you path existence before write operations
 
 Further Information
------------------------------
+-------------------
 
-* :doc:`vyra_base.helper` - API-Referenz
-* :class:`~vyra_base.helper.logger.Logger` - Logger-class
-* :class:`~vyra_base.helper.error_traceback.ErrorTraceback` - Error-Decorato
-* :class:`~vyra_base.helper.crypto_helper.CryptoHelper` - Krypto-functions
-* :class:`~vyra_base.helper.file_reader.FileReader` - Datei read
-* :class:`~vyra_base.helper.file_writer.FileWriter` - Datei schreiben
-* :class:`~vyra_base.helper.file_lock.FileLock` - Datei-Locking
-* :class:`~vyra_base.helper.env_handler.EnvHandler` - environment variables
+* :doc:`vyra_base.helper` - API-Reference
+* :class:`~vyra_base.helper.logger.Logger` - Logger class
+* :class:`~vyra_base.helper.error_traceback.ErrorTraceback` - Error Decorator
+* :class:`~vyra_base.helper.crypto_helper.CryptoHelper` - Crypto functions
+* :class:`~vyra_base.helper.file_reader.FileReader` - File read
+* :class:`~vyra_base.helper.file_writer.FileWriter` - File write
+* :class:`~vyra_base.helper.file_lock.FileLock` - File locking
+* :class:`~vyra_base.helper.env_handler.EnvHandler` - Environment variables

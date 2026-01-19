@@ -5,7 +5,7 @@ The ``vyra_base/interfaces`` Paket enthält alle Basis-ROS2-Interfaces for das V
 Thise Interfaces definieren standardisierte messages, Services and Actions.
 
 Overview
----------
+--------
 
 ROS2-Interfaces in VYRA bestehen from drei Typen:
 
@@ -16,7 +16,7 @@ ROS2-Interfaces in VYRA bestehen from drei Typen:
 Alle VYRA-Module can diese Basis-Interfaces use, um standardisierte Kommunikation to gewährleisen.
 
 Available Interfaces
----------------------
+--------------------
 
 Messages (msg/)
 ^^^^^^^^^^^^^^^
@@ -28,11 +28,11 @@ Messages (msg/)
    * - Interface
      - Description
    * - **VBASEUpdateParamEvent.msg**
-     - Event-Nachricht for Parameter-Änderungen (is of Parameter-System genutzt)
+     - Event message for parameter changes (used by the parameter system)
    * - **VBASEVolatileLis.msg**
-     - Lise aller Volatile-Keys
+     - List of all volatile keys
    * - **VBASEVolatileHash.msg**
-     - Hash-Value for Volatile-Daten
+     - Hash value for volatile data
 
 Services (srv/)
 ^^^^^^^^^^^^^^^
@@ -46,12 +46,11 @@ Services (srv/)
    * - **VBASESetParam.srv**
      - Set parameter (Request: name, value / Response: success)
    * - **VBASEReadAllParams.srv**
-     - Alle Read parameter (Response: Lise aller Parameter)
+     - Read all parameters (Response: list of all parameters)
    * - **VBASEStateResume.srv**
-     - State Machine fortset (for Pause/Resume-Functionality)
+     - State Machine resume (for Pause/Resume functionality)
    * - **VBASESecurityRequestAccess.srv**
-     - Sicherheits-Access anfordern (Security Framework)
-
+     - Request security access (Security Framework)
 Actions (action/)
 ^^^^^^^^^^^^^^^^^
 
@@ -62,15 +61,15 @@ Actions (action/)
    * - Interface
      - Description
    * - **VBASEInitiateUpdate.action**
-     - Software-Update initiieren (long-running Operation with progress-Feedback)
+     - Initiate software update (long-running operation with progress feedback)
 
-Interface-Metadaten
--------------------
+Interface-Metadata
+------------------
 
-Interfaces are via JSON-Konfigurationsdateien beschrieben.
-Thise becan be found sich in ``config/*.json`` and definieren, wie Interfaces verwendet are.
+Interfaces are described via JSON configuration files.
+These can be found in ``config/*.json`` and define how interfaces are used.
 
-Example-Metadaten
+Example Metadata
 ^^^^^^^^^^^^^^^^^^
 
 **Parameter-Service-Definition** (``config/parameter_metadata.json``):
@@ -82,29 +81,28 @@ Example-Metadaten
            {
                "name": "set_param",
                "type": "vyra_base_interfaces/srv/VBASESetParam",
-               "description": "Setzt einen Parameter-Value",
+               "description": "Set a parameter value",
                "implementation": "vyra_base.core.parameter.Parameter.set_param"
            },
            {
                "name": "read_all_params",
                "type": "vyra_base_interfaces/srv/VBASEReadAllParams",
-               "description": "Liest alle Parameter",
+               "description": "Read all parameters",
                "implementation": "vyra_base.core.parameter.Parameter.read_all_params"
            }
        ]
    }
 
-**Verwendungszweck:**
+**Purpose:**
 
-* Automatische Service-Registration durch ``entity.set_interfaces()``
-* Dokumentation der verfügbaren Schnittstellen
-* Mapping of Service-Namen to Implementierungen
-
+* Automatic service registration through ``entity.set_interfaces()``
+* Documentation of available interfaces
+* Mapping of service names to implementations
 Interface-Definition
 --------------------
 
-Example: Service definieren
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Example: Define Service
+^^^^^^^^^^^^^^^^^^^^^^^
 
 **VBASESetParam.srv**:
 
@@ -118,14 +116,13 @@ Example: Service definieren
    bool success
    string message
 
-**Bedeutung:**
+**Meaning:**
 
-* Oberhalb of ``---``: Request-Struktur
-* Unterhalb of ``---``: Response-Struktur
-* Kommentare with ``#``
-
-Example: Message definieren
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* Above ``---``: Request structure
+* Below ``---``: Response structure
+* Comments with ``#``
+Example: Define Message
+^^^^^^^^^^^^^^^^^^^^^^^
 
 **VBASEUpdateParamEvent.msg**:
 
@@ -137,10 +134,10 @@ Example: Message definieren
    string new_value
    builtin_interfaces/Time timestamp
 
-Eigene Module-Interfaces
--------------------------
+Own Module Interfaces
+---------------------
 
-Jedes VYRA-Modul sollte sein eigenes Interface-Paket haben:
+Each VYRA module should have its own interface package:
 
 .. code-block:: text
 
@@ -158,38 +155,38 @@ Jedes VYRA-Modul sollte sein eigenes Interface-Paket haben:
 
 **Naming Convention:**
 
-* Modulname + ``_interfaces`` (z.B. ``v2_modulemanager_interfaces``)
-* Prefix for Interface-Namen with Modul-Kürzel (z.B. ``MM`` for ModuleManager)
+* Module name + ``_interfaces`` (e.g. ``v2_modulemanager_interfaces``)
+* Prefix for interface names with module abbreviation (e.g. ``MM`` for ModuleManager)
 
-Interface-Verwendung
---------------------
+Interface Usage
+---------------
 
-Im Python-Code
+In Python Code
 ^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Basis-Interfaces importieren
+   # Import base interfaces
    from vyra_base_interfaces.srv import VBASESetParam
    from vyra_base_interfaces.msg import VBASEUpdateParamEvent
    
-   # Service Client create
+   # Create service client
    job = create_vyra_job(
        node=entity.node,
        service_name="/my_module/set_param",
        service_type=VBASESetParam
    )
    
-   # Request create
+   # Create request
    request = VBASESetParam.Request()
    request.parameter_name = "max_speed"
    request.parameter_value = "100.0"
    
-   # Service onrufen
+   # Call service
    response = await job.call_async(request)
 
-In JSON-Metadaten
-^^^^^^^^^^^^^^^^^
+In JSON Metadata
+^^^^^^^^^^^^^^^^
 
 .. code-block:: json
 
@@ -210,10 +207,10 @@ In JSON-Metadaten
        ]
    }
 
-Automatische Registration
----------------------------
+Automatic Registration
+----------------------
 
-Entity lädt and regisriert Interfaces automatically:
+Entity loads and registers interfaces automatically:
 
 .. code-block:: python
 
@@ -229,67 +226,66 @@ Entity lädt and regisriert Interfaces automatically:
        
        return entity
 
-**Prozess:**
+**Process:**
 
-1. JSON-Metadaten read (``config/*.json``)
-2. Interface-Typen importieren
-3. Methoden with ``@remote_callable`` can be found
-4. ROS2-Services register
-5. DataSpace aktualisieren
+1. JSON metadata read (``config/*.json``)
+2. mport interface types
+3. Methods with ``@remote_callable`` can be found
+4. Register ROS2 services
+5. Update DataSpace
 
 Best Practices
 --------------
 
 ✅ **Recommended:**
 
-* Use you VYRA-Basis-Interfaces wo möglich
-* Erstellen you eigene Interface-Pakete for modulspezifische Typen
-* Dokumentieren you Interfaces in JSON-Metadaten
-* Use you Namespaces for Interface-Namen (z.B. ``VBASE``, ``MM``)
-* Versionieren you Interface-Änderungen
+* Use your VYRA base interfaces where possible
+* Create your own interface packages for module-specific types
+* Document your interfaces in JSON metadata
+* Use your namespaces for interface names (e.g. ``VBASE``, ``MM``)
+* Version your interface changes
 
 ❌ **Avoid:**
 
-* Direkte Verwendung of ROS2-Standard-Interfaces without Wrapper
-* Viamäßig komplexe messages (> 1 KB)
-* Interfaces without Metadaten-Dokumentation
-* Breaking Changes an bestehenden Interfaces
+* Direct use of ROS2 standard interfaces without wrapper
+* Excessively complex messages (> 1 KB)
+* Interfaces without metadata documentation
+* Breaking changes to existing interfaces
 
 Colcon Build
 ------------
 
-Interfaces must with ``colcon build`` kompiliert are:
+Interfaces must be compiled with ``colcon build``:
 
 .. code-block:: bash
 
-   # Im Modul-Root
+   # In the module root
    source /opt/ros/kilted/setup.bash
    colcon build --packages-select vyra_base_interfaces
    source install/setup.bash
 
-Nach dem Build are die Interfaces in Python Available:
+After the build, the interfaces are available in Python:
 
 .. code-block:: python
 
    from vyra_base_interfaces.srv import VBASESetParam
-   # ✅ Funktioniert after colcon build
+   # ✅ Works after colcon build
 
 Interface-Pfade
 ---------------
 
-**Quelle**: ``src/vyra_base/interfaces/``
+**Source**: ``src/vyra_base/interfaces/``
 
-**Nach Build**: ``install/vyra_base_interfaces/``
+**After Build**: ``install/vyra_base_interfaces/``
 
-**Python-Import**: ``from vyra_base_interfaces.srv import *``
-
-**NFS-Share**: ``/nfs/ros_interfaces/`` (for alle Module togänglich)
+**Python Import**: ``from vyra_base_interfaces.srv import *``
+**NFS-Share**: ``/nfs/ros_interfaces/`` (for all modules accessible)
 
 Further Information
 -----------------------------
 
-* :doc:`com/ros2_communication` - Verwendung of Interfaces
-* :doc:`vyra_base.com.datalayer` - Interface Factoy
-* ROS2 Interface-Dokumentation: https://docs.ros.org/en/kilted/Concepts/About-ROS-Interfaces.html
-* ``package.xml`` - ROS2 Package-Konfiguration
-* ``CMakeLiss.txt`` - Build-Konfiguration
+* :doc:`com/ros2_communication` - Usage of Interfaces
+* :doc:`vyra_base.com.datalayer` - Interface Factory
+* ROS2 Interface Documentation: https://docs.ros.org/en/kilted/Concepts/About-ROS-Interfaces.html
+* ``package.xml`` - ROS2 Package Configuration
+* ``CMakeLists.txt`` - Build Configuration

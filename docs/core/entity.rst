@@ -1,11 +1,11 @@
 VyraEntity - The Core
-===========================
+=====================
 
 The :class:`~vyra_base.core.entity.VyraEntity` is the central management unit of each VYRA module.
 It orchestrates all components such as ROS2 communication, state management, storage, and security.
 
 Initialization
----------------
+--------------
 
 The entity is typically created in a module's ``_base_.py``:
 
@@ -39,7 +39,7 @@ Main Functions
 Parameter Management
 ^^^^^^^^^^^^^^^^^^^^
 
-Access to persisttent configuration data via the Parameter component:
+Access to persistent configuration data via the Parameter component:
 
 .. code-block:: python
 
@@ -52,12 +52,12 @@ Access to persisttent configuration data via the Parameter component:
    # Read all parameters
    all_params = await entity.parameter.read_all_params(request, response)
 
-Parameters are stoed in a **SQLite database** in the module under ``/workspace/storage/data/``.
-This enables persisttent data storage between restarts.
+Parameters are stored in a **SQLite database** in the module under ``/workspace/storage/data/``.
+This enables persistent data storage between restarts.
 
 .. note::
-   Parameters are suitable for configuration data that must be stoed permanently.
-   Database accesses are relativelyely slow, therefore not suitable for real-time data.
+   Parameters are suitable for configuration data that must be stored permanently.
+   Database accesses are relatively slow, therefore not suitable for real-time data.
 
 Volatile Management
 ^^^^^^^^^^^^^^^^^^^
@@ -122,13 +122,13 @@ Each entity has an integrated state machine:
    await state_machine.trigger_event(StateEvent(...))
 
 Regiser Interfaces
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 
 ROS2 interfaces are defined via JSON metadata and registered automatically:
 
 .. code-block:: python
 
-   # Load and regiser interfaces from JSON
+   # Load and register interfaces from JSON
    interfaces = await entity.load_interfaces_from_config()
    await entity.set_interfaces(interfaces)
 
@@ -137,13 +137,12 @@ Lifecycle Management
 
 Startup
 ^^^^^^^
-
 .. code-block:: python
 
    # Start up entity
    success = await entity.startup_entity()
    if success:
-       print("Entity started successfuly")
+       print("Entity started successfully")
 
 Shutdown
 ^^^^^^^^
@@ -174,7 +173,7 @@ The entity manages various storage backends:
    )
 
 Important Notes
------------------
+---------------
 
 .. warning::
    The entity should only be initialized once per module.
@@ -189,4 +188,4 @@ Further Information
 
 * :doc:`parameter` - Detailed parameter documentation
 * :doc:`volatile` - Detailed volatile documentation
-* :class:`~vyra_base.core.entity.VyraEntity` - API-Referenz
+* :class:`~vyra_base.core.entity.VyraEntity` - API Reference

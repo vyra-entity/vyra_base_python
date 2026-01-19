@@ -116,8 +116,8 @@ Create Table
 * ``DateTime``: timestamp
 * ``UUID``: Unique Identifier (recommended for IDs)
 
-Example-Tabellen
-^^^^^^^^^^^^^^^^
+Example-Tables
+^^^^^^^^^^^^^^
 
 **Parameter Table**:
 
@@ -145,20 +145,20 @@ Example-Tabellen
        module: Mapped[str] = mapped_column(String(100))
        timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-Database-Operationen
+Database Operations
 --------------------
 
-DbManipulato-class
+DbManipulator-class
 ^^^^^^^^^^^^^^^^^^
 
 The :class:`~vyra_base.storage.db_manipulato.DbManipulato`-class simplifies CRUD Operations:
 
 .. code-block:: python
 
-   from vyra_base.storage.db_manipulato import DbManipulato
+   from vyra_base.storage.db_manipulato import DbManipulator
    
-   # Manipulato for eine Create Table
-   manipulato = DbManipulato(
+   # Manipulator for a Create Table
+   manipulator = DbManipulator(
        db_access=db,
        table_structure=tb_sensor_data
    )
@@ -168,7 +168,7 @@ Insert Data (Create)
 
 .. code-block:: python
 
-   # Azelner Atrag
+   # Insert Entry
    result = await manipulato.insert({
        "sensor_name": "temperature_1",
        "value": 23.5,
@@ -176,33 +176,33 @@ Insert Data (Create)
    })
    
    if result.success:
-       print(f"Agefügt with ID: {result.Details['id']}")
+       print(f"Added with ID: {result.Details['id']}")
 
-Daten read (Read)
+Data read (Read)
 ^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
    # By ID
-   result = await manipulato.get_by_id(sensor_id)
+   result = await manipulator.get_by_id(sensor_id)
    if result.success:
        Sensor = result.Details
        print(f"Sensor: {Sensor.sensor_name}, Value: {Sensor.value}")
    
-   # Alle Aträge
-   result = await manipulato.get_all()
+   # All Entries
+   result = await manipulator.get_all()
    for Sensor in result.Details:
        print(f"{Sensor.sensor_name}: {Sensor.value} {Sensor.unit}")
    
    # With Filters
-   result = await manipulato.get_all(filters={
+   result = await manipulator.get_all(filters={
        "sensor_name": "temperature_1"
    })
    
-   # Mit Sortierung and Liwith
-   result = await manipulato.get_all(
+   # With Sorting and Limit
+   result = await manipulator.get_all(
        order_by=tb_sensor_data.timestamp.desc(),
-       liwith=10
+       limit=10
    )
 
 Update Data (Update)
@@ -210,25 +210,25 @@ Update Data (Update)
 
 .. code-block:: python
 
-   # By Filter aktualisieren
-   result = await manipulato.update(
+   # By Filter update
+   result = await manipulator.update(
        data={"value": 25.0},
        filters={"sensor_name": "temperature_1"}
    )
    
    if result.success:
-       print(f"{result.Details} Aträge aktualisiert")
+       print(f"{result.Details} entries updated")
 
 Delete Data (Delete)
 ^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # By ID löschen
-   result = await manipulato.delete_by_id(sensor_id)
+   # By ID delete
+   result = await manipulator.delete_by_id(sensor_id)
    
-   # By Filter löschen
-   result = await manipulato.delete(filters={
+   # By Filter delete
+   result = await manipulator.delete(filters={
        "sensor_name": "old_sensor"
    })
 
@@ -259,12 +259,12 @@ The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages Redis-Ver
    # Value read
    value = await redis.get("key")
    
-   # Alle Keys onlisen
+   # All Keys online
    keys = await redis.keys("*")
 
 .. note::
-   Redis is typically via die :doc:`core/volatile`-class verwendet,
-   not direkt via RedisClient. youhe :doc:`core/volatile` for Details.
+   Redis is typically via the :doc:`core/volatile`-class used,
+   not directly via RedisClient. See :doc:`core/volatile` for details.
 
 Integration with Entity
 -----------------------
@@ -272,7 +272,7 @@ Integration with Entity
 Via VyraEntity
 ^^^^^^^^^^^^^^^
 
-Entity stellt automatically Storage Access bereit:
+Entity provides automatic Storage Access:
 
 .. code-block:: python
 
@@ -282,10 +282,10 @@ Entity stellt automatically Storage Access bereit:
    # Redis-Access
    redis = entity.storage.redis_client
    
-   # Custom Tabelle register
-   from vyra_base.storage.db_manipulato import DbManipulato
+   # Custom Table register
+   from vyra_base.storage.db_manipulato import DbManipulator
    
-   sensor_manipulato = DbManipulato(
+   sensor_manipulator = DbManipulator(
        db_access=entity.storage.db_access,
        table_structure=tb_sensor_data
    )
@@ -313,7 +313,7 @@ Database
 * Use you ``tb_`` Prefix for alle Tabellen
 * Use you UUID for Primary Keys
 * Fügen you ``timestamp`` Felder hinto
-* Use you ``DbManipulato`` for CRUD Operations
+* Use you ``DbManipulator`` for CRUD Operations
 * Definieren you Constraints (unique, nullable)
 
 ❌ **Avoid:**
@@ -328,14 +328,14 @@ Redis
 
 ✅ **Recommended:**
 
-* Use you Volatiles (See :doc:`core/volatile`)
-* Use you kurze, fromsagekräftige Keys
-* Implementieren you TTL for temporäre Daten
-* Use you TLS for Verbindungen
+* Used in Volatiles (See :doc:`core/volatile`)
+* Use short, meaningful Keys
+* Implement TTL for temporary data
+* Use TLS for connections
 
 ❌ **Avoid:**
 
-* Direkter RedisClient-Access (use you Volatile)
+* Direct RedisClient access (use the Volatile)
 * Very large values (> 1 MB)
 * Persistent data in Redis
 
@@ -349,7 +349,7 @@ Error Handling
    if result.success:
        # Success
        data = result.Details
-       print(f"Gefanden: {data}")
+       print(f"Found: {data}")
    else:
        # Error
        print(f"Error: {result.message}")
@@ -362,17 +362,17 @@ For schema changes:
 
 .. code-block:: python
 
-   # Alte Delete table (Vorsicht: data loss!)
+   # Old Delete table (Caution: data loss!)
    await db.drop_table(tb_old_data)
    
-   # Neue Create Table
+   # New Create Table
    await db.create_selected_table([tb_new_data])
    
-   # Oder: Alembic for Migrationen use (recommended)
+   # Or: Use Alembic for migrations (recommended)
 
 .. tip::
-   Für Produktionsumgebungen should you Alembic for Database-Migrationen use.
-   This enables versionierte Schema-Updates without data loss.
+   FFor production environments, you should use Alembic for database migrations.
+   This enables versioned schema updates without data loss.
    
    Further information: https://alembic.sqlalchemy.org/
 
@@ -394,5 +394,5 @@ Further Information
 * :class:`~vyra_base.storage.db_access.DbAccess` - Database-Access
 * :class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD Operations
 * :class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client
-* SQLAlchemy Dokumentation: https://docs.sqlalchemy.org/
-* Redis Dokumentation: https://redis.io/docs/
+* SQLAlchemy Documentation: https://docs.sqlalchemy.org/
+* Redis Documentation: https://redis.io/docs/

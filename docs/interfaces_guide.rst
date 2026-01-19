@@ -2,7 +2,7 @@ Interfaces
 ==========
 
 Interface Configuration Guide
-------------------------------
+-----------------------------
 
 VYRA uses JSON configuration files to define ROS2 interfaces (services, topics, and actions) for modules. These configuration files are located in ``src/<module_name>_interfaces/config/`` and automatically generate the corresponding ROS2 message types and service endpoints.
 

@@ -37,10 +37,10 @@ The COM-Modul besteht from drei Hauptbereichen:
    * **ErrorFeeder**: Automatische Error-Meldungen
 
 Quick Start
----------------
+-----------
 
-ROS2 Service onrufen
-^^^^^^^^^^^^^^^^^^^^^^
+Call ROS2 Service
+^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -53,11 +53,11 @@ ROS2 Service onrufen
        service_type=GetStatus
    )
    
-   # Service onrufen
+   # Call Service
    response = await job.call_async(request)
 
-ROS2 Service bereitstellen
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Provide ROS2 Service
+^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -71,7 +71,7 @@ ROS2 Service bereitstellen
            return response
 
 Topic publish
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 .. code-block:: python
 
@@ -88,7 +88,7 @@ Topic publish
    speaker.shout(message)
 
 Further Information
------------------------------
+-------------------
 
 * :doc:`com/ros2_communication` - ROS2 Details (Job, Callable, Speaker)
 * :doc:`com/ipc_communication` - IPC via gRPC

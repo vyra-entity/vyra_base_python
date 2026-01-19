@@ -1,24 +1,23 @@
-Parameter - Persistente Konfiguration
-======================================
+Parameter - Persistent Configuration
+====================================
 
-The :class:`~vyra_base.core.parameter.Parameter`-class manages persisttente Konfigurationsdaten,
-die in einer SQLite-Database gespeichert are.
-
-Konzept
+The :class:`~vyra_base.core.parameter.Parameter`-class manages persistent configuration data,
+which is stored in a SQLite database.
+Concept
 -------
 
-Parameter are **permanente Configuration values**, die:
+Parameter are **permanent configuration values**, which:
 
-* In einer SQLite-Database gespeichert are
-* Zwischen Modul-Neustarts erhalten bleiben
-* Via ROS2-Services togänglich are
-* Automatisch validiert are can
-* Change-Events understützen
+* Are stored in a SQLite database
+* Persist between module restarts
+* Are accessible via ROS2 services
+* Are automatically validated
+* Support change events
 
 Access via Entity
 -------------------
 
-The easiest Access is done via die VyraEntity:
+The easiest access is done via the VyraEntity:
 
 .. code-block:: python
 
@@ -46,11 +45,11 @@ Azelner Parameter
    })()
    response = type('obj', (object,), {})()
    
-   # Parameter abrufen
+   # Read parameter
    await entity.parameter.get_param(request, response)
    print(f"Value: {response.parameter_value}")
 
-Alle Parameter
+All parameters
 ^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -58,7 +57,7 @@ Alle Parameter
    request = type('obj', (object,), {})()
    response = type('obj', (object,), {})()
    
-   # Alle Parameter abrufen
+   # Read all parameters
    await entity.parameter.read_all_params(request, response)
    for param in response.parameters:
        print(f"{param.name}: {param.value}")
@@ -77,12 +76,12 @@ Set parameter
    # Set parameter
    await entity.parameter.set_param(request, response)
    if response.success:
-       print("Parameter erfolgreich gesetzt")
+       print("Parameter set successfully")
 
 default values load
 -------------------
 
-Parameter can from JSON-Dateien with default values initialisiert are:
+Parameter can be initialized from JSON files with default values:
 
 .. code-block:: python
 
@@ -90,10 +89,10 @@ Parameter can from JSON-Dateien with default values initialisiert are:
    await entity.parameter.load_defaults(
        db_session=db_session,
        config_path="/workspace/config/defaults.json",
-       reset=False  # True = bestehende Werte overwrite
+       reset=False  # True = overwrite existing values
    )
 
-**Example JSON-Struktur:**
+**Example JSON structure:**
 
 .. code-block:: json
 
@@ -115,69 +114,67 @@ Parameter can from JSON-Dateien with default values initialisiert are:
 Change-Events
 -------------
 
-Monito you Parameterchanges in Echtzeit:
+Monitor your parameter changes in real-time:
 
 .. code-block:: python
 
-   # Event-Topic abfragen
+   # Query event topic
    request = type('obj', (object,), {})()
    response = type('obj', (object,), {})()
    
    await entity.parameter.get_update_param_event_topic(request, response)
    event_topic = response.event_topic
    
-   # Listener for den Event-Topic set up (via ROS2)
-   # The Event is at jeder Parameteränderung getriggert
+   # Listener for the event topic set up (via ROS2)
+   # The event is triggered on every parameter change
 
-Datenspeicherung
-----------------
+Storage
+-------
 
 **Storage Location**: ``/workspace/storage/data/<module_name>.db``
 
-The SQLite-Database speichert Parameter in folgender Struktur:
+The SQLite database stores parameters in the following structure:
 
-* **Tabellenname**: ``tb_parameters`` (See :doc:`../storage`)
-* **Spalten**: ``name``, ``value``, ``description``, ``timestamp``
+* **Table name**: ``tb_parameters`` (See :doc:`../storage`)
+* **Columns**: ``name``, ``value``, ``description``, ``timestamp``
 * **Access**: Via SQLAlchemy ORM
 
 .. note::
-   Parameter-Database-Tabellen folgen der Naming Convention ``tb_<name>``.
-   Further information to Tabellenstruktur can be found you under :doc:`../storage`.
+   Parameter database tables follow the naming convention ``tb_<name>``.
+   Further information about table structure can be found under :doc:`../storage`.
 
-Anwendungsfälle
----------------
+Use Cases
+---------
 
-Parameter eignen sich for:
+Parameter are suitable for:
 
 ✅ **Recommended:**
 
-* Configuration values (Timeouts, Liwiths, thresholds)
+* Configuration values (Timeouts, Limits, thresholds)
 * calibration data
 * user preferences
 * system settings
 
-❌ **Nicht recommended:**
+❌ **Not recommended:**
 
 * High-frequency real-time data (use you :doc:`volatile`)
-* Große Datenmengen (> MB, use you externe Databases)
+* Large data volumes (> MB, use you external databases)
 * Temporary buffers
 
-Performance-Hinweise
---------------------
-
+Performance Notes
+-----------------
 .. warning::
    Database accesses are relatively slow (~1-10ms).
-   Avoid you frequent Parameter-Updates in Echtzeit-Schleifen.
+   Avoid frequent parameter updates in real-time loops.
 
 .. tip::
-   Cachen you oft gereade Parameter in lokalen Variablen:
+   Cache frequently read parameters in local variables:
    
    .. code-block:: python
    
-      # Amal on Start load
       max_speed = await entity.parameter.get_param(...)
       
-      # In Schleife use (without DB-Access)
+      # In loop use (without DB-Access)
       for i in range(1000):
           if speed > max_speed:
               # ...
@@ -185,7 +182,7 @@ Performance-Hinweise
 Further Information
 -----------------------------
 
-* :doc:`entity` - Entity-Dokumentation
+* :doc:`entity` - Entity Documentation
 * :doc:`volatile` - Volatile Alternative
-* :doc:`../storage` - Storage-Backend Details
-* :class:`~vyra_base.core.parameter.Parameter` - API-Referenz
+* :doc:`../storage` - Storage Backend Details
+* :class:`~vyra_base.core.parameter.Parameter` - API Reference

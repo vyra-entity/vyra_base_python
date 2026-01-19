@@ -12,7 +12,7 @@ The Core module forms the heart of the VYRA framework. All central components ar
    core/volatile
 
 Overview
----------
+--------
 
 The Core module consists of three main components:
 
@@ -21,7 +21,7 @@ The Core module consists of three main components:
 * **Volatile**: Volatile, fast data storage with Redis
 
 Component Interaction
-------------------------------
+---------------------
 
 The three components work closely together:
 
@@ -34,7 +34,7 @@ The three components work closely together:
    Use Volatiles for real-time data and fast caching.
 
 Further Information
------------------------------
+-------------------
 
 * :doc:`core/entity` - Central Entity Management
 * :doc:`core/parameter` - Persistent Parameters
