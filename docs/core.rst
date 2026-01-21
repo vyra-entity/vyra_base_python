@@ -26,7 +26,7 @@ Component Interaction
 The three components work closely together:
 
 1. **VyraEntity** initializes and orchestrates all module components
-2. **Parameter** manages persisttent configurations (slow, permanent)
+2. **Parameter** manages persistent configurations (slow, permanent)
 3. **Volatile** manages volatile real-time data (fast, temporary)
 
 .. tip::

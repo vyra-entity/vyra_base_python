@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy import event
 from sqlalchemy import inspect
@@ -137,67 +137,214 @@ class Parameter:
         return True
 
     @remote_callable
-    async def get_param(self, request: Any, response: Any) -> None:
+    async def get_parameter(self, request: Any, response: Any) -> bool:
         """
-        Get a parameter value by its key (api).
+        Get a parameter value by its key (ROS2 service interface).
+        
+        This is the external ROS2 service endpoint. For internal calls,
+        use :meth:`get_parameter_impl` instead.
 
-        :param key: The key of the parameter to retrieve.
-        :return: The value of the parameter.
-        :raises ValueError: If the parameter does not exist or if multiple parameters are found.
-        :rtype: None
+        :param request: The request object containing the key of the parameter to retrieve.
+        :type request: Any
+        :param response: The response object to store the result.
+        :type response: Any
+        :return: True if successful, False otherwise.
+        :rtype: bool
+        
+        **ROS2 Service Usage:**
+        
+        .. code-block:: bash
+        
+            ros2 service call /module_name/get_parameter \\
+                vyra_base_interfaces/srv/GetParameter \\
+                "{key: 'param_name'}"
+        
+        **Internal Usage:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.get_parameter_impl("param_name")
+            if result:
+                print(result["value"])
         """
         key = request.key
+        
+        param_return = await self.get_parameter_impl(key)
+        if param_return is None:
+            response.json_value = "[]"
+            response.success = False
+            response.message = f"Failed to retrieve parameter with key '{key}'."
+            return False
+        
+        response.json_value = param_return["value"]
+        response.success = param_return["success"]
+        response.message = param_return["message"]
+        
+        return True
+    
+    async def get_parameter_impl(self, key: str) -> Optional[dict]:
+        """
+        Get a parameter value by its key (internal implementation).
+        
+        This method contains the actual business logic for retrieving a parameter.
+        It can be called directly from Python code without going through the ROS2
+        service layer.
 
-        response.json_value = "[]"
+        :param key: The key of the parameter to retrieve.
+        :type key: str
+        :return: Dictionary with parameter data or None on error.
+        :rtype: Optional[dict]
+        
+        **Return format:**
+        
+        .. code-block:: python
+        
+            {
+                "value": "<json_serialized_parameter>",
+                "success": True,
+                "message": "Parameter 'key' retrieved successfully."
+            }
+        
+        **Example:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.get_parameter_impl("robot_speed")
+            if result and result["success"]:
+                param_data = json.loads(result["value"])
+                print(f"Speed: {param_data['value']}")
+        """
+        response: Any = {}
+        response['value'] = "[]"
 
         all_params: DBReturnValue = await self.persistant_manipulator.get_all(
             filters={"name": key})
 
         if all_params.status != DBSTATUS.SUCCESS:
-            response.success = False
-            response.message = f"Failed to retrieve parameter with key '{key}'." 
-            Logger.warn(response.message)
+            response['success'] = False
+            response['message'] = f"Failed to retrieve parameter with key '{key}'." 
+            Logger.warn(response['message'])
             return None
 
         if not isinstance(all_params.value, list):
-            response.success = False
-            response.message = "Internal error: all_params.value is not a list."
-            Logger.warn(response.message)
+            response['success'] = False
+            response['message'] = "Internal error: all_params.value is not a list."
+            Logger.warn(response['message'])
             return None
 
         all_params.value = self.persistant_manipulator.to_dict(all_params.value[0])
-        response.message = f"Parameter '{key}' retrieved successfully."
-        response.success = True
-        response.json_value = json.dumps(all_params.value)
+        response['message'] = f"Parameter '{key}' retrieved successfully."
+        response['success'] = True
+        response['value'] = json.dumps(all_params.value)
 
-        return None
+        return response
 
     @remote_callable
-    async def set_param(self, request: Any, response: Any) -> None:
+    async def set_parameter(self, request: Any, response: Any) -> None:
         """
-        Set a parameter value by its key (api).
+        Set a parameter value by its key (ROS2 service interface).
+        
+        This is the external ROS2 service endpoint. For internal calls,
+        use :meth:`set_parameter_impl` instead.
 
-        :param key: The key of the parameter to set.
-        :param value: The value to set for the parameter.
+        :param request: The request object containing key and value.
+        :type request: Any
+        :param response: The response object to update with the result.
+        :type response: Any
+        :return: None
+        :rtype: None
+        
+        **ROS2 Service Usage:**
+        
+        .. code-block:: bash
+        
+            ros2 service call /module_name/set_parameter \\
+                vyra_base_interfaces/srv/SetParameter \\
+                "{key: 'robot_speed', value: '2.5'}"
+        
+        **Internal Usage:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.set_parameter_impl("robot_speed", "2.5")
+            if result and result["success"]:
+                print("Parameter updated!")
         """
         key = request.key
         value = request.value
+        
+        param_return = await self.set_parameter_impl(key, value)
+        if param_return is None:
+            response.success = False
+            response.message = "Internal error occurred"
+            return None
+        
+        response.success = param_return["success"]
+        response.message = param_return["message"]
+        return None
+    
+    async def set_parameter_impl(self, key: str, value: Any) -> Optional[dict]:
+        """
+        Set a parameter value by its key (internal implementation).
+        
+        This method contains the actual business logic for updating a parameter.
+        It validates the input, performs type conversion, and updates the database.
+
+        :param key: The key of the parameter to set.
+        :type key: str
+        :param value: The value to set for the parameter.
+        :type value: Any
+        :return: Dictionary with success status and message, or None on error.
+        :rtype: Optional[dict]
+        
+        **Return format:**
+        
+        .. code-block:: python
+        
+            {
+                "success": True,
+                "message": "Parameter 'key' updated successfully."
+            }
+        
+        **Example:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.set_parameter_impl("robot_speed", "3.0")
+            if result and result["success"]:
+                print(result["message"])
+            else:
+                print(f"Error: {result['message'] if result else 'Unknown'}")
+        
+        **Error handling:**
+        
+        - Returns success=False if parameter doesn't exist
+        - Returns success=False if type conversion fails
+        - Returns None on internal errors
+        """
+        response: dict = {}
 
         param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
             filters={"name": key})
 
         if param_ret.status != DBSTATUS.SUCCESS:
-            response.success = False
-            response.message = f"Failed to retrieve parameter with key '{key}'."
-            return 
+            response['success'] = False
+            response['message'] = f"Failed to retrieve parameter with key '{key}'."
+            Logger.warn(response['message'])
+            return response
 
         if not isinstance(param_ret.value, list):
-            raise ValueError("param_ret.value must be a list.")
+            response['success'] = False
+            response['message'] = "Internal error: param_ret.value is not a list."
+            Logger.error(response['message'])
+            return response
+            
         if len(param_ret.value) == 0:
-            response.success = False
-            response.message = (f"Parameter with key '{key}' does not exist.")
-            Logger.warn(response.message)
-            return None
+            response['success'] = False
+            response['message'] = f"Parameter with key '{key}' does not exist."
+            Logger.warn(response['message'])
+            return response
+            
         if len(param_ret.value) > 1:
             Logger.warn(
                 f"Multiple parameters found with key '{key}'. "
@@ -208,43 +355,118 @@ class Parameter:
                 "value": (eval(param_ret.value[0].type.value))(value)
             }
         except ValueError as ve:
-            response.success = False
-            response.message = (
+            response['success'] = False
+            response['message'] = (
                 f"Failed to convert value '{value}' to type "
                 f"'{param_ret.value[0].type.value}': {ve}")
-            return None
+            Logger.error(response['message'])
+            return response
 
         update_ret: DBReturnValue = await self.persistant_manipulator.update(
             param_obj, filters={"name": key})
 
         if update_ret.status != DBSTATUS.SUCCESS:
-            response.status = False
-            response.message = f"Failed to update parameter with key '{key}'."
+            response['success'] = False
+            response['message'] = f"Failed to update parameter with key '{key}'."
+            Logger.error(response['message'])
             return response
 
-        response.status = True
-        response.message = f"Parameter '{key}' updated successfully."
-        return None
+        response['success'] = True
+        response['message'] = f"Parameter '{key}' updated successfully."
+        Logger.info(response['message'])
+        return response
 
     @remote_callable
     async def read_all_params(self, request: Any, response: Any) -> None:
         """
-        Read all parameters (api). Return a JSON string containing all parameters.
-        Example:
-        response.all_params_json = '[{"name": "param1", "value": "value1"}, ...]'
+        Read all parameters (ROS2 service interface).
         
+        This is the external ROS2 service endpoint. For internal calls,
+        use :meth:`read_all_params_impl` instead.
+        
+        Returns a JSON string containing all parameters with their metadata.
+        
+        :param request: The request object (unused).
+        :type request: Any
+        :param response: The response object to update with the result.
+        :type response: Any
         :return: None
+        :rtype: None
+        
+        **Response format:**
+        
+        .. code-block:: python
+        
+            response.all_params_json = '[{"name": "param1", "value": "value1", ...}, ...]'
+        
+        **ROS2 Service Usage:**
+        
+        .. code-block:: bash
+        
+            ros2 service call /module_name/read_all_params \\
+                vyra_base_interfaces/srv/ReadAllParams "{}"
+        
+        **Internal Usage:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.read_all_params_impl()
+            if result:
+                params = json.loads(result["all_params_json"])
+                for param in params:
+                    print(f"{param['name']}: {param['value']}")
         """
+        param_return = await self.read_all_params_impl()
+        if param_return is None:
+            response.all_params_json = "[]"
+            return None
+        
+        response.all_params_json = param_return["all_params_json"]
+        return None
+    
+    async def read_all_params_impl(self) -> Optional[dict]:
+        """
+        Read all parameters (internal implementation).
+        
+        This method retrieves all parameters from the database and serializes
+        them to JSON format.
+        
+        :return: Dictionary containing all parameters as JSON string, or None on error.
+        :rtype: Optional[dict]
+        
+        **Return format:**
+        
+        .. code-block:: python
+        
+            {
+                "all_params_json": '[{"name": "...", "value": "...", "type": "..."}, ...]'
+            }
+        
+        **Example:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.read_all_params_impl()
+            if result:
+                params = json.loads(result["all_params_json"])
+                for param in params:
+                    print(f"Parameter: {param['name']}")
+                    print(f"  Value: {param['value']}")
+                    print(f"  Type: {param['type']}")
+        """
+        response: dict = {}
+        
         ret_obj: DBReturnValue = await self.persistant_manipulator.get_all()
+        
         if not isinstance(ret_obj.value, list):
-            raise ValueError("ret_obj.value must be a list.")
+            Logger.error("Internal error: ret_obj.value is not a list.")
+            return None
 
         all_params = [
             self.persistant_manipulator.to_dict(p) for p in ret_obj.value]
 
-        response.all_params_json = json.dumps(all_params)
-
-        return None
+        response['all_params_json'] = json.dumps(all_params)
+        return response
 
     @ErrorTraceback.w_check_error_exist
     def after_update_param_callback(self, mapper, connection, target) -> None:
@@ -276,15 +498,84 @@ class Parameter:
         )
 
     @remote_callable
-    async def get_update_param_event_topic(self, request: Any, response: Any) -> None:
+    async def param_changed_topic(self, request: Any, response: Any) -> None:
         """
-        Get the topic for parameter change events (api).
+        Get the ROS2 topic name for parameter change events (ROS2 service interface).
+        
+        This is the external ROS2 service endpoint. For internal calls,
+        use :meth:`param_changed_topic_impl` instead.
+        
+        Returns the topic name where parameter change notifications are published.
+        Other modules can subscribe to this topic to receive updates.
 
-        :return: The topic for parameter change events.
+        :param request: The request object (unused).
+        :type request: Any
+        :param response: The response object to update with the result.
+        :type response: Any
+        :return: None
+        :rtype: None
+        
+        **ROS2 Service Usage:**
+        
+        .. code-block:: bash
+        
+            ros2 service call /module_name/param_changed_topic \\
+                vyra_base_interfaces/srv/ParamChangedTopic "{}"
+        
+        **Internal Usage:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.param_changed_topic_impl()
+            if result:
+                topic = result["topic"]
+                print(f"Subscribe to parameter changes: {topic}")
         """
+        param_return = await self.param_changed_topic_impl()
+        if param_return is None:
+            response.topic = ""
+            return None
+        
+        response.topic = param_return["topic"]
+        return None
+    
+    async def param_changed_topic_impl(self) -> Optional[dict]:
+        """
+        Get the ROS2 topic name for parameter change events (internal implementation).
+        
+        This method retrieves the topic name from the internal publisher server.
+        The topic is used to broadcast parameter changes to other modules.
+
+        :return: Dictionary containing the topic name, or None on error.
+        :rtype: Optional[dict]
+        
+        **Return format:**
+        
+        .. code-block:: python
+        
+            {
+                "topic": "/module_name/param_update_event"
+            }
+        
+        **Example:**
+        
+        .. code-block:: python
+        
+            result = await param_manager.param_changed_topic_impl()
+            if result:
+                # Subscribe to parameter change events
+                node.create_subscription(
+                    UpdateParamEvent,
+                    result["topic"],
+                    callback=on_param_changed
+                )
+        """
+        response: dict = {}
+        
         pub_server: VyraPublisher | None = self.update_parameter_speaker.publisher_server
         if pub_server is None:
-            raise RuntimeError("Publisher server is not initialized.")
-        else:
-            response.topic = pub_server.publisher_info.name
-        return None
+            Logger.error("Publisher server is not initialized.")
+            return None
+        
+        response['topic'] = pub_server.publisher_info.name
+        return response

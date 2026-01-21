@@ -24,7 +24,7 @@
     {
         "tags": ["ros2_srv"],
         "type": "callable",
-        "functionname": "set_param",
+        "functionname": "set_parameter",
         "displayname": "Set Parameter",
         "description": "Set a parameter in the vyra system.",
         "filetype": "VBASESetParam.srv",
@@ -65,7 +65,7 @@
     {
         "tags": ["ros2_srv"],
         "type": "callable",
-        "functionname": "get_param",
+        "functionname": "get_parameter",
         "displayname": "Get Parameter",
         "description": "Get a parameter in the vyra system.",
         "filetype": "VBASEGetParam.srv",
@@ -106,7 +106,7 @@
     {
         "tags": ["ros2_srv"],
         "type": "callable",
-        "functionname": "get_update_param_event_topic",
+        "functionname": "param_changed_topic",
         "displayname": "Get Update Parameter Event Topic",
         "description": "Get the topic for update parameter events.",
         "filetype": "VBASEGetUpdateParamEventTopic.srv",

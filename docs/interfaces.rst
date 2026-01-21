@@ -79,10 +79,10 @@ Example Metadata
    {
        "services": [
            {
-               "name": "set_param",
+               "name": "set_parameter",
                "type": "vyra_base_interfaces/srv/VBASESetParam",
                "description": "Set a parameter value",
-               "implementation": "vyra_base.core.parameter.Parameter.set_param"
+               "implementation": "vyra_base.core.parameter.Parameter.set_parameter"
            },
            {
                "name": "read_all_params",
@@ -173,7 +173,7 @@ In Python Code
    # Create service client
    job = create_vyra_job(
        node=entity.node,
-       service_name="/my_module/set_param",
+       service_name="/my_module/set_parameter",
        service_type=VBASESetParam
    )
    

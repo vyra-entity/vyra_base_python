@@ -44,10 +44,10 @@ Access to persistent configuration data via the Parameter component:
 .. code-block:: python
 
    # Read parameter
-   value = await entity.parameter.get_param(request, response)
+   value = await entity.parameter.get_parameter(request, response)
    
    # Set parameter
-   await entity.parameter.set_param(request, response)
+   await entity.parameter.set_parameter(request, response)
    
    # Read all parameters
    all_params = await entity.parameter.read_all_params(request, response)

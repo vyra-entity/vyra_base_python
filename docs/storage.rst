@@ -1,7 +1,7 @@
 Storage - Data Storage
 ======================
 
-The Storage module provides access to persisttent (SQLite) and volatile (Redis) data storage.
+The Storage module provides access to persistent (SQLite) and volatile (Redis) data storage.
 
 Overview
 --------

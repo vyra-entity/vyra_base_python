@@ -80,45 +80,98 @@ Read values
        value = await entity.volatile.get_volatile_value(key)
        print(f"{key}: {value}")
 
-Change-Events
--------------
+Change-Events & ROS2 Topic Mapping
+-----------------------------------
 
-Monitor your changes to volatiles in real-time:
+Monitor changes to volatiles in real-time and publish them automatically to ROS2 topics.
 
-Event register
-^^^^^^^^^^^^^^
+**Complete workflow to map a volatile to a ROS2 topic:**
+
+Step 1: Create the Volatile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, create a volatile parameter with an initial value:
 
 .. code-block:: python
 
-   # Change-Event for a key activate
-   await entity.volatile.add_change_event("temperature")
+   # Create volatile with initial value
+   await entity.volatile.set_volatile_value("temperature", 23.5)
 
-Event-Callback define
-^^^^^^^^^^^^^^^^^^^^^
+Step 2: Subscribe to Changes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Subscribe to change notifications for the volatile. This creates a ROS2 speaker
+and sets up Redis key-space notifications:
+
 .. code-block:: python
 
-   async def on_temperature_change(message: dict, callback_context):
-       """Called when 'temperature' changes"""
-       new_value = message.get("value")
-       print(f"Temperature changed: {new_value}°C")
+   # Subscribe to changes (creates ROS2 topic)
+   await entity.volatile.subscribe_to_changes("temperature")
+
+This automatically creates a ROS2 topic that follows the pattern:
+``/module_name/volatile/temperature``
+
+Step 3: Activate the Listener
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Activate the Redis pub/sub listener to receive change notifications:
+
+.. code-block:: python
+
+   # Activate the listener to receive notifications
+   await entity.volatile.activate_listener("temperature")
+
+Step 4: Changes Automatically Published
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now, whenever the volatile value changes, it's automatically published to the ROS2 topic:
+
+.. code-block:: python
+
+   # Any update now triggers ROS2 topic publication
+   await entity.volatile.set_volatile_value("temperature", 24.1)
+   # -> Automatically published to /module_name/volatile/temperature!
+
+Complete Example
+^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   async def setup_volatile_ros2_mapping(entity: VyraEntity):
+       \"\"\"Complete example: Map volatile to ROS2 topic\"\"\"
        
-       # Reaction to change
-       if new_value > 30:
-           print("⚠️ Temperature too high!")
-   
-   # Callback register
-   await entity.volatile.transient_event_callback(
-       message={"key": "temperature"},
-       callback_context=on_temperature_change
-   )
+       # Step 1: Create volatile
+       await entity.volatile.set_volatile_value("sensor_data", {
+           "temperature": 23.5,
+           "humidity": 60.2,
+           "timestamp": "2026-01-21T10:30:00"
+       })
+       
+       # Step 2: Subscribe to changes
+       await entity.volatile.subscribe_to_changes("sensor_data")
+       
+       # Step 3: Activate listener
+       await entity.volatile.activate_listener("sensor_data")
+       
+       # Step 4: Updates are now published to ROS2
+       while True:
+           # Read sensor (simulated)
+           new_data = read_sensor()
+           
+           # Update volatile -> triggers ROS2 publication
+           await entity.volatile.set_volatile_value("sensor_data", new_data)
+           
+           await asyncio.sleep(1)  # Update every second
 
-Event remove
-^^^^^^^^^^^^
+Unsubscribe from Changes
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To stop monitoring and remove the ROS2 topic:
 
 .. code-block:: python
 
-   # Change-Event deactivate
-   await entity.volatile.remove_change_event("temperature")
+   # Stop publishing changes to ROS2
+   await entity.volatile.unsubscribe_from_changes("temperature")
 
 Channel-Listener
 ----------------
@@ -132,49 +185,69 @@ For advanced Pub/Sub communication:
    
    # Now all messages on 'sensor_channel' are received
 
-Practical Example
-----------------
+Practical Examples
+------------------
 
-Sensor Data with Event Reaction
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sensor Data with ROS2 Publishing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
    async def sensor_monitoring_example(entity: VyraEntity):
-       """Monitor sensor data and react to changes"""
+       \"\"\"Monitor sensor data and publish changes to ROS2 topics\"\"\"
        
-       # Activate change events
-       await entity.volatile.add_change_event("temperature")
-       await entity.volatile.add_change_event("humidity")
+       # Setup: Create volatiles and subscribe to changes
+       await entity.volatile.set_volatile_value("temperature", 20.0)
+       await entity.volatile.set_volatile_value("humidity", 50.0)
        
-       # Callback for temperature changes
-       async def on_temp_change(message: dict, context):
-           temp = await entity.volatile.get_volatile_value("temperature")
-           if temp > 30:
-               # Publish warning
-               entity.publish_error("Temperature critical!")
+       await entity.volatile.subscribe_to_changes("temperature")
+       await entity.volatile.subscribe_to_changes("humidity")
+       await entity.volatile.activate_listener("temperature")
        
-       # Update sensor data (e.g., in a loop)
+       # Monitor and publish sensor data
        while True:
            # Read data from sensor (simulated)
            current_temp = read_sensor_temperature()
            current_humidity = read_sensor_humidity()
            
-           # Store in volatiles (triggers change events)
+           # Update volatiles -> automatically published to ROS2 topics
            await entity.volatile.set_volatile_value("temperature", current_temp)
            await entity.volatile.set_volatile_value("humidity", current_humidity)
            
-           await asyncio.sleep(1)  # Update every second
-Inter-Module Communication (IMC)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+           # React to critical values
+           if current_temp > 30:
+               entity.news_feeder.feed("⚠️ Temperature critical!")
+           
+           await asyncio.slvia ROS2
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Module A: Provide data
-   await entity_a.volatile.set_volatile_value("shared_status", "running")
+   # Module A: Publish status via volatile -> ROS2 topic
+   async def module_a_publisher(entity_a: VyraEntity):
+       # Setup volatile with ROS2 publishing
+       await entity_a.volatile.set_volatile_value("module_a_status", "idle")
+       await entity_a.volatile.subscribe_to_changes("module_a_status")
+       await entity_a.volatile.activate_listener("module_a_status")
+       
+       # Status updates are now published to ROS2
+       await entity_a.volatile.set_volatile_value("module_a_status", "running")
+       await entity_a.volatile.set_volatile_value("module_a_status", "completed")
    
-   # Module B: Read data
-   status = await entity_b.volatile.get_volatile_value("shared_status")
+   # Module B: Subscribe to Module A's ROS2 topic
+   async def module_b_subscriber(entity_b: VyraNode):
+       # Subscribe to the ROS2 topic created by Module A
+       # Topic name: /module_a/volatile/module_a_status
+       
+       def on_status_received(msg):
+           print(f"Module A status: {msg}")
+       
+       entity_b.create_subscription(
+           msg_type=String,  # or appropriate type
+           topic='/module_a/volatile/module_a_status',
+           callback=on_status_received,
+           qos_profile=10
+       volatile_value("shared_status")
    print(f"Status of Module A: {status}")
 .. note::
    Both modules must use the same Redis server (default in the VYRA system).
@@ -199,22 +272,31 @@ Performance
 
 * Writing: ~0.1 - 0.5 ms
 * Reading: ~0.1 - 0.3 ms
-* Event Trigger: ~1 - 5 ms
-.. important::
-   Volatiles are **100x faster** than Parameters (SQLite).
-   Use your Volatiles for high-frequency data operations!
+* EveSubscribe to changes for values that other modules need
+   await volatile.subscribe_to_changes("robot_pose")
+   await volatile.activate_listener("robot_pose")
+   
+   # Always create the volatile before subscribing
+   await volatile.set_volatile_value("status", "idle")  # First!
+   await volatile.subscribe_to_changes("status")        # Then!
 
-Best Practices
---------------
-
-✅ **Recommended:**
+❌ **Avoid:**
 
 .. code-block:: python
 
-   # Short, meaningful keys
-   await volatile.set_volatile_value("temp_sensor_1", 23.5)
+   # Don't subscribe before creating the volatile
+   await volatile.subscribe_to_changes("status")  # ❌ KeyError!
+   await volatile.set_volatile_value("status", "idle")
    
-   # Structured data for related values
+   # Very long keys
+   await volatile.set_volatile_value("this_is_a_very_long_key_name...", value)
+   
+   # Very large data structures (> 1 MB)
+   await volatile.set_volatile_value("huge_data", very_large_object)
+   
+   # High-frequency subscriptions without need
+   for i in range(10000):
+       await volatile.subscribe_to_changess
    await volatile.set_volatile_value("robot_pose", {
        "x": 1.5, "y": 2.3, "theta": 0.78
    })

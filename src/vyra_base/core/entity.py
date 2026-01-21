@@ -136,9 +136,7 @@ class VyraEntity:
 
         self.state_machine: UnifiedStateMachine = self._init_state_machine(state_entry)
 
-        self.security_manager: Optional[SecurityManager] = None
-        if module_config.get('security', {}).get('enabled', False):
-            self.security_manager = self._init_security_manager(module_config)
+        self._init_security_manager(module_config)
 
         VyraEntity.register_callables_callbacks(self)
 
@@ -541,17 +539,7 @@ class VyraEntity:
             self.error_feeder.feed(error_entry)
             return False
 
-    def _init_state_machine_legacy(self, state_entry: StateEntry) -> UnifiedStateMachine:
-        """
-        Legacy initialization method (deprecated).
-        
-        This method is kept for backward compatibility but should not be used.
-        Use _init_state_machine() instead.
-        """
-        Logger.warning("Using legacy state machine initialization (deprecated)")
-        return self._init_state_machine(state_entry)
-
-    def _init_security_manager(self, module_config: dict[str, Any]) -> SecurityManager:
+    def _init_security_manager(self, module_config: dict[str, Any]):
         """
         Initialize the security manager for the entity.
 
@@ -589,13 +577,15 @@ class VyraEntity:
             f"{SecurityLevel.get_name(max_level)}"
         )
         
-        return SecurityManager(
+        self.security_manager = SecurityManager(
             max_security_level=max_level,
             session_duration_seconds=session_duration,
             ca_key_path=ca_key_path,
             ca_cert_path=ca_cert_path,
             module_passwords=module_passwords
         )
+
+        VyraEntity.register_callables_callbacks(self.security_manager)
 
     async def setup_storage(
             self, config: dict[str, Any], 
@@ -741,9 +731,7 @@ class VyraEntity:
                     "Supported types are callable, job, speaker."
                 )
                 Logger.error(fail_msg)
-                raise ValueError(fail_msg)
-        
-            
+                raise ValueError(fail_msg) 
 
     def register_storage(self, storage: Storage) -> None:
         """
@@ -771,124 +759,100 @@ class VyraEntity:
         """
         checker_node = CheckerNode()
         return checker_node.is_node_available(node_name)
-
-    # @remote_callable
-    # async def trigger_transition(self, request: Any, response: Any) -> None:
-    #     """
-    #     Trigger a state transition for the entity from internal or remote.
-
-    #     :param request: The request containing the transition name.
-    #     :type request: Any
-    #     :param response: The response object to update with the result.
-    #     :type response: Any
-    #     :raises NotImplementedError: If the method is not implemented in the subclass.
-    #     :returns: None
-    #     :rtype: None
-    #     """
-    #     # TEST -----------------------------------------------------
-    #     # from vyra_base.storage.db_manipulator import DbManipulator
-    #     # from vyra_base.storage.tb_params import Parameter
-    #     # self.mr_manipulator = DbManipulator(
-    #     #     self.database_access, 
-    #     #     Parameter
-    #     # )
-    #     # Logger.log(await self.mr_manipulator.get_all())
-    #     # ----------------------------------------------------------
-
-    #     trigger_list = [t['trigger'] for t in self.state_machine.all_transitions]
-    #     if request.trigger_name not in trigger_list:
-    #         fail_msg = (
-    #             f"Transition {request.trigger_name} not found in "
-    #             f"available transitions: {trigger_list}."
-    #         )
-            
-    #         response.success = False
-    #         response.message = fail_msg
-    #         Logger.warn(fail_msg)
-    #         return None
-        
-    #     can_trigger, possible_trigger = self.state_machine.is_transition_possible(
-    #         request.trigger_name)
-
-    #     if not can_trigger:
-    #         fail_msg = (
-    #             f"Transition {request.trigger_name} not possible in "
-    #             f"current state {self.state_machine.model.state}."
-    #             f" Possible transitions are: {possible_trigger}."
-    #         )
-            
-    #         response.success = False
-    #         response.message = fail_msg
-    #         Logger.warn(fail_msg)
-    #         return None
-        
-    #     getattr(self.state_machine.model, f"{request.trigger_name}")()
-
-    #     response.success = True
-    #     response.message = f"Transition {request.trigger_name} triggered successfully."
-
-    #     self.news_feeder.feed(
-    #         f"Transition {request.trigger_name} triggered successfully."
-    #     )
-
-    # @remote_callable
-    # async def startup(self, request: Any, response: Any) -> None:
-    #     """
-    #     Start up the entity and initialize its components.
-
-    #     :param request: The request object containing startup parameters.
-    #     :type request: Any
-    #     :param response: The response object to update with the result.
-    #     :type response: Any
-    #     :raises NotImplementedError: If the method is not implemented in the subclass.
-    #     :returns: None
-    #     :rtype: None
-    #     """
-        
-    #     can_trigger, possible_trigger = self.state_machine.is_transition_possible(
-    #         'StartUp')
-
-    #     if not can_trigger:
-    #         fail_msg = (
-    #             f"<StartUp> not possible in "
-    #             f"current state {self.state_machine.model.state}."
-    #             f" Possible transitions are: {possible_trigger}."
-    #         )
-            
-    #         response.success = False
-    #         response.message = fail_msg
-    #         Logger.warn(fail_msg)
-    #         return None
-        
-    #     getattr(self.state_machine.model, f"StartUp")()
-
-    #     response.success = True
-    #     response.message = f"<StartUp> triggered successfully."
-
-    #     self.news_feeder.feed(
-    #         f"<StartUp> triggered successfully."
-    #     )
     
     @remote_callable
     async def get_interface_list(self, request: Any, response: Any) -> Any:
         """
         Retrieves all capabilities (speaker, callable, job) of the entity that are set to
-        visible from the module to external access.
+        visible for external access (ROS2 service interface).
+        
+        This is the external ROS2 service endpoint. For internal calls,
+        use :meth:`get_interface_list_impl` instead.
+        
+        Returns a list of JSON-serialized interface configurations showing which
+        ROS2 services, topics, and jobs are available for this module.
 
-        :param request: The request object.
+        :param request: The request object (unused).
         :type request: Any
         :param response: The response object to update with the result.
         :type response: Any
-        :returns: None
+        :return: None
         :rtype: Any
+        
+        **ROS2 Service Usage:**
+        
+        .. code-block:: bash
+        
+            ros2 service call /module_name/get_interface_list \\
+                vyra_base_interfaces/srv/GetInterfaceList "{}"
+        
+        **Internal Usage:**
+        
+        .. code-block:: python
+        
+            result = await entity.get_interface_list_impl()
+            if result:
+                interfaces = [json.loads(i) for i in result["interface_list"]]
+                for interface in interfaces:
+                    print(f"Interface: {interface['functionname']}")
+                    print(f"  Type: {interface['type']}")
+                    print(f"  Description: {interface['description']}")
         """
+        interface_return = await self.get_interface_list_impl()
+        if interface_return is None:
+            response.interface_list = []
+            return None
+        
+        response.interface_list = interface_return["interface_list"]
+        return None
+    
+    async def get_interface_list_impl(self) -> Optional[dict]:
+        """
+        Retrieves all capabilities (speaker, callable, job) of the entity that are set to
+        visible for external access (internal implementation).
+        
+        This method filters the registered interfaces for those marked as visible
+        and returns them as JSON-serialized strings. Useful for service discovery
+        and dynamic interface introspection.
+
+        :return: Dictionary containing list of interfaces, or None on error.
+        :rtype: Optional[dict]
+        
+        **Return format:**
+        
+        .. code-block:: python
+        
+            {
+                "interface_list": [
+                    '{"functionname": "...", "type": "callable", ...}',
+                    '{"functionname": "...", "type": "speaker", ...}',
+                    ...
+                ]
+            }
+        
+        **Example:**
+        
+        .. code-block:: python
+        
+            result = await entity.get_interface_list_impl()
+            if result:
+                for interface_json in result["interface_list"]:
+                    interface = json.loads(interface_json)
+                    
+                    if interface["type"] == "callable":
+                        print(f"Service: {interface['functionname']}")
+                    elif interface["type"] == "speaker":
+                        print(f"Topic: {interface['functionname']}")
+        """
+        response: dict = {}
         response_interface_list = []
+        
         for interface in self._interface_list:
             if interface.displaystyle.visible:
                 response_interface_list.append(json.dumps(interface.asdict()))
 
-        response.interface_list = response_interface_list
-        return None
+        response["interface_list"] = response_interface_list
+        return response
 
     @staticmethod
     def register_callables_callbacks(callback_parent: object):

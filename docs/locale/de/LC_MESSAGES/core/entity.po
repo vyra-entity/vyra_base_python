@@ -47,13 +47,13 @@ msgid "Parameter Management"
 msgstr ""
 
 #: ../../core/entity.rst:42 99c2bf15bcc34636ab964d6cc5c696fb
-msgid "Access to persisttent configuration data via the Parameter component:"
+msgid "Access to persistent configuration data via the Parameter component:"
 msgstr ""
 
 #: ../../core/entity.rst:55 89f6caedb6f745a49025a53a38c03def
 msgid ""
 "Parameters are stoed in a **SQLite database** in the module under "
-"``/workspace/storage/data/``. This enables persisttent data storage between"
+"``/workspace/storage/data/``. This enables persistent data storage between"
 " restarts."
 msgstr ""
 

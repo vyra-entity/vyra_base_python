@@ -27,6 +27,7 @@ import rclpy
 from rclpy.node import Node
 from builtin_interfaces.msg import Time
 
+from vyra_base.com.datalayer.interface_factory import remote_callable
 from vyra_base.security.security_levels import (
     SecurityLevel,
     AccessStatus,
@@ -158,6 +159,47 @@ class SecurityManager:
                 Logger.info(f"Loaded CA certificate from {ca_cert_path}")
         except Exception as e:
             Logger.error(f"Failed to load CA infrastructure: {e}")
+
+    @remote_callable
+    async def request_access(self, request, response) -> bool:
+        """
+        Remote callable wrapper for handle_request_access.
+        
+        :param request: Request object with access parameters
+        :param response: Response object to populate
+        :return: True if handled successfully, False otherwise
+        """
+        try:
+            (
+                success,
+                message,
+                session_token,
+                hmac_key,
+                certificate,
+                expires_at,
+                granted_sl
+            ) = await self.handle_request_access(
+                module_name=request.module_name,
+                module_id=request.module_id,
+                requested_role=request.requested_role,
+                requested_sl=request.requested_sl,
+                password=request.password,
+                certificate_csr=request.certificate_csr
+            )
+            
+            response.success = success
+            response.message = message
+            response.session_token = session_token
+            response.hmac_key = hmac_key
+            response.certificate = certificate
+            response.expires_at = Time(sec=int(expires_at.timestamp()), nanosec=0)
+            response.granted_sl = granted_sl
+            
+            return True
+        except Exception as e:
+            Logger.error(f"Error handling request_access: {e}")
+            return False
+    
 
     async def handle_request_access(
         self,

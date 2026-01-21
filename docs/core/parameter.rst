@@ -26,15 +26,15 @@ The easiest access is done via the VyraEntity:
    entity = VyraEntity(...)
    
    # Read parameter
-   value = await entity.parameter.get_param(request, response)
+   value = await entity.parameter.get_parameter(request, response)
    
    # Set parameter
-   await entity.parameter.set_param(request, response)
+   await entity.parameter.set_parameter(request, response)
 
 Read parameter
 ---------------
 
-Azelner Parameter
+Single Parameter
 ^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -46,7 +46,7 @@ Azelner Parameter
    response = type('obj', (object,), {})()
    
    # Read parameter
-   await entity.parameter.get_param(request, response)
+   await entity.parameter.get_parameter(request, response)
    print(f"Value: {response.parameter_value}")
 
 All parameters
@@ -74,7 +74,7 @@ Set parameter
    response = type('obj', (object,), {})()
    
    # Set parameter
-   await entity.parameter.set_param(request, response)
+   await entity.parameter.set_parameter(request, response)
    if response.success:
        print("Parameter set successfully")
 
@@ -122,7 +122,7 @@ Monitor your parameter changes in real-time:
    request = type('obj', (object,), {})()
    response = type('obj', (object,), {})()
    
-   await entity.parameter.get_update_param_event_topic(request, response)
+   await entity.parameter.param_changed_topic(request, response)
    event_topic = response.event_topic
    
    # Listener for the event topic set up (via ROS2)
@@ -172,7 +172,7 @@ Performance Notes
    
    .. code-block:: python
    
-      max_speed = await entity.parameter.get_param(...)
+      max_speed = await entity.parameter.get_parameter(...)
       
       # In loop use (without DB-Access)
       for i in range(1000):

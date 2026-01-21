@@ -1,76 +1,60 @@
-# VBASESecurityRequestAccess.srv
-# "params": [
-#     {
-#         "datatype": "string",
-#         "displayname": "certificate",
-#         "description": "The certificate to use for authentication"
-#     },
-#     {
-#         "datatype": "uuid",
-#         "displayname": "module_id",
-#         "description": "The ID of the module to access"
-#     },
-#     {
-#         "datatype": "int",
-#         "displayname": "requested_level",
-#         "description": "The requested access level (1: Read, 2: Extended Read, 3: Control and Parameter, 4: Extended Control, 5: Full Access)"
-#     },
-#     {
-#         "datatype": "string",
-#         "displayname": "level_4_psw",
-#         "description": "Password for level 4 access (optional)"
-#     },
-#     {
-#         "datatype": "string",
-#         "displayname": "level_5_passkey",
-#         "description": "Passkey for level 5 access (optional)"
-#     }
-# ],
-# "returns": [
-#     {
-#         "name": "access_status",
-#         "datatype": "int",
-#         "displayname": "Access Status",
-#         "description": "The access status, e.g., '0:ACCESS_GRANTED', '1:ACCESS_DENIED', '2:MISSING_ACCESS_PARAMETERS', '3:INTERNAL_ERROR'"
-#     },
-#     {
-#         "name": "granted_level",
-#         "datatype": "int",
-#         "displayname": "Granted Level",
-#         "description": "The granted access level"
-#     },
-#     {
-#         "name": "expiry_timestamp",
-#         "datatype": "int64",
-#         "displayname": "Expiry Timestamp",
-#         "description": "The timestamp (in epoch format) when the access expires"
-#     },
-#     {
-#         "name": "access_token",
-#         "datatype": "string",
-#         "displayname": "Access Token",
-#         "description": "The access token to be used for subsequent authenticated requests"
-#     },
-#     {
-#         "name": "refresh_token",
-#         "datatype": "string",
-#         "displayname": "Refresh Token",
-#         "description": "The refresh token to renew the access token when it expires"
-#     },
-#     {
-#         "name": "token_type",
-#         "datatype": "string",
-#         "displayname": "Token Type",
-#         "description": "The type of the access token (e.g., 'Bearer')"
-#     },
-#     {
-#         "name": "message",
-#         "datatype": "string",
-#         "displayname": "Message",
-#         "description": "Additional information about the access request"
-#     }
-# ]
+# VBASERequestAccess.srv
+# Request access to a module with a specific security level
+# This service is used by Module A to authenticate with Module B
 
 # Request
+# Name of the module requesting access (e.g., "v2_modulemanager")
 string module_name
-string access_type  # e.g., "read", "control", etc.
+
+# Unique identifier (UUID) of the requesting module
+unique_identifier_msgs/UUID module_id
+
+# Role identifier for the requesting module
+# Custom designation for identification (e.g., "operator", "supervisor", "maintenance")
+string requested_role
+
+# Requested security level (1-5):
+# 1 = NONE: No authentication required
+# 2 = BASIC_AUTH: Module ID verification only
+# 3 = EXTENDED_AUTH: Module ID + password authentication
+# 4 = HMAC: HMAC-SHA256 signature validation (message integrity)
+# 5 = DIGITAL_SIGNATURE: Certificate-based digital signature (full PKI)
+uint8 requested_sl
+
+# Password for Level 3 (EXTENDED_AUTH) authentication
+# Required for security level 3, optional for others
+string password
+
+# Certificate Signing Request (CSR) for Level 5 authentication
+# Base64 encoded PEM format CSR
+# Required only for security level 5
+string certificate_csr
+
+---
+# Response
+# Indicates if access was granted
+bool success
+
+# Human-readable message about the access request result
+string message
+
+# Session token for subsequent authenticated requests
+# Valid for the duration specified in expires_at
+# Token format: JWT or random UUID
+string session_token
+
+# HMAC key for Level 4 security (hex-encoded shared secret)
+# Used to sign messages with HMAC-SHA256
+# Empty for security levels < 4
+string hmac_key
+
+# Certificate for Level 5 security (PEM format)
+# Signed certificate issued by the module's CA
+# Empty for security levels < 5
+string certificate
+
+# Timestamp when the session token expires
+builtin_interfaces/Time expires_at
+
+# Granted security level (may differ from requested if downgraded)
+uint8 granted_sl

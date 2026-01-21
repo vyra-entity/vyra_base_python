@@ -25,7 +25,7 @@ msgstr ""
 
 #: ../../storage.rst:4 9a81265a7af84fc2b1c770df6711c156
 msgid ""
-"The Storage module provides access to persisttent (SQLite) and volatile "
+"The Storage module provides access to persistent (SQLite) and volatile "
 "(Redis) data storage."
 msgstr ""
 

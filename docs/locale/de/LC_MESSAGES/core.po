@@ -64,7 +64,7 @@ msgid "**VyraEntity** initializes and orchestrates all module components"
 msgstr "**VyraEntity** initialisiert und orchestriert alle Modulkomponenten"
 
 #: ../../core.rst:29 88354b683c8c4a8d91bd5faa6ed50169
-msgid "**Parameter** manages persisttent configurations (slow, permanent)"
+msgid "**Parameter** manages persistent configurations (slow, permanent)"
 msgstr "**Parameter** verwaltet persistente Konfigurationen (langsam, permanent)"
 
 #: ../../core.rst:30 1df1c90424e1456a9509a49c7025409e

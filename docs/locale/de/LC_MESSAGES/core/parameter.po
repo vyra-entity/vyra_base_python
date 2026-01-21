@@ -26,7 +26,7 @@ msgstr ""
 #: ../../core/parameter.rst:4 296c38e1299e48f7b36f967cc39c766d
 msgid ""
 "The :class:`~vyra_base.core.parameter.Parameter`-class manages "
-"persisttente Konfigurationsdaten, die in einer SQLite-Datenbank "
+"persistente Konfigurationsdaten, die in einer SQLite-Datenbank "
 "gespeichert are."
 msgstr ""
 
@@ -71,7 +71,7 @@ msgid "Read parameter"
 msgstr ""
 
 #: ../../core/parameter.rst:39 a9966354496f4f61be0e01cf4802acf7
-msgid "Azelner Parameter"
+msgid "Single Parameter"
 msgstr ""
 
 #: ../../core/parameter.rst:54 71d7ec79f3854e78ba8fe3faf5322db4

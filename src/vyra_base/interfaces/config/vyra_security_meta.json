@@ -5,7 +5,7 @@
         "functionname": "request_access",
         "displayname": "Request Access",
         "description": "Request access to this module with a specific security level. This service is used by Module A to authenticate with Module B. The latest successful authentication replaces all previous sessions.",
-        "filetype": "VBASERequestAccess.srv",
+        "filetype": "VBASESecurityRequestAccess.srv",
         "params": [
             {
                 "displayname": "module_name",
