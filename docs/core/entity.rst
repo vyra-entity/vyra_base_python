@@ -39,18 +39,49 @@ Main Functions
 Parameter Management
 ^^^^^^^^^^^^^^^^^^^^
 
-Access to persistent configuration data via the Parameter component:
+Access to persistent configuration data via the Parameter component.
+
+**Internal API** (``_impl`` methods):
+
+For use **within your module**, call the ``_impl`` methods directly:
 
 .. code-block:: python
 
-   # Read parameter
-   value = await entity.parameter.get_parameter(request, response)
+   # Read parameter (internal)
+   result = await entity.param_manager.get_parameter_impl("max_speed")
+   if result and result["success"]:
+       param_data = json.loads(result["value"])
+       print(f"Max Speed: {param_data['value']}")
    
-   # Set parameter
-   await entity.parameter.set_parameter(request, response)
+   # Set parameter (internal)
+   result = await entity.param_manager.set_parameter_impl(
+       key="max_speed",
+       value="120.0"
+   )
+   if result and result["success"]:
+       print(f"✅ {result['message']}")
    
-   # Read all parameters
-   all_params = await entity.parameter.read_all_params(request, response)
+   # Read all parameters (internal)
+   result = await entity.param_manager.read_all_params_impl()
+   if result:
+       params = json.loads(result["all_params_json"])
+       for param in params:
+           print(f"{param['name']}: {param['value']}")
+
+**External API** (ROS2 services):
+
+For access from **other modules** or via ROS2:
+
+.. code-block:: python
+
+   # Read parameter (ROS2 service)
+   await entity.param_manager.get_parameter(request, response)
+   
+   # Set parameter (ROS2 service)
+   await entity.param_manager.set_parameter(request, response)
+   
+   # Read all parameters (ROS2 service)
+   await entity.param_manager.read_all_params(request, response)
 
 Parameters are stored in a **SQLite database** in the module under ``/workspace/storage/data/``.
 This enables persistent data storage between restarts.
@@ -58,25 +89,34 @@ This enables persistent data storage between restarts.
 .. note::
    Parameters are suitable for configuration data that must be stored permanently.
    Database accesses are relatively slow, therefore not suitable for real-time data.
+   
+.. tip::
+   **Performance:** Use ``_impl`` methods for internal calls to avoid ROS2 serialization overhead.
+   This is significantly faster (~10x) than going through the ROS2 service layer.
 
 Volatile Management
 ^^^^^^^^^^^^^^^^^^^
 
-Access to volatile, fast data via the Volatile component:
+Access to volatile, fast data via the Volatile component.
+
+**Note:** Volatile methods are **already internal methods** - they don't have
+a separate ROS2 service interface. All volatile operations are designed for
+internal module use:
 
 .. code-block:: python
 
-   # Set volatile value
+   # Set volatile value (internal only)
    await entity.volatile.set_volatile_value("sensor_data", temperature)
    
-   # Read volatile value
+   # Read volatile value (internal only)
    value = await entity.volatile.get_volatile_value("sensor_data")
    
-   # Read all volatile names
+   # Read all volatile names (internal only)
    all_keys = await entity.volatile.read_all_volatile_names()
    
-   # Regiser event listener for changes
-   await entity.volatile.add_change_event("sensor_data")
+   # Subscribe to changes -> creates ROS2 topic for external access
+   await entity.volatile.subscribe_to_changes("sensor_data")
+   await entity.volatile.activate_listener("sensor_data")
 
 Volatiles use **Redis** for fast in-memory data storage.
 This data is **volatile** - it is lost on restart.
@@ -86,8 +126,12 @@ This data is **volatile** - it is lost on restart.
    
    * Sensor data and real-time information
    * Temporary intermediate results
-   * Fast inter-module communication
+   * Fast inter-module communication via ROS2 topics
    * Event-based triggers
+   
+   **Inter-module communication:** While volatiles are set internally,
+   you can publish changes to ROS2 topics using ``subscribe_to_changes()``.
+   Other modules can then subscribe to these topics.
 
 ROS2 Communication
 ^^^^^^^^^^^^^^^^^^
@@ -131,7 +175,45 @@ ROS2 interfaces are defined via JSON metadata and registered automatically:
    # Load and register interfaces from JSON
    interfaces = await entity.load_interfaces_from_config()
    await entity.set_interfaces(interfaces)
+Interface Introspection
+^^^^^^^^^^^^^^^^^^^^^^^
 
+Query available interfaces programmatically:
+
+**Internal API:**
+
+.. code-block:: python
+
+   # Get interface list (internal)
+   result = await entity.get_interface_list_impl()
+   
+   if result:
+       for interface_json in result["interface_list"]:
+           interface = json.loads(interface_json)
+           print(f"Interface: {interface['functionname']}")
+           print(f"  Type: {interface['type']}")
+           print(f"  Visible: {interface['displaystyle']['visible']}")
+
+**External API (ROS2 service):**
+
+.. code-block:: python
+
+   # Get interface list (ROS2 service)
+   request = type('obj', (object,), {})()
+   response = type('obj', (object,), {})()
+   
+   await entity.get_interface_list(request, response)
+   
+   for interface_json in response.interface_list:
+       interface = json.loads(interface_json)
+       print(f"Interface: {interface['functionname']}")
+
+**ROS2 CLI:**
+
+.. code-block:: bash
+
+   ros2 service call /module_name/get_interface_list \\
+       vyra_base_interfaces/srv/GetInterfaceList "{}"
 Lifecycle Management
 --------------------
 

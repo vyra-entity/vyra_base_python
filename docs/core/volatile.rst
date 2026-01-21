@@ -40,18 +40,30 @@ Access via Entity
    
    entity = VyraEntity(...)
    
-   # Volatile-Access
+   # Volatile-Access (all methods are internal - no ROS2 services)
    volatile = entity.volatile
+
+.. note::
+   **Important:** Unlike Parameters, Volatile methods do **not** have a separate
+   ROS2 service interface. All volatile operations (``set_volatile_value``,
+   ``get_volatile_value``, etc.) are **internal methods** designed for use
+   within your module's Python code.
+   
+   However, you can **publish volatile changes to ROS2 topics** using
+   ``subscribe_to_changes()`` - see :ref:`ros2-topic-mapping` for details.
 
 Set value
 ------------
 
+All volatile operations are **internal methods** - they are called directly
+from your Python code without going through ROS2 services:
+
 .. code-block:: python
 
-   # Value set
+   # Set value (internal method)
    await entity.volatile.set_volatile_value("temperature", 23.5)
    
-   # Complex data (are automatically serialized)
+   # Complex data (automatically serialized)
    await entity.volatile.set_volatile_value("sensor_data", {
        "temperature": 23.5,
        "humidity": 60.2,
@@ -61,13 +73,19 @@ Set value
    # Lists/Arrays
    await entity.volatile.set_volatile_value("measurements", [1, 2, 3, 4, 5])
 
-Read values
------------
+All read operations are **internal methods**:
 
 .. code-block:: python
 
-   # Read single value
+   # Read single value (internal method)
    temperature = await entity.volatile.get_volatile_value("temperature")
+   print(f"Current temperature: {temperature}°C")
+   
+   # Complex data
+   sensor_data = await entity.volatile.get_volatile_value("sensor_data")
+   print(f"Temperature: {sensor_data['temperature']}")
+   
+   # Read all existing keys (internal method)ty.volatile.get_volatile_value("temperature")
    print(f"Current temperature: {temperature}°C")
    
    # Complex data
@@ -78,38 +96,51 @@ Read values
    all_keys = await entity.volatile.read_all_volatile_names()
    for key in all_keys:
        value = await entity.volatile.get_volatile_value(key)
-       print(f"{key}: {value}")
+.. _ros2-topic-mapping:
 
 Change-Events & ROS2 Topic Mapping
 -----------------------------------
+
+While volatile methods themselves are internal, you can **publish volatile changes
+to ROS2 topics** for inter-module communication. This allows other modules to
+.. important::
+   **Internal vs. External:**
+    (Internal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, create a volatile parameter with an initial value using the **internal method**:
+
+.. code-block:: python
+
+   # Create volatile with initial value (internal method)
 
 Monitor changes to volatiles in real-time and publish them automatically to ROS2 topics.
 
 **Complete workflow to map a volatile to a ROS2 topic:**
 
 Step 1: Create the Volatile
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-First, create a volatile parameter with an initial value:
-
-.. code-block:: python
-
-   # Create volatile with initial value
-   await entity.volatile.set_volatile_value("temperature", 23.5)
-
-Step 2: Subscribe to Changes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^ (Setup ROS2 Publishing)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Subscribe to change notifications for the volatile. This creates a ROS2 speaker
 and sets up Redis key-space notifications:
 
 .. code-block:: python
 
-   # Subscribe to changes (creates ROS2 topic)
-   await entity.volatile.subscribe_to_changes("temperature")
+   # Subscribe to changes -> creates ROS2 topic (internal method
+Step 2: Subscribe to Changes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This automatically creates a ROS2 topic that follows the pattern:
-``/module_name/volatile/temperature``
+Subscribe to change notifications for the volatile. This creates a ROS2 speaker
+and sets up Redis key-space notifications:
+ (Internal)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Activate the Redis pub/sub listener to receive change notifications:
+
+.. code-block:: python
+
+   # Activate the listener to receive notifications (internal method)
 
 Step 3: Activate the Listener
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -121,16 +152,19 @@ Activate the Redis pub/sub listener to receive change notifications:
    # Activate the listener to receive notifications
    await entity.volatile.activate_listener("temperature")
 
-Step 4: Changes Automatically Published
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Step 4: Changes Automatically Published (Internal → External)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Now, whenever the volatile value changes, it's automatically published to the ROS2 topic:
+Now, whenever the volatile value changes internally, it's automatically published
+to the ROS2 topic for external subscribers:
 
 .. code-block:: python
 
-   # Any update now triggers ROS2 topic publication
+   # Any update now triggers ROS2 topic publication (internal method)
    await entity.volatile.set_volatile_value("temperature", 24.1)
    # -> Automatically published to /module_name/volatile/temperature!
+   
+   # You update internally, other modules receive via ROS2 topic subscription
 
 Complete Example
 ^^^^^^^^^^^^^^^^

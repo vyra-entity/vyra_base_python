@@ -25,58 +25,157 @@ The easiest access is done via the VyraEntity:
    
    entity = VyraEntity(...)
    
-   # Read parameter
-   value = await entity.parameter.get_parameter(request, response)
+   # External access via ROS2 services (requires request/response objects)
+   value = await entity.param_manager.get_parameter(request, response)
    
-   # Set parameter
-   await entity.parameter.set_parameter(request, response)
+   # Internal access via _impl methods (direct, without ROS2 overhead)
+   result = await entity.param_manager.get_parameter_impl("max_speed")
+
+Internal vs. External API
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Parameter functions are available in **two variants**:
+
+**1. ROS2 Service Interface** (``@remote_callable``)
+   - For external access via ROS2 services
+   - Requires ``request`` and ``response`` objects
+   - Used by other modules or external systems
+   - Example: ``get_parameter(request, response)``
+
+**2. Internal Implementation** (``_impl`` suffix)
+   - For internal module use (Python code)
+   - Direct function calls without ROS2 overhead
+   - Returns Python dictionaries
+   - Example: ``get_parameter_impl(key)``
+
+.. tip::
+   **When to use which?**
+   
+   - Use ``_impl`` methods when calling from **within your module**
+   - Use ROS2 services when calling from **other modules** or **external systems**
+   
+   The ``_impl`` methods are **faster** as they skip the ROS2 serialization layer.
 
 Read parameter
 ---------------
 
-Single Parameter
-^^^^^^^^^^^^^^^^^^^
+Single Parameter (Internal API)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For use **within your module**, use the ``_impl`` method:
 
 .. code-block:: python
 
-   # Request prepare (simplifies)
+   # Direct internal call
+   result = await entity.param_manager.get_parameter_impl("max_speed")
+   
+   if result and result["success"]:
+       param_data = json.loads(result["value"])
+       print(f"Max Speed: {param_data['value']}")
+   else:
+       print(f"Error: {result['message'] if result else 'Unknown error'}")
+
+Single Parameter (ROS2 Service)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For external access via ROS2 services:
+
+.. code-block:: python
+
+   # Request prepare
    request = type('obj', (object,), {
-       'parameter_name': 'max_speed'
+       'key': 'max_speed'
    })()
    response = type('obj', (object,), {})()
    
-   # Read parameter
-   await entity.parameter.get_parameter(request, response)
-   print(f"Value: {response.parameter_value}")
+   # Call ROS2 service
+   await entity.param_manager.get_parameter(request, response)
+   
+   if response.success:
+       print(f"Value: {response.json_value}")
 
-All parameters
-^^^^^^^^^^^^^^
+**ROS2 CLI:**
+
+.. code-block:: bash
+
+   ros2 service call /module_name/get_parameter \\
+       vyra_base_interfaces/srv/GetParameter \\
+       "{key: 'max_speed'}"
+
+All parameters (Internal API)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   # Direct internal call
+   result = await entity.param_manager.read_all_params_impl()
+   
+   if result:
+       params = json.loads(result["all_params_json"])
+       for param in params:
+           print(f"{param['name']}: {param['value']}")
+
+All parameters (ROS2 Service)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
    request = type('obj', (object,), {})()
    response = type('obj', (object,), {})()
    
-   # Read all parameters
-   await entity.parameter.read_all_params(request, response)
-   for param in response.parameters:
-       print(f"{param.name}: {param.value}")
+   # Call ROS2 service
+   await entity.param_manager.read_all_params(request, response)
+   
+   # Parse JSON response
+   params = json.loads(response.all_params_json)
+   for param in params:
+       print(f"{param['name']}: {param['value']}")
 
 Set parameter
 ----------------
 
+Set Parameter (Internal API)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   # Direct internal call
+   result = await entity.param_manager.set_parameter_impl(
+       key="max_speed",
+       value="120.0"
+   )
+   
+   if result and result["success"]:
+       print(f"✅ {result['message']}")
+   else:
+       print(f"❌ Error: {result['message'] if result else 'Unknown error'}")
+
+Set Parameter (ROS2 Service)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. code-block:: python
 
    request = type('obj', (object,), {
-       'parameter_name': 'max_speed',
-       'parameter_value': '100.0'
+       'key': 'max_speed',
+       'value': '120.0'
    })()
    response = type('obj', (object,), {})()
    
-   # Set parameter
-   await entity.parameter.set_parameter(request, response)
+   # Call ROS2 service
+   await entity.param_manager.set_parameter(request, response)
+   
    if response.success:
-       print("Parameter set successfully")
+       print(f"✅ {response.message}")
+   else:
+       print(f"❌ {response.message}")
+
+**ROS2 CLI:**
+
+.. code-block:: bash
+
+   ros2 service call /module_name/set_parameter \\
+       vyra_base_interfaces/srv/SetParameter \\
+       "{key: 'max_speed', value: '120.0'}"
 
 default values load
 -------------------
@@ -114,18 +213,41 @@ Parameter can be initialized from JSON files with default values:
 Change-Events
 -------------
 
-Monitor your parameter changes in real-time:
+Monitor parameter changes in real-time:
+
+Get Event Topic (Internal API)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
-   # Query event topic
+   # Direct internal call
+   result = await entity.param_manager.param_changed_topic_impl()
+   
+   if result:
+       event_topic = result["topic"]
+       print(f"Parameter change topic: {event_topic}")
+       
+       # Subscribe to topic
+       entity.node.create_subscription(
+           UpdateParamEvent,
+           event_topic,
+           callback=on_param_changed,
+           qos_profile=10
+       )
+
+Get Event Topic (ROS2 Service)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+   # Query event topic via ROS2 service
    request = type('obj', (object,), {})()
    response = type('obj', (object,), {})()
    
-   await entity.parameter.param_changed_topic(request, response)
-   event_topic = response.event_topic
+   await entity.param_manager.param_changed_topic(request, response)
+   event_topic = response.topic
    
-   # Listener for the event topic set up (via ROS2)
+   # Subscribe to the topic (via ROS2)
    # The event is triggered on every parameter change
 
 Storage
