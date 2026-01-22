@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vyra_base"
-version = "0.1.8+build.8"
+version = "0.1.8+build.11"
 description = "Base library for V.Y.R.A. modules written in Python"
 authors = ["Holger Schernewski"]
 license = "LICENSE"

@@ -28,6 +28,7 @@ class Parameter:
             parameter_base_types: dict[str, Any],
             node: Any,
             storage_access_persistant: Any,
+            storage_access_persistant_default: Any=None,
             storage_access_transient: Any = None
         )   -> None:
         """
@@ -48,6 +49,7 @@ class Parameter:
         :raises ValueError: If the storage_access is not of type DbAccess.
         """
         self.storage_access_persistant = storage_access_persistant
+        self.storage_access_persistant_default = storage_access_persistant_default
 
         self.persistant_manipulator = DbManipulator(
             storage_access_persistant,
@@ -61,7 +63,8 @@ class Parameter:
             type=parameter_base_types['UpdateParamEvent'], 
             node=node, 
             description="Parameter update event speaker.",
-            ident_name=self.update_param_event_ident
+            ident_name=self.update_param_event_ident,
+            domain_name="parameter"
         )
 
         self.storage_access_transient: Any|None = storage_access_transient
@@ -69,8 +72,8 @@ class Parameter:
     @ErrorTraceback.w_check_error_exist
     async def load_defaults(
             self, 
-            storage_access_default: DbAccess, 
-            override_exist: bool=False) -> bool:
+            storage_access_default: Optional[DbAccess] = None, 
+            override_exist: bool = False) -> bool:
         """
         Initialize parameters. Load default parameters if they does not exist. 
         Also add them to the transient storage.
@@ -80,6 +83,16 @@ class Parameter:
         :return: None
         :raises ValueError: If the storage_access_default is not of type DbAccess.
         """
+
+        if storage_access_default is not None and not isinstance(storage_access_default, DbAccess):
+            raise ValueError("Invalid storage_access_default. Must be of type DbAccess.")
+
+        if storage_access_default is None:
+            if self.storage_access_persistant_default is None:
+                Logger.warning("No default storage access provided. Skipping default "
+                            "parameter loading.")
+                return False
+            storage_access_default = self.storage_access_persistant_default
 
         if not isinstance(storage_access_default, DbAccess):
             raise ValueError("Invalid storage_access_default. Must be of type DbAccess.")

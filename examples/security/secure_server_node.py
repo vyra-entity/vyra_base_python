@@ -103,7 +103,7 @@ class SecureServerNode(Node, SecurityManager):
             asyncio.set_event_loop(loop)
             
             result = loop.run_until_complete(
-                self.handle_request_access(
+                self.request_access_impl(
                     request.module_name,
                     request.module_id,
                     request.requested_role,

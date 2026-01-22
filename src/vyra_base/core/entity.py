@@ -246,21 +246,22 @@ class VyraEntity:
         """
         Logger.debug("Initializing parameters for the entity.")
         
-        self.param_manager = Parameter(
-            parameter_base_types=parameter_base_types,
-            node=self._node,
-            storage_access_persistant=self.database_access,
-            storage_access_transient=self.redis_access
-        )
-
-        VyraEntity.register_callables_callbacks(self.param_manager)
-
         self.default_database_access = DbAccess(
             module_name=self.module_entry.name,
             db_config=default_config
         )
 
-        await self.param_manager.load_defaults(self.default_database_access)
+        self.param_manager = Parameter(
+            parameter_base_types=parameter_base_types,
+            node=self._node,
+            storage_access_persistant=self.database_access,
+            storage_access_persistant_default=self.default_database_access,
+            storage_access_transient=self.redis_access
+        )
+
+        VyraEntity.register_callables_callbacks(self.param_manager)
+
+        await self.param_manager.load_defaults()
 
     def _init_volatiles(self, transient_base_types: dict[str, Any]) -> None:
         """

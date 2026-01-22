@@ -8,6 +8,7 @@ from vyra_base.storage.redis_client import RedisClient, REDIS_TYPE
 from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
 from vyra_base.com.datalayer.interface_factory import remove_vyra_speaker
 
+from vyra_base.helper.logger import Logger
 
 class Volatile:
     """
@@ -74,7 +75,7 @@ class Volatile:
         self._active_shouter.clear()
 
     @ErrorTraceback.w_check_error_exist
-    async def activate_listener(self, channel):
+    async def activate_listener(self, channel: str|list[str]):
         """
         Activate the Redis pub/sub listener for monitoring volatile parameter changes.
         
@@ -87,22 +88,46 @@ class Volatile:
         2. Identify new channels that need listeners
         3. Create Redis pub/sub listener with change notification callback
         
-        :param channel: The channel name to activate (currently unused, for future extension).
-        :type channel: str
+        :param channel: The channel name(s) to activate (currently unused, for future extension).
+        :type channel: str | list[str]
         :raises KeyError: If the channel does not exist in Redis.
         :raises RuntimeError: If the listener creation fails.
         """
         # Get list of channels that are already being listened to
         active_listener = (await self.redis.get_active_listeners())['active_channels']
         
-        # Find channels in our speaker registry that don't have active listeners yet
-        new_listener = [li for li in self._active_shouter.keys() if li not in active_listener]
-        
+        if not isinstance(channel, list):
+            channel = [channel]
+
+        # # Find channels in our speaker registry that don't have active listeners yet
+        # new_listener = [li for li in self._active_shouter.keys() if li not in active_listener]
+        new_listener: list[str] = [li for li in channel if li in self._active_shouter and li not in active_listener]
+
+        if len(new_listener) == 0:
+            Logger.warning(
+                f"No new volatile channels to listen to. Active listeners: {active_listener}, Requested: {channel}")
+            
+            return  # No new channels to listen to
+
         # Create pub/sub listener for new channels
         await self.redis.create_pubsub_listener(
             channels=new_listener,
             callback_handler=self.on_volatile_change_received
         )
+
+    async def deactivate_listener(self, channel: str|list[str]):
+        """
+        Deactivate the Redis pub/sub listener for volatile parameter changes.
+        
+        This method stops listening for changes on all registered volatile parameters.
+        After calling this, no further change notifications will be received.
+        """
+        if not isinstance(channel, list):
+            channel = [channel]
+
+        Logger.info(f"Deactivating listeners for channels: {channel}")
+
+        await self.redis.remove_listener_channels(channels=channel)
     
     @ErrorTraceback.w_check_error_exist
     async def on_volatile_change_received(self, message: dict, callback_context):
@@ -215,9 +240,9 @@ class Volatile:
         return await self.redis.get(key)
 
     @ErrorTraceback.w_check_error_exist
-    async def subscribe_to_changes(self, volatile_key: str):
+    async def publish_volatile_to_ros2(self, volatile_key: str, ros2_topic_name: str | None = None):
         """
-        Subscribe to change notifications for a specific volatile parameter.
+        Create a ROS2 publisher for a volatile parameter and subscribe to its changes.
         
         This method sets up automatic ROS2 topic publishing whenever the specified
         volatile parameter changes in Redis. It creates a ROS2 speaker that will
@@ -233,6 +258,8 @@ class Volatile:
         
         :param volatile_key: The name of the volatile parameter to monitor.
         :type volatile_key: str
+        :param ros2_topic_name: Optional custom name for the ROS2 topic. If None, uses volatile_key as topic name.
+        :type ros2_topic_name: str | None
         :raises KeyError: If the volatile key does not exist in Redis.
         :raises ValueError: If the Redis data type is not supported.
         
@@ -243,8 +270,11 @@ class Volatile:
             # Step 1: Create volatile value
             await volatile.set_volatile_value("temperature", 23.5)
             
-            # Step 2: Subscribe to changes (creates ROS2 topic)
-            await volatile.subscribe_to_changes("temperature")
+            # Step 2: Create ROS2 publisher with default topic name
+            await volatile.publish_volatile_to_ros2("temperature")
+            
+            # Alternative: Use custom topic name
+            await volatile.publish_volatile_to_ros2("temperature", "sensor_temp")
             
             # Step 3: Activate listener to receive notifications
             await volatile.activate_listener("temperature")
@@ -255,7 +285,7 @@ class Volatile:
         
         **Resulting ROS2 topic:**
         The created topic name follows the pattern:
-        ``/module_name/volatile/<volatile_key>``
+        ``/module_name/volatile/<ros2_topic_name or volatile_key>``
         """
         # Step 1: Verify volatile key exists
         if not await self.redis.exists(volatile_key):
@@ -274,12 +304,16 @@ class Volatile:
                 f"Unsupported Redis type: {redis_type}. "
                 f"Supported types: {list(self.REDIS_TYPE_MAP.keys())}")
 
+        # Use custom topic name or default to volatile_key
+        topic_name = ros2_topic_name if ros2_topic_name is not None else volatile_key
+
         # Step 3: Create ROS2 speaker for this volatile type
         speaker: VyraSpeaker = create_vyra_speaker(
             type=self.REDIS_TYPE_MAP[redis_type],
             node=self.communication_node,
             description=f"Volatile change events for: {volatile_key}",
-            ident_name="volatile"
+            ident_name=topic_name,
+            domain_name="volatile"
         )
         self._active_shouter[volatile_key] = speaker
         
@@ -310,7 +344,7 @@ class Volatile:
             await self.redis.unsubscribe_from_key(volatile_key)
             # Remove speaker from registry if it exists
             if volatile_key in self._active_shouter:
-                remove_vyra_speaker(volatile_key)
+                remove_vyra_speaker(speaker=self._active_shouter[volatile_key])
                 del self._active_shouter[volatile_key]
         else:
             raise KeyError(

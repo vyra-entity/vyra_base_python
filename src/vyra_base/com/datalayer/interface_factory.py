@@ -7,6 +7,7 @@ from typing import Any, Callable, Union
 
 from rclpy.qos import QoSProfile
 
+from vyra_base.com.datalayer.action_server import Action, VyraActionServer
 from vyra_base.com.datalayer.callable import VyraCallable, VyraCallableExecutor
 from vyra_base.com.datalayer.job import VyraJob, VyraJobRunner
 from vyra_base.com.datalayer.node import NodeSettings, VyraNode, CheckerNode
@@ -378,13 +379,13 @@ def create_vyra_speaker(
         periodic_caller: Union[Callable, None] = None,
         qos_profile: Union[int, QoSProfile] = 10,
         ident_name: str = "global_speaker",
+        domain_name: str = "speaker",
         async_loop = None
         ) -> VyraSpeaker:
     """
     Create a speaker for a V.Y.R.A. service.
 
     A speaker is a publisher that sends messages to a topic and is used to publish simple data types to other V.Y.R.A. OS modules.
-    :param domain_name: Domain name of the speaker to categorize.
     :param type: The ROS2 message datatype definition.
     :type type: Any
     :param node: The ROS2 node definition.
@@ -401,12 +402,14 @@ def create_vyra_speaker(
     :type qos_profile: int or QoSProfile
     :param ident_name: Identifier name for the speaker.
     :type ident_name: str
+    :param domain_name: Domain name of the speaker to categorize.
+    :type domain_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
     :return: The created VyraSpeaker object.
     :rtype: VyraSpeaker
     """
-    domain_name = "speaker"
+
     base_name: str = node.node_settings.name
 
     if base_name == NodeSettings.name:
@@ -457,6 +460,7 @@ def create_vyra_callable(
         node: VyraNode,
         callback: Union[Callable, None] = None,
         ident_name: str = "global_callable",
+        domain_name: str = "callable",
         async_loop = None
     ) -> VyraCallable:
     """
@@ -474,13 +478,15 @@ def create_vyra_callable(
     :type callback: Callable or None
     :param ident_name: Identifier name for the callable.
     :type ident_name: str
+    :param domain_name: Domain name of the speaker to categorize.
+    :type domain_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
     :raises ValueError: If no callback function is provided.
     :return: The created VyraCallable object.
     :rtype: VyraCallable
     """
-    domain_name = "callable"
+
     base_name: str = node.node_settings.name
 
     if base_name == NodeSettings.name:
@@ -540,6 +546,7 @@ def create_vyra_job(
         feedback_callback: Union[Callable, None] = None,
         result_callback: Union[Callable, None] = None,
         ident_name: str = "global_job",
+        domain_name: str = "job",
         async_loop = None) -> VyraJob:
     """
     Create a job (action server) for a V.Y.R.A. service.
@@ -586,14 +593,13 @@ def create_vyra_job(
     :type result_callback: Callable or None
     :param ident_name: Identifier name for the job.
     :type ident_name: str
+    :param domain_name: Domain name of the speaker to categorize.
+    :type domain_name: str
     :param async_loop: Optional event loop for asynchronous execution.
     :type async_loop: Any
     :return: The created VyraJob instance.
     :rtype: VyraJob
-    """
-    from vyra_base.com.datalayer.action_server import Action, VyraActionServer
-    
-    domain_name = "job"
+    """    
     base_name: str = node.node_settings.name
 
     if base_name == NodeSettings.name:

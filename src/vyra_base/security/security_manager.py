@@ -163,7 +163,7 @@ class SecurityManager:
     @remote_callable
     async def request_access(self, request, response) -> bool:
         """
-        Remote callable wrapper for handle_request_access.
+        Remote callable wrapper for request_access_impl.
         
         :param request: Request object with access parameters
         :param response: Response object to populate
@@ -178,7 +178,7 @@ class SecurityManager:
                 certificate,
                 expires_at,
                 granted_sl
-            ) = await self.handle_request_access(
+            ) = await self.request_access_impl(
                 module_name=request.module_name,
                 module_id=request.module_id,
                 requested_role=request.requested_role,
@@ -201,7 +201,7 @@ class SecurityManager:
             return False
     
 
-    async def handle_request_access(
+    async def request_access_impl(
         self,
         module_name: str,
         module_id: uuid.UUID,

@@ -123,6 +123,10 @@ echo "Step 6: Copying wheel to module directories..."
 
 # Copy to vyra_module_template
 if [ -d "../vyra_module_template/wheels" ]; then
+    # Clean old wheels
+    rm -rf ../vyra_module_template/wheels/vyra_base-*.whl 2>/dev/null || true
+    
+    # Copy new wheel
     cp "$WHEEL_FILE" ../vyra_module_template/wheels/
     echo "  ✅ Copied to vyra_module_template/wheels"
 else
@@ -146,6 +150,10 @@ fi
 # Copy to vyra_base_image
 VYRA_BASE_IMAGE_DIR="../../VOS2_WORKSPACE/vyra_base_image"
 if [ -d "$VYRA_BASE_IMAGE_DIR" ]; then
+    # Clean old wheels
+    rm -rf "$VYRA_BASE_IMAGE_DIR"/vyra_base-*.whl 2>/dev/null || true
+
+    # Copy new wheel
     cp "$WHEEL_FILE" "$VYRA_BASE_IMAGE_DIR/"
     echo "  ✅ Copied to vyra_base_image"
 else

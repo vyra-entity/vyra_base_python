@@ -186,9 +186,8 @@ Parameter can be initialized from JSON files with default values:
 
    # default values from JSON load
    await entity.parameter.load_defaults(
-       db_session=db_session,
-       config_path="/workspace/config/defaults.json",
-       reset=False  # True = overwrite existing values
+       storage_access_default,  # optional: custom DB session, default: None
+       reset  # optional: True = overwrite existing values, default: False
    )
 
 **Example JSON structure:**
