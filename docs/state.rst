@@ -13,12 +13,12 @@ and consists of three hierarchical layers:
    :maxdepth: 2
    :caption: State Machine Documentation
 
-   statemachine/overview
-   statemachine/states
-   statemachine/transitions
-   statemachine/events
-   statemachine/api_reference
-   statemachine/quick_reference
+   state/overview
+   state/states
+   state/transitions
+   state/events
+   state/api_reference
+   state/quick_reference
 
 Overview
 ========

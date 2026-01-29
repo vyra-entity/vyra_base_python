@@ -26,7 +26,7 @@ including state management, ROS2 integration, security, and communication utilit
    :maxdepth: 2
    :caption: State Machine
 
-   statemachine
+   state
 
 .. toctree::
    :maxdepth: 2
