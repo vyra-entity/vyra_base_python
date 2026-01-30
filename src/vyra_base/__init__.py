@@ -1,6 +1,7 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Any
 
 import vyra_base
 
@@ -61,3 +62,36 @@ def extract_ros_interfaces(target_path: str | Path):
             print(f"Copied {file.name} to {target_config}")
 
     print(f"ROS2 interfaces extracted to {target_path} successfully.")
+
+def get_reserved_list() -> dict[str, Any]:
+    """
+    Get the list of reserved usernames.
+
+    :return: List of reserved usernames.
+    :rtype: list[str]
+    """
+
+    vyra_base_path = Path(vyra_base.__file__).parent / "interfaces" / "config"
+ 
+    reserved_file = vyra_base_path / "RESERVED.list"
+    if not reserved_file.exists():
+        raise FileNotFoundError(f"Reserved list file not found: {reserved_file}")
+    
+    reserved = {}
+    with open(reserved_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('#') or not line or '|' not in line:
+                continue
+            
+            parts = [p.strip() for p in line.split('|')]
+            if len(parts) >= 2:
+                interface_name = parts[0]
+                function_name = parts[1] if parts[1] != '-' else None
+                config_file = parts[2] if len(parts) > 2 else 'unknown'
+                reserved[interface_name] = {
+                    'function_name': function_name,
+                    'config_file': config_file
+                }
+    
+    return reserved

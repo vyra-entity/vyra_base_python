@@ -133,18 +133,38 @@ else
     echo "  ⚠️  Warning: ../vyra_module_template/wheels not found"
 fi
 
-# Copy to v2_modulemanager
-MODULEMANAGER_DIR="../../VOS2_WORKSPACE/modules/v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff/wheels"
-if [ -d "$(dirname "$MODULEMANAGER_DIR")" ]; then
-    # Clean old wheels
-    rm -rf "$MODULEMANAGER_DIR"/vyra_base-*.whl 2>/dev/null || true
+# Copy to all modules in VOS2_WORKSPACE/modules/
+VOS2_MODULES_DIR="../../VOS2_WORKSPACE/modules"
+if [ -d "$VOS2_MODULES_DIR" ]; then
+    echo "  Searching for modules in $VOS2_MODULES_DIR..."
+    MODULE_COUNT=0
     
-    # Copy new wheel
-    mkdir -p "$MODULEMANAGER_DIR"
-    cp "$WHEEL_FILE" "$MODULEMANAGER_DIR/"
-    echo "  ✅ Copied to v2_modulemanager/wheels"
+    # Iterate through all directories in modules/
+    for MODULE_DIR in "$VOS2_MODULES_DIR"/*/; do
+        if [ -d "$MODULE_DIR" ]; then
+            MODULE_NAME=$(basename "$MODULE_DIR")
+            WHEELS_DIR="${MODULE_DIR}wheels"
+            
+            # Check if wheels directory exists
+            if [ -d "$WHEELS_DIR" ]; then
+                # Clean old wheels
+                rm -rf "$WHEELS_DIR"/vyra_base-*.whl 2>/dev/null || true
+                
+                # Copy new wheel
+                cp "$WHEEL_FILE" "$WHEELS_DIR/"
+                echo "  ✅ Copied to $MODULE_NAME/wheels"
+                MODULE_COUNT=$((MODULE_COUNT + 1))
+            fi
+        fi
+    done
+    
+    if [ $MODULE_COUNT -eq 0 ]; then
+        echo "  ⚠️  Warning: No modules with wheels directory found"
+    else
+        echo "  ✅ Copied to $MODULE_COUNT module(s)"
+    fi
 else
-    echo "  ⚠️  Warning: v2_modulemanager directory not found"
+    echo "  ⚠️  Warning: VOS2_WORKSPACE/modules directory not found"
 fi
 
 # Copy to vyra_base_image
