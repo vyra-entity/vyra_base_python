@@ -1,12 +1,11 @@
 import asyncio
-from typing import Any, Type
+from typing import Any, Type, Optional
 
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.speaker import VyraSpeaker
+from vyra_base.com.transport.ros2.node import VyraNode
+from vyra_base.com.core.types import VyraSpeaker
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.storage.redis_client import RedisClient, REDIS_TYPE
-from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
-from vyra_base.com.datalayer.interface_factory import remove_vyra_speaker
+from vyra_base.com import InterfaceFactory, ProtocolType
 
 from vyra_base.helper.logger import Logger
 
@@ -39,13 +38,13 @@ class Volatile:
             self, 
             storage_access_transient: RedisClient, 
             module_id: str,
-            node: VyraNode,
+            node: Optional[VyraNode],
             transient_base_types: dict[str, Any]):
         """
         Initialize the Volatile class.
         """
         self.module_id: str = module_id
-        self.communication_node = node
+        self.communication_node: Optional[VyraNode] = node
 
         self.REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
             REDIS_TYPE.STRING: transient_base_types['VolatileString'],
@@ -64,13 +63,25 @@ class Volatile:
         """
         Clean up the Volatile instance.
         This will unsubscribe from all active shouters and stop the listener if active.
+        Note: Cannot await in destructor, so cleanup may not be complete.
+        Use explicit cleanup() method for proper async cleanup.
         """
         if self._listener:
             self._listener.cancel()
             self._listener = None
 
+        # Note: Cannot await in __del__, so we just clear the references
+        # Proper cleanup should be done via explicit cleanup() method
+        self._active_shouter.clear()
+    
+    async def cleanup(self):
+        """Async cleanup method for proper resource cleanup."""
+        if self._listener:
+            self._listener.cancel()
+            self._listener = None
+
         for key, speaker in self._active_shouter.items():
-            remove_vyra_speaker(key)
+            await speaker.shutdown()
 
         self._active_shouter.clear()
 
@@ -162,7 +173,7 @@ class Volatile:
         # Only process actual messages (not subscribe/unsubscribe events)
         if message_type == "message" and channel in self._active_shouter:
             # Publish the changed value to the ROS2 topic
-            self._active_shouter[channel].shout(message["data"])
+            await self._active_shouter[channel].shout(message["data"])
 
     @ErrorTraceback.w_check_error_exist
     async def read_all_volatile_names(self) -> list:
@@ -308,12 +319,12 @@ class Volatile:
         topic_name = ros2_topic_name if ros2_topic_name is not None else volatile_key
 
         # Step 3: Create ROS2 speaker for this volatile type
-        speaker: VyraSpeaker = create_vyra_speaker(
-            type=self.REDIS_TYPE_MAP[redis_type],
+        speaker: VyraSpeaker = await InterfaceFactory.create_speaker(
+            name=topic_name,
+            protocols=[ProtocolType.ROS2],
+            message_type=self.REDIS_TYPE_MAP[redis_type],
             node=self.communication_node,
-            description=f"Volatile change events for: {volatile_key}",
-            ident_name=topic_name,
-            domain_name="volatile"
+            is_publisher=True
         )
         self._active_shouter[volatile_key] = speaker
         
@@ -344,7 +355,7 @@ class Volatile:
             await self.redis.unsubscribe_from_key(volatile_key)
             # Remove speaker from registry if it exists
             if volatile_key in self._active_shouter:
-                remove_vyra_speaker(speaker=self._active_shouter[volatile_key])
+                await self._active_shouter[volatile_key].shutdown()
                 del self._active_shouter[volatile_key]
         else:
             raise KeyError(

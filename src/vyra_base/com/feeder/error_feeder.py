@@ -1,11 +1,22 @@
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Union
+from typing import Any, Union, Optional
 
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
-from vyra_base.com.handler.ros2 import ROS2Handler
+# Check ROS2 availability
+try:
+    import builtin_interfaces
+    _ROS2_AVAILABLE = True
+except ImportError:
+    _ROS2_AVAILABLE = False
+
+if _ROS2_AVAILABLE:
+    from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
+    from vyra_base.com.handler.ros2 import ROS2Handler
+else:
+    Ros2TypeConverter = None
+    ROS2Handler = None
+
 from vyra_base.defaults.entries import ErrorEntry, ModuleEntry
 from vyra_base.defaults.exceptions import FeederException
 
@@ -28,7 +39,7 @@ class ErrorFeeder(BaseFeeder):
     def __init__(
             self, 
             type: Any,
-            node: VyraNode,
+            node: Optional[Any],
             module_config: ModuleEntry,
             loggingOn: bool = False
         ):
@@ -38,10 +49,12 @@ class ErrorFeeder(BaseFeeder):
         self._doc: str = 'Collect error messages of this module.'
         self._level: int = logging.ERROR
         self._type: Any = type
-        self._node: VyraNode = node
+        self._node: Optional[Any] = node
         self._module_config: ModuleEntry = module_config
+        self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
 
-        self._handler_classes.append(ROS2Handler)
+        if self._ros2_available and ROS2Handler:
+            self._handler_classes.append(ROS2Handler)
 
         self.create(loggingOn=loggingOn)
 
@@ -64,13 +77,21 @@ class ErrorFeeder(BaseFeeder):
         else:
             raise FeederException(f"Wrong Type. Expect: NewsEntry, got {type(errorElement)}")
 
-        errorfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
-                errorfeed_entry.timestamp if errorfeed_entry.timestamp else datetime.now()
-        )
-        
-        errorfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
-            errorfeed_entry.uuid if errorfeed_entry.uuid else uuid.uuid4()
-        )
+        # Convert to ROS2 types only if ROS2 available
+        if self._ros2_available and Ros2TypeConverter:
+            errorfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
+                    errorfeed_entry.timestamp if errorfeed_entry.timestamp else datetime.now()
+            )
+            
+            errorfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
+                errorfeed_entry.uuid if errorfeed_entry.uuid else uuid.uuid4()
+            )
+        else:
+            # For non-ROS2 protocols, keep native Python types
+            if errorfeed_entry.timestamp is None:
+                errorfeed_entry.timestamp = datetime.now()
+            if errorfeed_entry.uuid is None:
+                errorfeed_entry.uuid = uuid.uuid4()
 
         super().feed(errorfeed_entry)
 

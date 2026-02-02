@@ -8,7 +8,7 @@ to provide ROS2 services.
 import rclpy
 from example_interfaces.srv import AddTwoInts
 from vyra_base.com import create_vyra_callable, remote_callable
-from vyra_base.com.datalayer.node import VyraNode, NodeSettings
+from vyra_base.com.transport.ros2.node import VyraNode, NodeSettings
 
 
 # Method 1: Using create_vyra_callable with explicit callback

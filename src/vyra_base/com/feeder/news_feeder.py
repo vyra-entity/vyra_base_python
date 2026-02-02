@@ -2,14 +2,23 @@ import logging
 import re
 import uuid
 from datetime import datetime
-from typing import Any, Union
+from typing import Any, Union, Optional
 
-from builtin_interfaces.msg import Time as BuiltinTime
+# Check ROS2 availability
+try:
+    import builtin_interfaces
+    _ROS2_AVAILABLE = True
+except ImportError:
+    _ROS2_AVAILABLE = False
+
+if _ROS2_AVAILABLE:
+    from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
+    from vyra_base.com.handler.ros2 import ROS2Handler
+else:
+    Ros2TypeConverter = None
+    ROS2Handler = None
 
 from .feeder import BaseFeeder
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
-from vyra_base.com.handler.ros2 import ROS2Handler
 from vyra_base.defaults.entries import ModuleEntry, NewsEntry
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.helper.logger import Logger
@@ -33,7 +42,7 @@ class NewsFeeder(BaseFeeder):
     def __init__(
             self, 
             type: Any,
-            node: VyraNode,
+            node: Optional[Any],
             module_config: ModuleEntry,
             loggingOn: bool = True
         ):
@@ -43,10 +52,12 @@ class NewsFeeder(BaseFeeder):
         self._doc: str = 'Collect news messages of this module.'
         self._level: int = logging.INFO
         self._type: Any = type
-        self._node: VyraNode = node
+        self._node: Optional[Any] = node
         self._module_config: ModuleEntry = module_config
+        self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
 
-        self._handler_classes.append(ROS2Handler)
+        if self._ros2_available and ROS2Handler:
+            self._handler_classes.append(ROS2Handler)
 
         self.create(loggingOn=loggingOn)
 
@@ -71,13 +82,21 @@ class NewsFeeder(BaseFeeder):
         else:
             raise FeederException(f"Wrong Type. Expect: NewsEntry, got {type(newsElement)}")
 
-        newsfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
-                newsfeed_entry.timestamp if newsfeed_entry.timestamp else datetime.now()
-        )
-        
-        newsfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
-            newsfeed_entry.uuid if newsfeed_entry.uuid else uuid.uuid4()
-        )
+        # Convert to ROS2 types only if ROS2 available
+        if self._ros2_available and Ros2TypeConverter:
+            newsfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
+                    newsfeed_entry.timestamp if newsfeed_entry.timestamp else datetime.now()
+            )
+            
+            newsfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
+                newsfeed_entry.uuid if newsfeed_entry.uuid else uuid.uuid4()
+            )
+        else:
+            # For non-ROS2 protocols, keep native Python types
+            if newsfeed_entry.timestamp is None:
+                newsfeed_entry.timestamp = datetime.now()
+            if newsfeed_entry.uuid is None:
+                newsfeed_entry.uuid = uuid.uuid4()
 
         super().feed(newsfeed_entry)
 

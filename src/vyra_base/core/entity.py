@@ -2,24 +2,29 @@ from __future__ import annotations
 
 import asyncio
 import json
+import importlib.util
 from asyncio import AbstractEventLoop
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, TYPE_CHECKING
 
-from vyra_base.com.datalayer.callable import VyraCallable
-from vyra_base.com.datalayer.interface_factory import (
-    DataSpace,
-    create_vyra_callable,
-    create_vyra_job,
-    create_vyra_speaker,
-    remote_callable,
-)
-from vyra_base.com.datalayer.node import CheckerNode, NodeSettings, VyraNode
+# NEW: Import from new multi-protocol architecture
+from vyra_base.com import InterfaceFactory, remote_callable, ProtocolType
+from vyra_base.com.core.types import VyraCallable
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
+
+# Check ROS2 availability
+_ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+
+if TYPE_CHECKING or _ROS2_AVAILABLE:
+    from vyra_base.com.transport.ros2.node import CheckerNode, NodeSettings, VyraNode
+else:
+    CheckerNode = None
+    NodeSettings = None
+    VyraNode = None
 from vyra_base.defaults.entries import (
     ErrorEntry,
     FunctionConfigBaseTypes,
@@ -111,7 +116,18 @@ class VyraEntity:
         """
         self._init_logger(log_config)
 
-        if VyraEntity._check_node_availability(module_entry.name):
+        # Check ROS2 availability
+        self._ros2_available = _ROS2_AVAILABLE
+        
+        if not self._ros2_available:
+            Logger.warn(
+                "⚠️ ROS2 not available. "
+                "Entity will run in slim mode with SharedMemory/UDS/Redis communication. "
+                "Install ROS2 and source setup.bash to enable ROS2 features."
+            )
+
+        # Only check node availability if ROS2 is available
+        if self._ros2_available and VyraEntity._check_node_availability(module_entry.name):
             raise RuntimeError(
                 f"Node {module_entry.name} is available in the ROS2 system."
                 " Please choose a different name."
@@ -123,11 +139,16 @@ class VyraEntity:
         # Store ROS2 message types for creating entries
         self._error_entry_type = error_entry._type
 
-        node_settings = NodeSettings(
-            name=f"{self.module_entry.name}_{self.module_entry.uuid}"
-        )
-
-        self._node = VyraNode(node_settings)
+        # Create ROS2 node only if ROS2 is available
+        if self._ros2_available and VyraNode and NodeSettings:
+            node_settings = NodeSettings(
+                name=f"{self.module_entry.name}_{self.module_entry.uuid}"
+            )
+            self._node = VyraNode(node_settings)
+            Logger.info(f"✅ ROS2 node created: {self._node.get_name()}")
+        else:
+            self._node = None
+            Logger.info("🔵 No ROS2 node created (slim mode)")
 
         feeder: tuple = self.__init_feeder(state_entry, news_entry, error_entry)
         self.state_feeder: StateFeeder = feeder[0]
@@ -143,7 +164,7 @@ class VyraEntity:
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
     @property
-    def node(self) -> Optional[VyraNode]:
+    def node(self) -> Optional['VyraNode']:
         """
         Get the ROS2 node of the entity.
 
@@ -162,9 +183,10 @@ class VyraEntity:
         :returns: The namespace of the node.
         :rtype: str
         """
-        if not hasattr(self, '_node'):
+        if not hasattr(self, '_node') or self._node is None:
             return ''
-        return self._node.get_namespace()
+        else:
+            return self._node.get_namespace()
 
     def _init_logger(self, log_config: Optional[dict[str, Any]]) -> None:
         """
@@ -655,7 +677,7 @@ class VyraEntity:
             settings: list[FunctionConfigEntry],
             permission_xml: str=None) -> None:
         """
-        Add a DDS communication interface to this module.
+        Add communication interfaces to this module.
 
         Interfaces are used to communicate with other modules or external systems.
         Interface types can be:
@@ -663,6 +685,13 @@ class VyraEntity:
         - ``!vyra-callable``: Callable function that can be invoked remotely.
         - ``!vyra-job``: Job that can be executed in the background.
         - ``!vyra-speaker``: Speaker that can publish messages periodically.
+        
+        Protocols used depend on availability:
+        - ROS2 (if available)
+        - SharedMemory (always available)
+        - UDS (always available)
+        - Redis (if configured)
+        - gRPC (if configured)
 
         :param settings: Settings for the module functions.
         :type settings: list[FunctionConfigEntry]
@@ -689,14 +718,23 @@ class VyraEntity:
             
             self._interface_list.append(setting)
 
+            # Use ROS2 if available, otherwise skip ROS2-specific creation
+            # (InterfaceFactory will handle protocol selection in future versions)
+            if not self._ros2_available:
+                Logger.debug(
+                    f"⚠️ ROS2 not available, skipping ROS2 interface creation for {setting.functionname}. "
+                    "Use InterfaceFactory for multi-protocol support."
+                )
+                continue
+
             if setting.type == FunctionConfigBaseTypes.callable.value:
                 Logger.info(f"Creating callable: {setting.functionname}")
-                create_vyra_callable(
-                    type=setting.ros2type,
-                    node=self._node,
+                await InterfaceFactory.create_callable(
+                    name=setting.functionname,
                     callback=setting.callback,
-                    async_loop=async_loop,
-                    ident_name=setting.functionname
+                    protocols=[ProtocolType.ROS2],
+                    service_type=setting.ros2type,
+                    node=self._node
                 )
             elif setting.type == FunctionConfigBaseTypes.job.value:
                 Logger.info(f"Creating job: {setting.functionname}")
@@ -706,25 +744,29 @@ class VyraEntity:
 
             elif setting.type == FunctionConfigBaseTypes.speaker.value:
                 Logger.info(f"Creating speaker: {setting.functionname}")
+                
+                # Extract periodic parameters
                 periodic: bool = False
                 periodic_caller: Any = None
                 periodic_interval: Union[float, None] = None
 
                 if setting.periodic != None:
-                    periodic: bool = True
+                    periodic = True
                     periodic_caller = setting.periodic.caller if periodic else None
                     periodic_interval = setting.periodic.interval if periodic else None
                 
-                create_vyra_speaker(
-                    type=setting.ros2type,
+                # Speaker creation through InterfaceFactory
+                await InterfaceFactory.create_speaker(
+                    name=setting.functionname,
+                    protocols=[ProtocolType.ROS2],
+                    message_type=setting.ros2type,
                     node=self._node,
+                    is_publisher=True,
+                    qos_profile=setting.qosprofile,
                     description=setting.description,
                     periodic=periodic,
                     interval_time=periodic_interval,
-                    periodic_caller= periodic_caller,
-                    qos_profile=setting.qosprofile,
-                    async_loop=async_loop,
-                    ident_name=setting.functionname
+                    periodic_caller=periodic_caller
                 )
             else:
                 fail_msg = (
@@ -758,10 +800,14 @@ class VyraEntity:
         :returns: True if the node is available, False otherwise.
         :rtype: bool
         """
+        if CheckerNode is None:
+            Logger.warning("CheckerNode not available. Check if ROS2 is available")
+            return False
+        
         checker_node = CheckerNode()
         return checker_node.is_node_available(node_name)
     
-    @remote_callable
+    @remote_callable()
     async def get_interface_list(self, request: Any, response: Any) -> Any:
         """
         Retrieves all capabilities (speaker, callable, job) of the entity that are set to
@@ -864,7 +910,7 @@ class VyraEntity:
 
         Example::
 
-            from vyra_base.com.datalayer.interface_factory import remote_callable
+            from vyra_base.com import remote_callable
 
             class MyParentClass:
                 @remote_callable
@@ -905,15 +951,9 @@ class VyraEntity:
             rc_active = getattr(attr, "_remote_callable", False)
 
             if callable(attr) and rc_active:
-                callable_obj = VyraCallable(
-                    name=attr.__name__,
-                    connected_callback=attr
-                )
-                
+                # Interface automatically registered via @remote_callable decorator
                 Logger.debug(
-                    f"Registering callable callback <{callable_obj.name}> from method {attr}")
-                
-                DataSpace.add_callable(callable_obj)
+                    f"Remote callable <{attr.__name__}> registered via decorator")
 
                 # Set on the underlying function object
                 if hasattr(attr, "__func__"):

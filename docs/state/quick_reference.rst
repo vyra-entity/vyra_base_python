@@ -195,7 +195,7 @@ Using OperationalStateMachine
         UnifiedStateMachine, 
         OperationalStateMachine
     )
-    from vyra_base.com.datalayer.interface_factory import remote_callable
+    from vyra_base.com import remote_callable
     
     class MyComponent(OperationalStateMachine):
         def __init__(self, unified_sm: UnifiedStateMachine):

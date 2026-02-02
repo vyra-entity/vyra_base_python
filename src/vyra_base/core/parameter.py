@@ -5,13 +5,9 @@ from typing import Any, Optional
 from sqlalchemy import event
 from sqlalchemy import inspect
 
-from vyra_base.com.datalayer.interface_factory import (
-    create_vyra_speaker,
-    remote_callable
-)
-from vyra_base.com.datalayer.publisher import VyraPublisher
-from vyra_base.com.datalayer.speaker import VyraSpeaker
-from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
+from vyra_base.com import InterfaceFactory, ProtocolType, remote_callable
+from vyra_base.com.transport.ros2.ros2_speaker import ROS2Speaker
+from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.helper.logger import Logger
 from vyra_base.storage.db_access import DBSTATUS, DbAccess
@@ -59,15 +55,22 @@ class Parameter:
         self.parameter_base_types = parameter_base_types
         self.update_param_event_ident = "param_update_event_speaker"
 
-        self.update_parameter_speaker: VyraSpeaker = create_vyra_speaker(
-            type=parameter_base_types['UpdateParamEvent'], 
-            node=node, 
-            description="Parameter update event speaker.",
-            ident_name=self.update_param_event_ident,
-            domain_name="parameter"
-        )
+        # Store node reference for lazy speaker initialization
+        self._node = node
+        self.update_parameter_speaker: Optional[Any] = None  # Will be ROS2Speaker
 
         self.storage_access_transient: Any|None = storage_access_transient
+
+    async def _init_speaker(self) -> None:
+        """Initialize the parameter update speaker lazily."""
+        if self.update_parameter_speaker is None:
+            self.update_parameter_speaker = await InterfaceFactory.create_speaker(
+                name=self.update_param_event_ident,
+                protocols=[ProtocolType.ROS2],
+                message_type=self.parameter_base_types['UpdateParamEvent'],
+                node=self._node,
+                is_publisher=True
+            )
 
     @ErrorTraceback.w_check_error_exist
     async def load_defaults(
@@ -149,7 +152,7 @@ class Parameter:
 
         return True
 
-    @remote_callable
+    @remote_callable()
     async def get_parameter(self, request: Any, response: Any) -> bool:
         """
         Get a parameter value by its key (ROS2 service interface).
@@ -252,7 +255,7 @@ class Parameter:
 
         return response
 
-    @remote_callable
+    @remote_callable()
     async def set_parameter(self, request: Any, response: Any) -> None:
         """
         Set a parameter value by its key (ROS2 service interface).
@@ -389,7 +392,7 @@ class Parameter:
         Logger.info(response['message'])
         return response
 
-    @remote_callable
+    @remote_callable()
     async def read_all_params(self, request: Any, response: Any) -> None:
         """
         Read all parameters (ROS2 service interface).
@@ -499,18 +502,12 @@ class Parameter:
                 old_value = attr.history.deleted
                 new_value = attr.history.added
                 Logger.debug(f"Feld {attr.key} changed: {old_value} -> {new_value}")
-                
-        self.update_parameter_speaker.shout(
-            message={
-                "param_key": target.name,
-                "changed_from": old_value,
-                "changed_to": new_value,
-                "timestamp": Ros2TypeConverter.time_to_ros2buildintime(
-                    datetime.now())
-            }
-        )
+        
+        # NOTE: SQLAlchemy event callbacks must be synchronous - cannot use await
+        # TODO: Implement async event queue for parameter change notifications via ROS2
+        Logger.debug(f"Parameter '{target.name}' updated (ROS2 change event not published)")
 
-    @remote_callable
+    @remote_callable()
     async def param_changed_topic(self, request: Any, response: Any) -> None:
         """
         Get the ROS2 topic name for parameter change events (ROS2 service interface).
@@ -585,7 +582,12 @@ class Parameter:
         """
         response: dict = {}
         
-        pub_server: VyraPublisher | None = self.update_parameter_speaker.publisher_server
+        # Ensure speaker is initialized
+        if self.update_parameter_speaker is None:
+            await self._init_speaker()
+        
+        # Access internal publisher from ROS2Speaker
+        pub_server = getattr(self.update_parameter_speaker, '_publisher', None)
         if pub_server is None:
             Logger.error("Publisher server is not initialized.")
             return None

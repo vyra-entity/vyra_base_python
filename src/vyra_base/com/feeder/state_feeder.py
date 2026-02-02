@@ -1,10 +1,21 @@
 import logging
-from typing import Any
+from typing import Any, Optional
+
+# Check ROS2 availability
+try:
+    import builtin_interfaces
+    _ROS2_AVAILABLE = True
+except ImportError:
+    _ROS2_AVAILABLE = False
+
+if _ROS2_AVAILABLE:
+    from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
+    from vyra_base.com.handler.ros2 import ROS2Handler
+else:
+    Ros2TypeConverter = None
+    ROS2Handler = None
 
 from .feeder import BaseFeeder
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.typeconverter import Ros2TypeConverter
-from vyra_base.com.handler.ros2 import ROS2Handler
 from vyra_base.defaults.entries import ModuleEntry
 from vyra_base.defaults.entries import StateEntry
 from vyra_base.defaults.exceptions import FeederException
@@ -36,7 +47,7 @@ class StateFeeder(BaseFeeder):
     def __init__(
             self, 
             type: Any,
-            node: VyraNode,
+            node: Optional[Any],
             module_config: ModuleEntry,
             loggingOn: bool = False,
             ):
@@ -45,8 +56,8 @@ class StateFeeder(BaseFeeder):
 
         :param type: The ros2-msg type for the feeder.
         :type type: Any
-        :param node: The VyraNode instance associated with this feeder (ROS2 Node).
-        :type node: VyraNode
+        :param node: The VyraNode instance (optional, None if ROS2 unavailable).
+        :type node: Optional[Any]
         :param module_config: Module configuration entry.
         :type module_config: ModuleEntry
         :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
@@ -60,10 +71,12 @@ class StateFeeder(BaseFeeder):
         self._doc: str = 'Collect states from this module.'
         self._level: int = logging.INFO
         self._type: Any = type
-        self._node: VyraNode = node
+        self._node: Optional[Any] = node
         self._module_config: ModuleEntry = module_config
+        self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
 
-        self._handler_classes.append(ROS2Handler)
+        if self._ros2_available and ROS2Handler:
+            self._handler_classes.append(ROS2Handler)
 
         self.create(loggingOn=loggingOn)
         
@@ -77,8 +90,11 @@ class StateFeeder(BaseFeeder):
         :raises FeederException: If the provided element is not of type StateEntry.
         """
         if isinstance(stateElement, StateEntry):
-            stateElement.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
-                stateElement.timestamp)
+            # Convert to ROS2 types only if ROS2 available
+            if self._ros2_available and Ros2TypeConverter:
+                stateElement.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
+                    stateElement.timestamp)
+            # For non-ROS2, timestamp stays as datetime
             super().feed(stateElement)
         else:
             raise FeederException(f"Wrong Type. Expect: StateEntry, got {type(stateElement)}")

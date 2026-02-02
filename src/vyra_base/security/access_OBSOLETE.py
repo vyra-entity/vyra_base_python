@@ -8,7 +8,7 @@ from vyra_base.security.trust import (
     TRUST_LEVEL, 
     TRUST_STATUS
 )
-from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.com import remote_callable
 from vyra_base.helper.error_handler import ErrorTraceback
 
 class ACCESS_STATUS(int, Enum):

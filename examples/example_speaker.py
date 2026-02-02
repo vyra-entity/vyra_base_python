@@ -9,7 +9,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from vyra_base.com import create_vyra_speaker
-from vyra_base.com.datalayer.node import VyraNode, NodeSettings
+from vyra_base.com.transport.ros2.node import VyraNode, NodeSettings
 
 def main():
     """Main function demonstrating VyraSpeaker usage."""

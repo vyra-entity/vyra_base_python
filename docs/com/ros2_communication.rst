@@ -139,7 +139,7 @@ A **Listener** receives messages from a topic:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.subscriber import VyraSubscriber
+   from vyra_base.com.transport.ros2.subscriber import Subscriber
    from std_msgs.msg import String
    
    # Define callback function

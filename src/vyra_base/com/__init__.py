@@ -1,56 +1,134 @@
 """
 VYRA Base Communication Module (COM)
 
-Provides ROS2 communication (Services, Topics, Actions),
-IPC over gRPC/Unix Domain Sockets, and automatic Feeders.
+Multi-protocol communication system with automatic protocol selection and fallback.
 
-Public API for external developers
+Provides:
+- Multi-protocol support (ROS2, Redis, gRPC, MQTT, REST, WebSocket, Modbus, OPC UA)
+- Automatic protocol fallback
+- Protocol-agnostic decorators (@remote_callable, @remote_speaker, @remote_job)
+- Backward compatibility with legacy ROS2-only datalayer API
+
+New Code (Recommended):
+    from vyra_base.com import remote_callable, InterfaceFactory, ProtocolType
+    
+Legacy Code (Still Supported):
+    from vyra_base.com import remote_callable
 """
 
-# ROS2 Communication - Datalayer
-from vyra_base.com.datalayer.interface_factory import (
-    create_vyra_job,          # Action Server (long-running jobs)
-    create_vyra_job_runner,   # Action Client (sends goals to jobs)
-    create_vyra_callable,      # Service Server (provides services)
-    create_vyra_speaker,       # Publisher (publishes topics)
-    remote_callable,           # Decorator for automatic service registration
-    DataSpace                  # Interface registry
+# ============================================================================
+# NEW MULTI-PROTOCOL API (Recommended)
+# ============================================================================
+
+# Core components
+from vyra_base.com.core import (
+    # Exceptions
+    CommunicationError,
+    ProtocolUnavailableError,
+    ProtocolNotInitializedError,
+    TransportError,
+    ProviderError,
+    InterfaceError,
+    CallableError,
+    SpeakerError,
+    JobError,
+    # Types
+    ProtocolType,
+    InterfaceType,
+    # Factory & Decorators
+    InterfaceFactory,
+    remote_callable,
+    remote_speaker,
+    remote_job,
 )
 
-from vyra_base.com.datalayer.job import VyraJob, VyraJobRunner
-from vyra_base.com.datalayer.callable import VyraCallable, VyraCallableExecutor
-from vyra_base.com.datalayer.speaker import VyraSpeaker, VyraSpeakerListener
-from vyra_base.com.datalayer.publisher import VyraPublisher
-from vyra_base.com.datalayer.subscriber import VyraSubscriber
-from vyra_base.com.datalayer.node import VyraNode, CheckerNode, NodeSettings
-from vyra_base.com.datalayer.action_client import VyraActionClient
-from vyra_base.com.datalayer.action_server import VyraActionServer
+# Provider Registry
+from vyra_base.com.providers import (
+    AbstractProtocolProvider,
+    ProviderRegistry,
+)
 
-# Feeders - Automatic data publication
+# Feeders - Multi-protocol support
 from vyra_base.com.feeder.feeder import BaseFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 
+# ============================================================================
+# LEGACY COMPATIBILITY (Deprecated - use InterfaceFactory instead)
+# ============================================================================
+#
+# NOTE: Legacy functions (create_vyra_callable, create_vyra_speaker, etc.) have been removed.
+# External modules using them should migrate to:
+#   from vyra_base.com import InterfaceFactory, remote_callable, ProtocolType
+#
+# The @remote_callable decorator now supports multi-protocol.
+# Old code using it will continue to work but gets ROS2-only behavior.
+#
+
+# Use new ROS2 implementations
+from vyra_base.com.transport.ros2.ros2_callable import ROS2Callable
+from vyra_base.com.transport.ros2.ros2_speaker import ROS2Speaker
+from vyra_base.com.transport.ros2.ros2_job import ROS2Job
+
+# ROS2 infrastructure - Using transport/ros2 implementations
+from vyra_base.com.transport.ros2.publisher import VyraPublisher
+from vyra_base.com.transport.ros2.subscriber import VyraSubscriber
+from vyra_base.com.transport.ros2.node import VyraNode, CheckerNode, NodeSettings
+from vyra_base.com.transport.ros2.action_client import VyraActionClient
+from vyra_base.com.transport.ros2.action_server import VyraActionServer
+from vyra_base.com.transport.ros2.service_client import VyraServiceClient
+from vyra_base.com.transport.ros2.service_server import VyraServiceServer
+
 # IPC - Inter-Process Communication
 from vyra_base.com.handler.ipc import GrpcUdsServer, GrpcUdsClient
 
 __all__ = [
-    # Factory functions
-    "create_vyra_job",
-    "create_vyra_job_runner",
-    "create_vyra_callable",
-    "create_vyra_speaker",
+    # ========================================================================
+    # NEW MULTI-PROTOCOL API (Recommended)
+    # ========================================================================
+    
+    # Exceptions
+    "CommunicationError",
+    "ProtocolUnavailableError",
+    "ProtocolNotInitializedError",
+    "TransportError",
+    "ProviderError",
+    "InterfaceError",
+    "CallableError",
+    "SpeakerError",
+    "JobError",
+    
+    # Types
+    "ProtocolType",
+    "InterfaceType",
+    
+    # Factory
+    "InterfaceFactory",
+    
+    # Decorators (Multi-protocol)
     "remote_callable",
-    "DataSpace",
+    "remote_speaker",
+    "remote_job",
+    
+    # Providers
+    "AbstractProtocolProvider",
+    "ProviderRegistry",
+    
+    # Feeders (Multi-protocol)
+    "BaseFeeder",
+    "StateFeeder",
+    "NewsFeeder",
+    "ErrorFeeder",
+    
+    # ========================================================================
+    # LEGACY ROS2 API (Minimal exports - migrate to InterfaceFactory)
+    # ========================================================================
     
     # ROS2 Classes
-    "VyraJob",
-    "VyraJobRunner",
-    "VyraCallable",
-    "VyraCallableExecutor",
-    "VyraSpeaker",
-    "VyraSpeakerListener",
+    "ROS2Job",
+    "ROS2Callable",
+    "ROS2Speaker",
     "VyraPublisher",
     "VyraSubscriber",
     "VyraNode",
@@ -58,14 +136,10 @@ __all__ = [
     "NodeSettings",
     "VyraActionClient",
     "VyraActionServer",
+    "VyraServiceClient",
+    "VyraServiceServer",
     
-    # Feeders
-    "BaseFeeder",
-    "StateFeeder",
-    "NewsFeeder",
-    "ErrorFeeder",
-    
-    # IPC
+    # IPC (Legacy)
     "GrpcUdsServer",
     "GrpcUdsClient",
 ]

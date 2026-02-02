@@ -27,7 +27,7 @@ import rclpy
 from rclpy.node import Node
 from builtin_interfaces.msg import Time
 
-from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.com import remote_callable
 from vyra_base.security.security_levels import (
     SecurityLevel,
     AccessStatus,

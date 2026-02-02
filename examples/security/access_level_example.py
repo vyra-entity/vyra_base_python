@@ -144,7 +144,7 @@ async def build_base():
 # =============================================================================
 
 from vyra_base.state import OperationalStateMachine
-from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.com import remote_callable
 from vyra_base.security import security_required, SecurityLevel
 from vyra_base.helper.logger import Logger
 

@@ -186,7 +186,7 @@ A central dashboard can subscribe to all feeder topics:
 .. code-block:: python
 
    # Dashboard Module (Subscriber)
-   from vyra_base.com.datalayer.subscriber import VyraSubscriber
+   from vyra_base.com.transport.ros2.subscriber import Subscriber
    
    class MonitoingDashboard:
        def __init__(self, entity):

@@ -157,7 +157,7 @@ After defining the service in JSON, implement it in your application:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import remote_callable
+   from vyra_base.com import remote_callable
    from vyra_base.security import security_required, SecurityLevel
 
    class Application(OperationalStateMachine):

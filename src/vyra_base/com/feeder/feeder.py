@@ -1,19 +1,36 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Type
+from typing import Any, Type, Optional
 
-from rclpy.qos import (
-    QoSProfile,
-    QoSHistoryPolicy,
-    QoSReliabilityPolicy,
-    QoSDurabilityPolicy,
-)
+# Check ROS2 availability
+try:
+    import rclpy
+    _ROS2_AVAILABLE = True
+except ImportError:
+    _ROS2_AVAILABLE = False
+
+if _ROS2_AVAILABLE:
+    from rclpy.qos import (
+        QoSProfile,
+        QoSHistoryPolicy,
+        QoSReliabilityPolicy,
+        QoSDurabilityPolicy,
+    )
+    from vyra_base.com import InterfaceFactory, ProtocolType
+    from vyra_base.com.transport.ros2.node import VyraNode
+    from vyra_base.com.core.types import VyraSpeaker
+else:
+    QoSProfile = None
+    QoSHistoryPolicy = None
+    QoSReliabilityPolicy = None
+    QoSDurabilityPolicy = None
+    InterfaceFactory = None
+    ProtocolType = None
+    VyraNode = None
+    VyraSpeaker = None
 
 from vyra_base.com.handler.communication import CommunicationHandler
-from vyra_base.com.datalayer.interface_factory import create_vyra_speaker
-from vyra_base.com.datalayer.node import VyraNode
-from vyra_base.com.datalayer.speaker import VyraSpeaker
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.helper.logger import Logger
 
@@ -29,66 +46,116 @@ class BaseFeeder:
         """
         Initialize the BaseFeeder.
         """
-        self._qos = QoSProfile(
-            history=QoSHistoryPolicy.KEEP_LAST,
-            depth=10,
-            reliability=QoSReliabilityPolicy.RELIABLE,
-            durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
-        )
+        # QoS configuration (only if ROS2 available)
+        if _ROS2_AVAILABLE:
+            self._qos = QoSProfile(
+                history=QoSHistoryPolicy.KEEP_LAST,
+                depth=10,
+                reliability=QoSReliabilityPolicy.RELIABLE,
+                durability=QoSDurabilityPolicy.TRANSIENT_LOCAL
+            )
+        else:
+            self._qos = None
 
         self._feedBaseName: str = 'vyraFeeder'
         self._feederName: str = 'AbstractFeeder'
         self._doc: str = 'Abstract class for all feeder classes.'
         self._level: int = logging.INFO
+        self._ros2_available: bool = _ROS2_AVAILABLE
 
         self._handler_classes: list[Type[CommunicationHandler]] = []  # Store handler classes
         self._handler: list[Type[CommunicationHandler] | CommunicationHandler] = []  # Store handler instances
         self._feeder: logging.Logger
         self._loggingOn: bool  # If true, the feeder will log messages in the base logger
-        self._node: VyraNode
+        self._node: Optional[Any] = None  # VyraNode or None
         self._type: Any
-        self._speaker: VyraSpeaker
+        self._speaker: Optional[Any] = None  # VyraSpeaker or new protocol speaker
 
-    def create(self, loggingOn: bool = False) -> None:
+    async def create(self, loggingOn: bool = False) -> None:
         """
         Create the feeder and its communication handlers.
+        Supports ROS2 (if available) or fallback to Redis/MQTT.
+        
         :raises FeederException: If the speaker could not be created.
         :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
         :param loggingOn: If True, enables logging in the base logger.
         :type loggingOn: bool
-        :raises FeederException: If the speaker could not be created.
-        :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
         """
-        self._speaker: VyraSpeaker = create_vyra_speaker(
-            type=self._type,
-            node=self._node,
-            description=self._doc,
-            qos_profile=self._qos,
-            ident_name=self._feederName,
-        )
         self._loggingOn: bool = loggingOn
-
-        if self._speaker.publisher_server is None:
+        
+        # Try ROS2 first if available
+        if self._ros2_available and self._node is not None:
+            try:
+                self._speaker = await InterfaceFactory.create_speaker(
+                    name=self._feederName,
+                    protocols=[ProtocolType.ROS2],
+                    message_type=self._type,
+                    node=self._node,
+                    is_publisher=True,
+                    qos_profile=self._qos
+                )
+                
+                if self._speaker.publisher_server is None:
+                    raise FeederException(
+                        f"Could not create ROS2 speaker for {self._feederName}."
+                    )
+                
+                Logger.info(f"✅ {self._feederName} using ROS2 protocol")
+                
+            except Exception as e:
+                Logger.warn(f"⚠️ ROS2 speaker creation failed: {e}. Falling back to Redis/MQTT.")
+                self._speaker = None
+        
+        # Fallback to new protocol speakers (Redis, MQTT)
+        if self._speaker is None and _NEW_PROTOCOLS_AVAILABLE:
+            try:
+                # Use InterfaceFactory for protocol fallback
+                import asyncio
+                loop = asyncio.get_event_loop()
+                
+                self._speaker = loop.run_until_complete(
+                    InterfaceFactory.create_speaker(
+                        name=self._feederName,
+                        protocols=[ProtocolType.REDIS, ProtocolType.MQTT],
+                    )
+                )
+                
+                Logger.info(f"✅ {self._feederName} using {self._speaker.protocol.value} protocol")
+                
+            except Exception as e:
+                Logger.error(f"❌ Failed to create feeder speaker: {e}")
+                raise FeederException(
+                    f"Could not create speaker for {self._feederName}. "
+                    f"Install ROS2 or configure Redis/MQTT."
+                )
+        
+        if self._speaker is None:
             raise FeederException(
-                f"Could not create speaker for {self._feederName} with type {type}."
-            )        
+                f"No communication protocol available for {self._feederName}. "
+                f"Install ROS2, Redis, or MQTT."
+            )
 
         self.create_feeder()
 
-        for handler_class in self._handler_classes:
-            if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
-                raise TypeError("Handler class must be a subclass of CommunicationHandler")
+        # Create handlers only for ROS2 speakers
+        if self._ros2_available and hasattr(self._speaker, 'publisher_server'):
+            for handler_class in self._handler_classes:
+                if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
+                    raise TypeError("Handler class must be a subclass of CommunicationHandler")
 
-            handler = handler_class(
-                initiator=self._feederName,
-                speaker=self._speaker,
-                type=self._speaker.publisher_server.publisher_info.type
-            )
-            self.add_handler(handler)
+                handler = handler_class(
+                    initiator=self._feederName,
+                    speaker=self._speaker,
+                    type=self._speaker.publisher_server.publisher_info.type
+                )
+                self.add_handler(handler)
+        else:
+            Logger.debug(f"⚠️ Skipping ROS2 handlers for {self._feederName} (non-ROS2 protocol)")
 
     def feed(self, msg: Any) -> None:
         """
         Feed a message to the feeder.
+        Supports ROS2 handlers or direct speaker.shout() for new protocols.
 
         :param msg: The message to feed.
         :type msg: Any
@@ -99,6 +166,15 @@ class BaseFeeder:
             Logger.log(
                 f"Feeder {self._feederName} fed with message: {msg}"
             )
+        
+        # If using new protocols (Redis/MQTT), publish directly
+        if not self._ros2_available or not hasattr(self._speaker, 'publisher_server'):
+            try:
+                import asyncio
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(self._speaker.shout(msg))
+            except Exception as e:
+                Logger.error(f"❌ Failed to feed message via {self._speaker.protocol}: {e}")
 
     def create_feeder(self):
         """

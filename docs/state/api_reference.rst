@@ -95,7 +95,7 @@ Usage:
 
 .. code-block:: python
 
-    from vyra_base.com.datalayer.interface_factory import remote_callable
+    from vyra_base.com import remote_callable
     
     class MyComponent(OperationalStateMachine):
         @remote_callable
