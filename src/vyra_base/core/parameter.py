@@ -6,8 +6,6 @@ from sqlalchemy import event
 from sqlalchemy import inspect
 
 from vyra_base.com import InterfaceFactory, ProtocolType, remote_callable
-from vyra_base.com.transport.ros2.ros2_speaker import ROS2Speaker
-from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.helper.logger import Logger
 from vyra_base.storage.db_access import DBSTATUS, DbAccess

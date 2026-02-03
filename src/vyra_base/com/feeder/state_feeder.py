@@ -9,7 +9,7 @@ except ImportError:
     _ROS2_AVAILABLE = False
 
 if _ROS2_AVAILABLE:
-    from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
+    from vyra_base.com.transport.ros2 import Ros2TypeConverter
     from vyra_base.com.handler.ros2 import ROS2Handler
 else:
     Ros2TypeConverter = None
@@ -74,11 +74,16 @@ class StateFeeder(BaseFeeder):
         self._node: Optional[Any] = node
         self._module_config: ModuleEntry = module_config
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
+        self._loggingOn: bool = loggingOn
 
         if self._ros2_available and ROS2Handler:
             self._handler_classes.append(ROS2Handler)
-
-        self.create(loggingOn=loggingOn)
+    
+    async def start(self) -> None:
+        """
+        Starts the feeder by initializing handlers.
+        """
+        await self.create(loggingOn=self._loggingOn)
         
     def feed(self, stateElement: StateEntry) -> None:
         """

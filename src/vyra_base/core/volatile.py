@@ -4,7 +4,7 @@ from typing import Any, Type, Optional
 from vyra_base.com.transport.ros2.node import VyraNode
 from vyra_base.com.core.types import VyraSpeaker
 from vyra_base.helper.error_handler import ErrorTraceback
-from vyra_base.storage.redis_client import RedisClient, REDIS_TYPE
+from vyra_base.com.transport.redis import RedisClient, REDIS_TYPE
 from vyra_base.com import InterfaceFactory, ProtocolType
 
 from vyra_base.helper.logger import Logger

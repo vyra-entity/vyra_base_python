@@ -5,15 +5,15 @@ Unified communication abstraction layer supporting multiple protocols.
 Implements provider pattern for pluggable transports.
 
 Available Transports:
-- Shared Memory: Zero-copy local IPC via POSIX shared memory
+- Redis: Message queue and key-value storage via Redis
 - ROS2: Distributed communication via DDS middleware
 - UDS: Stream-based local IPC via Unix domain sockets
 
 Example Usage:
-    >>> # Shared Memory Transport
-    >>> from vyra_base.com.transport.shared_memory import SharedMemoryProvider
+    >>> # Redis Transport
+    >>> from vyra_base.com.transport.redis import RedisProvider, RedisClient
     >>> 
-    >>> provider = SharedMemoryProvider(ProtocolType.SHARED_MEMORY)
+    >>> provider = RedisProvider(ProtocolType.REDIS)
     >>> if await provider.check_availability():
     ...     await provider.initialize()
     ...     callable = await provider.create_callable("service", callback)
@@ -36,19 +36,17 @@ Example Usage:
     ...     callable = await provider.create_callable("service", callback)
 """
 
-# Shared Memory Transport (always try to import)
+# Redis Transport (optional)
 try:
-    from vyra_base.com.transport.shared_memory import (
-        SharedMemoryProvider,
-        SharedMemoryCallable,
-        SharedMemorySpeaker,
-        SharedMemorySegment,
-        SharedMemoryDiscovery,
-        POSIX_IPC_AVAILABLE,
+    from vyra_base.com.transport.redis import (
+        RedisProvider,
+        RedisClient,
+        RedisCallable,
+        RedisSpeaker,
+        REDIS_AVAILABLE,
     )
-    SHARED_MEMORY_AVAILABLE = POSIX_IPC_AVAILABLE
 except ImportError:
-    SHARED_MEMORY_AVAILABLE = False
+    REDIS_AVAILABLE = False
 
 # ROS2 Transport (optional)
 try:
@@ -73,19 +71,18 @@ except ImportError:
 
 __all__ = [
     # Availability flags
-    "SHARED_MEMORY_AVAILABLE",
+    "REDIS_AVAILABLE",
     "ROS2_AVAILABLE",
     "UDS_AVAILABLE",
 ]
 
 # Export based on availability
-if SHARED_MEMORY_AVAILABLE:
+if REDIS_AVAILABLE:
     __all__.extend([
-        "SharedMemoryProvider",
-        "SharedMemoryCallable",
-        "SharedMemorySpeaker",
-        "SharedMemorySegment",
-        "SharedMemoryDiscovery",
+        "RedisProvider",
+        "RedisClient",
+        "RedisCallable",
+        "RedisSpeaker",
     ])
 
 if ROS2_AVAILABLE:
@@ -110,7 +107,7 @@ def get_available_transports() -> dict:
         Dict mapping protocol name to availability status
     """
     return {
-        "shared_memory": SHARED_MEMORY_AVAILABLE,
+        "redis": REDIS_AVAILABLE,
         "ros2": ROS2_AVAILABLE,
         "uds": UDS_AVAILABLE,
     }

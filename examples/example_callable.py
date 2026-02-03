@@ -5,9 +5,12 @@ This example demonstrates how to create and use a VyraCallable
 to provide ROS2 services.
 """
 
+import asyncio
 import rclpy
 from example_interfaces.srv import AddTwoInts
-from vyra_base.com import create_vyra_callable, remote_callable
+from vyra_base.com import remote_callable
+from vyra_base.com.core.types import ProtocolType
+from vyra_base.com.transport.ros2 import ROS2Provider
 from vyra_base.com.transport.ros2.node import VyraNode, NodeSettings
 
 
@@ -29,7 +32,7 @@ def add_two_ints_callback(request, response):
 class Calculator:
     """Example class using @remote_callable decorator."""
     
-    @remote_callable
+    @remote_callable()
     async def multiply_two_ints(self, request, response):
         """
         Service to multiply two integers.
@@ -43,20 +46,20 @@ class Calculator:
         return response
 
 
-def main():
+async def main():
     """Main function demonstrating VyraCallable usage."""
     
     # Initialize ROS2
     rclpy.init()
     
-    # Create a VyraNode
-    node_settings = NodeSettings(name="callable_example_node")
-    node = VyraNode(node_settings=node_settings)
-    
+    provider = ROS2Provider(
+        protocol=ProtocolType.ROS2,
+        node_name="callable_example_provider"
+    )
     # Method 1: Create a Callable with explicit callback
-    callable_add = create_vyra_callable(
-        type=AddTwoInts,
-        node=node,
+    callable_add = await provider.create_callable(
+        name="add_service",
+        message_type=AddTwoInts,
         callback=add_two_ints_callback,
         ident_name="add_service",
         description="Service to add two integers"
@@ -68,15 +71,15 @@ def main():
     
     # Spin to handle service requests
     try:
-        rclpy.spin(node)
+        rclpy.spin(provider.get_node())
     except KeyboardInterrupt:
         print("\nShutting down...")
     
     # Cleanup
-    node.destroy_node()
+    await callable_add.shutdown()
     rclpy.shutdown()
     print("Callable example completed!")
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

@@ -23,9 +23,16 @@ from typing import Dict, Optional, Tuple
 from pathlib import Path
 from dataclasses import dataclass, field
 
-import rclpy
-from rclpy.node import Node
-from builtin_interfaces.msg import Time
+try:
+    import rclpy
+    from rclpy.node import Node
+    from builtin_interfaces.msg import Time
+    ROS2_AVAILABLE = True
+except ImportError:
+    rclpy = None
+    Node = None
+    Time = None
+    ROS2_AVAILABLE = False
 
 from vyra_base.com import remote_callable
 from vyra_base.security.security_levels import (
@@ -155,12 +162,19 @@ class SecurityManager:
                 Logger.warn("CA key not found, Level 5 authentication will not be available")
                 
             if ca_cert_path and ca_cert_path.exists():
+                # Load both PEM string and parsed certificate object
                 self.ca_cert_pem = ca_cert_path.read_text()
+                from cryptography import x509
+                from cryptography.hazmat.backends import default_backend
+                cert_bytes = ca_cert_path.read_bytes()
+                self.ca_cert = x509.load_pem_x509_certificate(cert_bytes, default_backend())
                 Logger.info(f"Loaded CA certificate from {ca_cert_path}")
+            else:
+                self.ca_cert = None
         except Exception as e:
             Logger.error(f"Failed to load CA infrastructure: {e}")
 
-    @remote_callable
+    @remote_callable()
     async def request_access(self, request, response) -> bool:
         """
         Remote callable wrapper for request_access_impl.
@@ -192,7 +206,8 @@ class SecurityManager:
             response.session_token = session_token
             response.hmac_key = hmac_key
             response.certificate = certificate
-            response.expires_at = Time(sec=int(expires_at.timestamp()), nanosec=0)
+            if Time is not None:
+                response.expires_at = Time(sec=int(expires_at.timestamp()), nanosec=0)
             response.granted_sl = granted_sl
             
             return True
@@ -302,7 +317,7 @@ class SecurityManager:
                     0
                 )
             
-            if not self.ca_private_key or not self.ca_cert_pem:
+            if not self.ca_private_key or not self.ca_cert:
                 Logger.error("CA infrastructure not available for Level 5")
                 return (
                     False,
@@ -320,7 +335,7 @@ class SecurityManager:
                 certificate = crypto_sign_csr(
                     certificate_csr,
                     self.ca_private_key,
-                    self.ca_cert_pem,
+                    self.ca_cert,  # Type is now guaranteed to be Certificate (not None)
                     validity_days=365
                 )
             except Exception as e:

@@ -4,8 +4,11 @@ ROS2 Protocol Provider
 Implements AbstractProtocolProvider for ROS2 transport.
 Provides distributed communication via DDS middleware.
 """
+from __future__ import annotations
+
+import asyncio
 import logging
-from typing import Any, Callable, Optional, Dict
+from typing import Any, Callable, Optional, Dict, TYPE_CHECKING
 
 from vyra_base.com.core.types import (
     ProtocolType,
@@ -17,6 +20,8 @@ from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     ProviderError,
 )
+from vyra_base.com.transport.ros2.node import NodeSettings, VyraNode
+from vyra_base.com.transport.ros2.vyra_models import ROS2Speaker, ROS2Callable, ROS2Job
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 
 logger = logging.getLogger(__name__)
@@ -90,7 +95,7 @@ class ROS2Provider(AbstractProtocolProvider):
         """
         super().__init__(protocol)
         self.node_name = node_name
-        self._node: Optional[Node] = None
+        self._node: Optional[VyraNode] = None
         
         # Default configuration
         self._config = {
@@ -161,7 +166,7 @@ class ROS2Provider(AbstractProtocolProvider):
             
             # Create node (we'll use the existing VyraNode or create a basic one)
             # Note: In actual usage, this will be integrated with existing VyraNode
-            from vyra_base.com.transport.ros2.node import NodeSettings, VyraNode
+            
             
             node_settings = NodeSettings(
                 name=self._config["node_name"],
@@ -233,9 +238,6 @@ class ROS2Provider(AbstractProtocolProvider):
             f"🔧 Creating ROS2 service: {name} (type: {service_type})"
         )
         
-        # Import ROS2-specific implementation
-        from vyra_base.com.transport.ros2.ros2_callable import ROS2Callable
-        
         # Create ROS2 callable
         callable_instance = ROS2Callable(
             name=name,
@@ -284,10 +286,7 @@ class ROS2Provider(AbstractProtocolProvider):
         logger.info(
             f"🔧 Creating ROS2 {role}: {name} (type: {message_type})"
         )
-        
-        # Import ROS2-specific implementation
-        from vyra_base.com.transport.ros2.ros2_speaker import ROS2Speaker
-        
+                
         # Create ROS2 speaker
         speaker_instance = ROS2Speaker(
             name=name,
@@ -333,10 +332,7 @@ class ROS2Provider(AbstractProtocolProvider):
         logger.info(
             f"🔧 Creating ROS2 action: {name} (type: {action_type})"
         )
-        
-        # Import ROS2-specific implementation
-        from vyra_base.com.transport.ros2.ros2_job import ROS2Job
-        
+                
         # Create ROS2 job
         job_instance = ROS2Job(
             name=name,
@@ -351,28 +347,14 @@ class ROS2Provider(AbstractProtocolProvider):
         logger.info(f"✅ ROS2 action created: {name}")
         return job_instance
     
-    def get_node(self) -> Optional[Node]:
+    def get_node(self) -> Node:
         """
         Get the ROS2 node.
         
         Returns:
-            rclpy Node instance or None if not initialized
+            rclpy Node instance
         """
-        return self._node
-    
-    def spin_once(self, timeout_sec: float = 0.0) -> None:
-        """
-        Spin the node once.
+        if not self._initialized or not self._node:
+            raise ProviderError("Provider not initialized or node not available")
         
-        Args:
-            timeout_sec: Timeout in seconds
-        """
-        if self._node:
-            rclpy.spin_once(self._node, timeout_sec=timeout_sec)
-    
-    async def spin_async(self) -> None:
-        """Spin the node asynchronously (use in async context)."""
-        if self._node:
-            # Run spin in executor to avoid blocking
-            loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, rclpy.spin, self._node)
+        return self._node

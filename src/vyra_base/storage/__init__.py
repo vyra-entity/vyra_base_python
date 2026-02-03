@@ -18,8 +18,21 @@ from .db_access import DbAccess, DBTYPE, DBSTATUS, DBMESSAGE
 # Database CRUD operations
 from .db_manipulator import DbManipulator, DBReturnValue
 
-# Redis client
-from .redis_client import RedisClient
+# Redis client - BACKWARD COMPATIBILITY
+# NOTE: RedisClient has been moved to vyra_base.com.transport.redis
+# This import maintains backward compatibility
+try:
+    from vyra_base.com.transport.redis import RedisClient, REDIS_TYPE
+    _REDIS_AVAILABLE = True
+except ImportError:
+    # Fallback to old location if new location not available
+    try:
+        from .redis_client import RedisClient, REDIS_TYPE
+        _REDIS_AVAILABLE = True
+    except ImportError:
+        RedisClient = None
+        REDIS_TYPE = None
+        _REDIS_AVAILABLE = False
 
 # Storage base class
 from .storage import Storage
@@ -40,8 +53,9 @@ __all__ = [
     "DbManipulator",
     "DBReturnValue",
     
-    # Redis
+    # Redis (backward compatibility)
     "RedisClient",
+    "REDIS_TYPE",
     
     # Storage base
     "Storage",

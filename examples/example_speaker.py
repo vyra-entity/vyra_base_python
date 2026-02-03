@@ -5,13 +5,15 @@ This example demonstrates how to create and use a VyraSpeaker
 to publish messages on ROS2 topics.
 """
 
+import asyncio
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-from vyra_base.com import create_vyra_speaker
+from vyra_base.com.core.types import ProtocolType
+from vyra_base.com.transport.ros2 import ROS2Provider
 from vyra_base.com.transport.ros2.node import VyraNode, NodeSettings
 
-def main():
+async def main():
     """Main function demonstrating VyraSpeaker usage."""
     
     # Initialize ROS2
@@ -21,10 +23,21 @@ def main():
     node_settings = NodeSettings(name="speaker_example_node")
     node = VyraNode(node_settings=node_settings)
     
+    provider = ROS2Provider(
+        protocol=ProtocolType.ROS2,
+        node_name="speaker_example_provider"
+    )
+
+    await provider.initialize(config={
+        "node_name": "vyra_speaker_example",
+        "namespace": "/vyra"
+    })
+
     # Create a Speaker (Publisher)
-    speaker = create_vyra_speaker(
-        type=String,
-        node=node,
+    speaker = await provider.create_speaker(
+        name="example_topic",
+        message_type=String,
+        is_publisher=True,
         description="Example speaker for publishing string messages",
         ident_name="example_speaker",
         qos_profile=10  # Queue size
@@ -38,7 +51,7 @@ def main():
         msg.data = f"Hello from VyraSpeaker! Message #{i}"
         
         # Use 'shout' method to publish
-        speaker.shout(msg)
+        await speaker.shout(msg)
         print(f"Published: {msg.data}")
         
         # Sleep for 1 second
@@ -51,4 +64,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

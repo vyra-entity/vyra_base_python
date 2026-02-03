@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any, Type, Optional
 
@@ -20,15 +21,6 @@ if _ROS2_AVAILABLE:
     from vyra_base.com import InterfaceFactory, ProtocolType
     from vyra_base.com.transport.ros2.node import VyraNode
     from vyra_base.com.core.types import VyraSpeaker
-else:
-    QoSProfile = None
-    QoSHistoryPolicy = None
-    QoSReliabilityPolicy = None
-    QoSDurabilityPolicy = None
-    InterfaceFactory = None
-    ProtocolType = None
-    VyraNode = None
-    VyraSpeaker = None
 
 from vyra_base.com.handler.communication import CommunicationHandler
 from vyra_base.defaults.exceptions import FeederException
@@ -107,10 +99,9 @@ class BaseFeeder:
                 self._speaker = None
         
         # Fallback to new protocol speakers (Redis, MQTT)
-        if self._speaker is None and _NEW_PROTOCOLS_AVAILABLE:
+        if self._speaker is None:
             try:
                 # Use InterfaceFactory for protocol fallback
-                import asyncio
                 loop = asyncio.get_event_loop()
                 
                 self._speaker = loop.run_until_complete(
@@ -167,10 +158,13 @@ class BaseFeeder:
                 f"Feeder {self._feederName} fed with message: {msg}"
             )
         
+        if not self._speaker:
+            Logger.error(f"❌ No speaker available for feeder {self._feederName}")
+            return
+        
         # If using new protocols (Redis/MQTT), publish directly
         if not self._ros2_available or not hasattr(self._speaker, 'publisher_server'):
             try:
-                import asyncio
                 loop = asyncio.get_event_loop()
                 loop.run_until_complete(self._speaker.shout(msg))
             except Exception as e:

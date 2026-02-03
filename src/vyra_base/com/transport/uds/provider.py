@@ -18,8 +18,8 @@ from vyra_base.com.core.exceptions import (
     ProviderError,
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
-from vyra_base.com.transport.uds.callable import UDSCallable
-from vyra_base.com.transport.uds.socket import UDS_SOCKET_DIR
+from vyra_base.com.transport.uds.communication import UDS_SOCKET_DIR
+from vyra_base.com.transport.uds.vyra_models import UDSCallable
 
 logger = logging.getLogger(__name__)
 

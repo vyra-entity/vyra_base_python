@@ -25,12 +25,24 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, AsyncIterator, Callable, Optional
-
-import grpc
-from grpc import aio
+from typing import Any, AsyncIterator, Callable, Optional, TYPE_CHECKING
 
 logger = logging.getLogger(__name__)
+
+# Check if grpcio is available
+try:
+    import grpc
+    from grpc import aio
+    GRPC_AVAILABLE = True
+except ImportError:
+    GRPC_AVAILABLE = False
+    grpc = None
+    aio = None
+    logger.warning("⚠️  grpcio not installed. gRPC over UDS functionality disabled.")
+
+# Type hints only
+if TYPE_CHECKING and GRPC_AVAILABLE:
+    from grpc import aio
 
 
 class GrpcUdsBase(ABC):
@@ -121,7 +133,7 @@ class GrpcUdsServer(GrpcUdsBase):
             ('grpc.max_send_message_length', 50 * 1024 * 1024),  # 50 MB
             ('grpc.max_receive_message_length', 50 * 1024 * 1024),  # 50 MB
         ]
-        self._server: Optional[aio.Server] = None
+        self._server: Optional[.Server] = None
         self._servicers = []
         
     def add_service(

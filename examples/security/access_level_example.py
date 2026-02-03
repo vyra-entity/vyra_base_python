@@ -154,7 +154,7 @@ class Application(OperationalStateMachine):
     """
     
     def __init__(self, entity: VyraEntity, *args, **kwargs):
-        super().__init__(entity.unified_state_machine)
+        super().__init__(entity.state_machine.fsm)
         self.entity = entity
         
         # Log security status
@@ -167,7 +167,7 @@ class Application(OperationalStateMachine):
     # Level 1: Public Service (No authentication required)
     # -------------------------------------------------------------------------
     
-    @remote_callable
+    @remote_callable()
     @security_required(security_level=SecurityLevel.NONE)
     def get_status(self, request=None, response=None):
         """
@@ -176,6 +176,9 @@ class Application(OperationalStateMachine):
         """
         Logger.info("get_status called")
         
+        if response is None:
+            return response
+
         response.status = "running"
         response.success = True
         return response
@@ -184,7 +187,7 @@ class Application(OperationalStateMachine):
     # Level 3: Password Required
     # -------------------------------------------------------------------------
     
-    @remote_callable
+    @remote_callable()
     @security_required(security_level=SecurityLevel.EXTENDED_AUTH)
     def set_config(self, request=None, response=None):
         """
@@ -212,7 +215,7 @@ class Application(OperationalStateMachine):
     # Level 4: HMAC Signature Required
     # -------------------------------------------------------------------------
     
-    @remote_callable
+    @remote_callable()
     @security_required(security_level=SecurityLevel.HMAC)
     def start_operation(self, request=None, response=None):
         """
@@ -284,6 +287,10 @@ class ClientModule(Node):
         # Call service
         future = access_client.call_async(request)
         response = await future
+        
+        if response is None:
+            self.get_logger().error("❌ No response from RequestAccess service")
+            return False
         
         if response.success:
             self.get_logger().info(

@@ -3,8 +3,9 @@ REST External Communication
 
 HTTP REST API integration with FastAPI/aiohttp.
 """
-from vyra_base.com.external.rest.provider import RestProvider
+from vyra_base.com.external.rest.rest_client import RestClient, REST_AVAILABLE
 
 __all__ = [
-    "RestProvider",
+    "RestClient",
+    "REST_AVAILABLE",
 ]

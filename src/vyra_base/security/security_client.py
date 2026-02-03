@@ -21,6 +21,7 @@ License: Proprietary
 
 import time
 import uuid
+from pathlib import Path
 from typing import Any, Callable, Optional, Type
 from functools import wraps
 from dataclasses import dataclass
@@ -124,7 +125,8 @@ class SafetyMetadataBuilder:
                 raise SecurityError("Private key required for Level 5")
             
             try:
-                private_key = load_private_key(security_context.private_key_path)
+                
+                private_key = load_private_key(Path(security_context.private_key_path))
                 message = f"{sender_id}|{timestamp_sec}|{nonce}|{additional_data}"
                 signature = sign_message_rsa(message, private_key)
                 metadata['security_payload'] = signature

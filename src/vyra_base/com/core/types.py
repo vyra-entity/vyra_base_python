@@ -272,12 +272,14 @@ class VyraJob(VyraInterface):
     def __init__(
         self,
         name: str,
-        callback: Optional[Callable] = None,
+        result_callback: Optional[Callable] = None,
+        feedback_callback: Optional[Callable] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
         super().__init__(name, protocol, InterfaceType.JOB, **kwargs)
-        self.callback = callback
+        self.result_callback = result_callback
+        self.feedback_callback = feedback_callback
         self._transport_handle: Optional[Any] = None
     
     async def initialize(self) -> bool:

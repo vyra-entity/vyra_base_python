@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 import uuid
 from datetime import datetime
@@ -11,16 +12,14 @@ except ImportError:
     _ROS2_AVAILABLE = False
 
 if _ROS2_AVAILABLE:
-    from vyra_base.com.transport.ros2.typeconverter import Ros2TypeConverter
+    from vyra_base.com.transport.ros2 import Ros2TypeConverter
     from vyra_base.com.handler.ros2 import ROS2Handler
-else:
-    Ros2TypeConverter = None
-    ROS2Handler = None
 
 from vyra_base.defaults.entries import ErrorEntry, ModuleEntry
 from vyra_base.defaults.exceptions import FeederException
 
 from .feeder import BaseFeeder
+
 
 class ErrorFeeder(BaseFeeder):
     """
@@ -52,12 +51,17 @@ class ErrorFeeder(BaseFeeder):
         self._node: Optional[Any] = node
         self._module_config: ModuleEntry = module_config
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
-
-        if self._ros2_available and ROS2Handler:
+        self._loggingOn: bool = loggingOn
+        
+        if self._ros2_available and ROS2Handler is not None:
             self._handler_classes.append(ROS2Handler)
 
-        self.create(loggingOn=loggingOn)
-
+    async def start(self) -> None:
+        """
+        Starts the feeder by initializing handlers.
+        """
+        await self.create(loggingOn=self._loggingOn)
+        
     def feed(self, errorElement: Union[ErrorEntry, dict]) -> None:
         """
         Feed a news entry to the feeder.
@@ -78,7 +82,7 @@ class ErrorFeeder(BaseFeeder):
             raise FeederException(f"Wrong Type. Expect: NewsEntry, got {type(errorElement)}")
 
         # Convert to ROS2 types only if ROS2 available
-        if self._ros2_available and Ros2TypeConverter:
+        if self._ros2_available and Ros2TypeConverter is not None:
             errorfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
                     errorfeed_entry.timestamp if errorfeed_entry.timestamp else datetime.now()
             )

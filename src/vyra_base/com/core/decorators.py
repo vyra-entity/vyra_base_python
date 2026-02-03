@@ -63,11 +63,12 @@ def remote_callable(
             async def async_wrapper(*args, **wrapper_kwargs):
                 return await func(*args, **wrapper_kwargs)
             
+            # Use setattr to dynamically assign attributes to the wrapper function
             setattr(async_wrapper, "_vyra_remote_callable", True)
-            async_wrapper._vyra_callable_name = func._vyra_callable_name
-            async_wrapper._vyra_protocols = protocols
-            async_wrapper._vyra_auto_register = auto_register
-            async_wrapper._vyra_kwargs = kwargs
+            setattr(async_wrapper, "_vyra_callable_name", func._vyra_callable_name)
+            setattr(async_wrapper, "_vyra_protocols", protocols)
+            setattr(async_wrapper, "_vyra_auto_register", auto_register)
+            setattr(async_wrapper, "_vyra_kwargs", kwargs)
             
             return async_wrapper
         
@@ -77,11 +78,11 @@ def remote_callable(
             async def async_wrapper(*args, **wrapper_kwargs):
                 return func(*args, **wrapper_kwargs)
             
-            async_wrapper._vyra_remote_callable = True
-            async_wrapper._vyra_callable_name = func._vyra_callable_name
-            async_wrapper._vyra_protocols = protocols
-            async_wrapper._vyra_auto_register = auto_register
-            async_wrapper._vyra_kwargs = kwargs
+            setattr(async_wrapper, "_vyra_remote_callable", True)
+            setattr(async_wrapper, "_vyra_callable_name", func._vyra_callable_name)
+            setattr(async_wrapper, "_vyra_protocols", protocols)
+            setattr(async_wrapper, "_vyra_auto_register", auto_register)
+            setattr(async_wrapper, "_vyra_kwargs", kwargs)
             
             return async_wrapper
     
@@ -138,11 +139,11 @@ def remote_speaker(
             speaker = getattr(self_obj, speaker_attr)
             return await speaker.shout(message)
         
-        wrapper._vyra_remote_speaker = True
-        wrapper._vyra_speaker_name = func._vyra_speaker_name
-        wrapper._vyra_protocols = protocols
-        wrapper._vyra_auto_register = auto_register
-        wrapper._vyra_kwargs = kwargs
+        setattr(wrapper, "_vyra_remote_speaker", True)
+        setattr(wrapper, "_vyra_speaker_name", func._vyra_speaker_name)
+        setattr(wrapper, "_vyra_protocols", protocols)
+        setattr(wrapper, "_vyra_auto_register", auto_register)
+        setattr(wrapper, "_vyra_kwargs", kwargs)
         
         return wrapper
     
@@ -185,11 +186,11 @@ def remote_job(
             async def async_wrapper(*args, **wrapper_kwargs):
                 return await func(*args, **wrapper_kwargs)
             
-            async_wrapper._vyra_remote_job = True
-            async_wrapper._vyra_job_name = func._vyra_job_name
-            async_wrapper._vyra_protocols = protocols
-            async_wrapper._vyra_auto_register = auto_register
-            async_wrapper._vyra_kwargs = kwargs
+            setattr(async_wrapper, "_vyra_remote_job", True)
+            setattr(async_wrapper, "_vyra_job_name", func._vyra_job_name)
+            setattr(async_wrapper, "_vyra_protocols", protocols)
+            setattr(async_wrapper, "_vyra_auto_register", auto_register)
+            setattr(async_wrapper, "_vyra_kwargs", kwargs)
             
             return async_wrapper
         else:
@@ -197,11 +198,11 @@ def remote_job(
             async def async_wrapper(*args, **wrapper_kwargs):
                 return func(*args, **wrapper_kwargs)
             
-            async_wrapper._vyra_remote_job = True
-            async_wrapper._vyra_job_name = func._vyra_job_name
-            async_wrapper._vyra_protocols = protocols
-            async_wrapper._vyra_auto_register = auto_register
-            async_wrapper._vyra_kwargs = kwargs
+            setattr(async_wrapper, "_vyra_remote_job", True)
+            setattr(async_wrapper, "_vyra_job_name", func._vyra_job_name)
+            setattr(async_wrapper, "_vyra_protocols", protocols)
+            setattr(async_wrapper, "_vyra_auto_register", auto_register)
+            setattr(async_wrapper, "_vyra_kwargs", kwargs)
             
             return async_wrapper
     
@@ -235,7 +236,7 @@ def get_decorated_methods(obj: Any) -> dict:
             
             if hasattr(attr, "_vyra_remote_callable"):
                 result["callables"].append({
-                    "name": attr._vyra_callable_name,
+                    "name": getattr(attr, "_vyra_callable_name"),
                     "method": attr,
                     "protocols": attr._vyra_protocols,
                     "kwargs": attr._vyra_kwargs,

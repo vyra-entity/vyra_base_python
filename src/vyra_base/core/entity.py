@@ -45,12 +45,14 @@ from vyra_base.state import (
 )
 from vyra_base.storage.db_access import DbAccess
 from vyra_base.storage.db_access import DBTYPE
-from vyra_base.storage.redis_client import RedisClient
+from vyra_base.com.transport.redis import RedisClient
 from vyra_base.storage.storage import Storage
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.security import SecurityManager, SecurityLevel
+
+
 
 
 class VyraEntity:
@@ -478,7 +480,11 @@ class VyraEntity:
                 "timestamp": "startup_initiated"
             })
             
-            # Step 2: Initialize resources (storages would be initialized here)
+            # Stestate_feeder.start()p 2: Initialize resources (storages would be initialized here)
+            await self.state_feeder.start()
+            await self.news_feeder.start()
+            await self.error_feeder.start()
+
             # This is where setup_storage and other initialization would happen
             
             # Step 3: Complete initialization successfully

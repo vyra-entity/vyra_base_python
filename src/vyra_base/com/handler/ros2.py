@@ -11,7 +11,7 @@ from vyra_base.helper.error_handler import ErrorTraceback
 
 class ROS2Handler(CommunicationHandler):
     """
-    Abstract class for all DDS communication handlers.
+    Abstract class for all transport communication handlers.
 
     :cvar __handlerName__: Name of the handler.
     :type __handlerName__: str
@@ -44,7 +44,7 @@ class ROS2Handler(CommunicationHandler):
         self._type: Any = type
         super().__init__()
 
-    def emit(self, record: LogRecord):
+    async def emit(self, record: LogRecord):
         """
         Emit a log record by publishing it as a ROS2 message.
         
@@ -81,6 +81,6 @@ class ROS2Handler(CommunicationHandler):
 
                 setattr(ros_msg, field, value)
 
-            self._speaker.shout(ros_msg)
+            await self._speaker.shout(ros_msg)
         finally:
             ErrorTraceback.check_error_exist()

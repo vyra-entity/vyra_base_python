@@ -14,11 +14,13 @@ License: Proprietary
 """
 
 import rclpy
+import uuid
+
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
-import uuid
 from std_msgs.msg import String
-
+from unique_identifier_msgs.msg import UUID
+from typing import Optional
 from vyra_base.interfaces.srv import VBASERequestAccess
 from vyra_base.security.security_client import (
     SecurityContext,
@@ -48,7 +50,7 @@ class SecureClientNode(Node):
         self.module_id = str(uuid.uuid4())
         
         # Security context (will be set after authentication)
-        self.security_context: SecurityContext = None
+        self.security_context: Optional[SecurityContext] = None
         
         # Create client for RequestAccess service
         self.access_client = self.create_client(
@@ -76,8 +78,6 @@ class SecureClientNode(Node):
         request = VBASERequestAccess.Request()
         request.module_name = self.module_name
         
-        # Convert UUID string to UUID message
-        from unique_identifier_msgs.msg import UUID
         uuid_obj = uuid.UUID(self.module_id)
         request.module_id = UUID(uuid=list(uuid_obj.bytes))
         
@@ -97,6 +97,10 @@ class SecureClientNode(Node):
             
             response = future.result()
             
+            if response is None:
+                Logger.error("No response from access service!")
+                return False
+
             if response.success:
                 Logger.info(f"✅ Access granted with SL{response.granted_sl}")
                 Logger.info(f"Session token: {response.session_token[:16]}...")

@@ -48,11 +48,17 @@ from vyra_base.com.providers import (
     ProviderRegistry,
 )
 
-# Feeders - Multi-protocol support
-from vyra_base.com.feeder.feeder import BaseFeeder
-from vyra_base.com.feeder.state_feeder import StateFeeder
-from vyra_base.com.feeder.news_feeder import NewsFeeder
-from vyra_base.com.feeder.error_feeder import ErrorFeeder
+# Feeders - Multi-protocol support (optional)
+try:
+    from vyra_base.com.feeder.feeder import BaseFeeder
+    from vyra_base.com.feeder.state_feeder import StateFeeder
+    from vyra_base.com.feeder.news_feeder import NewsFeeder
+    from vyra_base.com.feeder.error_feeder import ErrorFeeder
+except ImportError:
+    BaseFeeder = None
+    StateFeeder = None
+    NewsFeeder = None
+    ErrorFeeder = None
 
 # ============================================================================
 # LEGACY COMPATIBILITY (Deprecated - use InterfaceFactory instead)
@@ -66,22 +72,41 @@ from vyra_base.com.feeder.error_feeder import ErrorFeeder
 # Old code using it will continue to work but gets ROS2-only behavior.
 #
 
-# Use new ROS2 implementations
-from vyra_base.com.transport.ros2.ros2_callable import ROS2Callable
-from vyra_base.com.transport.ros2.ros2_speaker import ROS2Speaker
-from vyra_base.com.transport.ros2.ros2_job import ROS2Job
+# Use new ROS2 implementations (optional)
+try:
+    from vyra_base.com.transport.ros2.vyra_models.callable import ROS2Callable
+    from vyra_base.com.transport.ros2.vyra_models.speaker import ROS2Speaker
+    from vyra_base.com.transport.ros2.vyra_models.job import ROS2Job
+except ImportError:
+    ROS2Callable = None
+    ROS2Speaker = None
+    ROS2Job = None
 
-# ROS2 infrastructure - Using transport/ros2 implementations
-from vyra_base.com.transport.ros2.publisher import VyraPublisher
-from vyra_base.com.transport.ros2.subscriber import VyraSubscriber
-from vyra_base.com.transport.ros2.node import VyraNode, CheckerNode, NodeSettings
-from vyra_base.com.transport.ros2.action_client import VyraActionClient
-from vyra_base.com.transport.ros2.action_server import VyraActionServer
-from vyra_base.com.transport.ros2.service_client import VyraServiceClient
-from vyra_base.com.transport.ros2.service_server import VyraServiceServer
+# ROS2 infrastructure - Using transport/ros2 implementations (optional)
+try:
+    from vyra_base.com.transport.ros2.communication.publisher import VyraPublisher
+    from vyra_base.com.transport.ros2.communication.subscriber import VyraSubscriber
+    from vyra_base.com.transport.ros2.node import VyraNode, CheckerNode, NodeSettings
+    from vyra_base.com.transport.ros2.communication.action_client import VyraActionClient
+    from vyra_base.com.transport.ros2.communication.action_server import VyraActionServer
+    from vyra_base.com.transport.ros2.communication.service_client import VyraServiceClient
+    from vyra_base.com.transport.ros2.communication.service_server import VyraServiceServer
+except ImportError:
+    VyraSubscriber = None
+    VyraNode = None
+    CheckerNode = None
+    NodeSettings = None
+    VyraActionClient = None
+    VyraActionServer = None
+    VyraServiceClient = None
+    VyraServiceServer = None
 
-# IPC - Inter-Process Communication
-from vyra_base.com.handler.ipc import GrpcUdsServer, GrpcUdsClient
+# IPC - Inter-Process Communication (moved to external/grpc)
+try:
+    from vyra_base.com.external.grpc import GrpcServer, GrpcClient
+except ImportError:
+    GrpcServer = None
+    GrpcClient = None
 
 __all__ = [
     # ========================================================================
@@ -139,7 +164,7 @@ __all__ = [
     "VyraServiceClient",
     "VyraServiceServer",
     
-    # IPC (Legacy)
-    "GrpcUdsServer",
-    "GrpcUdsClient",
+    # IPC Classes
+    "GrpcServer",
+    "GrpcClient",
 ]
