@@ -2,7 +2,6 @@
 Communication Decorators
 
 Modern decorators for multi-protocol communication.
-Replaces datalayer.interface_factory decorators with protocol-agnostic versions.
 """
 import asyncio
 import functools
@@ -23,7 +22,6 @@ def remote_callable(
     """
     Decorator for methods that should be accessible as remote callables.
     
-    Replaces old @remote_callable from datalayer.interface_factory.
     Now supports multiple protocols with automatic fallback.
     
     Args:
