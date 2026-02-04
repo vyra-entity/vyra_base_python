@@ -78,7 +78,7 @@ msgid "Volatiles, real-time data, caching"
 msgstr ""
 
 #: ../../storage.rst:26 bed319fd22dc47e89ab9eba55a6139eb
-msgid ":class:`~vyra_base.storage.redis_client.RedisClient`"
+msgid ":class:`~vyra_base.com.transport.redis.communication.RedisClient`"
 msgstr ""
 
 #: ../../storage.rst:29 327b55bc530746f6b0ffe5d65d182066
@@ -219,7 +219,7 @@ msgstr ""
 
 #: ../../storage.rst:241 05cb3a8d0b2b4dbf86f07b0308e53e2e
 msgid ""
-"The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages "
+"The :class:`~vyra_base.com.transport.redis.communication.RedisClient`-class manages "
 "Redis-Verbindungen:"
 msgstr ""
 
@@ -392,7 +392,7 @@ msgid ":class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD-Operationen
 msgstr ""
 
 #: ../../storage.rst:396 bed319fd22dc47e89ab9eba55a6139eb
-msgid ":class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client"
+msgid ":class:`~vyra_base.com.transport.redis.communication.RedisClient` - Redis-Client"
 msgstr ""
 
 #: ../../storage.rst:397 d1c6bcc5455e40b9a3dd1b88f60f0a95
@@ -448,7 +448,7 @@ msgstr ""
 #~ msgid "Volatiles, Echtzeitdaten, Caching"
 #~ msgstr ""
 
-#~ msgid ":class:`~vyra_base.storage.redis_client.RedisClient`"
+#~ msgid ":class:`~vyra_base.com.transport.redis.communication.RedisClient`"
 #~ msgstr ""
 
 #~ msgid "Datenbank-Zugriff (SQLite)"
@@ -508,7 +508,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Die :class:`~vyra_base.storage.redis_client.RedisClient`-Klasse"
+#~ "Die :class:`~vyra_base.com.transport.redis.communication.RedisClient`-Klasse"
 #~ " verwaltet Redis-Verbindungen:"
 #~ msgstr ""
 
@@ -616,7 +616,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "The :class:`~vyra_base.storage.redis_client.RedisClient`-Klasse"
+#~ "The :class:`~vyra_base.com.transport.redis.communication.RedisClient`-Klasse"
 #~ " verwaltet Redis-Verbindungen:"
 #~ msgstr ""
 
@@ -708,6 +708,6 @@ msgstr ""
 #~ "CRUD-Operationen"
 #~ msgstr ""
 
-#~ msgid ":class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client"
+#~ msgid ":class:`~vyra_base.com.transport.redis.communication.RedisClient` - Redis-Client"
 #~ msgstr ""
 

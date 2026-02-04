@@ -183,6 +183,42 @@ fi
 echo ""
 
 # ========================================
+# 7. Update CHANGELOG.md
+# ========================================
+echo "Step 7: Updating CHANGELOG.md..."
+
+CHANGELOG_FILE="$PROJECT_ROOT/CHANGELOG.md"
+
+# Prompt for changelog entry
+echo ""
+echo "======================================="
+echo "📝 Changelog Entry for v$NEW_VERSION"
+echo "======================================="
+echo "Enter changelog description (press Ctrl+D when done):"
+echo ""
+
+# Read multiline input
+CHANGELOG_ENTRY=$(cat)
+
+if [ -z "$CHANGELOG_ENTRY" ]; then
+    echo "  ⚠️  Warning: No changelog entry provided"
+else
+    # Get current date
+    CURRENT_DATE=$(date +%Y-%m-%d)
+    
+    # Create changelog entry with proper formatting
+    NEW_ENTRY="\n\n## [$NEW_VERSION] - $CURRENT_DATE\n\n### Build\n\n$CHANGELOG_ENTRY"
+    
+    # Insert after [Unreleased] section
+    # Use sed to insert after line containing "## [Unreleased]"
+    sed -i "/## \[Unreleased\]/a\\$NEW_ENTRY" "$CHANGELOG_FILE"
+    
+    echo "  ✅ Changelog updated"
+fi
+
+echo ""
+
+# ========================================
 # Summary
 # ========================================
 echo "========================================"

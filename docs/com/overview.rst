@@ -116,12 +116,12 @@ IPC (Inter Process Communication)
    * - Class
      - Usage
      - Reference
-   * - **GrpcUdsServer**
+   * - **GrpcServer**
      - gRPC server via Unix Domain Socket
-     - :class:`~vyra_base.com.handler.ipc.GrpcUdsServer`
-   * - **GrpcUdsClient**
+     - :class:`~vyra_base.com.handler.ipc.GrpcServer`
+   * - **GrpcClient**
      - gRPC client via Unix Domain Socket
-     - :class:`~vyra_base.com.handler.ipc.GrpcUdsClient`
+     - :class:`~vyra_base.com.external.grpc.GrpcClient`
 
 Factoy Functions
 -----------------
@@ -214,9 +214,9 @@ Use IPC
 
 .. code-block:: python
 
-   from vyra_base.com.handler.ipc import GrpcUdsClient
+   from vyra_base.com.handler.ipc import GrpcClient
    
-   client = GrpcUdsClient(socket_path="/tmp/my_module.sock")
+   client = GrpcClient(target="/tmp/my_module.sock")
    await client.connect()
    response = await client.call_unary("MethodName", request)
 

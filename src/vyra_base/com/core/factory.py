@@ -3,8 +3,7 @@ Interface Factory
 
 Unified interface creation with automatic protocol selection and fallback.
 """
-import logging
-from typing import Any, Callable, Optional, List
+from typing import Any, Callable, Optional, List, Union
 from vyra_base.com.core.types import (
     ProtocolType,
     VyraCallable,
@@ -15,9 +14,9 @@ from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     InterfaceError,
 )
+from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 from vyra_base.com.providers.provider_registry import ProviderRegistry
-
-logger = logging.getLogger(__name__)
+from vyra_base.helper.logger import Logger
 
 
 class InterfaceFactory:
@@ -54,24 +53,49 @@ class InterfaceFactory:
     # Default fallback chain for each interface type
     CALLABLE_FALLBACK = [
         ProtocolType.ROS2,
-        ProtocolType.SHARED_MEMORY,
-        ProtocolType.UDS,
-        ProtocolType.GRPC,
+        ProtocolType.REDIS,
+        ProtocolType.UDS
     ]
     
     SPEAKER_FALLBACK = [
-        ProtocolType.REDIS,
         ProtocolType.ROS2,
-        ProtocolType.MQTT,
-        ProtocolType.SHARED_MEMORY,
+        ProtocolType.REDIS,
+        ProtocolType.UDS
     ]
     
     JOB_FALLBACK = [
-        ProtocolType.REDIS,
         ProtocolType.ROS2,
-        ProtocolType.GRPC,
+        ProtocolType.REDIS,
+        ProtocolType.UDS
     ]
     
+    @staticmethod
+    def register_provider(provider: Union[AbstractProtocolProvider, list]) -> None:
+        """
+        Register one or more protocol providers.
+        
+        Args:
+            provider: Single provider instance or list of providers
+        """
+        registry = ProviderRegistry()
+        
+        if isinstance(provider, list):
+            for prov in provider:
+                registry.register_provider(prov)
+        else:
+            registry.register_provider(provider)
+    
+    @staticmethod
+    def unregister_provider(protocol: ProtocolType) -> None:
+        """
+        Unregister a protocol provider.
+        
+        Args:
+            protocol: Protocol type to unregister
+        """
+        registry = ProviderRegistry()
+        registry.unregister_provider(protocol)
+
     @staticmethod
     async def create_callable(
         name: str,
@@ -109,8 +133,7 @@ class InterfaceFactory:
             ... )
         """
         if callback is None:
-                logger.warning("callback-object is None")
-                raise TypeError
+            Logger.info("callback-object is None")
         
         protocols = protocols or InterfaceFactory.CALLABLE_FALLBACK
         registry = ProviderRegistry()
@@ -120,11 +143,11 @@ class InterfaceFactory:
                 provider = registry.get_provider(protocol)
                 
                 if not provider:
-                    logger.debug(f"⚠️ No provider for {protocol.value}")
+                    Logger.debug(f"⚠️ No provider for {protocol.value}")
                     continue
                 
                 if not await provider.check_availability():
-                    logger.debug(f"⚠️ Protocol {protocol.value} not available")
+                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
                     continue
                 
                 callable_instance = await provider.create_callable(
@@ -133,11 +156,11 @@ class InterfaceFactory:
                     **kwargs
                 )
                 
-                logger.info(f"✅ Callable '{name}' created via {protocol.value}")
+                Logger.info(f"✅ Callable '{name}' created via {protocol.value}")
                 return callable_instance
                 
             except Exception as e:
-                logger.warning(f"⚠️ Failed to create callable with {protocol.value}: {e}")
+                Logger.warning(f"⚠️ Failed to create callable with {protocol.value}: {e}")
                 continue
         
         # No protocol worked
@@ -192,11 +215,11 @@ class InterfaceFactory:
                 provider = registry.get_provider(protocol)
                 
                 if not provider:
-                    logger.debug(f"⚠️ No provider for {protocol.value}")
+                    Logger.debug(f"⚠️ No provider for {protocol.value}")
                     continue
                 
                 if not await provider.check_availability():
-                    logger.debug(f"⚠️ Protocol {protocol.value} not available")
+                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
                     continue
                 
                 speaker = await provider.create_speaker(
@@ -205,15 +228,15 @@ class InterfaceFactory:
                     **kwargs
                 )
                 
-                logger.info(f"✅ Speaker '{name}' created via {protocol.value}")
+                Logger.info(f"✅ Speaker '{name}' created via {protocol.value}")
                 return speaker
                 
             except NotImplementedError:
                 # Some providers don't support speakers
-                logger.debug(f"⚠️ {protocol.value} doesn't support speakers")
+                Logger.debug(f"⚠️ {protocol.value} doesn't support speakers")
                 continue
             except Exception as e:
-                logger.warning(f"⚠️ Failed to create speaker with {protocol.value}: {e}")
+                Logger.warning(f"⚠️ Failed to create speaker with {protocol.value}: {e}")
                 continue
         
         # No protocol worked
@@ -256,7 +279,7 @@ class InterfaceFactory:
         registry = ProviderRegistry()
         
         if callback is None:
-                logger.warning("callback-object is None")
+                Logger.warning("callback-object is None")
                 raise TypeError
         
         for protocol in protocols:
@@ -264,11 +287,11 @@ class InterfaceFactory:
                 provider = registry.get_provider(protocol)
                 
                 if not provider:
-                    logger.debug(f"⚠️ No provider for {protocol.value}")
+                    Logger.debug(f"⚠️ No provider for {protocol.value}")
                     continue
                 
                 if not await provider.check_availability():
-                    logger.debug(f"⚠️ Protocol {protocol.value} not available")
+                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
                     continue
                 
                 job = await provider.create_job(
@@ -277,15 +300,15 @@ class InterfaceFactory:
                     **kwargs
                 )
                 
-                logger.info(f"✅ Job '{name}' created via {protocol.value}")
+                Logger.info(f"✅ Job '{name}' created via {protocol.value}")
                 return job
                 
             except NotImplementedError:
                 # Some providers don't support jobs
-                logger.debug(f"⚠️ {protocol.value} doesn't support jobs")
+                Logger.debug(f"⚠️ {protocol.value} doesn't support jobs")
                 continue
             except Exception as e:
-                logger.warning(f"⚠️ Failed to create job with {protocol.value}: {e}")
+                Logger.warning(f"⚠️ Failed to create job with {protocol.value}: {e}")
                 continue
         
         # No protocol worked
@@ -349,4 +372,4 @@ class InterfaceFactory:
         else:
             raise ValueError(f"Invalid interface_type: {interface_type}")
         
-        logger.info(f"✅ Fallback chain for {interface_type} updated")
+        Logger.info(f"✅ Fallback chain for {interface_type} updated")

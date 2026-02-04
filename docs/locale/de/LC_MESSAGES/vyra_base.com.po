@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 
 #: 53b88d87e9774bc9b22a0e3e0b7f108e 64ad36061ee54e88ba2d908432ac4810 of
-#: vyra_base.com.handler.ipc.GrpcUdsClient.stop:1
+#: vyra_base.com.handler.ipc.GrpcClient.stop:1
 msgid "Close the gRPC channel."
 msgstr ""
 
@@ -54,7 +54,7 @@ msgstr ""
 msgid ""
 ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
 " "
-"\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.handler.ipc.GrpcUdsClient\\`\\]`"
+"\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.handler.ipc.GrpcClient\\`\\]`"
 msgstr ""
 
 #: 39410ce28ec440748e0c44c9d7ea0ad5 of
@@ -67,7 +67,7 @@ msgstr ""
 msgid ""
 ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
 " "
-"\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.handler.ipc.GrpcUdsServer\\`\\]`"
+"\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.external.grpc.GrpcServer\\`\\]`"
 msgstr ""
 
 #: 5738d7327a924cfab67e239edb41ecbe of
@@ -82,7 +82,7 @@ msgstr ""
 
 #: 2e4a8c2db1834da58255975e60a2e686 of
 #: vyra_base.com.handler.ipc.GrpcUdsServiceRegistry.register_client:6
-msgid "GrpcUdsClient instance"
+msgid "GrpcClient instance"
 msgstr ""
 
 #: 77f58774a1cc4c0382341fe802ee94b2 of
@@ -97,7 +97,7 @@ msgstr ""
 
 #: 76241688bd094fa18e7d0dfbee0b5521 of
 #: vyra_base.com.handler.ipc.GrpcUdsServiceRegistry.register_server:6
-msgid "GrpcUdsServer instance"
+msgid "GrpcServer instance"
 msgstr ""
 
 #: 6b5ee9d93f9c4ae89719d8fa07d02ba4 of
@@ -1728,7 +1728,7 @@ msgstr ""
 #~ msgid ""
 #~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
 #~ " "
-#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.handler.ipc.GrpcUdsClient\\`\\]`"
+#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.handler.ipc.GrpcClient\\`\\]`"
 #~ msgstr ""
 
 #~ msgid "Get server by name."
@@ -1737,7 +1737,7 @@ msgstr ""
 #~ msgid ""
 #~ ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Optional\\`\\\\"
 #~ " "
-#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.handler.ipc.GrpcUdsServer\\`\\]`"
+#~ "\\\\\\[\\:py\\:class\\:\\`\\~vyra\\_base.com.external.grpc.GrpcServer\\`\\]`"
 #~ msgstr ""
 
 #~ msgid "Register a gRPC client."
@@ -1746,7 +1746,7 @@ msgstr ""
 #~ msgid "Unique name for the client"
 #~ msgstr ""
 
-#~ msgid "GrpcUdsClient instance"
+#~ msgid "GrpcClient instance"
 #~ msgstr ""
 
 #~ msgid "Register and start a gRPC server."
@@ -1755,7 +1755,7 @@ msgstr ""
 #~ msgid "Unique name for the server"
 #~ msgstr ""
 
-#~ msgid "GrpcUdsServer instance"
+#~ msgid "GrpcServer instance"
 #~ msgstr ""
 
 #~ msgid "Start all registered servers and connect all clients."

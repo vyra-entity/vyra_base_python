@@ -95,7 +95,8 @@ class VyraEntity:
             error_entry: ErrorEntry,
             module_entry: ModuleEntry,
             module_config: dict[str, Any],
-            log_config: Optional[dict[str, Any]] = None) -> None:
+            log_config: Optional[dict[str, Any]] = None,
+            register_protocols: Optional[list[ProtocolType]] = None) -> None:
         """
         Initialize the VyraEntity.
 
@@ -152,6 +153,12 @@ class VyraEntity:
             self._node = None
             Logger.info("🔵 No ROS2 node created (slim mode)")
 
+        self.registered_protocols = register_protocols or [
+            ProtocolType.ROS2,
+            ProtocolType.REDIS,
+            ProtocolType.UDS
+        ]
+
         feeder: tuple = self.__init_feeder(state_entry, news_entry, error_entry)
         self.state_feeder: StateFeeder = feeder[0]
         self.news_feeder: NewsFeeder = feeder[1]
@@ -189,6 +196,52 @@ class VyraEntity:
             return ''
         else:
             return self._node.get_namespace()
+
+    async def _register_transport_provider(self, register_types: list[ProtocolType]) -> None:
+        """
+        Register the transport protocol providers based on availability.
+
+        This method registers the appropriate protocol providers (ROS2, Redis, etc.)
+        with the InterfaceFactory to enable communication for the entity.
+        """
+        providers = []
+        
+        if self._ros2_available and self._node is not None and ProtocolType.ROS2 in register_types:
+            node_name = self._node.node_settings.name
+            from vyra_base.com.transport.ros2.provider import ROS2Provider
+            ros2_provider = ROS2Provider(node_name=node_name)
+            await ros2_provider.initialize({
+                "node_name": node_name,
+                "namespace": self._node.get_namespace(),
+                "use_simulation_time": self.module_config.get("use_simulation_time", False)
+            })
+            providers.append(ros2_provider)
+            Logger.info("✅ Registered ROS2 protocol provider")
+        
+        if ProtocolType.REDIS in register_types:
+            from vyra_base.com.transport.redis.provider import RedisProvider
+            redis_provider = RedisProvider(module_name=self.module_entry.name)
+            providers.append(redis_provider)
+            Logger.info("✅ Registered Redis protocol provider")
+
+        if ProtocolType.UDS in register_types:
+            from vyra_base.com.transport.uds.provider import UDSProvider
+            uds_provider = UDSProvider(module_name=self.module_entry.name)
+            providers.append(uds_provider)
+            Logger.info("✅ Registered UDS protocol provider")
+        
+        # Register all available providers
+        InterfaceFactory.register_provider(providers)
+
+    def _unregister_transport_providers(self) -> None:
+        """
+        Unregister all transport protocol providers.
+
+        This method removes all registered protocol providers from the InterfaceFactory.
+        """
+        for protocol in self.registered_protocols:
+            InterfaceFactory.unregister_provider(protocol)
+            Logger.info(f"✅ Unregistered {protocol.value} protocol provider")
 
     def _init_logger(self, log_config: Optional[dict[str, Any]]) -> None:
         """
@@ -480,7 +533,10 @@ class VyraEntity:
                 "timestamp": "startup_initiated"
             })
             
-            # Stestate_feeder.start()p 2: Initialize resources (storages would be initialized here)
+            # Step 2: Initialize transport providers
+            await self._register_transport_provider(self.registered_protocols)
+
+            # Step 3: Initialize resources (storages would be initialized here)
             await self.state_feeder.start()
             await self.news_feeder.start()
             await self.error_feeder.start()
@@ -545,6 +601,7 @@ class VyraEntity:
             
             # Step 2: Clean up resources
             # This is where cleanup would happen (close connections, save state, etc.)
+            self._unregister_transport_providers()
             
             # Step 3: Complete shutdown
             self.state_machine.complete_shutdown()
@@ -680,8 +737,7 @@ class VyraEntity:
 
     async def set_interfaces(
             self, 
-            settings: list[FunctionConfigEntry],
-            permission_xml: str=None) -> None:
+            settings: list[FunctionConfigEntry]) -> None:
         """
         Add communication interfaces to this module.
 
@@ -706,14 +762,6 @@ class VyraEntity:
         :returns: None
         :rtype: None
         """
-
-        if not permission_xml:
-            Logger.warn(
-                f"No permission XML provided for provided settings: {settings}. "
-                "Skip loading interfaces in permission.xml"
-            )
-
-        async_loop: AbstractEventLoop = asyncio.get_event_loop()
 
         for setting in settings:
             if setting.functionname in [i.functionname for i in self._interface_list]:

@@ -3,6 +3,7 @@ ROS2 Callable Implementation
 
 Concrete implementation of VyraCallable for ROS2 Service communication.
 """
+import asyncio
 import logging
 from typing import Any, Callable, Optional
 
@@ -104,7 +105,7 @@ class ROS2Callable(VyraCallable):
         
         # Cleanup service server/client
         if self._service_server:
-            self.node.destroy_service(self._service_server.service_info.service)
+            self.node.destroy_service(self._service_server._service_info.service)
             self._service_server = None
         
         if self._service_client:
@@ -131,7 +132,7 @@ class ROS2Callable(VyraCallable):
         if not self._initialized:
             raise InterfaceError(f"ROS2Callable '{self.name}' not initialized")
         
-        if not self._service_client:
+        if not self._service_client or not self._service_client.service_info.client:
             raise InterfaceError(
                 f"Cannot call ROS2Callable '{self.name}': no service client. "
                 "This is likely a server-side callable."
@@ -141,15 +142,20 @@ class ROS2Callable(VyraCallable):
             logger.debug(f"📞 Calling ROS2 service: {self.name}")
             
             # Call service via VyraServiceClient
-            response = await self._service_client.call_async(
-                request=request,
+            response = await asyncio.wait_for(
+                self._service_client.service_info.client.call_async(
+                    request=request,
+                ),
                 timeout=timeout
             )
             
             self._last_response = response
             logger.debug(f"✅ ROS2 service call succeeded: {self.name}")
             return response
-            
+        
+        except asyncio.TimeoutError:
+            logger.error(f"❌ ROS2 service call timed out '{self.name}' after {timeout}s")
+            raise InterfaceError(f"Service call timed out after {timeout} seconds")
         except Exception as e:
             logger.error(f"❌ ROS2 service call failed '{self.name}': {e}")
             raise InterfaceError(f"Service call failed: {e}")

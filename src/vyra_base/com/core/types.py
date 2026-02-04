@@ -19,11 +19,11 @@ class ProtocolType(str, Enum):
     """Supported communication protocols."""
     # Communication Abstraction Layer (CAL)
     ROS2 = "ros2"
-    SHARED_MEMORY = "shared_memory"
+    REDIS = "redis"
     UDS = "uds"
     
     # External Communication Layer
-    REDIS = "redis"
+    SHARED_MEMORY = "sharedmemory"
     MQTT = "mqtt"
     GRPC = "grpc"
     REST = "rest"

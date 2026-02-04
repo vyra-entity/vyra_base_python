@@ -7,6 +7,7 @@ Provides distributed communication via DDS middleware.
 from __future__ import annotations
 
 import asyncio
+from ctypes import ArgumentError
 import logging
 from typing import Any, Callable, Optional, Dict, TYPE_CHECKING
 
@@ -140,7 +141,8 @@ class ROS2Provider(AbstractProtocolProvider):
         Returns:
             bool: True if initialization successful
         """
-        if not self._available:
+        available = await self.check_availability()
+        if not available:
             raise ProtocolUnavailableError(
                 "ROS2 transport not available. "
                 "Install ROS2 and source setup.bash"
@@ -208,7 +210,7 @@ class ROS2Provider(AbstractProtocolProvider):
     async def create_callable(
         self,
         name: str,
-        callback: Callable,
+        callback: Optional[Callable],
         **kwargs
     ) -> VyraCallable:
         """
@@ -230,10 +232,12 @@ class ROS2Provider(AbstractProtocolProvider):
         """
         self.require_initialization()
         
-        service_type = kwargs.get("service_type")
+        service_type = kwargs.pop("service_type", None)
         if not service_type:
-            raise ValueError("service_type is required for ROS2 callable")
+            raise ArgumentError("service_type is required for ROS2 callable")
         
+        node = kwargs.pop("node", None)
+
         logger.info(
             f"🔧 Creating ROS2 service: {name} (type: {service_type})"
         )
@@ -242,7 +246,7 @@ class ROS2Provider(AbstractProtocolProvider):
         callable_instance = ROS2Callable(
             name=name,
             callback=callback,
-            node=self._node,
+            node=node or self._node,
             service_type=service_type,
             **kwargs
         )
@@ -272,15 +276,18 @@ class ROS2Provider(AbstractProtocolProvider):
             
         Raises:
             ProviderError: If provider not initialized
-            ValueError: If message_type not provided
+            ArgumentError: If message_type not provided
         """
         self.require_initialization()
         
-        message_type = kwargs.get("message_type")
+        message_type = kwargs.pop("message_type", None)
         if not message_type:
-            raise ValueError("message_type is required for ROS2 speaker")
-        
+            raise ArgumentError("message_type is required for ROS2 speaker")
+
+        node = kwargs.pop("node", None)
+
         is_publisher = kwargs.get("is_publisher", True)
+        kwargs.pop("is_publisher", None)
         role = "publisher" if is_publisher else "subscriber"
         
         logger.info(
@@ -290,7 +297,7 @@ class ROS2Provider(AbstractProtocolProvider):
         # Create ROS2 speaker
         speaker_instance = ROS2Speaker(
             name=name,
-            node=self._node,
+            node=node or self._node,
             message_type=message_type,
             is_publisher=is_publisher,
             **kwargs
@@ -321,14 +328,16 @@ class ROS2Provider(AbstractProtocolProvider):
             
         Raises:
             ProviderError: If provider not initialized
-            ValueError: If action_type not provided
+            ArgumentError: If action_type not provided
         """
         self.require_initialization()
         
-        action_type = kwargs.get("action_type")
+        action_type = kwargs.pop("action_type", None)
         if not action_type:
-            raise ValueError("action_type is required for ROS2 job")
+            raise ArgumentError("action_type is required for ROS2 job")
         
+        node = kwargs.pop("node", None)
+
         logger.info(
             f"🔧 Creating ROS2 action: {name} (type: {action_type})"
         )
@@ -337,7 +346,7 @@ class ROS2Provider(AbstractProtocolProvider):
         job_instance = ROS2Job(
             name=name,
             callback=callback,
-            node=self._node,
+            node=node or self._node,
             action_type=action_type,
             **kwargs
         )

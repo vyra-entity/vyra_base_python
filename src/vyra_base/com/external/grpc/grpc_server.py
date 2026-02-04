@@ -154,7 +154,3 @@ class GrpcServer:
     def is_running(self) -> bool:
         """Check if server is running."""
         return self._running
-
-
-# Legacy alias for backward compatibility
-GrpcUdsServer = GrpcServer

@@ -11,11 +11,11 @@ It supports all gRPC communication patterns:
 **Usage:**
 
 Server:
-   server = GrpcUdsServer(socket_path="/tmp/my_service.sock")
+   server = GrpcServer(target="/tmp/my_service.sock")
    server.add_service(MyServiceServicer())
    await server.start()
 
 Client:
-   client = GrpcUdsClient(socket_path="/tmp/my_service.sock")
+   client = GrpcClient(target="/tmp/my_service.sock")
    await client.connect()
    response = await client.call_unary("method_name", request)

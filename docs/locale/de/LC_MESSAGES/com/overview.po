@@ -269,7 +269,7 @@ msgid "IPC (Inter-Process Communication)"
 msgstr ""
 
 #: ../../com/overview.rst:119 f27cfcf0ce1e4caca8335f6dc4745cef
-msgid "**GrpcUdsServer**"
+msgid "**GrpcServer**"
 msgstr ""
 
 #: ../../com/overview.rst:120 883ba43131e54d289215cd14bd2aa5f2
@@ -277,11 +277,11 @@ msgid "gRPC server via Unix Domain Socket"
 msgstr ""
 
 #: ../../com/overview.rst:121 1ea1f5c39e554cb99a976a9f14358602
-msgid ":class:`~vyra_base.com.handler.ipc.GrpcUdsServer`"
+msgid ":class:`~vyra_base.com.external.grpc.GrpcServer`"
 msgstr ""
 
 #: ../../com/overview.rst:122 cdafb768474a4108b6e94c0024f007e4
-msgid "**GrpcUdsClient**"
+msgid "**GrpcClient**"
 msgstr ""
 
 #: ../../com/overview.rst:123 a9addab3e7d647b790d359dce036f793
@@ -289,7 +289,7 @@ msgid "gRPC client via Unix Domain Socket"
 msgstr ""
 
 #: ../../com/overview.rst:124 7c0b02ba951b4a6ab4a8c4ef1b009db7
-msgid ":class:`~vyra_base.com.handler.ipc.GrpcUdsClient`"
+msgid ":class:`~vyra_base.com.handler.ipc.GrpcClient`"
 msgstr ""
 
 #: ../../com/overview.rst:127 752a9210523641c8aea8eae9c1a4dd4a

@@ -73,7 +73,7 @@ class AbstractProtocolProvider(ABC):
     async def create_callable(
         self,
         name: str,
-        callback: Callable,
+        callback: Optional[Callable],
         **kwargs
     ) -> VyraCallable:
         """

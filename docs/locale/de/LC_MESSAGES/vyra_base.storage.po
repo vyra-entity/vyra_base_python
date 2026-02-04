@@ -121,7 +121,7 @@ msgstr ""
 
 #: 031867846e8e4d28b89c243a454638a2 4710e855146d4a4eb65f57b85a6e808a
 #: 8df5a0aa57354818ac213c5eeb78d344 of vyra_base.storage.db_access.DbAccess:1
-#: vyra_base.storage.redis_client.RedisClient:1
+#: vyra_base.com.transport.redis.communication.RedisClient:1
 msgid "Bases: :py:class:`~vyra_base.storage.storage.Storage`"
 msgstr ""
 
@@ -847,7 +847,7 @@ msgid "Self with success status set."
 msgstr ""
 
 #: dfb7fd27ba284e7c8a83ebec40541ac6 of
-#: vyra_base.storage.redis_client.RedisClient:1
+#: vyra_base.com.transport.redis.communication.RedisClient:1
 msgid ""
 "Unified Redis Client for vyra_base Combines RedisAccess and "
 "RedisManipulator functionality with TLS support and streaming "
@@ -876,22 +876,22 @@ msgid "Wrapper for asynchronous functions."
 msgstr ""
 
 #: 6b3f20527431451a9b31f4049237ffef of
-#: vyra_base.storage.redis_client.RedisClient.create_stream_listener:1
+#: vyra_base.com.transport.redis.communication.RedisClient.create_stream_listener:1
 msgid "Alias for create_pubsub_listener (backward compatibility)"
 msgstr ""
 
 #: 62ccc6b25f4348d3aa2feac51302d34d of
-#: vyra_base.storage.redis_client.RedisClient.create_stream_listener:4
+#: vyra_base.com.transport.redis.communication.RedisClient.create_stream_listener:4
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
 msgstr ""
 
 #: a7fc0987f9264ae5bfe06f21fa94cc63 of
-#: vyra_base.storage.redis_client.RedisClient.publish_event:1
+#: vyra_base.com.transport.redis.communication.RedisClient.publish_event:1
 msgid "Alias for publish_with_metadata (backward compatibility)"
 msgstr ""
 
 #: 865480c152f74ba4ab978ccbb46c049c of
-#: vyra_base.storage.redis_client.RedisClient.publish_event:4
+#: vyra_base.com.transport.redis.communication.RedisClient.publish_event:4
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`int\\``"
 msgstr ""
 

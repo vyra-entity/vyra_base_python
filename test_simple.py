@@ -35,9 +35,9 @@ def test_basic_imports():
     
     try:
         from vyra_base.storage import redis_client
-        print("✅ vyra_base.storage.redis_client imported successfully")
+        print("✅ vyra_base.com.transport.redis.communication imported successfully")
     except ImportError as e:
-        print(f"❌ vyra_base.storage.redis_client import failed: {e}")
+        print(f"❌ vyra_base.com.transport.redis.communication import failed: {e}")
 
 if __name__ == "__main__":
     test_basic_imports()

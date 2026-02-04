@@ -96,6 +96,11 @@ class GrpcClient:
         """Check if client is connected."""
         return self._connected
     
+    @property
+    def channel(self) -> Optional[aio.Channel]:
+        """Get the gRPC channel."""
+        return self._channel
+    
     @ErrorTraceback.w_check_error_exist
     async def connect(self) -> None:
         """Establish connection to gRPC server."""
@@ -149,7 +154,7 @@ class GrpcClient:
         """Ensure client is connected."""
         if not self._connected or not self._channel:
             raise ConnectionError("gRPC client not connected. Call connect() first.")
-    
+            
     @ErrorTraceback.w_check_error_exist
     async def call_method(
         self,

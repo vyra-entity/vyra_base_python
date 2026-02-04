@@ -62,10 +62,15 @@ class VyraServiceServer:
         :param async_loop: Optional asyncio event loop.
         :type async_loop: Any, Optional
         """
-        self.service_info: ServiceServerInfo = serviceInfo
+        self._service_info: ServiceServerInfo = serviceInfo
         self._node: VyraNode = node
         self._async_loop: AbstractEventLoop | None = async_loop
         self.callback_task = None
+
+    @property
+    def service_info(self) -> ServiceServerInfo:
+        """Get the service information."""
+        return self._service_info
 
     def create_service(
             self, 
@@ -81,9 +86,9 @@ class VyraServiceServer:
         :raises TypeError: If the callback is not callable.
         :raises ValueError: If the service type or name is not provided.
         """
-        Logger.info(f"Creating service: {self.service_info.name}")
+        Logger.info(f"Creating service: {self._service_info.name}")
         
-        self.service_info.callback = callback
+        self._service_info.callback = callback
         
         if not callable(callback):
             raise TypeError("Callback must be a callable function.")
@@ -93,21 +98,21 @@ class VyraServiceServer:
 
         
         
-        if not self.service_info.type:
+        if not self._service_info.type:
             raise ValueError("Service type must be provided.")
         
-        if not self.service_info.name:
+        if not self._service_info.name:
             raise ValueError("Service name must be provided.")
         
-        self.service_info.service = self._node.create_service(
-            self.service_info.type, 
-            self.service_info.name, 
+        self._service_info.service = self._node.create_service(
+            self._service_info.type, 
+            self._service_info.name, 
             self._service_callback
         )
 
         Logger.info(
-            f"ROS2 Service {self.service_info.name} created with "
-            f"type {self.service_info.type} and "
+            f"ROS2 Service {self._service_info.name} created with "
+            f"type {self._service_info.type} and "
             f"callback {callback}.")
 
     def destroy_service(self) -> None:
@@ -116,10 +121,10 @@ class VyraServiceServer:
 
         This method will remove the service if it exists.
         """
-        if self.service_info.service:
-            self._node.destroy_service(self.service_info.service)
-            self.service_info.service = None
-            Logger.info(f"Service '{self.service_info.name}' destroyed.")
+        if self._service_info.service:
+            self._node.destroy_service(self._service_info.service)
+            self._service_info.service = None
+            Logger.info(f"Service '{self._service_info.name}' destroyed.")
 
     @ErrorTraceback.w_check_error_exist
     def _service_callback(self, request, response) -> None:
@@ -136,30 +141,30 @@ class VyraServiceServer:
         :rtype: Any
         """
         
-        Logger.info(f"Service callback triggered for: {self.service_info.name}")
+        Logger.info(f"Service callback triggered for: {self._service_info.name}")
 
         # Check if it's an async function or async method
-        is_async = (iscoroutinefunction(self.service_info.callback) or 
-                   (hasattr(self.service_info.callback, '__func__') and 
-                    iscoroutinefunction(self.service_info.callback.__func__)))
+        is_async = (iscoroutinefunction(self._service_info.callback) or 
+                   (hasattr(self._service_info.callback, '__func__') and 
+                    iscoroutinefunction(self._service_info.callback.__func__)))
 
         if self._async_loop is not None and is_async:
             Logger.debug(
-                f"Scheduling async callback for service {self.service_info.name}."
+                f"Scheduling async callback for service {self._service_info.name}."
             )
 
             result = self.run_async_in_thread(
-                self.service_info.callback(request, response),
-                self.service_info.callback_timeout
+                self._service_info.callback(request, response),
+                self._service_info.callback_timeout
             )
             Logger.debug(
-                f"Async callback for {self.service_info.name} completed: {result}"
+                f"Async callback for {self._service_info.name} completed: {result}"
             )
         
-        elif callable(self.service_info.callback):
-            Logger.log(f"Executing sync callback for service {self.service_info.name}.")
+        elif callable(self._service_info.callback):
+            Logger.log(f"Executing sync callback for service {self._service_info.name}.")
             # Fallback: just call the callback directly (sync)
-            self.service_info.callback(request=request, response=response)
+            self._service_info.callback(request=request, response=response)
 
         return response
     

@@ -7,9 +7,6 @@ This package provides various communication handlers:
 - Database handlers for persistent storage
 """
 
-# GrpcUdsServer/Client moved to vyra_base.com.external.grpc
-# Import from there: from vyra_base.com.external.grpc import GrpcUdsServer, GrpcUdsClient
-
 try:
     from vyra_base.com.handler.database import DBCommunicationHandler
 except ImportError:
@@ -21,10 +18,6 @@ except ImportError:
     ROS2Handler = None
 
 __all__ = [
-    "GrpcUdsBase",
-    "GrpcUdsServer",
-    "GrpcUdsClient",
-    "GrpcUdsServiceRegistry",
     "DBCommunicationHandler",
     "ROS2Handler"
 ]

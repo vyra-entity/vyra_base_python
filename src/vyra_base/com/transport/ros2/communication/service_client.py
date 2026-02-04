@@ -72,6 +72,11 @@ class VyraServiceClient:
         self._service_info: ServiceClientInfo = serviceInfo
         self._node: VyraNode = node
     
+    @property
+    def service_info(self) -> ServiceClientInfo:
+        """Get the service information."""
+        return self._service_info
+
     async def create_service_caller(self) -> None:
         """
         Create a service caller in the ROS2 node.

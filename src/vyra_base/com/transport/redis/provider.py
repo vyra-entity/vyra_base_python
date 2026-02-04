@@ -33,7 +33,7 @@ class RedisProvider(AbstractProtocolProvider):
     - TLS support with ACL authentication
     - Streaming support (Redis Streams)
     
-    Wraps existing vyra_base.storage.redis_client.RedisClient
+    Wraps existing vyra_base.com.transport.redis.communication.RedisClient
     for seamless integration with established infrastructure.
     
     Example:

@@ -23,7 +23,7 @@ VYRA supports two storage backends:
      - :class:`~vyra_base.storage.db_access.DbAccess`
    * - **Redis**
      - Volatiles, real-time data, caching
-     - :class:`~vyra_base.storage.redis_client.RedisClient`
+     - :class:`~vyra_base.com.transport.redis.communication.RedisClient`
 
 Database Access (SQLite)
 ------------------------
@@ -238,11 +238,11 @@ Redis-Access
 RedisClient-class
 ^^^^^^^^^^^^^^^^^
 
-The :class:`~vyra_base.storage.redis_client.RedisClient`-class manages Redis-Verbindungen:
+The :class:`~vyra_base.com.transport.redis.communication.RedisClient`-class manages Redis-Verbindungen:
 
 .. code-block:: python
 
-   from vyra_base.storage.redis_client import RedisClient
+   from vyra_base.com.transport.redis.communication import RedisClient
    
    # Redis-Client create
    redis = RedisClient(
@@ -393,6 +393,6 @@ Further Information
 * :doc:`vyra_base.storage` - API-Referenz
 * :class:`~vyra_base.storage.db_access.DbAccess` - Database-Access
 * :class:`~vyra_base.storage.db_manipulato.DbManipulato` - CRUD Operations
-* :class:`~vyra_base.storage.redis_client.RedisClient` - Redis-Client
+* :class:`~vyra_base.com.transport.redis.communication.RedisClient` - Redis-Client
 * SQLAlchemy Documentation: https://docs.sqlalchemy.org/
 * Redis Documentation: https://redis.io/docs/

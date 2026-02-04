@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections import deque
 from typing import Any, Type, Optional
 
 # Check ROS2 availability
@@ -62,6 +63,7 @@ class BaseFeeder:
         self._node: Optional[Any] = None  # VyraNode or None
         self._type: Any
         self._speaker: Optional[Any] = None  # VyraSpeaker or new protocol speaker
+        self._feedbuffer = deque(maxlen=20)  
 
     async def create(self, loggingOn: bool = False) -> None:
         """
@@ -102,13 +104,9 @@ class BaseFeeder:
         if self._speaker is None:
             try:
                 # Use InterfaceFactory for protocol fallback
-                loop = asyncio.get_event_loop()
-                
-                self._speaker = loop.run_until_complete(
-                    InterfaceFactory.create_speaker(
-                        name=self._feederName,
-                        protocols=[ProtocolType.REDIS, ProtocolType.MQTT],
-                    )
+                self._speaker = await InterfaceFactory.create_speaker(
+                    name=self._feederName,
+                    protocols=[ProtocolType.REDIS, ProtocolType.MQTT]
                 )
                 
                 Logger.info(f"✅ {self._feederName} using {self._speaker.protocol.value} protocol")
@@ -151,6 +149,11 @@ class BaseFeeder:
         :param msg: The message to feed.
         :type msg: Any
         """
+        if not hasattr(self, '_feeder'):
+            self._feedbuffer.append(msg)
+            Logger.info(f"⏳ Feeder {self._feederName} not yet created. Buffering message: {msg}")
+            return
+        
         self._feeder.log(self._level, msg)
 
         if self._loggingOn:

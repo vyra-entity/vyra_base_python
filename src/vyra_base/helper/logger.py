@@ -122,7 +122,7 @@ class Logger:
         if log_config_path is None:
             log_config_path = Path(__file__).resolve().parent / "logger_config.json"
 
-        with Path(log_config_path).open(mode='r+') as content:
+        with Path(log_config_path).open(mode='r') as content:
             loaded_log_config: dict = json.load(content)
 
         if log_config:
