@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from StateStop.srv
+// Request message for StateStop service
+message StateStopRequest {
+    repeated string metadata = 1;
+}
+
+// Response message for StateStop service
+message StateStopResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Service definition (for Redis VyraCallable)
+service StateStopService {
+    rpc StateStop (StateStopRequest) returns (StateStopResponse);
+}

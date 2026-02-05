@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from StatePause.srv
+// Request message for StatePause service
+message StatePauseRequest {
+    repeated string metadata = 1;
+}
+
+// Response message for StatePause service
+message StatePauseResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Service definition (for Redis VyraCallable)
+service StatePauseService {
+    rpc StatePause (StatePauseRequest) returns (StatePauseResponse);
+}

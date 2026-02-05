@@ -4,12 +4,16 @@ Redis Callable Implementation
 Concrete implementation of VyraCallable for Redis key-value operations.
 Provides request-response pattern via Redis GET/SET operations.
 """
-from typing import Any, Callable, Optional
+import asyncio
 import logging
 import json
+import uuid
+
+from typing import Any, Callable, Optional
 
 from vyra_base.com.core.types import VyraCallable, ProtocolType
 from vyra_base.com.core.exceptions import InterfaceError
+from vyra_base.com.transport.redis.communication.redis_client import RedisClient
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +49,7 @@ class RedisCallable(VyraCallable):
         self,
         name: str,
         callback: Optional[Callable] = None,
-        redis_client: Optional[Any] = None,
+        redis_client: Optional[RedisClient] = None,
         request_key_pattern: str = "request:{name}:{id}",
         response_key_pattern: str = "response:{name}:{id}",
         ttl: int = 300,  # 5 minutes
@@ -63,7 +67,7 @@ class RedisCallable(VyraCallable):
             ttl: Time-to-live for keys in seconds
         """
         super().__init__(name, callback, ProtocolType.REDIS, **kwargs)
-        self.redis_client = redis_client
+        self.redis_client: RedisClient | None = redis_client
         self.request_key_pattern = request_key_pattern
         self.response_key_pattern = response_key_pattern
         self.ttl = ttl
@@ -103,6 +107,9 @@ class RedisCallable(VyraCallable):
         self._running = True
         pattern = self.request_key_pattern.format(name=self.name, id="*")
         
+        if self.redis_client is None:
+            raise InterfaceError("redis_client is not set")
+
         # Subscribe to request key pattern
         await self.redis_client.subscribe_pattern(pattern)
         
@@ -113,11 +120,16 @@ class RedisCallable(VyraCallable):
         """Background task to process incoming requests."""
         logger.info(f"📡 Redis callable '{self.name}' listening for requests")
         
+        if self.redis_client is None:
+            raise InterfaceError("redis_client is not set")
+
+        if self.callback is None:
+            raise InterfaceError("callback is not set for server-side RedisCallable")
+
         while self._running:
             try:
                 # This would need integration with RedisClient's pubsub listener
                 # For now, polling approach:
-                import asyncio
                 await asyncio.sleep(0.1)
                 
                 # Get pending requests
@@ -190,9 +202,6 @@ class RedisCallable(VyraCallable):
         if not self._initialized:
             raise InterfaceError(f"RedisCallable '{self.name}' not initialized")
         
-        import asyncio
-        import uuid
-        
         # Generate unique request ID
         request_id = str(uuid.uuid4())
         
@@ -200,6 +209,9 @@ class RedisCallable(VyraCallable):
         request_key = self.request_key_pattern.format(name=self.name, id=request_id)
         response_key = self.response_key_pattern.format(name=self.name, id=request_id)
         
+        if self.redis_client is None:
+            raise InterfaceError("redis_client is not set")
+
         try:
             logger.debug(f"📞 Calling Redis callable: {self.name}")
             

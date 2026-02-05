@@ -6,21 +6,28 @@ from typing import Any
 import vyra_base
 
 
-def extract_ros_interfaces(target_path: str | Path):
+def extract_interfaces(target_path: str | Path):
     """
-    Extract ROS2 interface files from the pip-installed library into a ROS2 package.
+    Extract VYRA interface files from the pip-installed library into a module interface package.
 
-    :param target_package_path: Path to the target ROS2 package where interfaces will be extracted.
-    :type target_package_path: str or pathlib.Path
+    Extracts speaker (.msg), callable (.srv + .proto), and job (.action) interfaces
+    using VYRA-specific terminology independent of ROS2 naming conventions.
+
+    :param target_path: Path to the target package where interfaces will be extracted.
+    :type target_path: str or pathlib.Path
 
     :return: None
     :rtype: None
 
-    This function copies interface files (msg, srv, action, json) from the installed
-    vyra_base library to the specified ROS2 package directory.
+    This function copies interface files from the installed vyra_base library:
+    - .msg files → target/msg/ (from speaker/ directory)
+    - .srv files → target/srv/ (from callable/ directory)
+    - .action files → target/action/ (from job/ directory)
+    - .proto files → target/proto/ (from proto/ directory, for Redis/gRPC)
+    
+    The source uses VYRA terminology (speaker/callable/job/proto) but outputs
+    to ROS2-compatible directories (msg/srv/action) plus proto/ for gRPC.
     """
-    # Finde die installierte Library
-
     import importlib.resources
     package_path: Path = Path(vyra_base.__file__).parent / 'interfaces'
 
@@ -30,7 +37,7 @@ def extract_ros_interfaces(target_path: str | Path):
         target_path = Path(target_path)
     
     # Copy interface files from source to target
-    print(f"Extracting ROS2 interfaces from {source_path} to {target_path}")
+    print(f"Extracting VYRA interfaces from {source_path} to {target_path}")
     
     # Copy build files first
     build_files = ['package.xml', 'CMakeLists.template.txt']
@@ -40,15 +47,25 @@ def extract_ros_interfaces(target_path: str | Path):
             shutil.copy2(source_file, target_path / build_file)
             print(f"Copied {build_file} to {target_path}")
     
-    for interface_type in ['msg', 'srv', 'action']:
-        source_dir: Path = source_path / interface_type
-        target_dir: Path = target_path / interface_type
+    # Map VYRA interface types to file extensions and target directories
+    # source_dir → (file_ext, target_dir)
+    interface_mapping = {
+        'speaker': ('msg', 'msg'),      # Speaker → .msg files for ROS2
+        'callable': ('srv', 'srv'),     # Callable → .srv files for ROS2
+        'job': ('action', 'action'),    # Job → .action files for ROS2
+        'proto': ('proto', 'proto')     # Proto → .proto files for Redis/gRPC
+    }
+    
+    for source_type, (file_ext, target_type) in interface_mapping.items():
+        source_dir: Path = source_path / source_type
+        target_dir: Path = target_path / target_type
         
         if source_dir.exists():
             target_dir.mkdir(exist_ok=True)
-            for file in source_dir.rglob(f'*.{interface_type}'):
+            
+            for file in source_dir.rglob(f'*.{file_ext}'):
                 shutil.copy2(file, target_dir / file.name)
-                print(f"Copied {file.name} to {target_dir}")
+                print(f"Copied {file.name} ({source_type}) to {target_dir}")
 
     config_path: Path = source_path / 'config'
     target_config: Path = target_path / 'config'
@@ -61,7 +78,18 @@ def extract_ros_interfaces(target_path: str | Path):
             shutil.copy2(file, target_config)
             print(f"Copied {file.name} to {target_config}")
 
-    print(f"ROS2 interfaces extracted to {target_path} successfully.")
+    print(f"VYRA interface extraction to {target_path} successful.")
+
+
+# Alias for backward compatibility
+def extract_ros_interfaces(target_path: str | Path):
+    """
+    Deprecated: Use extract_interfaces() instead.
+    
+    This function is kept for backward compatibility.
+    """
+    print("⚠️  extract_ros_interfaces() is deprecated. Use extract_interfaces() instead.")
+    return extract_interfaces(target_path)
 
 def get_reserved_list() -> dict[str, Any]:
     """

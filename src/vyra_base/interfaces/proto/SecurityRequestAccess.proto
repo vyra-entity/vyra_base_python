@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from SecurityRequestAccess.srv
+// Request message for SecurityRequestAccess service
+message SecurityRequestAccessRequest {
+    string module_name = 1;
+    string module_id = 2;
+    string requested_role = 3;
+    uint32 requested_sl = 4;
+    string password = 5;
+    string certificate_csr = 6;
+}
+
+// Response message for SecurityRequestAccess service
+message SecurityRequestAccessResponse {
+    bool success = 1;
+    string message = 2;
+    string session_token = 3;
+    string hmac_key = 4;
+    string certificate = 5;
+    string expires_at = 6;
+    uint32 granted_sl = 7;
+}
+
+// Service definition (for Redis VyraCallable)
+service SecurityRequestAccessService {
+    rpc SecurityRequestAccess (SecurityRequestAccessRequest) returns (SecurityRequestAccessResponse);
+}

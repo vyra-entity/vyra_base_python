@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from HealthCheck.srv
+// Request message for HealthCheck service
+message HealthCheckRequest {
+    // Empty request
+}
+
+// Response message for HealthCheck service
+message HealthCheckResponse {
+    bool alive = 1;
+    string state = 2;
+    string health_status = 3;
+    repeated string issues = 4;
+}
+
+// Service definition (for Redis VyraCallable)
+service HealthCheckService {
+    rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+}

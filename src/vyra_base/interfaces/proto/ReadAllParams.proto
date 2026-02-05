@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from ReadAllParams.srv
+// Request message for ReadAllParams service
+message ReadAllParamsRequest {
+    // Empty request
+}
+
+// Response message for ReadAllParams service
+message ReadAllParamsResponse {
+    string all_params_json = 1;
+}
+
+// Service definition (for Redis VyraCallable)
+service ReadAllParamsService {
+    rpc ReadAllParams (ReadAllParamsRequest) returns (ReadAllParamsResponse);
+}

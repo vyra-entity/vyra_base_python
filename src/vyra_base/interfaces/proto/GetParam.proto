@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from GetParam.srv
+// Request message for GetParam service
+message GetParamRequest {
+    string key = 1;
+}
+
+// Response message for GetParam service
+message GetParamResponse {
+    bool success = 1;
+    string error_message = 2;
+    string json_value = 3;
+}
+
+// Service definition (for Redis VyraCallable)
+service GetParamService {
+    rpc GetParam (GetParamRequest) returns (GetParamResponse);
+}

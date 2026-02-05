@@ -1,11 +1,17 @@
 [
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "initialize",
         "displayname": "Initialize",
         "description": "Executing initial commands and set state IDLE -> READY",
-        "filetype": "VBASEStateInitialize.srv",
+        "filetype": [
+            "VBASEStateInitialize.srv",
+            "StateInitialize.proto"
+        ],
         "params": [
             {
                 "name": "params",
@@ -35,12 +41,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "pause",
         "displayname": "Pause",
         "description": "Pause the current operation and set state READY|RUNNING -> PAUSED",
-        "filetype": "VBASEStatePause.srv",
+        "filetype": [
+            "VBASEStatePause.srv",
+            "StatePause.proto"
+        ],
         "params": [
             {
                 "name": "params",
@@ -70,12 +82,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "stop",
         "displayname": "Stop",
         "description": "Stop the current operation and set state READY|RUNNING|PAUSED -> STOPPED",
-        "filetype": "VBASEStateStop.srv",
+        "filetype": [
+            "VBASEStateStop.srv",
+            "StateStop.proto"
+        ],
         "params": [
             {
                 "name": "params",
@@ -105,12 +123,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "resume",
         "displayname": "Resume",
         "description": "Resume the current operation and set state PAUSED -> RUNNING",
-        "filetype": "VBASEStateResume.srv",
+        "filetype": [
+            "VBASEStateResume.srv",
+            "StateResume.proto"
+        ],
         "params": [
             {
                 "name": "params",
@@ -140,12 +164,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "reset",
         "displayname": "Reset",
         "description": "Reset the current operation and set state STOPPED -> IDLE",
-        "filetype": "VBASEStateReset.srv",
+        "filetype": [
+            "VBASEStateReset.srv",
+            "StateReset.proto"
+        ],
         "params": [
             {
                 "name": "params",

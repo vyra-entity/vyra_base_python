@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from StateResume.srv
+// Request message for StateResume service
+message StateResumeRequest {
+    repeated string metadata = 1;
+}
+
+// Response message for StateResume service
+message StateResumeResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Service definition (for Redis VyraCallable)
+service StateResumeService {
+    rpc StateResume (StateResumeRequest) returns (StateResumeResponse);
+}

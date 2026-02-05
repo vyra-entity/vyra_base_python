@@ -1,11 +1,17 @@
 [
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "get_interface_list",
         "displayname": "Get Interface List",
         "description": "Retrieve the list of interfaces of the vyra system.",
-        "filetype": "VBASEGetInterfaceList.srv",
+        "filetype": [
+            "VBASEGetInterfaceList.srv",
+            "GetInterfaceList.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -22,12 +28,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "set_parameter",
         "displayname": "Set Parameter",
         "description": "Set a parameter in the vyra system.",
-        "filetype": "VBASESetParam.srv",
+        "filetype": [
+            "VBASESetParam.srv",
+            "SetParam.proto"
+        ],
         "params": [
             {
                 "name": "key",
@@ -63,12 +75,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "get_parameter",
         "displayname": "Get Parameter",
         "description": "Get a parameter in the vyra system.",
-        "filetype": "VBASEGetParam.srv",
+        "filetype": [
+            "VBASEGetParam.srv",
+            "GetParam.proto"
+        ],
         "params": [
             {
                 "name": "key",
@@ -104,12 +122,18 @@
         }
     },
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "param_changed_topic",
         "displayname": "Get Update Parameter Event Topic",
         "description": "Get the topic for update parameter events.",
-        "filetype": "VBASEGetUpdateParamEventTopic.srv",
+        "filetype": [
+            "VBASEGetUpdateParamEventTopic.srv",
+            "GetUpdateParamEventTopic.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -126,12 +150,16 @@
         }
     },
     {
-        "tags": ["ros2_msg"],
+        "tags": [
+            "ros2"
+        ],
         "type": "speaker",
         "functionname": "updateParamEvent",
         "displayname": "Update Parameter Event",
         "description": "Communicate parameter updates in the system between different components or modules.",
-        "filetype": "VBASEUpdateParamEvent.msg",
+        "filetype": [
+            "VBASEUpdateParamEvent.msg"
+        ],
         "returns": [
             {
                 "datatype": "string",

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from GetUpdateParamEventTopic.srv
+// Request message for GetUpdateParamEventTopic service
+message GetUpdateParamEventTopicRequest {
+    // Empty request
+}
+
+// Response message for GetUpdateParamEventTopic service
+message GetUpdateParamEventTopicResponse {
+    string topic = 1;
+}
+
+// Service definition (for Redis VyraCallable)
+service GetUpdateParamEventTopicService {
+    rpc GetUpdateParamEventTopic (GetUpdateParamEventTopicRequest) returns (GetUpdateParamEventTopicResponse);
+}

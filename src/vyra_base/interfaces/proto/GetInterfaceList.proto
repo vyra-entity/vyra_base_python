@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from GetInterfaceList.srv
+// Request message for GetInterfaceList service
+message GetInterfaceListRequest {
+    // Empty request
+}
+
+// Response message for GetInterfaceList service
+message GetInterfaceListResponse {
+    repeated string interface_list = 1;
+}
+
+// Service definition (for Redis VyraCallable)
+service GetInterfaceListService {
+    rpc GetInterfaceList (GetInterfaceListRequest) returns (GetInterfaceListResponse);
+}

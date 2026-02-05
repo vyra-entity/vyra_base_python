@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from SetParam.srv
+// Request message for SetParam service
+message SetParamRequest {
+    string key = 1;
+    string value = 2;
+}
+
+// Response message for SetParam service
+message SetParamResponse {
+    bool success = 1;
+    string error_message = 2;
+}
+
+// Service definition (for Redis VyraCallable)
+service SetParamService {
+    rpc SetParam (SetParamRequest) returns (SetParamResponse);
+}

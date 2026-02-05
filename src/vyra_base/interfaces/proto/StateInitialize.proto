@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package vyra_base;
+
+// Auto-generated from StateInitialize.srv
+// Request message for StateInitialize service
+message StateInitializeRequest {
+    repeated string metadata = 1;
+}
+
+// Response message for StateInitialize service
+message StateInitializeResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Service definition (for Redis VyraCallable)
+service StateInitializeService {
+    rpc StateInitialize (StateInitializeRequest) returns (StateInitializeResponse);
+}

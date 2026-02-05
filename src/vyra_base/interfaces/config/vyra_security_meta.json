@@ -1,11 +1,17 @@
 [
     {
-        "tags": ["ros2_srv"],
+        "tags": [
+            "ros2",
+            "redis"
+        ],
         "type": "callable",
         "functionname": "request_access",
         "displayname": "Request Access",
         "description": "Request access to this module with a specific security level. This service is used by Module A to authenticate with Module B. The latest successful authentication replaces all previous sessions.",
-        "filetype": "VBASESecurityRequestAccess.srv",
+        "filetype": [
+            "VBASESecurityRequestAccess.srv",
+            "SecurityRequestAccess.proto"
+        ],
         "params": [
             {
                 "displayname": "module_name",

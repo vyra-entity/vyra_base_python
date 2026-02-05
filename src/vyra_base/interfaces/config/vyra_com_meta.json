@@ -1,11 +1,15 @@
 [
     {
-        "tags": ["ros2_msg"],
+        "tags": [
+            "ros2"
+        ],
         "type": "speaker",
         "functionname": "ErrorFeed",
         "displayname": "Error Feed",
         "description": "Communicate error information in the system between different components or modules.",
-        "filetype": "VBASEErrorFeed.msg",
+        "filetype": [
+            "VBASEErrorFeed.msg"
+        ],
         "returns": [
             {
                 "datatype": "uint32",
@@ -43,12 +47,16 @@
         "published": false
     },
     {
-        "tags": ["ros2_msg"],
+        "tags": [
+            "ros2"
+        ],
         "type": "speaker",
         "functionname": "StateFeed",
         "displayname": "State Feed",
         "description": "Communicate state information in the system between different components or modules.",
-        "filetype": "VBASEStateFeed.msg",
+        "filetype": [
+            "VBASEStateFeed.msg"
+        ],
         "returns": [
             {
                 "datatype": "string",
@@ -73,12 +81,16 @@
         }
     },
     {
-        "tags": ["ros2_msg"],
+        "tags": [
+            "ros2"
+        ],
         "type": "speaker",
         "functionname": "NewsFeed",
         "displayname": "News Feed",
         "description": "Communicate news in the system between different components or modules.",
-        "filetype": "VBASENewsFeed.msg",
+        "filetype": [
+            "VBASENewsFeed.msg"
+        ],
         "returns": [
             {
                 "datatype": "string",
