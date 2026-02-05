@@ -279,7 +279,7 @@ Interface-Pfade
 **After Build**: ``install/vyra_base_interfaces/``
 
 **Python Import**: ``from vyra_base_interfaces.srv import *``
-**NFS-Share**: ``/nfs/ros_interfaces/`` (for all modules accessible)
+**NFS-Share**: ``/nfs/vyra_interfaces/`` (for all modules accessible)
 
 Further Information
 -----------------------------

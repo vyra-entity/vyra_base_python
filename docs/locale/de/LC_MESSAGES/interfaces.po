@@ -362,7 +362,7 @@ msgid "**Python-Import**: ``from vyra_base_interfaces.srv import *``"
 msgstr ""
 
 #: ../../interfaces.rst:286 ab2d278e46394eaf9148cd520b4353ac
-msgid "**NFS-Share**: ``/nfs/ros_interfaces/`` (for alle Module togänglich)"
+msgid "**NFS-Share**: ``/nfs/vyra_interfaces/`` (for alle Module togänglich)"
 msgstr ""
 
 #: ../../interfaces.rst:289 88d7a240e6e34af08dcf6470429590b1
