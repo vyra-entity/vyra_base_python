@@ -5,7 +5,7 @@ import pytest
 import asyncio
 import os
 import tempfile
-from vyra_base.com.transport.uds.provider import UDSProvider
+from vyra_base.com.transport.t_uds.provider import UDSProvider
 from vyra_base.com.core.types import ProtocolType
 
 

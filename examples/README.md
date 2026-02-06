@@ -1,10 +1,53 @@
 # VYRA Base Python Examples
 
-This directory contains practical examples demonstrating how to use VYRA communication components.
+This directory contains practical examples demonstrating VYRA's communication capabilities.
 
 ## Examples
 
-### 1. Speaker Example (Publisher)
+### 1. External Communication
+**File**: `external_communication.py`
+
+Demonstrates integration with external (non-VYRA) systems:
+- REST API communication
+- MQTT broker integration  
+- Bidirectional bridge between VYRA and external systems
+
+```bash
+pip install aiohttp paho-mqtt
+python examples/external_communication.py
+```
+
+**Key Concepts**:
+- External REST API integration
+- MQTT pub/sub with external brokers
+- Bridging external data to VYRA network
+- Forwarding VYRA commands to external systems
+
+---
+
+### 2. Zenoh with Protobuf
+**File**: `zenoh_protobuf_example.py`
+
+Demonstrates using Zenoh transport with Protocol Buffers:
+- Speaker (Pub/Sub) with Protobuf messages
+- Callable (Request/Response) with Protobuf
+- Job (Long-running task) with Protobuf feedback
+- Binary Protobuf serialization
+
+```bash
+pip install eclipse-zenoh protobuf
+python examples/zenoh_protobuf_example.py
+```
+
+**Key Concepts**:
+- Type-safe communication with Protobuf
+- Efficient binary serialization
+- Cross-language message compatibility
+- Schema evolution and versioning
+
+---
+
+### 3. Speaker Example (Publisher)
 **File**: `example_speaker.py`
 
 Demonstrates how to publish messages on ROS2 topics using VyraSpeaker.
@@ -20,7 +63,7 @@ python examples/example_speaker.py
 
 ---
 
-### 2. Callable Example (Service Server)
+### 4. Callable Example (Service Server)
 **File**: `example_callable.py`
 
 Demonstrates how to provide ROS2 services using VyraCallable.
@@ -40,7 +83,7 @@ ros2 service call /callable_example_node/callable/add_service example_interfaces
 
 ---
 
-### 3. Job Example (Action Server & Client)
+### 5. Job Example (Action Server & Client)
 **File**: `example_job.py`
 
 Demonstrates long-running operations with feedback using VyraJob and VyraJobRunner.

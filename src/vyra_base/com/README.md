@@ -15,16 +15,16 @@ Professional multi-protocol communication system for distributed applications.
 │  (Types, Exceptions, Registry, Factory, Decorators)         │
 └────────────────────────┬────────────────────────────────────┘
                          │
-          ┌──────────────┼──────────────┐
-          │              │              │
-┌─────────▼────┐  ┌─────▼──────┐  ┌───▼──────────┐
-│  Transport   │  │  External  │  │  Industrial  │
-│   Layer      │  │   Layer    │  │    Layer     │
-├──────────────┤  ├────────────┤  ├──────────────┤
-│ • ROS2       │  │ • Redis    │  │ • Modbus     │
-│ • Shared Mem │  │ • gRPC     │  │ • OPC UA     │
-│ • UDS        │  │ • MQTT     │  │              │
-│              │  │ • REST     │  │              │
+          ┌──────────────┼──────────────┬─────────────┐
+          │              │              │             │
+┌─────────▼────┐  ┌─────▼──────┐  ┌───▼──────────┐ ┌▼────────┐
+│  Transport   │  │  External  │  │  Industrial  │ │Converter│
+│   Layer      │  │   Layer    │  │    Layer     │ │  Layer  │
+├──────────────┤  ├────────────┤  ├──────────────┤ ├─────────┤
+│ • ROS2       │  │ • Redis    │  │ • Modbus     │ │ • Proto │
+│ • Zenoh      │  │ • gRPC     │  │ • OPC UA     │ │         │
+│ • Shared Mem │  │ • MQTT     │  │              │ └─────────┘
+│ • UDS        │  │ • REST     │  │              │
 │              │  │ • WebSocket│  │              │
 └──────────────┘  └────────────┘  └──────────────┘
 ```
@@ -32,13 +32,13 @@ Professional multi-protocol communication system for distributed applications.
 ## Features
 
 ### 🚀 Multi-Protocol Support
-- **Transport Layer**: ROS2, Shared Memory, Unix Domain Sockets
-- **External Layer**: Redis, gRPC, MQTT, REST, WebSocket
+- **Transport Layer**: ROS2, Zenoh, Redis, Unix Domain Sockets, Shared Memory
+- **External Layer**: gRPC, MQTT, REST, WebSocket
 - **Industrial Layer**: Modbus, OPC UA (northbound)
 
 ### 🔄 Automatic Fallback
 ```python
-# Tries ROS2 → SharedMemory → UDS → Redis
+# Tries ROS2 → Zenoh → Redis → UDS
 callable = await InterfaceFactory.create_callable(
     "my_service",
     callback=handle_request
@@ -296,7 +296,7 @@ speaker = await InterfaceFactory.create_speaker(
 callable = await InterfaceFactory.create_callable("service")
 
 # ❌ Avoid - Hard-coded protocol
-from vyra_base.com.transport.ros2 import ROS2Provider
+from vyra_base.com.transport.t_ros2 import ROS2Provider
 provider = ROS2Provider()  # Only works with ROS2
 ```
 

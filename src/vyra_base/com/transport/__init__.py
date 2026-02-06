@@ -5,11 +5,31 @@ Unified communication abstraction layer supporting multiple protocols.
 Implements provider pattern for pluggable transports.
 
 Available Transports:
-- Redis: Message queue and key-value storage via Redis
 - ROS2: Distributed communication via DDS middleware
+- Zenoh: Unified pub/sub and query/reply with zero-copy
+- Redis: Message queue and key-value storage via Redis
 - UDS: Stream-based local IPC via Unix domain sockets
 
 Example Usage:
+    >>> # ROS2 Transport
+    >>> from vyra_base.com.transport.ros2 import ROS2Provider
+    >>> 
+    >>> provider = ROS2Provider(ProtocolType.ROS2)
+    >>> if await provider.check_availability():
+    ...     await provider.initialize()
+    ...     callable = await provider.create_callable("service", callback)
+    >>> 
+    >>> # Zenoh Transport
+    >>> from vyra_base.com.transport.zenoh import ZenohProvider
+    >>> 
+    >>> provider = ZenohProvider(ProtocolType.ZENOH)
+    >>> if await provider.check_availability():
+    ...     await provider.initialize(config={
+    ...         "mode": "client",
+    ...         "connect": ["tcp/zenoh-router:7447"]
+    ...     })
+    ...     callable = await provider.create_callable("service", callback)
+    >>> 
     >>> # Redis Transport
     >>> from vyra_base.com.transport.redis import RedisProvider, RedisClient
     >>> 
@@ -18,14 +38,6 @@ Example Usage:
     ...     await provider.initialize()
     ...     callable = await provider.create_callable("service", callback)
     ...     speaker = await provider.create_speaker("topic")
-    >>> 
-    >>> # ROS2 Transport
-    >>> from vyra_base.com.transport.ros2 import ROS2Provider
-    >>> 
-    >>> provider = ROS2Provider(ProtocolType.ROS2)
-    >>> if await provider.check_availability():
-    ...     await provider.initialize()
-    ...     callable = await provider.create_callable("service", callback)
     >>> 
     >>> # UDS Transport
     >>> from vyra_base.com.transport.uds import UDSProvider
@@ -38,7 +50,7 @@ Example Usage:
 
 # Redis Transport (optional)
 try:
-    from vyra_base.com.transport.redis import (
+    from vyra_base.com.transport.t_redis import (
         RedisProvider,
         RedisClient,
         RedisCallable,
@@ -50,7 +62,7 @@ except ImportError:
 
 # ROS2 Transport (optional)
 try:
-    from vyra_base.com.transport.ros2 import (
+    from vyra_base.com.transport.t_ros2 import (
         ROS2Provider,
         VyraNode,
         ROS2_AVAILABLE,
@@ -58,9 +70,22 @@ try:
 except ImportError:
     ROS2_AVAILABLE = False
 
+# Zenoh Transport (optional)
+try:
+    from vyra_base.com.transport.t_zenoh import (
+        ZenohProvider,
+        ZenohSession,
+        ZenohCallable,
+        ZenohSpeaker,
+        ZenohJob,
+        ZENOH_AVAILABLE,
+    )
+except ImportError:
+    ZENOH_AVAILABLE = False
+
 # UDS Transport (always available on Unix)
 try:
-    from vyra_base.com.transport.uds import (
+    from vyra_base.com.transport.t_uds import (
         UDSProvider,
         UDSCallable,
         UnixSocket,
@@ -73,6 +98,7 @@ __all__ = [
     # Availability flags
     "REDIS_AVAILABLE",
     "ROS2_AVAILABLE",
+    "ZENOH_AVAILABLE",
     "UDS_AVAILABLE",
 ]
 
@@ -89,6 +115,15 @@ if ROS2_AVAILABLE:
     __all__.extend([
         "ROS2Provider",
         "VyraNode",
+    ])
+
+if ZENOH_AVAILABLE:
+    __all__.extend([
+        "ZenohProvider",
+        "ZenohSession",
+        "ZenohCallable",
+        "ZenohSpeaker",
+        "ZenohJob",
     ])
 
 if UDS_AVAILABLE:
@@ -109,6 +144,7 @@ def get_available_transports() -> dict:
     return {
         "redis": REDIS_AVAILABLE,
         "ros2": ROS2_AVAILABLE,
+        "zenoh": ZENOH_AVAILABLE,
         "uds": UDS_AVAILABLE,
     }
 

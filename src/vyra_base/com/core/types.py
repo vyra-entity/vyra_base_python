@@ -19,6 +19,7 @@ class ProtocolType(str, Enum):
     """Supported communication protocols."""
     # Communication Abstraction Layer (CAL)
     ROS2 = "ros2"
+    ZENOH = "zenoh"
     REDIS = "redis"
     UDS = "uds"
     

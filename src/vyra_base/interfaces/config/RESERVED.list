@@ -3,40 +3,66 @@
 # Description:  This file contains all reserved interface names from vyra_base
 #               that should not be overridden by custom module interfaces.
 # Format:       <InterfaceName> | <FunctionName> | <ConfigFile>
+# Note:         This list includes .msg, .srv, .action, and .proto files
 
 # Communication Interfaces (vyra_com_meta.json)
 VBASEErrorFeed.msg | ErrorFeed | vyra_com_meta.json
+VBASEErrorFeed.proto | ErrorFeed | vyra_com_meta.json
 VBASEStateFeed.msg | StateFeed | vyra_com_meta.json
+VBASEStateFeed.proto | StateFeed | vyra_com_meta.json
 VBASENewsFeed.msg | NewsFeed | vyra_com_meta.json
+VBASENewsFeed.proto | NewsFeed | vyra_com_meta.json
 
 # Core Interfaces (vyra_core_meta.json)
 VBASEGetInterfaceList.srv | get_interface_list | vyra_core_meta.json
+VBASEGetInterfaceList.proto | get_interface_list | vyra_core_meta.json
 VBASESetParam.srv | set_parameter | vyra_core_meta.json
+VBASESetParam.proto | set_parameter | vyra_core_meta.json
 VBASEGetParam.srv | get_parameter | vyra_core_meta.json
+VBASEGetParam.proto | get_parameter | vyra_core_meta.json
 VBASEGetUpdateParamEventTopic.srv | param_changed_topic | vyra_core_meta.json
+VBASEGetUpdateParamEventTopic.proto | param_changed_topic | vyra_core_meta.json
 VBASEUpdateParamEvent.msg | updateParamEvent | vyra_core_meta.json
+VBASEUpdateParamEvent.proto | updateParamEvent | vyra_core_meta.json
 
 # State Machine Interfaces (vyra_state_meta.json)
 VBASEStateInitialize.srv | initialize | vyra_state_meta.json
+VBASEStateInitialize.proto | initialize | vyra_state_meta.json
 VBASEStatePause.srv | pause | vyra_state_meta.json
+VBASEStatePause.proto | pause | vyra_state_meta.json
 VBASEStateStop.srv | stop | vyra_state_meta.json
+VBASEStateStop.proto | stop | vyra_state_meta.json
 VBASEStateResume.srv | resume | vyra_state_meta.json
+VBASEStateResume.proto | resume | vyra_state_meta.json
 VBASEStateReset.srv | reset | vyra_state_meta.json
+VBASEStateReset.proto | reset | vyra_state_meta.json
 
 # Security Interfaces (vyra_security_meta.json)
 VBASESecurityRequestAccess.srv | request_access | vyra_security_meta.json
+VBASESecurityRequestAccess.proto | request_access | vyra_security_meta.json
 
 # Additional Message Types (not in meta files but used by system)
 VBASEKeyValue.msg | - | internal
+VBASEKeyValue.proto | - | internal
 VBASELoggerStream.msg | - | internal
+VBASELoggerStream.proto | - | internal
 VBASESecurityMetadata.msg | - | internal
+VBASESecurityMetadata.proto | - | internal
 VBASEVolatileHash.msg | - | internal
+VBASEVolatileHash.proto | - | internal
 VBASEVolatileList.msg | - | internal
+VBASEVolatileList.proto | - | internal
 VBASEVolatileSet.msg | - | internal
+VBASEVolatileSet.proto | - | internal
 VBASEVolatileString.msg | - | internal
+VBASEVolatileString.proto | - | internal
 SafetyMetadata.msg | - | internal
+SafetyMetadata.proto | - | internal
 
 # Additional Service Types
 VBASEGetLogs.srv | - | internal
+VBASEGetLogs.proto | - | internal
 VBASEHealthCheck.srv | - | internal
+VBASEHealthCheck.proto | - | internal
 VBASEReadAllParams.srv | - | internal
+VBASEReadAllParams.proto | - | internal

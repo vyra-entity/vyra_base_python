@@ -22,7 +22,7 @@ class TestTransportIntegration:
     @pytest.mark.asyncio
     async def test_redis_provider_lifecycle(self):
         """Test Redis provider full lifecycle."""
-        from vyra_base.com.transport.redis import RedisProvider
+        from vyra_base.com.transport.t_redis import RedisProvider
         
         try:
             # Create provider
@@ -61,7 +61,7 @@ class TestTransportIntegration:
     @pytest.mark.asyncio
     async def test_uds_provider_lifecycle(self):
         """Test UDS provider full lifecycle."""
-        from vyra_base.com.transport.uds import create_uds_provider
+        from vyra_base.com.transport.t_uds import create_uds_provider
         
         # Create temp socket path
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -240,7 +240,7 @@ class TestLayeredArchitecture:
     @pytest.mark.asyncio
     async def test_communication_to_vyra_models(self):
         """Test communication layer to VYRA models flow."""
-        from vyra_base.com.transport.uds import create_uds_provider
+        from vyra_base.com.transport.t_uds import create_uds_provider
         
         with tempfile.TemporaryDirectory() as tmpdir:
             socket_path = os.path.join(tmpdir, "layered_test.sock")
@@ -279,7 +279,7 @@ class TestEndToEnd:
             socket_path = os.path.join(tmpdir, "e2e_test.sock")
             
             try:
-                from vyra_base.com.transport.uds import create_uds_provider
+                from vyra_base.com.transport.t_uds import create_uds_provider
                 
                 # Server
                 server = await create_uds_provider(

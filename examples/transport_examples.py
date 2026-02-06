@@ -33,7 +33,7 @@ async def ros2_example():
         logger.warning("⚠️ ROS2 not available")
         return
     
-    from vyra_base.com.transport.ros2 import ROS2Provider
+    from vyra_base.com.transport.t_ros2 import ROS2Provider
     
     logger.info("=" * 60)
     logger.info("ROS2 TRANSPORT EXAMPLE")
@@ -75,7 +75,7 @@ async def uds_example():
         logger.warning("⚠️ UDS not available")
         return
     
-    from vyra_base.com.transport.uds import UDSProvider
+    from vyra_base.com.transport.t_uds import UDSProvider
     
     logger.info("=" * 60)
     logger.info("UNIX DOMAIN SOCKET TRANSPORT EXAMPLE")

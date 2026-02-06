@@ -2,6 +2,7 @@
     {
         "tags": [
             "ros2",
+            "zenoh",
             "redis"
         ],
         "type": "callable",

@@ -10,8 +10,8 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from vyra_base.com.core.types import ProtocolType
-from vyra_base.com.transport.ros2 import ROS2Provider
-from vyra_base.com.transport.ros2.node import VyraNode, NodeSettings
+from vyra_base.com.transport.t_ros2 import ROS2Provider
+from vyra_base.com.transport.t_ros2.node import VyraNode, NodeSettings
 
 async def main():
     """Main function demonstrating VyraSpeaker usage."""

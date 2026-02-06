@@ -51,19 +51,23 @@ class InterfaceFactory:
     """
     
     # Default fallback chain for each interface type
+    # Zenoh is prioritized as the default for best performance
     CALLABLE_FALLBACK = [
+        ProtocolType.ZENOH,
         ProtocolType.ROS2,
         ProtocolType.REDIS,
         ProtocolType.UDS
     ]
     
     SPEAKER_FALLBACK = [
+        ProtocolType.ZENOH,
         ProtocolType.ROS2,
         ProtocolType.REDIS,
         ProtocolType.UDS
     ]
     
     JOB_FALLBACK = [
+        ProtocolType.ZENOH,
         ProtocolType.ROS2,
         ProtocolType.REDIS,
         ProtocolType.UDS

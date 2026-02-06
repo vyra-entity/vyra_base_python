@@ -15,7 +15,7 @@ import time
 from rclpy.node import Node
 from example_interfaces.action import Fibonacci
 from vyra_base.com import create_vyra_job, create_vyra_job_runner
-from vyra_base.com.transport.ros2.node import VyraNode, NodeSettings
+from vyra_base.com.transport.t_ros2.node import VyraNode, NodeSettings
 
 
 # ============================================================================

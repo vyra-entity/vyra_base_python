@@ -2,6 +2,7 @@
     {
         "tags": [
             "ros2",
+            "zenoh",
             "redis"
         ],
         "type": "callable",
@@ -30,6 +31,7 @@
     {
         "tags": [
             "ros2",
+            "zenoh",
             "redis"
         ],
         "type": "callable",
@@ -77,6 +79,7 @@
     {
         "tags": [
             "ros2",
+            "zenoh",
             "redis"
         ],
         "type": "callable",
@@ -124,6 +127,7 @@
     {
         "tags": [
             "ros2",
+            "zenoh",
             "redis"
         ],
         "type": "callable",
@@ -151,7 +155,8 @@
     },
     {
         "tags": [
-            "ros2"
+            "ros2",
+            "zenoh"
         ],
         "type": "speaker",
         "functionname": "updateParamEvent",

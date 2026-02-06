@@ -16,11 +16,13 @@ from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
 
+from vyra_base.com.transport.t_zenoh.provider import ZenohProvider, ZENOH_AVAILABLE
+
 # Check ROS2 availability
 _ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
 
 if TYPE_CHECKING or _ROS2_AVAILABLE:
-    from vyra_base.com.transport.ros2.node import CheckerNode, NodeSettings, VyraNode
+    from vyra_base.com.transport.t_ros2.node import CheckerNode, NodeSettings, VyraNode
 else:
     CheckerNode = None
     NodeSettings = None
@@ -45,7 +47,7 @@ from vyra_base.state import (
 )
 from vyra_base.storage.db_access import DbAccess
 from vyra_base.storage.db_access import DBTYPE
-from vyra_base.com.transport.redis import RedisClient
+from vyra_base.com.transport.t_redis import RedisClient
 from vyra_base.storage.storage import Storage
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
@@ -155,6 +157,7 @@ class VyraEntity:
 
         self.registered_protocols = register_protocols or [
             ProtocolType.ROS2,
+            ProtocolType.ZENOH,
             ProtocolType.REDIS,
             ProtocolType.UDS
         ]
@@ -201,14 +204,14 @@ class VyraEntity:
         """
         Register the transport protocol providers based on availability.
 
-        This method registers the appropriate protocol providers (ROS2, Redis, etc.)
+        This method registers the appropriate protocol providers (ROS2, Zenoh, Redis, etc.)
         with the InterfaceFactory to enable communication for the entity.
         """
         providers = []
         
         if self._ros2_available and self._node is not None and ProtocolType.ROS2 in register_types:
             node_name = self._node.node_settings.name
-            from vyra_base.com.transport.ros2.provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.provider import ROS2Provider
             ros2_provider = ROS2Provider(node_name=node_name)
             await ros2_provider.initialize({
                 "node_name": node_name,
@@ -218,14 +221,30 @@ class VyraEntity:
             providers.append(ros2_provider)
             Logger.info("✅ Registered ROS2 protocol provider")
         
+        if ProtocolType.ZENOH in register_types:
+            try:
+                if ZENOH_AVAILABLE:
+                    zenoh_provider = ZenohProvider()
+                    zenoh_config = self.module_config.get("zenoh", {
+                        "mode": "client",
+                        "connect": ["tcp/zenoh-router:7447"]
+                    })
+                    await zenoh_provider.initialize(zenoh_config)
+                    providers.append(zenoh_provider)
+                    Logger.info("✅ Registered Zenoh protocol provider")
+                else:
+                    Logger.warning("⚠️ Zenoh not available, skipping provider registration")
+            except Exception as e:
+                Logger.warning(f"⚠️ Failed to register Zenoh provider: {e}")
+        
         if ProtocolType.REDIS in register_types:
-            from vyra_base.com.transport.redis.provider import RedisProvider
+            from vyra_base.com.transport.t_redis.provider import RedisProvider
             redis_provider = RedisProvider(module_name=self.module_entry.name)
             providers.append(redis_provider)
             Logger.info("✅ Registered Redis protocol provider")
 
         if ProtocolType.UDS in register_types:
-            from vyra_base.com.transport.uds.provider import UDSProvider
+            from vyra_base.com.transport.t_uds.provider import UDSProvider
             uds_provider = UDSProvider(module_name=self.module_entry.name)
             providers.append(uds_provider)
             Logger.info("✅ Registered UDS protocol provider")

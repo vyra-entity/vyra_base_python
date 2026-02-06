@@ -23,7 +23,7 @@ async def demo_redis_provider():
     logger.info("=" * 60)
     
     try:
-        from vyra_base.com.transport.redis import create_redis_provider
+        from vyra_base.com.transport.t_redis import create_redis_provider
         
         # Create provider (communication layer + VYRA models)
         provider = await create_redis_provider(
@@ -71,7 +71,7 @@ async def demo_uds_provider():
     logger.info("=" * 60)
     
     try:
-        from vyra_base.com.transport.uds import create_uds_provider
+        from vyra_base.com.transport.t_uds import create_uds_provider
         import tempfile
         import os
         

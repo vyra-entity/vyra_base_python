@@ -19,10 +19,10 @@ from .db_access import DbAccess, DBTYPE, DBSTATUS, DBMESSAGE
 from .db_manipulator import DbManipulator, DBReturnValue
 
 # Redis client - BACKWARD COMPATIBILITY
-# NOTE: RedisClient has been moved to vyra_base.com.transport.redis
+# NOTE: RedisClient has been moved to vyra_base.com.transport.t_redis
 # This import maintains backward compatibility
 try:
-    from vyra_base.com.transport.redis import RedisClient, REDIS_TYPE
+    from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
     _REDIS_AVAILABLE = True
 except ImportError:
     # Fallback to old location if new location not available

@@ -14,7 +14,7 @@ class TestROS2Provider:
     def test_ros2_provider_exists(self):
         """Test that ROS2 provider module exists."""
         try:
-            from vyra_base.com.transport.ros2 import ros2_provider
+            from vyra_base.com.transport.t_ros2 import ros2_provider
             assert ros2_provider is not None
         except ImportError:
             pytest.skip("ROS2 provider not implemented yet")
@@ -25,7 +25,7 @@ class TestROS2Provider:
             mock_import.side_effect = ImportError("No module named 'rclpy'")
             
             try:
-                from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+                from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
                 provider = ROS2Provider()
                 
                 # Should detect ROS2 unavailable
@@ -40,7 +40,7 @@ class TestROS2Provider:
             # Try to import rclpy
             import rclpy
             
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             provider = ROS2Provider()
             assert provider.protocol == ProtocolType.ROS2
@@ -54,7 +54,7 @@ class TestROS2Provider:
     async def test_ros2_provider_initialization(self):
         """Test ROS2 provider initialization."""
         try:
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             provider = ROS2Provider()
             
@@ -74,7 +74,7 @@ class TestROS2Provider:
     async def test_ros2_create_callable_service(self):
         """Test creating ROS2 service as callable."""
         try:
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             provider = ROS2Provider()
             
@@ -98,7 +98,7 @@ class TestROS2Provider:
     async def test_ros2_create_speaker_publisher(self):
         """Test creating ROS2 publisher as speaker."""
         try:
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             provider = ROS2Provider()
             
@@ -118,7 +118,7 @@ class TestROS2Provider:
     async def test_ros2_create_job_action(self):
         """Test creating ROS2 action as job."""
         try:
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             provider = ROS2Provider()
             
@@ -280,7 +280,7 @@ class TestROS2IntegrationWithMultiProtocol:
         from vyra_base.com.providers import ProviderRegistry
         
         try:
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             registry = ProviderRegistry()
             registry._providers.clear()
@@ -299,7 +299,7 @@ class TestROS2IntegrationWithMultiProtocol:
         from vyra_base.com.providers import ProviderRegistry
         
         try:
-            from vyra_base.com.transport.ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
             
             registry = ProviderRegistry()
             registry._providers.clear()

@@ -74,23 +74,23 @@ except ImportError:
 
 # Use new ROS2 implementations (optional)
 try:
-    from vyra_base.com.transport.ros2.vyra_models.callable import ROS2Callable
-    from vyra_base.com.transport.ros2.vyra_models.speaker import ROS2Speaker
-    from vyra_base.com.transport.ros2.vyra_models.job import ROS2Job
+    from vyra_base.com.transport.t_ros2.vyra_models.callable import ROS2Callable
+    from vyra_base.com.transport.t_ros2.vyra_models.speaker import ROS2Speaker
+    from vyra_base.com.transport.t_ros2.vyra_models.job import ROS2Job
 except ImportError:
     ROS2Callable = None
     ROS2Speaker = None
     ROS2Job = None
 
-# ROS2 infrastructure - Using transport/ros2 implementations (optional)
+# ROS2 infrastructure - Using transport/t_ros2 implementations (optional)
 try:
-    from vyra_base.com.transport.ros2.communication.publisher import VyraPublisher
-    from vyra_base.com.transport.ros2.communication.subscriber import VyraSubscriber
-    from vyra_base.com.transport.ros2.node import VyraNode, CheckerNode, NodeSettings
-    from vyra_base.com.transport.ros2.communication.action_client import VyraActionClient
-    from vyra_base.com.transport.ros2.communication.action_server import VyraActionServer
-    from vyra_base.com.transport.ros2.communication.service_client import VyraServiceClient
-    from vyra_base.com.transport.ros2.communication.service_server import VyraServiceServer
+    from vyra_base.com.transport.t_ros2.communication.publisher import VyraPublisher
+    from vyra_base.com.transport.t_ros2.communication.subscriber import VyraSubscriber
+    from vyra_base.com.transport.t_ros2.node import VyraNode, CheckerNode, NodeSettings
+    from vyra_base.com.transport.t_ros2.communication.action_client import VyraActionClient
+    from vyra_base.com.transport.t_ros2.communication.action_server import VyraActionServer
+    from vyra_base.com.transport.t_ros2.communication.service_client import VyraServiceClient
+    from vyra_base.com.transport.t_ros2.communication.service_server import VyraServiceServer
 except ImportError:
     VyraSubscriber = None
     VyraNode = None
