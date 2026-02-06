@@ -108,6 +108,101 @@ ros2 action send_goal /job_server_node/job/fibonacci_job example_interfaces/acti
 
 ---
 
+### 6. Listener Example (Subscriber)
+**File**: `example_listener.py`
+
+Subscribes to a ROS2 topic using VyraSpeaker with `is_publisher=False`. Pairs with `example_speaker.py`.
+
+```bash
+# Terminal 1: Start listener
+python examples/example_listener.py
+
+# Terminal 2: Publish (speaker or CLI)
+python examples/example_speaker.py
+# or: ros2 topic pub /vyra/example_topic std_msgs/msg/String "{data: 'Hello'}"
+```
+
+**Key Concepts**:
+- VyraSpeaker as subscriber (`is_publisher=False`)
+- `listen(callback)` for incoming messages
+- Same topic name as publisher for pub/sub
+
+---
+
+### 7. Unified State Machine
+**File**: `unified_state_machine_example.py`
+
+Shows the 3-layer state machine: Lifecycle, Operational, and Health.
+
+```bash
+python examples/unified_state_machine_example.py
+```
+
+**Key Concepts**:
+- `UnifiedStateMachine`: single API for all layers
+- Lifecycle: start, complete_initialization, shutdown
+- Operational: set_ready, start_task, pause, resume, stop, reset
+- Health: report_warning, clear_warning, report_fault, recover
+
+---
+
+### 8. Redis Pub/Sub
+**File**: `redis_pubsub_example.py`
+
+Redis transport: publish and subscribe with `RedisProvider` and `create_speaker`. Requires Redis (e.g. `docker run -p 6379:6379 redis`).
+
+```bash
+# Terminal 1: Subscriber
+python examples/redis_pubsub_example.py subscriber
+
+# Terminal 2: Publisher
+python examples/redis_pubsub_example.py publisher
+```
+
+**Key Concepts**:
+- RedisProvider, create_speaker (channel)
+- shout() to publish, listen(callback) to subscribe
+
+---
+
+### 9. Storage (Database)
+**File**: `storage_example.py`
+
+DbAccess (SQLite) and DbManipulator with a custom table (`tb_` prefix required).
+
+```bash
+python examples/storage_example.py
+```
+
+**Key Concepts**:
+- DbAccess with db_config (SQLite)
+- Custom table inheriting from Base (`tb_sensor_log`); table names must use `tb_` prefix
+- DbManipulator: add(), get_all(), get_by_id()
+
+Run from project root so that `vyra_base` and its logger are initialized correctly: `python examples/storage_example.py` or `pip install -e .` then run from any directory.
+
+---
+
+### 10. Communication Demo (Multi-Transport)
+**File**: `communication_demo.py`
+
+Runs several transport demos: Redis, UDS, Shared Memory, Modbus, External Registry. Good overview of the communication layer.
+
+```bash
+python examples/communication_demo.py
+```
+
+### 11. Operational State Machine (Lifecycle Methods)
+**File**: `operational_state_machine_example.py`
+
+OperationalStateMachine with lifecycle methods (initialize, start, pause, resume, stop, reset) and state validation.
+
+```bash
+python examples/operational_state_machine_example.py
+```
+
+---
+
 ## Prerequisites
 
 Make sure you have:
@@ -127,7 +222,8 @@ pip install -e .
 
 | Component | ROS2 Equivalent | Use Case |
 |-----------|----------------|----------|
-| **VyraSpeaker** | Publisher | One-way broadcast of data |
+| **VyraSpeaker** (is_publisher=True) | Publisher | One-way broadcast of data |
+| **VyraSpeaker** (is_publisher=False) | Subscriber | Receive messages on a topic |
 | **VyraCallable** | Service Server | Quick request/response |
 | **VyraJob** | Action Server | Long-running tasks with feedback |
 
