@@ -23,7 +23,7 @@ def extract_interfaces(target_path: str | Path):
     - .msg files → target/msg/ (from speaker/ directory)
     - .srv files → target/srv/ (from callable/ directory)
     - .action files → target/action/ (from job/ directory)
-    - .proto files → target/proto/ (from proto/ directory, for Redis/gRPC)
+    - .proto files → target/proto/ (from proto/ directory, for others)
     
     The source uses VYRA terminology (speaker/callable/job/proto) but outputs
     to ROS2-compatible directories (msg/srv/action) plus proto/ for gRPC.
@@ -53,7 +53,7 @@ def extract_interfaces(target_path: str | Path):
         'speaker': ('msg', 'msg'),      # Speaker → .msg files for ROS2
         'callable': ('srv', 'srv'),     # Callable → .srv files for ROS2
         'job': ('action', 'action'),    # Job → .action files for ROS2
-        'proto': ('proto', 'proto')     # Proto → .proto files for Redis/gRPC
+        'proto': ('proto', 'proto')     # Proto → .proto files for others
     }
     
     for source_type, (file_ext, target_type) in interface_mapping.items():

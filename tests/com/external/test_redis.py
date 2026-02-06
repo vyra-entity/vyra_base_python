@@ -3,7 +3,7 @@ Unit tests for Redis external protocol.
 """
 import pytest
 from unittest.mock import Mock, AsyncMock, patch
-from vyra_base.com.external.redis.provider import RedisProvider
+from vyra_base.com.transport.t_redis.provider import RedisProvider
 from vyra_base.com.core.types import ProtocolType
 
 
