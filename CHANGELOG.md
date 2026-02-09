@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.42] - 2026-02-09
+
+### Build
+
+Update FunctionConfigEntry ros2type->interfacetype to be not ros2 dependent but type agnostic
+
+
+## [0.1.8+build.41] - 2026-02-09
+
+### Build
+
+Bugfixing: Wrong types in feeder.py
+
+
 ## [0.1.8+build.40] - 2026-02-09
 
 ### Build

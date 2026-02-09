@@ -825,7 +825,7 @@ class VyraEntity:
                     name=setting.functionname,
                     callback=setting.callback,
                     protocols=[ProtocolType.ROS2],
-                    service_type=setting.ros2type,
+                    service_type=setting.interfacetypes,
                     node=self._node
                 )
             elif setting.type == FunctionConfigBaseTypes.job.value:
@@ -851,7 +851,7 @@ class VyraEntity:
                 await InterfaceFactory.create_speaker(
                     name=setting.functionname,
                     protocols=[ProtocolType.ROS2],
-                    message_type=setting.ros2type,
+                    message_type=setting.interfacetypes,
                     node=self._node,
                     is_publisher=True,
                     qos_profile=setting.qosprofile,

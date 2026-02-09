@@ -183,8 +183,8 @@ class FunctionConfigEntry(DCBase):
     :type tags: list[str]
     :param type: Type of the function
     :type type: FunctionConfigBaseTypes
-    :param ros2type: ROS2 type of the function
-    :type ros2type: Any
+    :param interfacetypes: Interface types of the function
+    :type interfacetypes: Any
     :param functionname: Name of the function
     :type functionname: str
     :param displayname: Display name of the function
@@ -206,7 +206,7 @@ class FunctionConfigEntry(DCBase):
     """
     tags: list[str]
     type: FunctionConfigBaseTypes
-    ros2type: Any
+    interfacetypes: Any
     functionname: str
     displayname: str
     description: str
@@ -232,8 +232,8 @@ class FunctionConfigEntry(DCBase):
             if f.name == "callback":
                 result[f.name] = getattr(self.callback, "__name__", None)
                 continue
-            if f.name == "ros2type":
-                result[f.name] = getattr(self.ros2type, "__name__", None)
+            if f.name == "interfacetypes":
+                result[f.name] = getattr(self.interfacetypes, "__name__", None)
                 continue
             if f.name == "displaystyle":
                 result[f.name] = self.displaystyle.asdict()
@@ -250,7 +250,7 @@ class ErrorEntry(DCBase):
 
     Stores the error details.
 
-    :param _type: The ros2 type of the error entry
+    :param _type: The interface type of the error entry
     :type _type: Any
     :param level: The level of the error (default: 0, MINOR_FAULT)
     :type level: Union[ErrorEntry.ERROR_LEVEL, int]

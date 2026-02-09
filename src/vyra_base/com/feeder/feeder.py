@@ -87,7 +87,8 @@ class BaseFeeder:
                     qos_profile=self._qos
                 )
                 
-                if self._speaker.publisher_server is None:
+                # Check if speaker was created successfully
+                if not self._speaker or not hasattr(self._speaker, '_publisher'):
                     raise FeederException(
                         f"Could not create ROS2 speaker for {self._feederName}."
                     )

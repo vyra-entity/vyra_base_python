@@ -248,6 +248,39 @@ class InterfaceFactory:
             f"Cannot create speaker '{name}'. "
             f"Tried protocols: {[p.value for p in protocols]}"
         )
+
+    @staticmethod
+    async def create_listener(
+        name: str,
+        callback: Callable[[Any], None],
+        protocols: Optional[List[ProtocolType]] = None,
+        **kwargs
+    ) -> VyraSpeaker:
+        """
+        Create Speaker and start listening immediately. Used for better usability.
+        
+        Args:
+            name: Topic/channel name
+            callback: Callback for received messages
+            protocols: Preferred protocols (fallback if not specified)
+            **kwargs: Additional parameters
+        Returns:
+            VyraSpeaker: Initialized speaker with active subscription
+        Raises:
+            InterfaceError: If no protocol available
+        """
+        if "is_publisher" in kwargs and kwargs["is_publisher"]:
+            raise ValueError("create_listener is for subscribers only. Remove 'is_publisher' flag.")
+        
+        speaker = await InterfaceFactory.create_speaker(
+            name=name,
+            callback=callback,
+            protocols=protocols,
+            **kwargs
+        )
+        
+        await speaker.listen(callback)
+        return speaker
     
     @staticmethod
     async def create_job(
