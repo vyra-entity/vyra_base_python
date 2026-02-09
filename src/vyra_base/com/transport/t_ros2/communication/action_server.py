@@ -113,3 +113,12 @@ class VyraActionServer:
         if self._action.result_callback:
             return self._action.result_callback(goal_handle)
         return GoalResponse.REJECT
+    
+    def destroy(self) -> None:
+        """
+        Destroy the action server and cleanup resources.
+        """
+        if self._action.server:
+            self._node.get_logger().info(f"Destroying action server: {self._action.name}")
+            self._action.server.destroy()
+            self._action.server = None

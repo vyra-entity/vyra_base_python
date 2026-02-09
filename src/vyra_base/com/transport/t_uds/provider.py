@@ -7,6 +7,7 @@ Provides low-latency local IPC via stream sockets.
 import logging
 from typing import Any, Callable, Optional, Dict
 
+from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
     VyraCallable,
@@ -70,8 +71,9 @@ class UDSProvider(AbstractProtocolProvider):
     
     def __init__(
         self,
+        module_name: str,
+        module_id: str,
         protocol: ProtocolType = ProtocolType.UDS,
-        module_name: str = "default"
     ):
         """
         Initialize UDS provider.
@@ -89,6 +91,9 @@ class UDSProvider(AbstractProtocolProvider):
             "connect_timeout": 5.0,
             "call_timeout": 5.0,
         }
+
+        # Topic builder for consistent naming
+        self._topic_builder = TopicBuilder(module_name, module_id)
     
     async def check_availability(self) -> bool:
         """
@@ -201,6 +206,7 @@ class UDSProvider(AbstractProtocolProvider):
         
         callable_instance = UDSCallable(
             name=name,
+            topic_builder=self._topic_builder,
             callback=callback,
             module_name=module_name,
             **kwargs

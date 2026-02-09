@@ -6,13 +6,13 @@ from typing import Any, Union, Optional
 
 # Check ROS2 availability
 try:
-    import builtin_interfaces  # pyright: ignore[reportAssignmentType]
+    import rclpy
     _ROS2_AVAILABLE = True
 except ImportError:
     _ROS2_AVAILABLE = False
 
 if _ROS2_AVAILABLE:
-    from vyra_base.com.transport.ros2 import Ros2TypeConverter
+    from vyra_base.com.transport.t_ros2 import Ros2TypeConverter
     from vyra_base.com.handler.ros2 import ROS2Handler
 else:
     Ros2TypeConverter = None
@@ -32,8 +32,8 @@ class NewsFeeder(BaseFeeder):
     :type type: Any
     :param node: The VyraNode instance associated with this feeder (ROS2 Node).
     :type node: VyraNode
-    :param module_config: Module configuration entry.
-    :type module_config: ModuleEntry
+    :param module_entity: Module configuration entry.
+    :type module_entity: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
     :type loggingOn: bool, Optional
     :raises FeederException: If the VyraSpeaker cannot be created with the given type.
@@ -43,7 +43,7 @@ class NewsFeeder(BaseFeeder):
             self, 
             type: Any,
             node: Optional[Any],
-            module_config: ModuleEntry,
+            module_entity: ModuleEntry,
             loggingOn: bool = True
         ):
         super().__init__()
@@ -53,7 +53,7 @@ class NewsFeeder(BaseFeeder):
         self._level: int = logging.INFO
         self._type: Any = type
         self._node: Optional[Any] = node
-        self._module_config: ModuleEntry = module_config
+        self._module_entity: ModuleEntry = module_entity
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
         self._loggingOn: bool = loggingOn
         
@@ -140,8 +140,8 @@ class NewsFeeder(BaseFeeder):
             message= message,
             timestamp= datetime.now(),
             uuid= uuid.uuid4(),
-            module_name= self._module_config.name,
-            module_id= self._module_config.uuid,
+            module_name= self._module_entity.name,
+            module_id= self._module_entity.uuid,
             _type= self._type
 
         )

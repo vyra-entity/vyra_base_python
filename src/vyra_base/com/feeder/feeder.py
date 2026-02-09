@@ -20,8 +20,6 @@ if _ROS2_AVAILABLE:
         QoSDurabilityPolicy,
     )
     from vyra_base.com import InterfaceFactory, ProtocolType
-    from vyra_base.com.transport.ros2.node import VyraNode
-    from vyra_base.com.core.types import VyraSpeaker
 
 from vyra_base.com.handler.communication import CommunicationHandler
 from vyra_base.defaults.exceptions import FeederException

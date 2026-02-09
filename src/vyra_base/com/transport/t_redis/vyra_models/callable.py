@@ -14,6 +14,7 @@ from typing import Any, Callable, Optional
 from vyra_base.com.core.types import VyraCallable, ProtocolType
 from vyra_base.com.core.exceptions import InterfaceError
 from vyra_base.com.transport.t_redis.communication.redis_client import RedisClient
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,10 @@ class RedisCallable(VyraCallable):
     
     Server-side: Listens to request key pattern, executes callback, writes response
     Client-side: Writes request to key, waits for response key
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: request:v2_modulemanager_abc123/calculate:12345
     
     Example:
         >>> # Server-side
@@ -48,6 +53,7 @@ class RedisCallable(VyraCallable):
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         callback: Optional[Callable] = None,
         redis_client: Optional[RedisClient] = None,
         request_key_pattern: str = "request:{name}:{id}",
@@ -65,8 +71,14 @@ class RedisCallable(VyraCallable):
             request_key_pattern: Pattern for request keys
             response_key_pattern: Pattern for response keys
             ttl: Time-to-live for keys in seconds
+            topic_builder: TopicBuilder for naming convention
         """
-        super().__init__(name, callback, ProtocolType.REDIS, **kwargs)
+        # Apply topic builder if provided
+        if topic_builder:
+            name = topic_builder.build(name, interface_type=InterfaceType.CALLABLE)
+            logger.debug(f"Applied TopicBuilder: {name}")
+        
+        super().__init__(name, topic_builder, callback, ProtocolType.REDIS, **kwargs)
         self.redis_client: RedisClient | None = redis_client
         self.request_key_pattern = request_key_pattern
         self.response_key_pattern = response_key_pattern

@@ -7,6 +7,7 @@ Provides message queue and key-value storage via Redis.
 import logging
 from typing import Any, Callable, Optional, Dict
 
+from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
     VyraCallable,
@@ -61,8 +62,9 @@ class RedisProvider(AbstractProtocolProvider):
     
     def __init__(
         self,
+        module_name: str,
+        module_id: str,
         protocol: ProtocolType = ProtocolType.REDIS,
-        module_name: str = "default",
         **redis_kwargs
     ):
         """
@@ -71,7 +73,7 @@ class RedisProvider(AbstractProtocolProvider):
         Args:
             protocol: Protocol type (must be REDIS)
             module_name: Module name for Redis namespace
-            **redis_kwargs: Additional arguments passed to RedisClient
+            module_id: Module ID for Redis namespace
                 - host: Redis host (default: from env REDIS_HOST)
                 - port: Redis port (default: from env REDIS_PORT)
                 - username: Redis ACL username
@@ -82,6 +84,8 @@ class RedisProvider(AbstractProtocolProvider):
         self.module_name = module_name
         self._redis_kwargs = redis_kwargs
         self._client: Optional[Any] = None  # RedisClient instance
+        self._topic_builder = TopicBuilder(module_name, module_id)
+
         
     async def check_availability(self) -> bool:
         """
@@ -174,6 +178,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         callable_obj = RedisCallable(
             name=name,
+            topic_builder=self._topic_builder,
             callback=callback,
             redis_client=self._client,
             **kwargs
@@ -206,6 +211,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         speaker = RedisSpeaker(
             name=name,
+            topic_builder=self._topic_builder,
             redis_client=self._client,
             module_name=self.module_name,
             callback=callback,

@@ -274,7 +274,7 @@ class RedisClient():
             return None
 
     @ErrorTraceback.w_check_error_exist
-    async def set(self, key: str, value: Any) -> bool:
+    async def set(self, key: str, value: Any, ex: int = None) -> bool:
         """
         Set a value in Redis.
         
@@ -309,7 +309,7 @@ class RedisClient():
                 return True
             else:
                 # Store as string
-                result = await client.set(key, value)
+                result = await client.set(key, value, ex=ex)
                 return result is not None
         except Exception as e:
             Logger.error(f"Error setting key {key}: {e}")

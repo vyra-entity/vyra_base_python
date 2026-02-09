@@ -3,13 +3,13 @@ from typing import Any, Optional
 
 # Check ROS2 availability
 try:
-    import builtin_interfaces
+    import rclpy
     _ROS2_AVAILABLE = True
 except ImportError:
     _ROS2_AVAILABLE = False
 
 if _ROS2_AVAILABLE:
-    from vyra_base.com.transport.ros2 import Ros2TypeConverter
+    from vyra_base.com.transport.t_ros2 import Ros2TypeConverter
     from vyra_base.com.handler.ros2 import ROS2Handler
 else:
     Ros2TypeConverter = None
@@ -29,8 +29,8 @@ class StateFeeder(BaseFeeder):
     :type type: Any
     :param node: The VyraNode instance associated with this feeder (ROS2 Node).
     :type node: VyraNode
-    :param module_config: Module configuration entry.
-    :type module_config: ModuleEntry
+    :param module_entity: Module configuration entry.
+    :type module_entity: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
     :type loggingOn: bool, Optional
 
@@ -41,14 +41,14 @@ class StateFeeder(BaseFeeder):
     :ivar _level: Logging level.
     :ivar _type: ROS2 message type.
     :ivar _node: VyraNode instance.
-    :ivar _module_config: Module configuration.
+    :ivar _module_entity: Module configuration.
     """
 
     def __init__(
             self, 
             type: Any,
             node: Optional[Any],
-            module_config: ModuleEntry,
+            module_entity: ModuleEntry,
             loggingOn: bool = False,
             ):
         """
@@ -58,8 +58,8 @@ class StateFeeder(BaseFeeder):
         :type type: Any
         :param node: The VyraNode instance (optional, None if ROS2 unavailable).
         :type node: Optional[Any]
-        :param module_config: Module configuration entry.
-        :type module_config: ModuleEntry
+        :param module_entity: Module configuration entry.
+        :type module_entity: ModuleEntry
         :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
         :type loggingOn: bool, Optional
 
@@ -72,7 +72,7 @@ class StateFeeder(BaseFeeder):
         self._level: int = logging.INFO
         self._type: Any = type
         self._node: Optional[Any] = node
-        self._module_config: ModuleEntry = module_config
+        self._module_entity: ModuleEntry = module_entity
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
         self._loggingOn: bool = loggingOn
 

@@ -11,6 +11,7 @@ from ctypes import ArgumentError
 import logging
 from typing import Any, Callable, Optional, Dict, TYPE_CHECKING
 
+from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
     VyraCallable,
@@ -84,8 +85,9 @@ class ROS2Provider(AbstractProtocolProvider):
     
     def __init__(
         self,
+        module_name: str,
+        module_id: str,
         protocol: ProtocolType = ProtocolType.ROS2,
-        node_name: str = "vyra_node"
     ):
         """
         Initialize ROS2 provider.
@@ -95,17 +97,18 @@ class ROS2Provider(AbstractProtocolProvider):
             node_name: Default node name
         """
         super().__init__(protocol)
-        self.node_name = node_name
+        self.node_name = f"{module_name}_{module_id}"
         self._node: Optional[VyraNode] = None
         
         # Default configuration
         self._config = {
-            "node_name": node_name,
+            "node_name": self.node_name,
             "namespace": "",
             "use_sim_time": False,
             "enable_rosout": True,
             "parameter_overrides": None,
         }
+        self._topic_builder = TopicBuilder(module_name, module_id)
     
     async def check_availability(self) -> bool:
         """
@@ -245,6 +248,7 @@ class ROS2Provider(AbstractProtocolProvider):
         # Create ROS2 callable
         callable_instance = ROS2Callable(
             name=name,
+            topic_builder=self._topic_builder,
             callback=callback,
             node=node or self._node,
             service_type=service_type,
@@ -297,6 +301,7 @@ class ROS2Provider(AbstractProtocolProvider):
         # Create ROS2 speaker
         speaker_instance = ROS2Speaker(
             name=name,
+            topic_builder=self._topic_builder,
             node=node or self._node,
             message_type=message_type,
             is_publisher=is_publisher,
@@ -345,6 +350,7 @@ class ROS2Provider(AbstractProtocolProvider):
         # Create ROS2 job
         job_instance = ROS2Job(
             name=name,
+            topic_builder=self._topic_builder,
             callback=callback,
             node=node or self._node,
             action_type=action_type,

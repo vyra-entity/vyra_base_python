@@ -10,6 +10,7 @@ import asyncio
 import logging
 from typing import Any, Callable, Optional, Dict
 
+from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
     VyraCallable,
@@ -79,6 +80,8 @@ class ZenohProvider(AbstractProtocolProvider):
     
     def __init__(
         self,
+        module_name: str,
+        module_id: str,
         protocol: ProtocolType = ProtocolType.ZENOH
     ):
         """
@@ -90,6 +93,9 @@ class ZenohProvider(AbstractProtocolProvider):
         super().__init__(protocol)
         self._session: Optional[ZenohSession] = None
         self._format = SerializationFormat.JSON
+
+        # Topic builder for consistent naming
+        self._topic_builder = TopicBuilder(module_name, module_id)
     
     async def check_availability(self) -> bool:
         """
@@ -216,6 +222,7 @@ class ZenohProvider(AbstractProtocolProvider):
             
             callable = ZenohCallable(
                 name=name,
+                topic_builder=self._topic_builder,
                 session=self._session,
                 callback=callback,
                 format=format,
@@ -259,6 +266,7 @@ class ZenohProvider(AbstractProtocolProvider):
             
             speaker = ZenohSpeaker(
                 name=name,
+                topic_builder=self._topic_builder,
                 session=self._session,
                 format=format,
                 is_publisher=is_publisher
@@ -302,6 +310,7 @@ class ZenohProvider(AbstractProtocolProvider):
             
             job = ZenohJob(
                 name=name,
+                topic_builder=self._topic_builder,
                 session=self._session,
                 callback=callback,
                 format=format,

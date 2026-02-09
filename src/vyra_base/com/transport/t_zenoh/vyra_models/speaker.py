@@ -19,6 +19,7 @@ from vyra_base.com.transport.t_zenoh.communication.publisher import PublisherInf
 from vyra_base.com.transport.t_zenoh.communication.subscriber import SubscriberInfo
 from vyra_base.com.transport.t_zenoh.communication.serializer import SerializationFormat
 from vyra_base.com.transport.t_zenoh.session import ZenohSession
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +29,16 @@ class ZenohSpeaker(VyraSpeaker):
     Zenoh-specific implementation of VyraSpeaker using Pub/Sub.
     
     Wraps ZenohPublisher for publishing and ZenohSubscriber for subscribing.
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/sensor_data
     """
     
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         session: Optional[ZenohSession] = None,
         format: SerializationFormat = SerializationFormat.JSON,
         is_publisher: bool = True,
@@ -46,9 +52,15 @@ class ZenohSpeaker(VyraSpeaker):
             session: Zenoh session
             format: Serialization format
             is_publisher: Whether this is a publisher (True) or subscriber (False)
+            topic_builder: TopicBuilder for naming convention
             **kwargs: Additional parameters
         """
-        super().__init__(name, ProtocolType.ZENOH, **kwargs)
+        # Apply topic builder if provided
+        if topic_builder:
+            name = topic_builder.build(name, interface_type=InterfaceType.SPEAKER)
+            logger.debug(f"Applied TopicBuilder: {name}")
+        
+        super().__init__(name, topic_builder, ProtocolType.ZENOH, **kwargs)
         self.session = session
         self.format = format
         self.is_publisher = is_publisher

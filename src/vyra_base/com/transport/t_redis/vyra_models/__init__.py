@@ -7,7 +7,7 @@ Implements Callable, Speaker, and Job patterns for unified interface.
 Available:
 - RedisCallable: Request-response pattern via Redis key-value
 - RedisSpeaker: Pub/Sub messaging via Redis channels
-- RedisJob: Long-running tasks via Redis Streams (future)
+- RedisJob: Long-running tasks via Redis Pub/Sub and key-value
 
 Example:
     >>> from vyra_base.com.transport.t_redis.vyra_models import RedisCallable, RedisSpeaker
@@ -35,14 +35,17 @@ Example:
 try:
     from vyra_base.com.transport.t_redis.vyra_models.callable import RedisCallable
     from vyra_base.com.transport.t_redis.vyra_models.speaker import RedisSpeaker
+    from vyra_base.com.transport.t_redis.vyra_models.job import RedisJob
     REDIS_MODELS_AVAILABLE = True
 except ImportError:
     RedisCallable = None
     RedisSpeaker = None
+    RedisJob = None
     REDIS_MODELS_AVAILABLE = False
 
 __all__ = [
     "RedisCallable",
     "RedisSpeaker",
+    "RedisJob",
     "REDIS_MODELS_AVAILABLE",
 ]

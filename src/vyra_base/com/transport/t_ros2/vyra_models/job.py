@@ -12,6 +12,7 @@ from vyra_base.com.transport.t_ros2.node import VyraNode
 from vyra_base.com.transport.t_ros2.communication.action_client import ActionClientInfo
 from vyra_base.com.transport.t_ros2.communication.action_server import ActionServerInfo
 from vyra_base.com.transport.t_ros2.communication import VyraActionServer, VyraActionClient
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -21,20 +22,37 @@ class ROS2Job(VyraJob):
     ROS2-specific implementation of VyraJob using ROS2 Actions.
     
     Wraps VyraActionServer for server-side and VyraActionClient for client-side.
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/execute_task
     """
     
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         result_callback: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
         node: Optional[VyraNode] = None,
         action_type: Optional[Any] = None,
         **kwargs
     ):
-        super().__init__(name, result_callback, feedback_callback, ProtocolType.ROS2, **kwargs)
+        # Apply topic builder if provided
+        if topic_builder:
+            name = topic_builder.build(name, interface_type=InterfaceType.JOB)
+            logger.debug(f"Applied TopicBuilder: {name}")
+        else:
+            logger.debug(f"No TopicBuilder provided for ROS2Job '{name}'")
+            raise InterfaceError("TopicBuilder is required for ROS2Job")
+        
+        super().__init__(
+            name, topic_builder, result_callback, feedback_callback, 
+            ProtocolType.ROS2, **kwargs)
+        
         self.node = node
         self.action_type = action_type
+        self.topic_builder = topic_builder
         self._action_server: Optional[VyraActionServer] = None
         self._action_client: Optional[VyraActionClient] = None
         self._last_result: Any = None

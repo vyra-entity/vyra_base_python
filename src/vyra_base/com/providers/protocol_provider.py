@@ -18,6 +18,7 @@ from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     ProviderError,
 )
+from vyra_base.com.core.topic_builder import TopicBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,8 @@ class AbstractProtocolProvider(ABC):
         self._available = False
         self._initialized = False
         self._config: Dict[str, Any] = {}
+        
+        self._topic_builder: TopicBuilder
     
     @property
     def name(self) -> str:
@@ -126,6 +129,22 @@ class AbstractProtocolProvider(ABC):
             VyraJob: Created job interface
         """
         pass
+
+    def create_topic_builder(self, module_name: str, module_id: str) -> TopicBuilder:
+        """
+        Create a TopicBuilder for consistent naming conventions.
+        
+        Args:
+            module_name: Name of the module (e.g., "v2_modulemanager")
+            module_id: Unique module ID (e.g., "abc123")
+            
+        Returns:
+            TopicBuilder instance configured with module info
+        """
+        self._topic_builder = TopicBuilder(
+            module_name=module_name, module_id=module_id)
+        
+        return self._topic_builder
     
     def is_available(self) -> bool:
         """Check if protocol is available."""

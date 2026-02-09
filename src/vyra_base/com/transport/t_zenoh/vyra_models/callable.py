@@ -19,6 +19,7 @@ from vyra_base.com.transport.t_zenoh.communication.queryable import QueryableInf
 from vyra_base.com.transport.t_zenoh.communication.query_client import QueryClientInfo
 from vyra_base.com.transport.t_zenoh.communication.serializer import SerializationFormat
 from vyra_base.com.transport.t_zenoh.session import ZenohSession
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +29,16 @@ class ZenohCallable(VyraCallable):
     Zenoh-specific implementation of VyraCallable using Query/Reply.
     
     Server side uses ZenohQueryable, client side uses ZenohQueryClient.
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/get_modules
     """
     
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         session: Optional[ZenohSession] = None,
         callback: Optional[Callable[[Any], Any]] = None,
         format: SerializationFormat = SerializationFormat.JSON,
@@ -50,9 +56,15 @@ class ZenohCallable(VyraCallable):
             format: Serialization format
             is_server: Whether this is a server (True) or client (False)
             timeout: Default timeout for client calls in seconds
+            topic_builder: TopicBuilder for naming convention
             **kwargs: Additional parameters
         """
-        super().__init__(name, callback, ProtocolType.ZENOH, **kwargs)
+        # Apply topic builder if provided
+        if topic_builder:
+            name = topic_builder.build(name, interface_type=InterfaceType.CALLABLE)
+            logger.debug(f"Applied TopicBuilder: {name}")
+        
+        super().__init__(name, topic_builder, callback, ProtocolType.ZENOH, **kwargs)
         self.session = session
         self.format = format
         self.is_server = is_server

@@ -13,6 +13,7 @@ from typing import Any, Callable, Optional
 from vyra_base.com.core.types import VyraCallable, ProtocolType
 from vyra_base.com.core.exceptions import CallableError, TimeoutError, TransportError
 from vyra_base.com.transport.t_uds.communication import UnixSocket, UDS_SOCKET_DIR
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,10 @@ class UDSCallable(VyraCallable):
     - JSON serialization
     - Automatic connection management
     - Server-side request handling
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Socket path: /tmp/vyra_uds/<module_name>_<module_id>_<function_name>.sock
     
     Example:
         >>> # Server side
@@ -51,6 +56,7 @@ class UDSCallable(VyraCallable):
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         callback: Optional[Callable] = None,
         module_name: str = "default",
         **kwargs
@@ -62,13 +68,18 @@ class UDSCallable(VyraCallable):
             name: Callable name
             callback: Server-side callback function
             module_name: Module name
+            topic_builder: Optional TopicBuilder for naming convention
             **kwargs: Additional metadata
         """
-        super().__init__(name, callback, ProtocolType.UDS, **kwargs)
+        # Apply topic builder if provided
+        socket_name = name
+        
+        super().__init__(name, topic_builder, callback, ProtocolType.UDS, **kwargs)
         self.module_name = module_name
+        self.topic_builder = topic_builder
         
         # Socket path
-        socket_filename = f"{module_name}_{name}.sock"
+        socket_filename = f"{socket_name}.sock"
         self._socket_path = UDS_SOCKET_DIR / socket_filename
         
         # Unix socket

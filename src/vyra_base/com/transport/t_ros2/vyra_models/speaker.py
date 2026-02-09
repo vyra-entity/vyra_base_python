@@ -15,6 +15,7 @@ from vyra_base.com.transport.t_ros2.communication import VyraPublisher, VyraSubs
 from vyra_base.com.transport.t_ros2.node import VyraNode
 from vyra_base.com.transport.t_ros2.communication.publisher import PublisherInfo
 from vyra_base.com.transport.t_ros2.communication.subscriber import SubscriptionInfo
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -24,17 +25,23 @@ class ROS2Speaker(VyraSpeaker):
     ROS2-specific implementation of VyraSpeaker using ROS2 Topics.
     
     Wraps VyraPublisher for publishing and VyraSubscriber for subscribing.
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/sensor_data
     """
     
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         node: Optional[VyraNode] = None,
         message_type: Optional[Any] = None,
         is_publisher: bool = True,
+        
         **kwargs
     ):
-        super().__init__(name, ProtocolType.ROS2, **kwargs)
+        super().__init__(name, topic_builder, ProtocolType.ROS2, **kwargs)
         self.node: VyraNode | None = node
         self.message_type = message_type
         self.is_publisher = is_publisher

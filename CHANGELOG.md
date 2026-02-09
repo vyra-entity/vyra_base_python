@@ -8,6 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.40] - 2026-02-09
+
+### Build
+
+Update types metadata structure:[bugfix]
+
+
+## [0.1.8+build.39] - 2026-02-09
+
+### Build
+
+Update transport structure in com->transport and bugfixing in development process
+
+
+## [0.1.8+build.38] - 2026-02-09
+
+### Build
+
+update speaker, callable, job structure to all transport provider
+
+
+## [0.1.8+build.37] - 2026-02-09
+
+### Build
+
+Bugfixing topic_builder
+
+
+## [0.1.8+build.36] - 2026-02-09
+
+### Build
+
+adding topic_builder to generate a generic naming convention for all transport protocols
+
+
 ## [0.1.8+build.35] - 2026-02-06
 
 ### Build

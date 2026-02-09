@@ -212,7 +212,12 @@ class VyraEntity:
         if self._ros2_available and self._node is not None and ProtocolType.ROS2 in register_types:
             node_name = self._node.node_settings.name
             from vyra_base.com.transport.t_ros2.provider import ROS2Provider
-            ros2_provider = ROS2Provider(node_name=node_name)
+
+            ros2_provider = ROS2Provider(
+                module_name=self.module_entry.name, 
+                module_id=self.module_entry.uuid
+            )
+            
             await ros2_provider.initialize({
                 "node_name": node_name,
                 "namespace": self._node.get_namespace(),
@@ -224,7 +229,11 @@ class VyraEntity:
         if ProtocolType.ZENOH in register_types:
             try:
                 if ZENOH_AVAILABLE:
-                    zenoh_provider = ZenohProvider()
+                    zenoh_provider = ZenohProvider(
+                        module_name=self.module_entry.name, 
+                        module_id=self.module_entry.uuid
+                    )
+                    
                     zenoh_config = self.module_config.get("zenoh", {
                         "mode": "client",
                         "connect": ["tcp/zenoh-router:7447"]
@@ -239,13 +248,23 @@ class VyraEntity:
         
         if ProtocolType.REDIS in register_types:
             from vyra_base.com.transport.t_redis.provider import RedisProvider
-            redis_provider = RedisProvider(module_name=self.module_entry.name)
+
+            redis_provider = RedisProvider(
+                module_name=self.module_entry.name, 
+                module_id=self.module_entry.uuid
+            )
+            
             providers.append(redis_provider)
             Logger.info("✅ Registered Redis protocol provider")
 
         if ProtocolType.UDS in register_types:
             from vyra_base.com.transport.t_uds.provider import UDSProvider
-            uds_provider = UDSProvider(module_name=self.module_entry.name)
+
+            uds_provider = UDSProvider(
+                module_name=self.module_entry.name, 
+                module_id=self.module_entry.uuid
+            )
+            
             providers.append(uds_provider)
             Logger.info("✅ Registered UDS protocol provider")
         
@@ -287,20 +306,20 @@ class VyraEntity:
         state_feeder = StateFeeder(
             type=state_entry._type, 
             node=self._node, 
-            module_config=self.module_entry
+            module_entity=self.module_entry
         )
 
         news_feeder = NewsFeeder(
             type=news_entry._type, 
             node=self._node,
-            module_config=self.module_entry,
+            module_entity=self.module_entry,
             loggingOn=True
         )
         
         error_feeder = ErrorFeeder(
             type=error_entry._type, 
             node=self._node,
-            module_config=self.module_entry,
+            module_entity=self.module_entry,
             loggingOn=True
         )
         return state_feeder, news_feeder, error_feeder

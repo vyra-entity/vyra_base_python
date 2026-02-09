@@ -1,3 +1,4 @@
+import asyncio
 import rclpy
 from dataclasses import dataclass
 from typing import Any, Callable, Final, NoReturn, Optional, Union
@@ -38,8 +39,8 @@ class ActionClientInfo:
     """
     name: str = 'vyra_action_client'
     type: Any = None
-    result_callable: Optional[Callable] = _base_callback
-    feedback_callable: Optional[Callable] = _base_callback
+    result_callback: Optional[Callable] = _base_callback
+    feedback_callback: Optional[Callable] = _base_callback
     client: Union[ActionClient, None] = None
     TIMEOUT_SEC: Final[float] = 1.0
 
@@ -94,6 +95,44 @@ class VyraActionClient:
 
         return self._action_info.client.send_goal_async(goal_msg)
 
+    async def send_goal_async(self, goal: Any, feedback_callback: Optional[Callable] = None) -> Any:
+        """
+        Send a goal asynchronously and wait for result.
+
+        :param goal: The goal message to send.
+        :type goal: Any
+        :param feedback_callback: Optional callback for feedback.
+        :type feedback_callback: Optional[Callable]
+        :raises ValueError: If the action client has not been created.
+        :return: The goal handle.
+        :rtype: Any
+        """
+        if not self._action_info.client:
+            raise ValueError("Action client must be created before sending a goal.")
+
+        self._node.get_logger().info(f"Sending goal async to action client: {self._action_info.name}")
+        
+        # Wait for server
+        server_ready = self._action_info.client.wait_for_server(timeout_sec=self._action_info.TIMEOUT_SEC)
+        if not server_ready:
+            raise TimeoutError(f"Action server {self._action_info.name} not available")
+        
+        # Send goal
+        send_goal_future = self._action_info.client.send_goal_async(
+            goal,
+            feedback_callback=feedback_callback
+        )
+        
+        # Wait for goal acceptance
+        goal_handle = await self._to_async(send_goal_future)
+        return goal_handle
+    
+    async def _to_async(self, future: Future) -> Any:
+        """Convert ROS2 Future to async/await compatible."""
+        while not future.done():
+            await asyncio.sleep(0.01)
+        return future.result()
+
     def goal_response_callback(self, future) -> None:
         """
         Callback for the goal response.
@@ -122,5 +161,14 @@ class VyraActionClient:
         result: Any = future.result().result
         self._node.get_logger().info('Action Result: {0}'.format(result.sequence))
 
-        if self._action_info.result_callable:
-            self._action_info.result_callable(future)
+        if self._action_info.result_callback:
+            self._action_info.result_callback(future)
+    
+    def destroy(self) -> None:
+        """
+        Destroy the action client and cleanup resources.
+        """
+        if self._action_info.client:
+            self._node.get_logger().info(f"Destroying action client: {self._action_info.name}")
+            self._action_info.client.destroy()
+            self._action_info.client = None

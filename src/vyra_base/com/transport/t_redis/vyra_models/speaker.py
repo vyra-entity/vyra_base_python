@@ -10,6 +10,7 @@ from typing import Any, Callable, Optional
 
 from vyra_base.com.core.types import VyraSpeaker, ProtocolType
 from vyra_base.com.core.exceptions import SpeakerError, TransportError
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,10 @@ class RedisSpeaker(VyraSpeaker):
     - Subscribe to Redis channels with callback
     - Automatic JSON serialization
     - Pattern subscriptions (wildcards)
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/sensor_data
     
     Example:
         >>> # Publisher
@@ -50,6 +55,7 @@ class RedisSpeaker(VyraSpeaker):
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         redis_client: Any,
         module_name: str = "default",
         callback: Optional[Callable] = None,
@@ -63,11 +69,12 @@ class RedisSpeaker(VyraSpeaker):
             name: Channel name (or pattern if pattern=True)
             redis_client: vyra_base RedisClient instance
             module_name: Module name for namespacing
-            callback: Optional callback for subscriber
-            pattern: If True, name is treated as pattern (e.g., "sensor_*")
-            **kwargs: Additional metadata
-        """
-        super().__init__(name, protocol=ProtocolType.REDIS, **kwargs)
+            callback: Optional[Callable] = None,
+            pattern: bool = False,
+            topic_builder: TopicBuilder,
+            **kwargs
+        """       
+        super().__init__(name, topic_builder, ProtocolType.REDIS, **kwargs)
         self._client = redis_client
         self.module_name = module_name
         self._callback = callback

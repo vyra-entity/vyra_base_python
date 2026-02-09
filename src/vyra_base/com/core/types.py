@@ -14,6 +14,7 @@ from enum import Enum
 from typing import Any, Callable, Optional, Dict, List
 from datetime import datetime
 
+from vyra_base.com.core.topic_builder import TopicBuilder
 
 class ProtocolType(str, Enum):
     """Supported communication protocols."""
@@ -101,12 +102,26 @@ class VyraInterface(ABC):
         interface_type: InterfaceType,
         **kwargs
     ):
-        self.metadata = InterfaceMetadata(
-            name=name,
-            protocol=protocol,
-            interface_type=interface_type,
-            **kwargs
-        )
+        # Extract known InterfaceMetadata parameters
+        metadata_params: Dict[str, str | ProtocolType | InterfaceType | Any] = {
+            'name': name,
+            'protocol': protocol,
+            'interface_type': interface_type
+        }
+        
+        # Map known kwargs to InterfaceMetadata fields
+        known_fields = {'description', 'access_level', 'display_style', 'created_at', 'tags', 'custom_data'}
+        for key in known_fields:
+            if key in kwargs:
+                metadata_params[key] = kwargs.pop(key)
+        
+        # Store remaining kwargs in custom_data
+        if kwargs:
+            custom_data: dict[str, Any] = metadata_params.get('custom_data', {})
+            custom_data.update(kwargs)
+            metadata_params['custom_data'] = custom_data
+        
+        self.metadata = InterfaceMetadata(**metadata_params)
         self._initialized = False
     
     @property
@@ -158,6 +173,7 @@ class VyraCallable(VyraInterface):
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         callback: Optional[Callable] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
@@ -165,6 +181,10 @@ class VyraCallable(VyraInterface):
         super().__init__(name, protocol, InterfaceType.CALLABLE, **kwargs)
         self.callback = callback
         self._transport_handle: Optional[Any] = None
+
+        if not topic_builder:
+            raise InterfaceError("TopicBuilder is required for ROS2Callable")
+        self.topic_builder: TopicBuilder = topic_builder
     
     async def initialize(self) -> bool:
         """Initialize callable with transport layer."""
@@ -208,10 +228,15 @@ class VyraSpeaker(VyraInterface):
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
         super().__init__(name, protocol, InterfaceType.SPEAKER, **kwargs)
+
+        if not topic_builder:
+            raise InterfaceError("TopicBuilder is required for ROS2Speaker")
+        self.topic_builder: TopicBuilder = topic_builder
         self._transport_handle: Optional[Any] = None
     
     async def initialize(self) -> bool:
@@ -273,6 +298,7 @@ class VyraJob(VyraInterface):
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         result_callback: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
@@ -282,6 +308,10 @@ class VyraJob(VyraInterface):
         self.result_callback = result_callback
         self.feedback_callback = feedback_callback
         self._transport_handle: Optional[Any] = None
+
+        if not topic_builder:
+            raise InterfaceError("TopicBuilder is required for ROS2Job")
+        self.topic_builder: TopicBuilder = topic_builder
     
     async def initialize(self) -> bool:
         """Initialize job with transport layer."""

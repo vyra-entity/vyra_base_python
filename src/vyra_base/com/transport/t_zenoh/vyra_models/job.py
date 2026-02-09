@@ -16,6 +16,7 @@ from vyra_base.com.transport.t_zenoh.communication.serializer import Serializati
 from vyra_base.com.transport.t_zenoh.session import ZenohSession
 from vyra_base.com.transport.t_zenoh.vyra_models.speaker import ZenohSpeaker
 from vyra_base.com.transport.t_zenoh.vyra_models.callable import ZenohCallable
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,16 @@ class ZenohJob(VyraJob):
     Implements job pattern using:
     - Callable for starting/cancelling jobs
     - Speaker for status/progress updates
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/execute_task
     """
     
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         session: Optional[ZenohSession] = None,
         result_callback: Optional[Callable[[Any], Any]] = None,
         feedback_callback: Optional[Callable[[Any], None]] = None,
@@ -58,9 +64,18 @@ class ZenohJob(VyraJob):
             feedback_callback: Async callback executed during job execution for progress updates
             format: Serialization format
             is_server: Whether this is a server (True) or client (False)
+            topic_builder: Optional TopicBuilder for naming convention
             **kwargs: Additional parameters
         """
-        super().__init__(name, result_callback, feedback_callback, ProtocolType.ZENOH, **kwargs)
+        # Apply topic builder if provided
+        if topic_builder:
+            name = topic_builder.build(name, interface_type=InterfaceType.JOB)
+            logger.debug(f"Applied TopicBuilder: {name}")
+        
+        super().__init__(
+            name, topic_builder, result_callback, feedback_callback, 
+            ProtocolType.ZENOH, **kwargs)
+        
         self.session = session
         self.format = format
         self.is_server = is_server

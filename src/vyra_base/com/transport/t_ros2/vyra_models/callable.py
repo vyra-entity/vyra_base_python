@@ -13,6 +13,7 @@ from vyra_base.com.transport.t_ros2.node import VyraNode
 from vyra_base.com.transport.t_ros2.communication.service_client import ServiceClientInfo
 from vyra_base.com.transport.t_ros2.communication.service_server import ServiceServerInfo
 from vyra_base.com.transport.t_ros2.communication import VyraServiceServer, VyraServiceClient
+from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
 
 logger = logging.getLogger(__name__)
 
@@ -22,17 +23,31 @@ class ROS2Callable(VyraCallable):
     ROS2-specific implementation of VyraCallable using ROS2 Services.
     
     Wraps VyraServiceServer for server-side and VyraServiceClient for client-side.
+    
+    Naming Convention:
+        Uses TopicBuilder for consistent naming: <module_name>_<module_id>/<function_name>
+        Example: v2_modulemanager_abc123/get_modules
     """
     
     def __init__(
         self,
         name: str,
+        topic_builder: TopicBuilder,
         callback: Optional[Callable] = None,
         node: Optional[VyraNode] = None,
         service_type: Optional[Any] = None,
         **kwargs
     ):
-        super().__init__(name, callback, ProtocolType.ROS2, **kwargs)
+        # Apply topic builder if provided
+        if topic_builder:
+            name = topic_builder.build(name, interface_type=InterfaceType.CALLABLE)
+            logger.debug(f"Applied TopicBuilder: {name}")
+        else:
+            logger.debug(f"No TopicBuilder provided for ROS2Callable '{name}'")
+            raise InterfaceError("TopicBuilder is required for ROS2Callable")
+        
+        super().__init__(name, topic_builder, callback, ProtocolType.ROS2, **kwargs)
+        
         self.node = node
         self.service_type = service_type
         self._service_server: Optional[VyraServiceServer] = None

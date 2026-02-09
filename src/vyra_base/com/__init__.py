@@ -42,6 +42,16 @@ from vyra_base.com.core import (
     remote_job,
 )
 
+# Topic Builder for naming conventions
+from vyra_base.com.core.topic_builder import (
+    TopicBuilder,
+    TopicComponents,
+    InterfaceType as TopicInterfaceType,
+    create_topic_builder,
+    build_topic,
+    parse_topic,
+)
+
 # Provider Registry
 from vyra_base.com.providers import (
     AbstractProtocolProvider,
@@ -139,6 +149,14 @@ __all__ = [
     # Providers
     "AbstractProtocolProvider",
     "ProviderRegistry",
+    
+    # Topic Builder
+    "TopicBuilder",
+    "TopicComponents",
+    "TopicInterfaceType",
+    "create_topic_builder",
+    "build_topic",
+    "parse_topic",
     
     # Feeders (Multi-protocol)
     "BaseFeeder",
