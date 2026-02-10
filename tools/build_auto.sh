@@ -180,6 +180,22 @@ else
     echo "  ⚠️  Warning: vyra_base_image directory not found"
 fi
 
+# Copy to test_daemon
+TEST_DAEMON_DIR="../../VOS2_WORKSPACE/development/test_daemon"
+if [ -d "$TEST_DAEMON_DIR" ]; then
+    # Create wheels directory if not exists
+    mkdir -p "$TEST_DAEMON_DIR/wheels"
+    
+    # Clean old wheels
+    rm -rf "$TEST_DAEMON_DIR"/wheels/vyra_base-*.whl 2>/dev/null || true
+    
+    # Copy new wheel
+    cp "$WHEEL_FILE" "$TEST_DAEMON_DIR/wheels/"
+    echo "  ✅ Copied to test_daemon/wheels"
+else
+    echo "  ⚠️  Warning: test_daemon directory not found"
+fi
+
 echo ""
 
 # ========================================
