@@ -98,9 +98,19 @@ class Logger:
 
     _ext_logger: list = []
     logger: logging.Logger
+    _initialized: bool = False
 
     pre_log_buffer: list[LogEntry] = []  # List to store log entries before logger is initialized
 
+    @classmethod
+    def _ensure_initialized(cls) -> None:
+        """
+        Ensure logger is initialized with default values if not already initialized.
+        This method is called automatically by log methods to enable autonomous logging.
+        """
+        if not cls._initialized or not hasattr(cls, 'logger'):
+            cls.initialize()
+    
     @classmethod
     def initialize(
         cls, 
@@ -145,6 +155,7 @@ class Logger:
 
         Logger._LOG_ACTIVE = log_active
         Logger.logger = logging.getLogger(Logger._LOGGER_NAME)
+        Logger._initialized = True  # Set before processing buffer to prevent recursion
 
         Logger._LOG_TAG = log_tag if log_tag is not None else ""
 
@@ -156,7 +167,10 @@ class Logger:
                 handler.flush()
                 break
 
-        [cls.log(entry) for entry in cls.pre_log_buffer]
+        # Process buffered entries after _initialized is set
+        buffered_entries = cls.pre_log_buffer.copy()
+        cls.pre_log_buffer.clear()
+        [cls.log(entry) for entry in buffered_entries]
 
     @classmethod
     def log(cls, entry: Union[LogEntry, str, Any], caller: str=None) -> None:
@@ -175,8 +189,10 @@ class Logger:
                 mode=LogMode.INFO
             )
 
-        if not hasattr(Logger, 'logger'):
-            Logger.pre_log_buffer.append(entry)
+        # Ensure logger is initialized before using it
+        if not cls._initialized:
+            cls.pre_log_buffer.append(entry)
+            cls._ensure_initialized()
             return None
 
         if not Logger._LOG_ACTIVE:

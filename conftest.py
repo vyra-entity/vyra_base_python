@@ -20,8 +20,13 @@ def event_loop():
 
 
 @pytest.fixture(autouse=True)
-def reset_singleton_state():
+def reset_singleton_state(request):
     """Reset any singleton state between tests"""
+    # Skip for tests that don't need DataSpace (e.g., standalone helper tests)
+    if 'no_dataspace_reset' in request.keywords:
+        yield
+        return
+    
     # Reset DataSpace between tests if it exists
     try:
         from vyra_base.com.datalayer.interface_factory import DataSpace

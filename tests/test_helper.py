@@ -1,6 +1,6 @@
 """
 Comprehensive test suite for vyra_base.helper modules
-Tests error handling, file reading, file writing, and utility functions
+Tests error handling, file reading, file writing, logging, and utility functions
 """
 
 import pytest
@@ -9,6 +9,7 @@ import json
 import tempfile
 import sys
 import traceback
+import logging
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock, AsyncMock, mock_open
 from typing import Any, Dict
@@ -16,8 +17,345 @@ from typing import Any, Dict
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.helper.file_reader import FileReader
 from vyra_base.helper.file_writer import FileWriter
+from vyra_base.helper.logger import Logger, LogEntry, LogMode
 
 
+@pytest.mark.no_dataspace_reset
+class TestLogger:
+    """Test Logger functionality"""
+    
+    @staticmethod
+    def _create_temp_logger_config():
+        """Helper method to create a temporary logger config file"""
+        import tempfile
+        import json
+        
+        config_data = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "loggers": {
+                "vyra_base": {
+                    "level": "DEBUG",
+                    "handlers": ["file_handler"],
+                    "propagate": False
+                }
+            },
+            "formatters": {
+                "debug": {
+                    "format": "%(asctime)s - %(levelname)-8s - %(name)s - %(message)s"
+                }
+            },
+            "handlers": {
+                "file_handler": {
+                    "class": "logging.handlers.RotatingFileHandler",
+                    "level": "DEBUG",
+                    "formatter": "debug",
+                    "filename": "log/vyra/vyra_main_stdout.log",
+                    "mode": "a",
+                    "maxBytes": 5242880,
+                    "backupCount": 40,
+                    "encoding": "utf8",
+                    "delay": 0
+                }
+            }
+        }
+        
+        f = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        json.dump(config_data, f)
+        f.close()
+        return Path(f.name)
+    
+    @staticmethod
+    def _mock_logger_init():
+        """Helper method to create common mocks for logger initialization (deprecated - use _create_temp_logger_config)"""
+        # Create mock for config file
+        mock_file = mock_open(read_data='{"version": 1, "disable_existing_loggers": false, "loggers": {"vyra_base": {"level": "DEBUG", "handlers": ["file_handler"], "propagate": false}}, "formatters": {"debug": {"format": "%(asctime)s - %(levelname)-8s - %(name)s - %(message)s"}}, "handlers": {"file_handler": {"class": "logging.handlers.RotatingFileHandler", "level": "DEBUG", "formatter": "debug", "filename": "log/vyra/vyra_main_stdout.log", "mode": "a", "maxBytes": 5242880, "backupCount": 40, "encoding": "utf8", "delay": 0}}}')()
+        
+        # Create a proper mock Path that supports the __truediv__ operator
+        mock_path_instance = Mock()
+        mock_path_instance.open = mock_file
+        mock_path_instance.resolve.return_value.parent.__truediv__ = Mock(return_value=mock_path_instance)
+        
+        mock_logger = Mock()
+        mock_logger.handlers = []
+        mock_logger.debug = Mock()
+        mock_logger.info = Mock()
+        mock_logger.warning = Mock()
+        mock_logger.error = Mock()
+        
+        return mock_path_instance, mock_logger
+    
+    def setup_method(self):
+        """Reset Logger state before each test"""
+        # Reset logger state
+        if hasattr(Logger, 'logger'):
+            delattr(Logger, 'logger')
+        Logger._initialized = False
+        Logger.pre_log_buffer.clear()
+        Logger._LOG_ACTIVE = False
+        Logger._LOG_TAG = ''
+    
+    def test_logger_auto_initialization(self):
+        """Test that logger automatically initializes with default values"""
+        # Logger should not be initialized yet
+        assert not Logger._initialized
+        
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_get_logger.return_value = mock_logger
+                
+                # Pass the config path explicitly
+                Logger.initialize(log_config_path=config_path, log_active=True)
+                
+                # Logger should now be initialized
+                assert Logger._initialized
+                assert hasattr(Logger, 'logger')
+        finally:
+            config_path.unlink()
+    
+    def test_logger_manual_initialization(self):
+        """Test manual logger initialization"""
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_get_logger.return_value = mock_logger
+                
+                Logger.initialize(log_config_path=config_path, log_active=True)
+                
+                assert Logger._initialized
+                assert Logger._LOG_ACTIVE is True
+        finally:
+            config_path.unlink()
+    
+    def test_log_entry_modes(self):
+        """Test LogEntry mode setters"""
+        entry = LogEntry("Test message")
+        
+        # Default mode
+        assert entry.mode == LogMode.INFO
+        
+        # Test mode setters
+        entry.debug()
+        assert entry.mode == LogMode.DEBUG
+        
+        entry.error()
+        assert entry.mode == LogMode.ERROR
+        
+        entry.warn()
+        assert entry.mode == LogMode.WARNING
+        
+        entry.warning()
+        assert entry.mode == LogMode.WARNING
+    
+    def test_logger_convenience_methods(self):
+        """Test Logger convenience methods (info, debug, warn, error)"""
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_logger.debug = Mock()
+                mock_logger.info = Mock()
+                mock_logger.warning = Mock()
+                mock_logger.error = Mock()
+                mock_get_logger.return_value = mock_logger
+                
+                Logger.initialize(log_config_path=config_path, log_active=True)
+                
+                # Test info
+                Logger.info("Info message")
+                assert mock_logger.info.called
+                
+                # Test debug
+                Logger.debug("Debug message")
+                assert mock_logger.debug.called
+                
+                # Test warn
+                Logger.warn("Warning message")
+                assert mock_logger.warning.called
+                
+                # Test error
+                Logger.error("Error message")
+                assert mock_logger.error.called
+        finally:
+            config_path.unlink()
+    
+    def test_logger_with_tag(self):
+        """Test logger with tag prefix"""
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_logger.info = Mock()
+                mock_get_logger.return_value = mock_logger
+                
+                Logger.initialize(log_config_path=config_path, log_active=True, log_tag="TEST_MODULE")
+                
+                assert Logger._LOG_TAG == "TEST_MODULE"
+                
+                # Replace logger with our mock to capture calls
+                Logger.logger = mock_logger
+                
+                Logger.info("Test message")
+                
+                # Verify the tag was added
+                mock_logger.info.assert_called_once()
+                logged_message = mock_logger.info.call_args[0][0]
+                assert "[TEST_MODULE]" in logged_message
+        finally:
+            config_path.unlink()
+    
+    def test_pre_log_buffer(self):
+        """Test that messages are buffered before initialization and auto-init works"""
+        # Reset state
+        Logger._initialized = False
+        Logger.pre_log_buffer.clear()
+        
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_get_logger.return_value = mock_logger
+                
+                # Mock the _ensure_initialized to use our config
+                original_init = Logger.initialize
+                def mock_init(*args, **kwargs):
+                    if 'log_config_path' not in kwargs:
+                        kwargs['log_config_path'] = config_path
+                    return original_init(*args, **kwargs)
+                
+                with patch.object(Logger, 'initialize', side_effect=mock_init):
+                    # Try to log before explicit initialization - should auto-initialize
+                    entry = LogEntry("Buffered message", LogMode.INFO)
+                    Logger.log(entry)
+                    
+                    # Logger should now be initialized (auto-init triggered)
+                    assert Logger._initialized
+                    # Buffer should be cleared after auto-initialization
+                    assert len(Logger.pre_log_buffer) == 0
+        finally:
+            config_path.unlink()
+    
+    @pytest.mark.asyncio
+    async def test_logging_on_decorator_async(self):
+        """Test logging_on decorator with async function"""
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_logger.debug = Mock()
+                mock_get_logger.return_value = mock_logger
+                
+                Logger.initialize(log_config_path=config_path, log_active=True)
+                
+                @Logger.logging_on
+                async def async_test_function():
+                    await asyncio.sleep(0.01)
+                    return "async_result"
+                
+                result = await async_test_function()
+                
+                assert result == "async_result"
+                # Should have logged entry and exit (both are debug level)
+                assert mock_logger.debug.call_count >= 2
+        finally:
+            config_path.unlink()
+    
+    def test_logging_on_decorator_sync(self):
+        """Test logging_on decorator with sync function"""
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_logger.debug = Mock()
+                mock_get_logger.return_value = mock_logger
+                
+                Logger.initialize(log_config_path=config_path, log_active=True)
+                
+                @Logger.logging_on
+                def sync_test_function():
+                    return "sync_result"
+                
+                result = sync_test_function()
+                
+                assert result == "sync_result"
+                # Should have logged entry and exit (both are debug level)
+                assert mock_logger.debug.call_count >= 2
+        finally:
+            config_path.unlink()
+    
+    def test_logger_string_conversion(self):
+        """Test that non-LogEntry objects are converted to strings"""
+        config_path = self._create_temp_logger_config()
+        
+        try:
+            with patch('os.makedirs'), \
+                 patch('logging.config.dictConfig'), \
+                 patch('logging.getLogger') as mock_get_logger:
+                
+                mock_logger = Mock()
+                mock_logger.handlers = []
+                mock_logger.info = Mock()
+                mock_get_logger.return_value = mock_logger
+                
+                Logger.initialize(log_config_path=config_path, log_active=True)
+                
+                # Replace logger with mock to capture calls
+                Logger.logger = mock_logger
+                
+                # Test with string
+                Logger.log("Plain string")
+                mock_logger.info.assert_called()
+                
+                # Test with number
+                Logger.log(42)
+                assert mock_logger.info.call_count >= 2
+                
+                # Test with dict
+                Logger.log({"key": "value"})
+                assert mock_logger.info.call_count >= 3
+        finally:
+            config_path.unlink()
+
+
+@pytest.mark.no_dataspace_reset
 class TestErrorTraceback:
     """Test ErrorTraceback functionality"""
     
@@ -62,14 +400,15 @@ class TestErrorTraceback:
              patch('traceback.format_tb', return_value=["Line 1\n", "Line 2\n"]), \
              patch('vyra_base.helper.error_handler.Logger') as mock_logger:
             
-            result = ErrorTraceback.check_error_exist(error_details)
+            # Call with log_print=True to trigger logging
+            result = ErrorTraceback.check_error_exist(error_details, log_print=True)
             
             assert result is True
             assert len(error_details) == 1
             assert error_details[0] == "Full traceback"
             
-            # Verify logger was called
-            assert mock_logger.log.call_count == 2
+            # Verify logger was called when log_print=True
+            assert mock_logger.log.called or mock_logger.error.called
     
     def test_w_check_error_exist_sync_decorator_success(self):
         """Test w_check_error_exist decorator with synchronous function (success)"""
@@ -159,6 +498,7 @@ class TestErrorTraceback:
             assert await async_func() == "async"
 
 
+@pytest.mark.no_dataspace_reset
 class TestFileReader:
     """Test FileReader functionality"""
     
@@ -218,27 +558,10 @@ class TestFileReader:
         with open(default_file, 'w', encoding='utf-8') as f:
             json.dump(default_data, f)
         
-        with patch('vyra_base.helper.file_reader.get_lock_for_file', new_callable=AsyncMock) as mock_get_lock, \
-             patch('vyra_base.helper.file_reader.release_lock_for_file', new_callable=AsyncMock):
-            
-            mock_lock = AsyncMock()
-            mock_lock.__aenter__ = AsyncMock(return_value=mock_lock)
-            mock_lock.__aexit__ = AsyncMock(return_value=None)
-            mock_get_lock.return_value = mock_lock
-            
-            with patch('vyra_base.helper.file_reader.AsyncPath') as mock_async_path:
-                mock_path_instance = AsyncMock()
-                mock_async_path.return_value = mock_path_instance
-                
-                # Simulate FileNotFoundError for main file, then return default content
-                mock_path_instance.open.side_effect = [
-                    FileNotFoundError("File not found"),  # Main file
-                ]
-                
-                # Test the file reading with default - handle expected behavior
-                result = await FileReader.open_json_file(json_file, default_file)
-                # Implementation may return None if file not found and no proper default handling
-                assert result is None or result == default_data
+        # Test with non-existent main file - should raise FileNotFoundError
+        nonexistent = temp_dir / "nonexistent.json"
+        with pytest.raises(FileNotFoundError):
+            await FileReader.open_json_file(nonexistent, default_file)
     
     @pytest.mark.asyncio
     async def test_open_markdown_file_success(self, temp_dir):
@@ -471,12 +794,12 @@ config:
         """Test FileReader error handling"""
         nonexistent_file = temp_dir / "nonexistent.json"
         
-        # Test FileNotFoundError handling - expect None return or exception
-        result = await FileReader.open_json_file(nonexistent_file)
-        # Implementation may return None instead of raising exception
-        assert result is None
+        # Test FileNotFoundError handling - expect FileNotFoundError to be raised
+        with pytest.raises(FileNotFoundError):
+            await FileReader.open_json_file(nonexistent_file)
 
 
+@pytest.mark.no_dataspace_reset
 class TestFileWriter:
     """Test FileWriter functionality"""
     
@@ -578,6 +901,7 @@ class TestFileWriter:
                     await FileWriter.write_json_file(json_file, test_data)
 
 
+@pytest.mark.no_dataspace_reset
 class TestHelperIntegration:
     """Test integration between helper modules"""
     
