@@ -165,8 +165,9 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Callable name (used as key prefix)
-            callback: Server-side callback function
+            callback: Server-side callback function (None for client)
             **kwargs: Additional parameters
+                - is_callable: True for server, False for client (auto-detected from callback if not provided)
             
         Returns:
             VyraCallable: Redis callable instance
@@ -175,6 +176,19 @@ class RedisProvider(AbstractProtocolProvider):
             raise ProviderError("Provider not initialized")
         
         from vyra_base.com.transport.t_redis.vyra_models import RedisCallable
+        
+        # Check is_callable flag (defaults to True if callback provided, False otherwise)
+        is_callable = kwargs.pop("is_callable", callback is not None)
+        
+        role = "server" if is_callable else "client"
+        logger.info(f"🔧 Creating Redis callable {role}: {name}")
+        
+        # Ensure callback matches is_callable flag
+        if is_callable and callback is None:
+            raise ProviderError("Callback required for callable server (is_callable=True)")
+        if not is_callable and callback is not None:
+            logger.debug("Ignoring callback for callable client (is_callable=False)")
+            callback = None
         
         callable_obj = RedisCallable(
             name=name,
@@ -185,6 +199,7 @@ class RedisProvider(AbstractProtocolProvider):
         )
         
         await callable_obj.initialize()
+        logger.info(f"✅ Redis callable {role} created: {name}")
         return callable_obj
     
     async def create_speaker(

@@ -45,6 +45,7 @@ try:
     from vyra_base.com.transport.t_zenoh.session import (
         ZenohSession,
         SessionConfig,
+        SessionMode
     )
     _session_available = True
 except ImportError as e:
@@ -89,6 +90,7 @@ __all__ = [
     "ZENOH_AVAILABLE",
     "ZenohSession",
     "SessionConfig",
+    "SessionMode",
     "ZenohCallable",
     "ZenohSpeaker",
     "ZenohJob",

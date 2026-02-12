@@ -202,9 +202,9 @@ class ZenohProvider(AbstractProtocolProvider):
         
         Args:
             name: Service name (key expression)
-            callback: Async callback for request handling
+            callback: Async callback for request handling (None for client)
             **kwargs: Additional parameters:
-                - is_server: True for server, False for client (default: True)
+                - is_callable: True for server, False for client (auto-detected from callback if not provided)
                 - timeout: Timeout for client calls in seconds (default: 5.0)
                 - format: Override serialization format
                 
@@ -216,7 +216,20 @@ class ZenohProvider(AbstractProtocolProvider):
         try:
             logger.debug(f"Creating Zenoh callable: {name}")
             
-            is_server = kwargs.get("is_server", True)
+            # Check is_callable flag (defaults to True if callback provided, False otherwise)
+            is_callable = kwargs.pop("is_callable", callback is not None)
+            is_server = is_callable  # For compatibility with existing code
+            
+            role = "server" if is_callable else "client"
+            logger.info(f"🔧 Creating Zenoh callable {role}: {name}")
+            
+            # Ensure callback matches is_callable flag
+            if is_callable and callback is None:
+                raise ProviderError("Callback required for callable server (is_callable=True)")
+            if not is_callable and callback is not None:
+                logger.debug("Ignoring callback for callable client (is_callable=False)")
+                callback = None
+            
             timeout = kwargs.get("timeout", 5.0)
             format = kwargs.get("format", self._format)
             
@@ -232,7 +245,7 @@ class ZenohProvider(AbstractProtocolProvider):
             
             await callable.initialize()
             
-            logger.info(f"✅ Zenoh callable created: {name}")
+            logger.info(f"✅ Zenoh callable {role} created: {name}")
             return callable
             
         except Exception as e:
@@ -292,9 +305,9 @@ class ZenohProvider(AbstractProtocolProvider):
         
         Args:
             name: Job name (base key expression)
-            callback: Async callback for job execution
+            callback: Async callback for job execution (None for client)
             **kwargs: Additional parameters:
-                - is_server: True for server, False for client (default: True)
+                - is_job: True for server, False for client (auto-detected from callback if not provided)
                 - format: Override serialization format
                 
         Returns:
@@ -305,7 +318,20 @@ class ZenohProvider(AbstractProtocolProvider):
         try:
             logger.debug(f"Creating Zenoh job: {name}")
             
-            is_server = kwargs.get("is_server", True)
+            # Check is_job flag (defaults to True if callback provided, False otherwise)
+            is_job = kwargs.pop("is_job", callback is not None)
+            is_server = is_job  # For compatibility with existing code
+            
+            role = "server" if is_job else "client"
+            logger.info(f"🔧 Creating Zenoh job {role}: {name}")
+            
+            # Ensure callback matches is_job flag
+            if is_job and callback is None:
+                raise ProviderError("Callback required for job server (is_job=True)")
+            if not is_job and callback is not None:
+                logger.debug("Ignoring callback for job client (is_job=False)")
+                callback = None
+            
             format = kwargs.get("format", self._format)
             
             job = ZenohJob(
@@ -319,7 +345,7 @@ class ZenohProvider(AbstractProtocolProvider):
             
             await job.initialize()
             
-            logger.info(f"✅ Zenoh job created: {name}")
+            logger.info(f"✅ Zenoh job {role} created: {name}")
             return job
             
         except Exception as e:

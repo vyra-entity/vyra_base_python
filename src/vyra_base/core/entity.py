@@ -11,6 +11,7 @@ from typing import Any, Optional, Union, TYPE_CHECKING
 
 # NEW: Import from new multi-protocol architecture
 from vyra_base.com import InterfaceFactory, remote_callable, ProtocolType
+from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
 from vyra_base.com.core.types import VyraCallable
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
@@ -280,6 +281,84 @@ class VyraEntity:
         for protocol in self.registered_protocols:
             InterfaceFactory.unregister_provider(protocol)
             Logger.info(f"✅ Unregistered {protocol.value} protocol provider")
+    
+    def set_interface_paths(self, interface_paths: list[str | Path]) -> None:
+        """
+        Set interface base paths for dynamic interface discovery.
+        
+        Updates the global InterfacePathRegistry used by all TopicBuilders
+        and InterfaceLoaders in this entity's protocol providers.
+        
+        Must be called BEFORE set_interfaces() to affect interface loading.
+        
+        Args:
+            interface_paths: List of base interface directory paths.
+                Each path should point to a directory containing:
+                - /config/*.json - Interface metadata
+                - /callable/*.srv - ROS2 service definitions
+                - /speaker/*.msg - ROS2 message definitions
+                - /job/*.action - ROS2 action definitions
+                - /proto/*.proto - Protocol Buffer definitions
+                - /proto/*_pb2.py - Generated Python protobuf modules
+        
+        Raises:
+            ValueError: If no valid paths provided
+        
+        Examples:
+            >>> from ament_index_python.packages import get_package_share_directory
+            >>> entity = VyraEntity(...)
+            >>> 
+            >>> # Set custom interface paths
+            >>> module_interfaces = Path(get_package_share_directory("v2_modulemanager_interfaces"))
+            >>> vyra_interfaces = Path(get_package_share_directory("vyra_module_interfaces"))
+            >>> entity.set_interface_paths([module_interfaces, vyra_interfaces])
+            >>> 
+            >>> # Now set_interfaces() will use dynamic loading from these paths
+            >>> await entity.set_interfaces(base_interfaces)
+        """
+        
+        # Validate and convert paths
+        validated_paths = []
+        for path in interface_paths:
+            path_obj = Path(path).resolve()
+            if not path_obj.exists():
+                Logger.warning(f"⚠️ Interface path does not exist: {path_obj}")
+                continue
+            if not path_obj.is_dir():
+                Logger.warning(f"⚠️ Interface path is not a directory: {path_obj}")
+                continue
+            validated_paths.append(path_obj)
+        
+        if not validated_paths:
+            raise ValueError(
+                "No valid interface paths provided. At least one valid path required."
+            )
+        
+        # Update global registry
+        registry = InterfacePathRegistry.get_instance()
+        registry.set_interface_paths([str(p) for p in validated_paths])
+        
+        Logger.info(
+            f"✅ Interface paths configured: {len(validated_paths)} path(s)"
+        )
+        for idx, path in enumerate(validated_paths, 1):
+            Logger.info(f"  [{idx}] {path}")
+        
+        # Optionally update environment for ROS2 discovery
+        from vyra_base.helper.ros2_env_helper import ensure_workspace_discoverable
+        
+        for path in validated_paths:
+            # Try to find workspace install directory (typically 3 levels up from share/<package>)
+            if "share" in path.parts:
+                share_idx = path.parts.index("share")
+                if share_idx >= 2:
+                    install_dir = Path(*path.parts[:share_idx])
+                    if install_dir.name == "install":
+                        count = ensure_workspace_discoverable(install_dir)
+                        if count > 0:
+                            Logger.debug(
+                                f"✓ Made {count} package(s) discoverable from: {install_dir}"
+                            )
 
     def _init_logger(self, log_config: Optional[dict[str, Any]]) -> None:
         """

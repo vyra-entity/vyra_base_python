@@ -101,79 +101,6 @@ class InterfaceFactory:
         registry.unregister_provider(protocol)
 
     @staticmethod
-    async def create_callable(
-        name: str,
-        callback: Optional[Callable] = None,
-        protocols: Optional[List[ProtocolType]] = None,
-        **kwargs
-    ) -> VyraCallable:
-        """
-        Create Callable with automatic protocol selection.
-        
-        Args:
-            name: Callable name
-            callback: Optional callback for server-side
-            protocols: Preferred protocols (fallback if not specified)
-            **kwargs: Additional parameters passed to provider
-            
-        Returns:
-            VyraCallable: Initialized callable
-            
-        Raises:
-            InterfaceError: If no protocol available
-            
-        Example:
-            >>> # Auto-select (uses CALLABLE_FALLBACK)
-            >>> callable = await InterfaceFactory.create_callable(
-            ...     "calculate",
-            ...     callback=lambda req: {"result": req["x"] + req["y"]}
-            ... )
-            >>> 
-            >>> # Explicit protocol preference
-            >>> callable = await InterfaceFactory.create_callable(
-            ...     "calculate",
-            ...     protocols=[ProtocolType.ROS2, ProtocolType.UDS],
-            ...     callback=handle_calc
-            ... )
-        """
-        if callback is None:
-            Logger.info("callback-object is None")
-        
-        protocols = protocols or InterfaceFactory.CALLABLE_FALLBACK
-        registry = ProviderRegistry()
-        
-        for protocol in protocols:
-            try:
-                provider = registry.get_provider(protocol)
-                
-                if not provider:
-                    Logger.debug(f"⚠️ No provider for {protocol.value}")
-                    continue
-                
-                if not await provider.check_availability():
-                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
-                    continue
-                
-                callable_instance = await provider.create_callable(
-                    name=name,
-                    callback=callback,
-                    **kwargs
-                )
-                
-                Logger.info(f"✅ Callable '{name}' created via {protocol.value}")
-                return callable_instance
-                
-            except Exception as e:
-                Logger.warning(f"⚠️ Failed to create callable with {protocol.value}: {e}")
-                continue
-        
-        # No protocol worked
-        raise InterfaceError(
-            f"Cannot create callable '{name}'. "
-            f"Tried protocols: {[p.value for p in protocols]}"
-        )
-    
-    @staticmethod
     async def create_speaker(
         name: str,
         callback: Optional[Callable] = None,
@@ -213,6 +140,10 @@ class InterfaceFactory:
         """
         protocols = protocols or InterfaceFactory.SPEAKER_FALLBACK
         registry = ProviderRegistry()
+
+        if not "is_publisher" in kwargs or not kwargs["is_publisher"]:
+            Logger.info("Adding is_publisher field to speaker element")
+            kwargs["is_publisher"] = True
         
         for protocol in protocols:
             try:
@@ -270,7 +201,9 @@ class InterfaceFactory:
             InterfaceError: If no protocol available
         """
         if "is_publisher" in kwargs and kwargs["is_publisher"]:
-            raise ValueError("create_listener is for subscribers only. Remove 'is_publisher' flag.")
+            raise ValueError(
+                "create_listener is for subscribers only. Remove " +
+                "'is_publisher' flag or use create_speaker")
         
         speaker = await InterfaceFactory.create_speaker(
             name=name,
@@ -283,6 +216,160 @@ class InterfaceFactory:
         return speaker
     
     @staticmethod
+    async def create_callable(
+        name: str,
+        callback: Optional[Callable] = None,
+        protocols: Optional[List[ProtocolType]] = None,
+        **kwargs
+    ) -> VyraCallable:
+        """
+        Create Callable (Service Server) with automatic protocol selection.
+        
+        Args:
+            name: Callable name
+            callback: Callback for server-side (required for server)
+            protocols: Preferred protocols (fallback if not specified)
+            **kwargs: Additional parameters passed to provider
+            
+        Returns:
+            VyraCallable: Initialized callable (server-side)
+            
+        Raises:
+            InterfaceError: If no protocol available
+            
+        Example:
+            >>> # Auto-select (uses CALLABLE_FALLBACK)
+            >>> callable = await InterfaceFactory.create_callable(
+            ...     "calculate",
+            ...     callback=lambda req, res: setattr(res, 'result', req.x + req.y) or res
+            ... )
+            >>> 
+            >>> # Explicit protocol preference
+            >>> callable = await InterfaceFactory.create_callable(
+            ...     "calculate",
+            ...     protocols=[ProtocolType.ROS2, ProtocolType.UDS],
+            ...     callback=handle_calc
+            ... )
+        """
+        if callback is None:
+            Logger.warning("callback-object is None for server-side callable")
+        
+        # Add is_callable flag for server (True)
+        if "is_callable" not in kwargs:
+            kwargs["is_callable"] = True
+        
+        protocols = protocols or InterfaceFactory.CALLABLE_FALLBACK
+        registry = ProviderRegistry()
+        
+        for protocol in protocols:
+            try:
+                provider = registry.get_provider(protocol)
+                
+                if not provider:
+                    Logger.debug(f"⚠️ No provider for {protocol.value}")
+                    continue
+                
+                if not await provider.check_availability():
+                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
+                    continue
+                
+                callable_instance = await provider.create_callable(
+                    name=name,
+                    callback=callback,
+                    **kwargs
+                )
+                
+                Logger.info(f"✅ Callable '{name}' created via {protocol.value}")
+                return callable_instance
+                
+            except Exception as e:
+                Logger.warning(f"⚠️ Failed to create callable with {protocol.value}: {e}")
+                continue
+        
+        # No protocol worked
+        raise InterfaceError(
+            f"Cannot create callable '{name}'. "
+            f"Tried protocols: {[p.value for p in protocols]}"
+        )
+    
+    @staticmethod
+    async def create_caller(
+        name: str,
+        protocols: Optional[List[ProtocolType]] = None,
+        **kwargs
+    ) -> VyraCallable:
+        """
+        Create Caller (Service Client) with automatic protocol selection.
+        
+        This is the client-side counterpart to create_callable (server-side).
+        Use this to call remote services.
+        
+        Args:
+            name: Service name
+            protocols: Preferred protocols (fallback if not specified)
+            **kwargs: Additional parameters passed to provider
+            
+        Returns:
+            VyraCallable: Initialized callable (client-side)
+            
+        Raises:
+            InterfaceError: If no protocol available
+            
+        Example:
+            >>> # Auto-select (uses CALLABLE_FALLBACK)
+            >>> caller = await InterfaceFactory.create_caller("calculate")
+            >>> result = await caller.call({"x": 5, "y": 3})
+            >>> 
+            >>> # Explicit protocol preference
+            >>> caller = await InterfaceFactory.create_caller(
+            ...     "calculate",
+            ...     protocols=[ProtocolType.ROS2, ProtocolType.UDS]
+            ... )
+        """
+        # Add is_callable flag for client (False)
+        if "is_callable" in kwargs and kwargs["is_callable"]:
+            raise ValueError(
+                "create_caller is for clients only. Remove " +
+                "'is_callable' flag or use create_callable")
+        
+        kwargs["is_callable"] = False
+        
+        # No callback for client side
+        protocols = protocols or InterfaceFactory.CALLABLE_FALLBACK
+        registry = ProviderRegistry()
+        
+        for protocol in protocols:
+            try:
+                provider = registry.get_provider(protocol)
+                
+                if not provider:
+                    Logger.debug(f"⚠️ No provider for {protocol.value}")
+                    continue
+                
+                if not await provider.check_availability():
+                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
+                    continue
+                
+                caller_instance = await provider.create_callable(
+                    name=name,
+                    callback=None,  # No callback for client
+                    **kwargs
+                )
+                
+                Logger.info(f"✅ Caller '{name}' created via {protocol.value}")
+                return caller_instance
+                
+            except Exception as e:
+                Logger.warning(f"⚠️ Failed to create caller with {protocol.value}: {e}")
+                continue
+        
+        # No protocol worked
+        raise InterfaceError(
+            f"Cannot create caller '{name}'. "
+            f"Tried protocols: {[p.value for p in protocols]}"
+        )
+    
+    @staticmethod
     async def create_job(
         name: str,
         callback: Optional[Callable] = None,
@@ -290,16 +377,16 @@ class InterfaceFactory:
         **kwargs
     ) -> VyraJob:
         """
-        Create Job with automatic protocol selection.
+        Create Job (Action Server) with automatic protocol selection.
         
         Args:
             name: Job name
-            callback: Optional callback for job execution
+            callback: Callback for job execution (required for server)
             protocols: Preferred protocols (fallback if not specified)
             **kwargs: Additional parameters
             
         Returns:
-            VyraJob: Initialized job
+            VyraJob: Initialized job (server-side)
             
         Raises:
             InterfaceError: If no protocol available
@@ -310,14 +397,18 @@ class InterfaceFactory:
             ...     "process_images",
             ...     callback=process_batch
             ... )
-            >>> await job.enqueue({"images": ["img1.jpg", "img2.jpg"]})
+            >>> # Client will send goals to this server
         """
         protocols = protocols or InterfaceFactory.JOB_FALLBACK
         registry = ProviderRegistry()
         
         if callback is None:
-                Logger.warning("callback-object is None")
-                raise TypeError
+                Logger.warning("callback-object is None for server-side job")
+                raise TypeError("Callback required for job server")
+        
+        # Add is_job flag for server (True)
+        if "is_job" not in kwargs:
+            kwargs["is_job"] = True
         
         for protocol in protocols:
             try:
@@ -351,6 +442,89 @@ class InterfaceFactory:
         # No protocol worked
         raise InterfaceError(
             f"Cannot create job '{name}'. "
+            f"Tried protocols: {[p.value for p in protocols]}"
+        )
+    
+    @staticmethod
+    async def create_dispatcher(
+        name: str,
+        protocols: Optional[List[ProtocolType]] = None,
+        **kwargs
+    ) -> VyraJob:
+        """
+        Create Dispatcher (Action Client) with automatic protocol selection.
+        
+        This is the client-side counterpart to create_job (server-side).
+        Use this to send goals to remote action servers.
+        
+        Args:
+            name: Action name
+            protocols: Preferred protocols (fallback if not specified)
+            **kwargs: Additional parameters (feedback_callback, etc.)
+            
+        Returns:
+            VyraJob: Initialized job (client-side)
+            
+        Raises:
+            InterfaceError: If no protocol available
+            
+        Example:
+            >>> # Auto-select (uses JOB_FALLBACK)
+            >>> dispatcher = await InterfaceFactory.create_dispatcher(
+            ...     "process_images",
+            ...     feedback_callback=lambda fb: print(f"Progress: {fb}")
+            ... )
+            >>> result = await dispatcher.execute({"images": ["img1.jpg", "img2.jpg"]})
+            >>> 
+            >>> # Explicit protocol preference
+            >>> dispatcher = await InterfaceFactory.create_dispatcher(
+            ...     "process_images",
+            ...     protocols=[ProtocolType.ROS2, ProtocolType.UDS]
+            ... )
+        """
+        # Add is_job flag for client (False)
+        if "is_job" in kwargs and kwargs["is_job"]:
+            raise ValueError(
+                "create_dispatcher is for clients only. Remove " +
+                "'is_job' flag or use create_job")
+        
+        kwargs["is_job"] = False
+        
+        protocols = protocols or InterfaceFactory.JOB_FALLBACK
+        registry = ProviderRegistry()
+        
+        for protocol in protocols:
+            try:
+                provider = registry.get_provider(protocol)
+                
+                if not provider:
+                    Logger.debug(f"⚠️ No provider for {protocol.value}")
+                    continue
+                
+                if not await provider.check_availability():
+                    Logger.debug(f"⚠️ Protocol {protocol.value} not available")
+                    continue
+                
+                dispatcher = await provider.create_job(
+                    name=name,
+                    callback=None,  # No result callback for client (only feedback)
+                    **kwargs
+                )
+                
+                Logger.info(f"✅ Dispatcher '{name}' created via {protocol.value}")
+                return dispatcher
+                
+            except NotImplementedError:
+                # Some providers don't support jobs
+                Logger.debug(f"⚠️ {protocol.value} doesn't support jobs")
+                continue
+            except Exception as e:
+                Logger.warning(f"⚠️ Failed to create dispatcher with {protocol.value}: {e}")
+                continue
+        
+        # No protocol worked
+        raise InterfaceError(
+            f"Cannot create dispatcher '{name}'. "
             f"Tried protocols: {[p.value for p in protocols]}"
         )
     

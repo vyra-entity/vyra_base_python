@@ -14,6 +14,7 @@ from vyra_base.com.core.types import VyraCallable, ProtocolType
 from vyra_base.com.core.exceptions import CallableError, TimeoutError, TransportError
 from vyra_base.com.transport.t_uds.communication import UnixSocket, UDS_SOCKET_DIR
 from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
+from vyra_base.com.converter.protobuf_converter import ProtobufConverter
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,7 @@ class UDSCallable(VyraCallable):
         topic_builder: TopicBuilder,
         callback: Optional[Callable] = None,
         module_name: str = "default",
+        protobuf_type: Optional[Any] = None,
         **kwargs
     ):
         """
@@ -68,6 +70,7 @@ class UDSCallable(VyraCallable):
             name: Callable name
             callback: Server-side callback function
             module_name: Module name
+            protobuf_type: Optional protobuf message type for serialization
             topic_builder: Optional TopicBuilder for naming convention
             **kwargs: Additional metadata
         """
@@ -77,6 +80,8 @@ class UDSCallable(VyraCallable):
         super().__init__(name, topic_builder, callback, ProtocolType.UDS, **kwargs)
         self.module_name = module_name
         self.topic_builder = topic_builder
+        self.protobuf_type = protobuf_type
+        self._protobuf_converter: Optional[ProtobufConverter] = None
         
         # Socket path
         socket_filename = f"{socket_name}.sock"
@@ -115,6 +120,34 @@ class UDSCallable(VyraCallable):
             f"🚀 Initializing UDS server: {self.module_name}.{self.name}"
         )
         
+        # Dynamic interface loading if protobuf_type not provided
+        if not self.protobuf_type and self.topic_builder:
+            try:
+                components = self.topic_builder.parse(self.name)
+                function_name = components.function_name
+                if function_name:
+                    self.protobuf_type = self.topic_builder.load_interface_type(
+                        function_name, protocol="uds"
+                    )
+                    logger.debug(
+                        f"🔄 Dynamically loaded protobuf type for UDS callable '{self.name}': "
+                        f"{self.protobuf_type.__name__ if self.protobuf_type else 'None'}"
+                    )
+            except Exception as e:
+                logger.warning(
+                    f"⚠️ Could not load protobuf type for UDS callable '{self.name}': {e}. "
+                    "Falling back to JSON mode."
+                )
+        
+        # Initialize protobuf converter if type available
+        if self.protobuf_type:
+            self._protobuf_converter = ProtobufConverter()
+            if not self._protobuf_converter.is_available():
+                logger.warning(
+                    "⚠️ ProtobufConverter not available. Falling back to JSON mode."
+                )
+                self._protobuf_converter = None
+        
         # Start listening
         if self._socket is None:
             logger.error("Could not start listener, no uds socket")
@@ -147,7 +180,12 @@ class UDSCallable(VyraCallable):
         """Handle incoming request (server side)."""
         try:
             # Deserialize request
-            request_data = json.loads(request_bytes.decode())
+            if self._protobuf_converter:
+                # Use protobuf deserialization
+                request_data = self._protobuf_converter.deserialize(request_bytes, self.protobuf_type)
+            else:
+                # Fallback to JSON deserialization
+                request_data = json.loads(request_bytes.decode())
             
             logger.debug(f"📥 Received request on {self.name}")
             
@@ -160,7 +198,14 @@ class UDSCallable(VyraCallable):
                 response = self.callback(request_data)
             
             # Serialize response
-            response_bytes = json.dumps(response).encode()
+            if self._protobuf_converter:
+                # Use protobuf serialization
+                response_bytes = self._protobuf_converter.serialize(response)
+                if isinstance(response_bytes, str):
+                    response_bytes = response_bytes.encode()
+            else:
+                # Fallback to JSON serialization
+                response_bytes = json.dumps(response).encode()
             
             logger.debug(f"📤 Sent response on {self.name}")
             return response_bytes
@@ -199,7 +244,14 @@ class UDSCallable(VyraCallable):
         
         try:
             # Serialize request
-            request_bytes = json.dumps(request).encode()
+            if self._protobuf_converter:
+                # Use protobuf serialization
+                request_bytes = self._protobuf_converter.serialize(request)
+                if isinstance(request_bytes, str):
+                    request_bytes = request_bytes.encode()
+            else:
+                # Fallback to JSON serialization
+                request_bytes = json.dumps(request).encode()
             
             logger.debug(f"📤 Sending request to {self.name}")
             
@@ -220,11 +272,18 @@ class UDSCallable(VyraCallable):
             if response_bytes is None:
                 elapsed = time.time() - start_time
                 raise TimeoutError(
-                    f"Callable '{self.name}' timeout after {elapsed:.2f}s"
+                    f"Call to '{self.name}' timed out",
+                    timeout=timeout,
+                    details={"request_data": request}
                 )
             
             # Deserialize response
-            response = json.loads(response_bytes.decode())
+            if self._protobuf_converter:
+                # Use protobuf deserialization
+                response = self._protobuf_converter.deserialize(response_bytes, self.protobuf_type)
+            else:
+                # Fallback to JSON deserialization
+                response = json.loads(response_bytes.decode())
             
             # Check for error response
             if isinstance(response, dict) and "error" in response:

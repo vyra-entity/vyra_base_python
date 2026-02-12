@@ -62,8 +62,40 @@ class ROS2Speaker(VyraSpeaker):
         if not self.node:
             raise InterfaceError("Node is required for ROS2Speaker")
         
+        # Dynamic interface loading if message_type not provided
         if not self.message_type:
-            raise InterfaceError("message_type is required for ROS2Speaker")
+            logger.debug(f"message_type not provided for '{self.name}', attempting dynamic loading")
+            
+            if self.topic_builder:
+                # Extract function name from topic
+                try:
+                    components = self.topic_builder.parse(self.name)
+                    function_name = components.function_name
+                    
+                    # Load interface dynamically
+                    self.message_type = self.topic_builder.load_interface_type(
+                        function_name,
+                        protocol="ros2"
+                    )
+                    
+                    if self.message_type:
+                        logger.info(
+                            f"✓ Dynamically loaded message type for '{self.name}': "
+                            f"{self.message_type}"
+                        )
+                    else:
+                        raise InterfaceError(
+                            f"Failed to dynamically load message type for '{self.name}'. "
+                            f"Please provide message_type explicitly or ensure interface metadata exists."
+                        )
+                except Exception as e:
+                    raise InterfaceError(
+                        f"Failed to dynamically load message type for '{self.name}': {e}"
+                    )
+            else:
+                raise InterfaceError(
+                    "message_type is required for ROS2Speaker when TopicBuilder unavailable"
+                )
         
         try:
             if self.is_publisher:

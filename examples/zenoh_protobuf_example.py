@@ -20,6 +20,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict
 
+from vyra_base.com.converter.protobuf_converter import ProtobufConverter
+
 # Protobuf (requires: pip install protobuf)
 try:
     from google.protobuf import message as pb_message
@@ -38,7 +40,8 @@ try:
         ZENOH_AVAILABLE
     )
     from vyra_base.com.transport.t_zenoh.communication.serializer import SerializationFormat
-    from vyra_base.com.converters import ConverterFactory, ProtobufConverter
+    from vyra_base.com.converter.factory import ConverterFactory
+    from vyra_base.com.converter.protobuf_converter import ProtobufConverter
 except ImportError as e:
     print(f"⚠️ VYRA imports failed: {e}")
     ZENOH_AVAILABLE = False

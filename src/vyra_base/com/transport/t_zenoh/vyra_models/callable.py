@@ -20,6 +20,7 @@ from vyra_base.com.transport.t_zenoh.communication.query_client import QueryClie
 from vyra_base.com.transport.t_zenoh.communication.serializer import SerializationFormat
 from vyra_base.com.transport.t_zenoh.session import ZenohSession
 from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
+from vyra_base.com.converter.protobuf_converter import ProtobufConverter
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ class ZenohCallable(VyraCallable):
         format: SerializationFormat = SerializationFormat.JSON,
         is_server: bool = True,
         timeout: float = 5.0,
+        protobuf_type: Optional[Any] = None,
         **kwargs
     ):
         """
@@ -56,6 +58,7 @@ class ZenohCallable(VyraCallable):
             format: Serialization format
             is_server: Whether this is a server (True) or client (False)
             timeout: Default timeout for client calls in seconds
+            protobuf_type: Optional protobuf message type for serialization
             topic_builder: TopicBuilder for naming convention
             **kwargs: Additional parameters
         """
@@ -69,6 +72,8 @@ class ZenohCallable(VyraCallable):
         self.format = format
         self.is_server = is_server
         self.timeout = timeout
+        self.protobuf_type = protobuf_type
+        self._protobuf_converter: Optional[ProtobufConverter] = None
         self._queryable: Optional[ZenohQueryable] = None
         self._query_client: Optional[ZenohQueryClient] = None
     
@@ -84,6 +89,38 @@ class ZenohCallable(VyraCallable):
         
         if not self.session or not self.session.is_open:
             raise InterfaceError("Zenoh session is required and must be open")
+        
+        # Dynamic interface loading if protobuf_type not provided
+        if not self.protobuf_type and self.topic_builder:
+            try:
+                components = self.topic_builder.parse(self.name)
+                function_name = components.function_name
+                if function_name:
+                    self.protobuf_type = self.topic_builder.load_interface_type(
+                        function_name, protocol="zenoh"
+                    )
+                    logger.debug(
+                        f"🔄 Dynamically loaded protobuf type for Zenoh callable '{self.name}': "
+                        f"{self.protobuf_type.__name__ if self.protobuf_type else 'None'}"
+                    )
+            except Exception as e:
+                logger.warning(
+                    f"⚠️ Could not load protobuf type for Zenoh callable '{self.name}': {e}. "
+                    "Falling back to JSON mode."
+                )
+        
+        # Initialize protobuf converter and update format if type available
+        if self.protobuf_type:
+            self._protobuf_converter = ProtobufConverter()
+            if not self._protobuf_converter.is_available():
+                logger.warning(
+                    "⚠️ ProtobufConverter not available. Falling back to JSON mode."
+                )
+                self._protobuf_converter = None
+            else:
+                # Update serialization format to PROTOBUF
+                self.format = SerializationFormat.PROTOBUF
+                logger.debug(f"✅ Using PROTOBUF serialization for Zenoh callable: {self.name}")
         
         try:
             if self.is_server:

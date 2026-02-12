@@ -45,6 +45,29 @@ from vyra_base.com.core.decorators import (
     get_decorated_methods,
 )
 
+from vyra_base.com.core.topic_builder import (
+    TopicBuilder,
+    TopicComponents,
+    InterfaceType as TopicInterfaceType,
+    create_topic_builder,
+    build_topic,
+    parse_topic,
+)
+
+from vyra_base.com.core.interface_path_registry import (
+    InterfacePathRegistry,
+    get_interface_registry,
+)
+
+from vyra_base.com.core.interface_loader import InterfaceLoader
+
+from vyra_base.helper.ros2_env_helper import (
+    update_ament_prefix_path,
+    update_python_path,
+    ensure_interface_package_discoverable,
+    ensure_workspace_discoverable,
+)
+
 __all__ = [
     # Exceptions
     "CommunicationError",
@@ -82,4 +105,20 @@ __all__ = [
     "remote_speaker",
     "remote_job",
     "get_decorated_methods",
+    # Topic Builder
+    "TopicBuilder",
+    "TopicComponents",
+    "TopicInterfaceType",
+    "create_topic_builder",
+    "build_topic",
+    "parse_topic",
+    # Interface Loading
+    "InterfacePathRegistry",
+    "get_interface_registry",
+    "InterfaceLoader",
+    # ROS2 Environment Helper
+    "update_ament_prefix_path",
+    "update_python_path",
+    "ensure_interface_package_discoverable",
+    "ensure_workspace_discoverable",
 ]

@@ -4,6 +4,9 @@ Topic Builder for Vyra Communication Framework
 Provides generic naming conventions for all transport protocols.
 Ensures consistent topic/service/key naming across ROS2, Zenoh, Redis, and UDS.
 
+Supports dynamic interface loading for ROS2 (.srv/.msg/.action) and
+Protocol Buffer (*_pb2.py) interfaces.
+
 Naming Convention:
     <module_name>_<module_id>/<function_name>{/<optional_subaction>}
 
@@ -17,8 +20,12 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
-from typing import Optional
+from pathlib import Path
+from typing import Any, Optional, Union
 from enum import Enum
+
+from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
+from vyra_base.com.core.interface_loader import InterfaceLoader
 
 logger = logging.getLogger(__name__)
 
@@ -72,13 +79,23 @@ class TopicBuilder:
     FUNCTION_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
     SUBACTION_PATTERN = re.compile(r"^[a-zA-Z0-9_/]+$")
     
-    def __init__(self, module_name: str, module_id: str):
+    def __init__(
+        self, 
+        module_name: str, 
+        module_id: str,
+        interface_paths: Optional[list[str | Path]] = None,
+        enable_interface_loading: bool = True
+    ):
         """
-        Initialize topic builder.
+        Initialize topic builder with optional interface loading.
         
         Args:
             module_name: Name of the module (e.g., "v2_modulemanager")
             module_id: Unique module instance ID (e.g., "abc123" or full hash)
+            interface_paths: Optional list of interface base paths.
+                If None, uses InterfacePathRegistry defaults.
+            enable_interface_loading: Enable dynamic interface loading.
+                Set to False for pure topic naming without interface loading.
             
         Raises:
             ValueError: If module_name or module_id contains invalid characters
@@ -99,7 +116,21 @@ class TopicBuilder:
         self.module_id = module_id
         self._module_prefix = f"{module_name}_{module_id}"
         
-        logger.debug(f"TopicBuilder initialized: {self._module_prefix}")
+        # Initialize interface loader if enabled
+        self._interface_loader: Optional[InterfaceLoader] = None
+        if enable_interface_loading:
+            if interface_paths:
+                # Convert to Path objects
+                path_objs = [Path(p).resolve() for p in interface_paths]
+                self._interface_loader = InterfaceLoader(interface_paths=path_objs)
+            else:
+                # Use registry defaults
+                self._interface_loader = InterfaceLoader()
+        
+        logger.debug(
+            f"TopicBuilder initialized: {self._module_prefix} "
+            f"(interface_loading={'enabled' if self._interface_loader else 'disabled'})"
+        )
     
     @property
     def module_prefix(self) -> str:
@@ -291,6 +322,175 @@ class TopicBuilder:
             )
         except ValueError:
             return False
+    
+    # ========== Dynamic Interface Loading Methods ==========
+    
+    def build_topic_name(
+        self,
+        function_name: str,
+        subaction: Optional[str] = None,
+        interface_type: Optional[InterfaceType] = None
+    ) -> str:
+        """
+        Build only the topic/service name (without loading interface).
+        
+        Pure naming function - works without ROS2 or interface loading.
+        Useful for slim mode or when interface type is not needed.
+        
+        Args:
+            function_name: Name of the function/interface
+            subaction: Optional subaction or subcategory
+            interface_type: Type of interface (for logging only)
+            
+        Returns:
+            Complete topic/service name
+            
+        Examples:
+            >>> builder.build_topic_name("get_modules")
+            'v2_modulemanager_abc123/get_modules'
+        """
+        return self.build(function_name, subaction, interface_type)
+    
+    def load_interface_type(
+        self,
+        function_name: str,
+        protocol: str = "ros2"
+    ) -> Optional[Union[type, Any]]:
+        """
+        Load interface type for a function (ROS2 or Protobuf).
+        
+        Dynamically loads interface class/module without compile-time imports.
+        Requires interface loader to be enabled.
+        
+        Args:
+            function_name: Name of function (from metadata)
+            protocol: Protocol to use: "ros2", "zenoh", "redis", "uds"
+                - "ros2" → loads .srv/.msg/.action interfaces
+                - others → loads .proto → *_pb2.py modules
+        
+        Returns:
+            Interface type/module, or None if not found or loader disabled
+        
+        Examples:
+            >>> # Load ROS2 service interface
+            >>> srv_type = builder.load_interface_type("get_interface_list", "ros2")
+            
+            >>> # Load protobuf for Zenoh
+            >>> pb_module = builder.load_interface_type("get_interface_list", "zenoh")
+        """
+        if self._interface_loader is None:
+            logger.debug(
+                f"Interface loading disabled for {function_name}, returning None"
+            )
+            return None
+        
+        try:
+            interface = self._interface_loader.get_interface_for_function(
+                function_name, protocol
+            )
+            
+            if interface:
+                logger.debug(
+                    f"✓ Loaded interface for '{function_name}' "
+                    f"(protocol: {protocol})"
+                )
+            else:
+                logger.debug(
+                    f"Interface not found for '{function_name}' "
+                    f"(protocol: {protocol})"
+                )
+            
+            return interface
+        
+        except Exception as e:
+            logger.error(
+                f"❌ Failed to load interface for '{function_name}': {e}",
+                exc_info=True
+            )
+            return None
+    
+    def build_with_interface(
+        self,
+        function_name: str,
+        subaction: Optional[str] = None,
+        interface_type: Optional[InterfaceType] = None,
+        protocol: str = "ros2"
+    ) -> tuple[str, Optional[Union[type, Any]]]:
+        """
+        Build topic name AND load interface type in one call.
+        
+        Combines topic naming with interface loading for convenience.
+        Returns both the topic name and the loaded interface.
+        
+        Args:
+            function_name: Name of the function/interface
+            subaction: Optional subaction
+            interface_type: Type of interface (callable/speaker/job)
+            protocol: Protocol for interface loading
+        
+        Returns:
+            Tuple of (topic_name, interface_type_or_module)
+            interface_type_or_module is None if loading failed/disabled
+        
+        Examples:
+            >>> # Build topic and load ROS2 service
+            >>> topic, service_type = builder.build_with_interface(
+            ...     "get_interface_list",
+            ...     interface_type=InterfaceType.CALLABLE,
+            ...     protocol="ros2"
+            ... )
+            >>> print(topic)  # 'v2_modulemanager_abc123/get_interface_list'
+            >>> print(service_type)  # <class '...VBASEGetInterfaceList'>
+            
+            >>> # Build topic and load protobuf for Zenoh
+            >>> topic, pb_module = builder.build_with_interface(
+            ...     "state_feed",
+            ...     interface_type=InterfaceType.SPEAKER,
+            ...     protocol="zenoh"
+            ... )
+        """
+        # Build topic name
+        topic_name = self.build_topic_name(
+            function_name, subaction, interface_type
+        )
+        
+        # Load interface type
+        interface = self.load_interface_type(function_name, protocol)
+        
+        return topic_name, interface
+    
+    def get_interface_loader(self) -> Optional[InterfaceLoader]:
+        """
+        Get the interface loader instance.
+        
+        Returns:
+            InterfaceLoader instance, or None if disabled
+        """
+        return self._interface_loader
+    
+    def reload_interface_metadata(self) -> None:
+        """
+        Force reload of interface metadata from config files.
+        
+        Clears cache and reloads all JSON metadata.
+        Only works if interface loader is enabled.
+        """
+        if self._interface_loader:
+            self._interface_loader.load_interface_metadata(reload=True)
+            logger.info("✓ Interface metadata reloaded")
+        else:
+            logger.warning("Interface loader disabled, cannot reload metadata")
+    
+    def get_loaded_interfaces_stats(self) -> dict[str, int]:
+        """
+        Get statistics about loaded interfaces.
+        
+        Returns:
+            Dict with cache statistics, or empty dict if loader disabled
+        """
+        if self._interface_loader:
+            return self._interface_loader.get_cache_stats()
+        return {}
 
 
 def create_topic_builder(module_name: str, module_id: str) -> TopicBuilder:

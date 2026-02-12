@@ -129,20 +129,47 @@ job = await InterfaceFactory.create_job(
 
 #### Methods
 
-**`create_callable(name, callback=None, protocols=None, **kwargs)`**
-- Creates request/response interface
-- **Default fallback**: ROS2 → SharedMemory → UDS → Redis → gRPC
+**`create_callable(name, callback, protocols=None, **kwargs)`**
+- Creates request/response interface (server-side)
+- **Role**: Service Server (responds to requests)
+- **Default fallback**: Zenoh → ROS2 → Redis → UDS
 - **Returns**: `VyraCallable` instance
+- **Note**: Automatically sets `is_callable=True`
+
+**`create_caller(name, protocols=None, **kwargs)`**
+- Creates request/response interface (client-side)
+- **Role**: Service Client (makes requests)
+- **Default fallback**: Zenoh → ROS2 → Redis → UDS
+- **Returns**: `VyraCallable` instance
+- **Note**: Automatically sets `is_callable=False`, no callback required
 
 **`create_speaker(name, callback=None, protocols=None, **kwargs)`**
-- Creates publish/subscribe interface
-- **Default fallback**: Redis → ROS2 → MQTT → SharedMemory
+- Creates publish/subscribe interface (publisher)
+- **Role**: Publisher (publishes messages)
+- **Default fallback**: Zenoh → ROS2 → Redis → UDS
 - **Returns**: `VyraSpeaker` instance
+- **Note**: Automatically sets `is_publisher=True`
 
-**`create_job(name, execute_callback=None, protocols=None, **kwargs)`**
-- Creates long-running task interface
-- **Default fallback**: ROS2 only (actions)
+**`create_listener(name, callback, protocols=None, **kwargs)`**
+- Creates publish/subscribe interface (subscriber)
+- **Role**: Subscriber (receives messages)
+- **Default fallback**: Zenoh → ROS2 → Redis → UDS
+- **Returns**: `VyraSpeaker` instance
+- **Note**: Automatically sets `is_publisher=False`, starts listening immediately
+
+**`create_job(name, callback, protocols=None, **kwargs)`**
+- Creates long-running task interface (server-side)
+- **Role**: Action Server (executes actions)
+- **Default fallback**: Zenoh → ROS2 → Redis → UDS
 - **Returns**: `VyraJob` instance
+- **Note**: Automatically sets `is_job=True`
+
+**`create_dispatcher(name, protocols=None, **kwargs)`**
+- Creates long-running task interface (client-side)
+- **Role**: Action Client (sends goals)
+- **Default fallback**: Zenoh → ROS2 → Redis → UDS
+- **Returns**: `VyraJob` instance
+- **Note**: Automatically sets `is_job=False`, no callback required
 
 **`set_fallback_chain(interface_type, protocols)`**
 - Customize protocol fallback order
@@ -152,8 +179,13 @@ job = await InterfaceFactory.create_job(
 - Returns list of currently available protocols
 - **Returns**: `List[ProtocolType]`
 
-**`reset_providers()`**
-- Clear all cached providers (useful for testing)
+**`register_provider(provider)`**
+- Register a protocol provider
+- **Parameter**: `AbstractProtocolProvider` instance or list
+
+**`unregister_provider(protocol)`**
+- Unregister a protocol provider
+- **Parameter**: `ProtocolType` enum value
 
 ### Decorators (`decorators.py`)
 
@@ -271,9 +303,145 @@ monitor = CommunicationMonitor()
 # - vyra_ros2_discovery_nodes
 ```
 
+### Dynamic Interface Loading
+
+Runtime interface discovery and loading without compile-time imports.
+
+#### Components
+
+**InterfacePathRegistry** - Singleton registry for interface base paths:
+
+```python
+from vyra_base.com.core import InterfacePathRegistry
+
+registry = InterfacePathRegistry.get_instance()
+registry.set_interface_paths([
+    "/workspace/install/mypackage_interfaces/share/mypackage_interfaces"
+])
+```
+
+**InterfaceLoader** - Dynamic loader for ROS2 and Protobuf interfaces:
+
+```python
+from vyra_base.com.core import InterfaceLoader
+
+loader = InterfaceLoader()
+
+# Load ROS2 service interface
+srv_type = loader.load_ros2_interface("mypackage_interfaces/srv/MyService")
+
+# Load protobuf module for Zenoh/Redis/UDS
+pb_module = loader.load_protobuf_interface("MyServicePB")
+
+# Load by function name from metadata
+interface = loader.get_interface_for_function("my_function", protocol="ros2")
+```
+
+**TopicBuilder** - Enhanced with interface loading:
+
+```python
+from vyra_base.com.core import TopicBuilder
+
+builder = TopicBuilder("v2_modulemanager", "abc123")
+
+# Build topic name only (slim mode compatible)
+topic = builder.build_topic_name("get_modules")
+
+# Load interface type
+interface = builder.load_interface_type("get_modules", protocol="ros2")
+
+# Build topic AND load interface
+topic, interface = builder.build_with_interface(
+    "get_modules",
+    protocol="ros2"
+)
+```
+
+#### Features
+
+- ✅ **Runtime Interface Discovery**: Load interfaces from string names
+- ✅ **No Compile-Time Dependencies**: Eliminate hardcoded imports
+- ✅ **Cross-Module Communication**: Discover interfaces from other modules
+- ✅ **Multi-Protocol Support**: ROS2, Zenoh, Redis, UDS
+- ✅ **Slim Mode Compatible**: Graceful fallback when ROS2 unavailable
+- ✅ **Performance Optimized**: Interface caching
+
+#### Usage in Modules
+
+```python
+from pathlib import Path
+from ament_index_python.packages import get_package_share_directory
+from vyra_base.core.entity import VyraEntity
+
+# Configure interface paths BEFORE set_interfaces()
+entity = VyraEntity(...)
+entity.set_interface_paths([
+    Path(get_package_share_directory("mymodule_interfaces")),
+    Path(get_package_share_directory("vyra_module_interfaces"))
+])
+
+# Now interfaces are loaded dynamically
+await entity.set_interfaces(base_interfaces)
+```
+
+**See detailed documentation**: [Dynamic Interface Loading Guide](../../../docs/DYNAMIC_INTERFACE_LOADING.md)
+
 ## Usage Patterns
 
-### Basic Factory Usage
+### Server-Client Pattern (New!)
+
+The factory now provides explicit server/client methods for clearer code:
+
+```python
+from vyra_base.com.core.factory import InterfaceFactory
+
+# SERVER SIDE: Responds to requests
+server = await InterfaceFactory.create_callable(
+    "my_service",
+    callback=lambda req, res: {"result": req["value"] * 2}
+)
+
+# CLIENT SIDE: Makes requests
+caller = await InterfaceFactory.create_caller("my_service")
+result = await caller.call({"value": 21})
+print(result)  # {"result": 42}
+```
+
+### Publisher-Subscriber Pattern
+
+```python
+# PUBLISHER: Sends messages
+speaker = await InterfaceFactory.create_speaker("events")
+await speaker.shout({"event": "update", "data": 123})
+
+# SUBSCRIBER: Receives messages
+listener = await InterfaceFactory.create_listener(
+    "events",
+    callback=lambda msg: print(f"Received: {msg}")
+)
+```
+
+### Action Server-Client Pattern
+
+```python
+# ACTION SERVER: Executes long-running tasks
+async def execute_job(goal, feedback_callback=None):
+    for i in range(100):
+        if feedback_callback:
+            await feedback_callback({"progress": i})
+    return {"status": "completed"}
+
+job = await InterfaceFactory.create_job("process_data", callback=execute_job)
+
+# ACTION CLIENT: Sends goals
+dispatcher = await InterfaceFactory.create_dispatcher(
+    "process_data",
+    feedback_callback=lambda fb: print(f"Progress: {fb['progress']}%")
+)
+result = await dispatcher.execute({"dataset": "data.csv"})
+```
+
+### Basic Factory Usage (Legacy)
 
 ```python
 from vyra_base.com.core.factory import InterfaceFactory
@@ -282,7 +450,7 @@ from vyra_base.com.core.types import ProtocolType
 # Auto-select protocol
 callable = await InterfaceFactory.create_callable(
     "service_name",
-    callback=lambda req: {"result": req["value"] * 2}
+    callback=lambda req, res: {"result": req["value"] * 2}
 )
 
 result = await callable.call({"value": 21})

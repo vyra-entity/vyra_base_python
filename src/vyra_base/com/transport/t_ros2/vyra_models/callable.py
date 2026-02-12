@@ -67,8 +67,40 @@ class ROS2Callable(VyraCallable):
         if not self.node:
             raise InterfaceError("Node is required for ROS2Callable")
         
+        # Dynamic interface loading if service_type not provided
         if not self.service_type:
-            raise InterfaceError("service_type is required for ROS2Callable")
+            logger.debug(f"service_type not provided for '{self.name}', attempting dynamic loading")
+            
+            if self.topic_builder:
+                # Extract function name from topic
+                try:
+                    components = self.topic_builder.parse(self.name)
+                    function_name = components.function_name
+                    
+                    # Load interface dynamically
+                    self.service_type = self.topic_builder.load_interface_type(
+                        function_name,
+                        protocol="ros2"
+                    )
+                    
+                    if self.service_type:
+                        logger.info(
+                            f"✓ Dynamically loaded service type for '{self.name}': "
+                            f"{self.service_type}"
+                        )
+                    else:
+                        raise InterfaceError(
+                            f"Failed to dynamically load service type for '{self.name}'. "
+                            f"Please provide service_type explicitly or ensure interface metadata exists."
+                        )
+                except Exception as e:
+                    raise InterfaceError(
+                        f"Failed to dynamically load service type for '{self.name}': {e}"
+                    )
+            else:
+                raise InterfaceError(
+                    "service_type is required for ROS2Callable when TopicBuilder unavailable"
+                )
         
         try:
             if self.callback:

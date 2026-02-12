@@ -3,6 +3,8 @@ Redis Callable Implementation
 
 Concrete implementation of VyraCallable for Redis key-value operations.
 Provides request-response pattern via Redis GET/SET operations.
+
+Supports both JSON (default) and Protocol Buffer message formats.
 """
 import asyncio
 import logging
@@ -15,6 +17,7 @@ from vyra_base.com.core.types import VyraCallable, ProtocolType
 from vyra_base.com.core.exceptions import InterfaceError
 from vyra_base.com.transport.t_redis.communication.redis_client import RedisClient
 from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
+from vyra_base.com.converters.protobuf_converter import ProtobufConverter
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +62,7 @@ class RedisCallable(VyraCallable):
         request_key_pattern: str = "request:{name}:{id}",
         response_key_pattern: str = "response:{name}:{id}",
         ttl: int = 300,  # 5 minutes
+        protobuf_type: Optional[Any] = None,  # Protocol Buffer message class
         **kwargs
     ):
         """
@@ -71,6 +75,7 @@ class RedisCallable(VyraCallable):
             request_key_pattern: Pattern for request keys
             response_key_pattern: Pattern for response keys
             ttl: Time-to-live for keys in seconds
+            protobuf_type: Optional Protocol Buffer message class for serialization
             topic_builder: TopicBuilder for naming convention
         """
         # Apply topic builder if provided
@@ -83,17 +88,58 @@ class RedisCallable(VyraCallable):
         self.request_key_pattern = request_key_pattern
         self.response_key_pattern = response_key_pattern
         self.ttl = ttl
+        self.protobuf_type = protobuf_type
+        self._protobuf_converter: Optional[ProtobufConverter] = None
         self._listener_task: Optional[Any] = None
         self._running = False
     
     async def initialize(self) -> bool:
-        """Initialize Redis callable."""
+        """Initialize Redis callable with optional Protobuf support."""
         if self._initialized:
             logger.warning(f"RedisCallable '{self.name}' already initialized")
             return True
         
         if not self.redis_client:
             raise InterfaceError("redis_client is required for RedisCallable")
+        
+        # Dynamic protobuf interface loading if not provided
+        if not self.protobuf_type and self.topic_builder:
+            logger.debug(f"protobuf_type not provided for '{self.name}', attempting dynamic loading")
+            
+            try:
+                components = self.topic_builder.parse(self.name)
+                function_name = components.function_name
+                
+                # Load protobuf interface dynamically (for redis/zenoh/uds)
+                self.protobuf_type = self.topic_builder.load_interface_type(
+                    function_name,
+                    protocol="redis"  # Uses .proto files
+                )
+                
+                if self.protobuf_type:
+                    logger.info(
+                        f"✓ Dynamically loaded protobuf type for '{self.name}': "
+                        f"{self.protobuf_type}"
+                    )
+            except Exception as e:
+                logger.debug(
+                    f"Could not dynamically load protobuf type for '{self.name}': {e}. "
+                    f"Falling back to JSON mode."
+                )
+        
+        # Initialize protobuf converter if protobuf type available
+        if self.protobuf_type:
+            self._protobuf_converter = ProtobufConverter()
+            
+            if not self._protobuf_converter or not self._protobuf_converter.is_available():
+                logger.warning(
+                    f"⚠️ Protobuf converter unavailable for '{self.name}'. "
+                    f"Falling back to JSON mode."
+                )
+                self._protobuf_converter = None
+                self.protobuf_type = None
+            else:
+                logger.info(f"✓ Protobuf mode enabled for RedisCallable '{self.name}'")
         
         try:
             if self.callback:
@@ -158,11 +204,25 @@ class RedisCallable(VyraCallable):
                         continue
                     
                     # Parse request
-                    if isinstance(request_data, str):
-                        request_data = json.loads(request_data)
+                    if self._protobuf_converter:
+                        # Use protobuf deserialization
+                        if isinstance(request_data, str):
+                            request_data = request_data.encode()
+                        request = self._protobuf_converter.deserialize(request_data, self.protobuf_type)
+                    else:
+                        # Fallback to JSON deserialization
+                        if isinstance(request_data, str):
+                            request = json.loads(request_data)
+                        else:
+                            request = request_data
                     
                     # Execute callback
-                    response_data = await self.callback(request_data)
+                    response_data = await self.callback(request)
+                    
+                    # Serialize response
+                    if self._protobuf_converter:
+                        # Use protobuf serialization
+                        response_data = self._protobuf_converter.serialize(response_data)
                     
                     # Write response
                     response_key = self.response_key_pattern.format(
@@ -227,17 +287,33 @@ class RedisCallable(VyraCallable):
         try:
             logger.debug(f"📞 Calling Redis callable: {self.name}")
             
+            # Serialize request
+            if self._protobuf_converter:
+                # Use protobuf serialization
+                request_data = self._protobuf_converter.serialize(request)
+            else:
+                # Direct storage (existing behavior)
+                request_data = request
+            
             # Write request
-            await self.redis_client.set(request_key, request)
+            await self.redis_client.set(request_key, request_data)
             
             # Wait for response (polling)
             start_time = asyncio.get_event_loop().time()
             while True:
                 # Check for response
-                response = await self.redis_client.get(response_key)
-                if response is not None:
+                response_data = await self.redis_client.get(response_key)
+                if response_data is not None:
                     # Clean up response key
                     await self.redis_client.delete(response_key)
+                    
+                    # Deserialize response
+                    if self._protobuf_converter:
+                        # Use protobuf deserialization
+                        response = self._protobuf_converter.deserialize(response_data, self.protobuf_type)
+                    else:
+                        # Direct return (existing behavior)
+                        response = response_data
                     
                     logger.debug(f"✅ Redis callable call succeeded: {self.name}")
                     return response

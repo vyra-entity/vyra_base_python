@@ -70,8 +70,40 @@ class ROS2Job(VyraJob):
         if not self.node:
             raise InterfaceError("Node is required for ROS2Job")
         
+        # Dynamic interface loading if action_type not provided
         if not self.action_type:
-            raise InterfaceError("action_type is required for ROS2Job")
+            logger.debug(f"action_type not provided for '{self.name}', attempting dynamic loading")
+            
+            if self.topic_builder:
+                # Extract function name from topic
+                try:
+                    components = self.topic_builder.parse(self.name)
+                    function_name = components.function_name
+                    
+                    # Load interface dynamically
+                    self.action_type = self.topic_builder.load_interface_type(
+                        function_name,
+                        protocol="ros2"
+                    )
+                    
+                    if self.action_type:
+                        logger.info(
+                            f"✓ Dynamically loaded action type for '{self.name}': "
+                            f"{self.action_type}"
+                        )
+                    else:
+                        raise InterfaceError(
+                            f"Failed to dynamically load action type for '{self.name}'. "
+                            f"Please provide action_type explicitly or ensure interface metadata exists."
+                        )
+                except Exception as e:
+                    raise InterfaceError(
+                        f"Failed to dynamically load action type for '{self.name}': {e}"
+                    )
+            else:
+                raise InterfaceError(
+                    "action_type is required for ROS2Job when TopicBuilder unavailable"
+                )
         
         try:
             if self.result_callback and self.feedback_callback:

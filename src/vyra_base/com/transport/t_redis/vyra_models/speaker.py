@@ -11,6 +11,7 @@ from typing import Any, Callable, Optional
 from vyra_base.com.core.types import VyraSpeaker, ProtocolType
 from vyra_base.com.core.exceptions import SpeakerError, TransportError
 from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
+from vyra_base.com.converters.protobuf_converter import ProtobufConverter
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ class RedisSpeaker(VyraSpeaker):
         module_name: str = "default",
         callback: Optional[Callable] = None,
         pattern: bool = False,
+        protobuf_type: Optional[Any] = None,
         **kwargs
     ):
         """
@@ -71,6 +73,7 @@ class RedisSpeaker(VyraSpeaker):
             module_name: Module name for namespacing
             callback: Optional[Callable] = None,
             pattern: bool = False,
+            protobuf_type: Optional protobuf message type for serialization
             topic_builder: TopicBuilder,
             **kwargs
         """       
@@ -81,6 +84,8 @@ class RedisSpeaker(VyraSpeaker):
         self._pattern = pattern
         self._listening = False
         self._listener_task: Optional[asyncio.Task] = None
+        self.protobuf_type = protobuf_type
+        self._protobuf_converter: Optional[ProtobufConverter] = None
         
         # Statistics
         self._publish_count = 0
@@ -90,6 +95,34 @@ class RedisSpeaker(VyraSpeaker):
         """Initialize Redis speaker."""
         if not self._client:
             raise SpeakerError("Redis client not provided")
+        
+        # Dynamic interface loading if protobuf_type not provided
+        if not self.protobuf_type and self.topic_builder:
+            try:
+                components = self.topic_builder.parse(self.name)
+                function_name = components.function_name
+                if function_name:
+                    self.protobuf_type = self.topic_builder.load_interface_type(
+                        function_name, protocol="redis"
+                    )
+                    logger.debug(
+                        f"🔄 Dynamically loaded protobuf type for Redis speaker '{self.name}': "
+                        f"{self.protobuf_type.__name__ if self.protobuf_type else 'None'}"
+                    )
+            except Exception as e:
+                logger.warning(
+                    f"⚠️ Could not load protobuf type for Redis speaker '{self.name}': {e}. "
+                    "Falling back to JSON mode."
+                )
+        
+        # Initialize protobuf converter if type available
+        if self.protobuf_type:
+            self._protobuf_converter = ProtobufConverter()
+            if not self._protobuf_converter or not self._protobuf_converter.is_available():
+                logger.warning(
+                    "⚠️ ProtobufConverter not available. Falling back to JSON mode."
+                )
+                self._protobuf_converter = None
         
         # Ensure Redis connection
         if not self._client._connected:
@@ -125,7 +158,15 @@ class RedisSpeaker(VyraSpeaker):
         
         try:
             # Serialize message
-            if isinstance(message, (dict, list)):
+            if self._protobuf_converter:
+                # Use protobuf serialization
+                message_data = self._protobuf_converter.serialize(message)
+                # Redis publish expects string, so decode if bytes
+                if isinstance(message_data, bytes):
+                    message_str = message_data.decode('utf-8', errors='ignore')
+                else:
+                    message_str = message_data
+            elif isinstance(message, (dict, list)):
                 message_str = json.dumps(message)
             elif isinstance(message, str):
                 message_str = message
@@ -218,20 +259,26 @@ class RedisSpeaker(VyraSpeaker):
                 try:
                     # Parse message
                     if isinstance(message_data, bytes):
-                        message_str = message_data.decode('utf-8')
+                        raw_data = message_data
                     elif isinstance(message_data, dict):
                         # Already parsed by Redis
-                        message_str = message_data.get('data', message_data)
-                        if isinstance(message_str, bytes):
-                            message_str = message_str.decode('utf-8')
+                        raw_data = message_data.get('data', message_data)
+                        if isinstance(raw_data, str):
+                            raw_data = raw_data.encode('utf-8')
                     else:
-                        message_str = str(message_data)
+                        raw_data = str(message_data).encode('utf-8')
                     
-                    # Try to parse as JSON
-                    try:
-                        message = json.loads(message_str)
-                    except (json.JSONDecodeError, TypeError):
-                        message = message_str
+                    # Deserialize message
+                    if self._protobuf_converter:
+                        # Use protobuf deserialization
+                        message = self._protobuf_converter.deserialize(raw_data, self.protobuf_type)
+                    else:
+                        # Fallback to JSON deserialization
+                        message_str = raw_data.decode('utf-8')
+                        try:
+                            message = json.loads(message_str)
+                        except (json.JSONDecodeError, TypeError):
+                            message = message_str
                     
                     self._receive_count += 1
                     logger.debug(f"📥 Received message on '{self.name}': {message}")

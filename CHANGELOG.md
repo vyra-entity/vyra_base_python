@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.48] - 2026-02-12
+
+### Build
+
+Update vyra transport layer to work with dynamic loading interface types
+
+
 ## [0.1.8+build.45] - 2026-02-11
 
 ### Build

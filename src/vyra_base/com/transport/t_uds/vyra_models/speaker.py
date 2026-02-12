@@ -16,6 +16,7 @@ from vyra_base.com.core.exceptions import SpeakerError, TransportError
 from vyra_base.helper.logger import Logger
 from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 from vyra_base.com.core.topic_builder import TopicBuilder, InterfaceType
+from vyra_base.com.converter.protobuf_converter import ProtobufConverter
 
 
 class UDSSpeaker(VyraSpeaker):
@@ -61,6 +62,7 @@ class UDSSpeaker(VyraSpeaker):
         topic_builder: TopicBuilder,
         callback: Optional[Callable[[Any], None] | Coroutine[Any, Any, None]] = None,
         is_publisher: bool = True,
+        protobuf_type: Optional[Any] = None,
         **kwargs
     ):
         """Initialize UDS Speaker."""
@@ -76,6 +78,8 @@ class UDSSpeaker(VyraSpeaker):
         self.callback = callback
         self.is_publisher = is_publisher
         self.topic_builder = topic_builder
+        self.protobuf_type = protobuf_type
+        self._protobuf_converter: Optional[ProtobufConverter] = None
         
         # Socket setup
         self._socket_path = Path(UDS_SOCKET_DIR) / f"{name.replace('/', '_')}_pub.sock"
@@ -91,6 +95,34 @@ class UDSSpeaker(VyraSpeaker):
         if self._initialized:
             Logger.warning(f"UDSSpeaker '{self.name}' already initialized")
             return True
+        
+        # Dynamic interface loading if protobuf_type not provided
+        if not self.protobuf_type and self.topic_builder:
+            try:
+                components = self.topic_builder.parse(self.name)
+                function_name = components.function_name
+                if function_name:
+                    self.protobuf_type = self.topic_builder.load_interface_type(
+                        function_name, protocol="uds"
+                    )
+                    Logger.debug(
+                        f"🔄 Dynamically loaded protobuf type for UDS speaker '{self.name}': "
+                        f"{self.protobuf_type.__name__ if self.protobuf_type else 'None'}"
+                    )
+            except Exception as e:
+                Logger.warning(
+                    f"⚠️ Could not load protobuf type for UDS speaker '{self.name}': {e}. "
+                    "Falling back to JSON mode."
+                )
+        
+        # Initialize protobuf converter if type available
+        if self.protobuf_type:
+            self._protobuf_converter = ProtobufConverter()
+            if not self._protobuf_converter.is_available():
+                Logger.warning(
+                    "⚠️ ProtobufConverter not available. Falling back to JSON mode."
+                )
+                self._protobuf_converter = None
         
         try:
             if self.is_publisher:
@@ -180,7 +212,14 @@ class UDSSpeaker(VyraSpeaker):
 
         try:
             # Serialize data
-            message = json.dumps(data).encode('utf-8')
+            if self._protobuf_converter:
+                # Use protobuf serialization
+                message = self._protobuf_converter.serialize(data)
+                if isinstance(message, str):
+                    message = message.encode('utf-8')
+            else:
+                # Fallback to JSON serialization
+                message = json.dumps(data).encode('utf-8')
             
             # Send to subscriber socket
             subscriber_path = self._socket_path
@@ -211,7 +250,13 @@ class UDSSpeaker(VyraSpeaker):
                     data, addr = self._socket.recvfrom(65536)  # Max UDP size
                     
                     # Deserialize and call callback
-                    message = json.loads(data.decode('utf-8'))
+                    if self._protobuf_converter:
+                        # Use protobuf deserialization
+                        message = self._protobuf_converter.deserialize(data, self.protobuf_type)
+                    else:
+                        # Fallback to JSON deserialization
+                        message = json.loads(data.decode('utf-8'))
+                    
                     Logger.debug(f"📥 Received UDS message: {self.name}")
                     
                     if self.callback:

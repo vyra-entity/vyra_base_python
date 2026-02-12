@@ -1,8 +1,8 @@
 """
-Example: Using VyraJob (Action Server) and VyraJobRunner (Action Client)
+Example: Using VyraJob (Action Server) and Action Client
 
 This example demonstrates how to create and use Jobs for long-running operations
-with feedback support.
+with feedback support using ROS2Provider.
 
 Jobs are based on ROS2 actions and provide:
 - Goal acceptance/rejection
@@ -10,12 +10,12 @@ Jobs are based on ROS2 actions and provide:
 - Final result upon completion
 """
 
+import asyncio
 import rclpy
 import time
-from rclpy.node import Node
 from example_interfaces.action import Fibonacci
-from vyra_base.com import create_vyra_job, create_vyra_job_runner
-from vyra_base.com.transport.t_ros2.node import VyraNode, NodeSettings
+from vyra_base.com.core.types import ProtocolType
+from vyra_base.com.transport.t_ros2 import ROS2Provider
 
 
 # ============================================================================
@@ -66,84 +66,85 @@ def fibonacci_goal_callback(goal_handle):
     return result
 
 
-def run_job_server():
+async def run_job_server():
     """Run the VyraJob (action server)."""
     
     # Initialize ROS2
     rclpy.init()
     
-    # Create a VyraNode
-    node_settings = NodeSettings(name="job_server_node")
-    node = VyraNode(node_settings=node_settings)
-    
-    # Create a Job (Action Server)
-    job = create_vyra_job(
-        type=Fibonacci,
-        node=node,
-        goal_callback=fibonacci_goal_callback,
-        ident_name="fibonacci_job",
+    # Create ROS2 provider
+    provider = ROS2Provider(
+        module_name="example_job_server",
+        module_id="demo123",
+        protocol=ProtocolType.ROS2
     )
     
-    print("VyraJob (Action Server) created!")
-    print("Waiting for goal requests...")
-    print("Call with: ros2 action send_goal /job_server_node/job/fibonacci_job example_interfaces/action/Fibonacci \"{order: 10}\"")
+    await provider.initialize(config={
+        "node_name": "job_server_node",
+        "namespace": "/examples"
+    })
+    
+    print("✅ ROS2Provider initialized")
+    
+    # Create a Job (Action Server)
+    job = await provider.create_job(
+        name="fibonacci_job",
+        action_type=Fibonacci,
+        callback=fibonacci_goal_callback
+    )
+    
+    print("✅ VyraJob (Action Server) created!")
+    print("📞 Waiting for goal requests...")
+    print("\nTest with:")
+    print("  ros2 action send_goal /examples/example_job_server_demo123/fibonacci_job example_interfaces/action/Fibonacci '{order: 10}'")
+    print("\n(Press Ctrl+C to stop)\n")
     
     # Spin to handle action requests
     try:
-        rclpy.spin(node)
+        rclpy.spin(provider.get_node())
     except KeyboardInterrupt:
-        print("\nShutting down server...")
+        print("\n🛑 Shutting down server...")
     
     # Cleanup
-    node.destroy_node()
-    rclpy.shutdown()
-
-
+    await job.shutdown()
+    await provider.shutdown()
 # ============================================================================
-# CLIENT SIDE: VyraJobRunner (Action Client)
+# CLIENT SIDE: Action Client
 # ============================================================================
-
-def on_feedback_received(feedback_msg):
-    """
-    Callback for receiving feedback from action server.
-    
-    :param feedback_msg: Feedback message from action
-    """
-    print(f"Received feedback: {feedback_msg.feedback.sequence}")
-
-
-def on_result_received(result):
-    """
-    Callback for receiving final result from action server.
-    
-    :param result: Result message from action
-    """
-    print(f"Final result received: {result.result.sequence}")
-    print(f"Status: {result.status}")
-
 
 async def run_job_client():
-    """Run the VyraJobRunner (action client)."""
+    """Run the Action Client to send goals to the action server."""
     
     # Initialize ROS2
     rclpy.init()
     
-    # Create a VyraNode
-    node_settings = NodeSettings(name="job_client_node")
-    node = VyraNode(node_settings=node_settings)
-    
-    # Create a Job Runner (Action Client)
-    job_runner = create_vyra_job_runner(
-        type=Fibonacci,
-        node=node,
-        feedback_callback=on_feedback_received,
-        result_callback=on_result_received,
-        ident_name="fibonacci_client",
-        timeout_sec=5.0
+    # Create ROS2 provider
+    provider = ROS2Provider(
+        module_name="example_job_client",
+        module_id="demo456",
+        protocol=ProtocolType.ROS2
     )
     
-    print("VyraJobRunner (Action Client) created!")
-    print("Sending goal to action server...")
+    await provider.initialize(config={
+        "node_name": "job_client_node",
+        "namespace": "/examples"
+    })
+    
+    print("✅ ROS2Provider initialized")
+    
+    # Define feedback callback
+    def on_feedback(feedback_msg):
+        print(f"📊 Feedback: {feedback_msg.feedback.sequence}")
+    
+    # Create Job Client (no callback = client side)
+    job_client = await provider.create_job(
+        name="fibonacci_job",
+        action_type=Fibonacci,
+        feedback_callback=on_feedback  # Only feedback, no result_callback = client
+    )
+    
+    print("✅ Action Client created!")
+    print("📤 Sending goal to action server...")
     
     # Prepare goal message
     goal_msg = Fibonacci.Goal()
@@ -151,15 +152,15 @@ async def run_job_client():
     
     # Send goal (async)
     try:
-        result = await job_runner.send_goal(goal_msg)
-        print(f"Goal completed! Result: {result.sequence}")
+        result = await job_client.execute(goal_msg, feedback_callback=on_feedback)
+        print(f"✅ Goal completed! Result: {result.result.sequence}")
     except Exception as e:
-        print(f"Error sending goal: {e}")
+        print(f"❌ Error sending goal: {e}")
     
     # Cleanup
-    node.destroy_node()
-    rclpy.shutdown()
-    print("Job client example completed!")
+    await job_client.shutdown()
+    await provider.shutdown()
+    print("✅ Job client example completed!")
 
 
 # ============================================================================
@@ -185,9 +186,8 @@ def main():
     mode = sys.argv[1].lower()
     
     if mode == "server":
-        run_job_server()
+        asyncio.run(run_job_server())
     elif mode == "client":
-        import asyncio
         asyncio.run(run_job_client())
     else:
         print(f"Unknown mode: {mode}")

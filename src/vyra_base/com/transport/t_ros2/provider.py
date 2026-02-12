@@ -217,14 +217,15 @@ class ROS2Provider(AbstractProtocolProvider):
         **kwargs
     ) -> VyraCallable:
         """
-        Create a ROS2 callable (service server).
+        Create a ROS2 callable (service server or client).
         
         Args:
             name: Service name
-            callback: Server-side callback function
+            callback: Server-side callback function (None for client)
             **kwargs: Additional parameters
                 - service_type: ROS2 service type (required)
                 - qos_profile: QoS profile
+                - is_callable: True for server, False for client (auto-detected from callback if not provided)
                 
         Returns:
             VyraCallable instance
@@ -240,10 +241,22 @@ class ROS2Provider(AbstractProtocolProvider):
             raise ArgumentError("service_type is required for ROS2 callable")
         
         node = kwargs.pop("node", None)
+        
+        # Check is_callable flag (defaults to True if callback provided, False otherwise)
+        is_callable = kwargs.pop("is_callable", callback is not None)
+        
+        role = "server" if is_callable else "client"
 
         logger.info(
-            f"🔧 Creating ROS2 service: {name} (type: {service_type})"
+            f"🔧 Creating ROS2 service {role}: {name} (type: {service_type})"
         )
+        
+        # Ensure callback matches is_callable flag
+        if is_callable and callback is None:
+            raise ArgumentError("Callback required for service server (is_callable=True)")
+        if not is_callable and callback is not None:
+            logger.debug("Ignoring callback for service client (is_callable=False)")
+            callback = None
         
         # Create ROS2 callable
         callable_instance = ROS2Callable(
@@ -257,7 +270,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         await callable_instance.initialize()
         
-        logger.info(f"✅ ROS2 service created: {name}")
+        logger.info(f"✅ ROS2 service {role} created: {name}")
         return callable_instance
     
     async def create_speaker(
@@ -320,13 +333,15 @@ class ROS2Provider(AbstractProtocolProvider):
         **kwargs
     ) -> VyraJob:
         """
-        Create a ROS2 job (action server/client).
+        Create a ROS2 job (action server or client).
         
         Args:
             name: Action name
-            callback: Action execution callback
+            callback: Action execution callback (for server) or None (for client)
             **kwargs: Additional parameters
                 - action_type: ROS2 action type (required)
+                - is_job: True for server, False for client (auto-detected from callback if not provided)
+                - feedback_callback: Optional feedback callback (client-side)
                 
         Returns:
             VyraJob instance
@@ -342,16 +357,33 @@ class ROS2Provider(AbstractProtocolProvider):
             raise ArgumentError("action_type is required for ROS2 job")
         
         node = kwargs.pop("node", None)
+        
+        # Check is_job flag (defaults to True if callback provided, False otherwise)
+        is_job = kwargs.pop("is_job", callback is not None)
+        
+        role = "server" if is_job else "client"
 
         logger.info(
-            f"🔧 Creating ROS2 action: {name} (type: {action_type})"
+            f"🔧 Creating ROS2 action {role}: {name} (type: {action_type})"
         )
-                
+        
+        # Ensure callback matches is_job flag
+        if is_job and callback is None:
+            raise ArgumentError("Callback required for action server (is_job=True)")
+        if not is_job and callback is not None:
+            logger.debug("Ignoring callback for action client (is_job=False)")
+            callback = None
+        
+        # Extract feedback and result callbacks for compatibility
+        feedback_callback = kwargs.pop("feedback_callback", None)
+        result_callback = callback if is_job else None
+        
         # Create ROS2 job
         job_instance = ROS2Job(
             name=name,
             topic_builder=self._topic_builder,
-            callback=callback,
+            result_callback=result_callback,
+            feedback_callback=feedback_callback,
             node=node or self._node,
             action_type=action_type,
             **kwargs
@@ -359,7 +391,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         await job_instance.initialize()
         
-        logger.info(f"✅ ROS2 action created: {name}")
+        logger.info(f"✅ ROS2 action {role} created: {name}")
         return job_instance
     
     def get_node(self) -> Node:

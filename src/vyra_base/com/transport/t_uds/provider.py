@@ -182,13 +182,14 @@ class UDSProvider(AbstractProtocolProvider):
         **kwargs
     ) -> VyraCallable:
         """
-        Create a UDS callable.
+        Create a UDS callable (server or client).
         
         Args:
             name: Callable name
             callback: Server-side callback function (None for client)
             **kwargs: Additional parameters
                 - module_name: Override default module name
+                - is_callable: True for server, False for client (auto-detected from callback if not provided)
                 
         Returns:
             UDSCallable instance
@@ -201,8 +202,18 @@ class UDSProvider(AbstractProtocolProvider):
         # Get module name
         module_name = kwargs.pop("module_name", self.module_name)
         
-        role = "server" if callback else "client"
-        logger.info(f"🔧 Creating UDS callable ({role}): {module_name}.{name}")
+        # Check is_callable flag (defaults to True if callback provided, False otherwise)
+        is_callable = kwargs.pop("is_callable", callback is not None)
+        
+        role = "server" if is_callable else "client"
+        logger.info(f"🔧 Creating UDS callable {role}: {module_name}.{name}")
+        
+        # Ensure callback matches is_callable flag
+        if is_callable and callback is None:
+            raise ProviderError("Callback required for callable server (is_callable=True)")
+        if not is_callable and callback is not None:
+            logger.debug("Ignoring callback for callable client (is_callable=False)")
+            callback = None
         
         callable_instance = UDSCallable(
             name=name,
@@ -214,7 +225,7 @@ class UDSProvider(AbstractProtocolProvider):
         
         await callable_instance.initialize()
         
-        logger.info(f"✅ UDS callable created ({role}): {module_name}.{name}")
+        logger.info(f"✅ UDS callable {role} created: {module_name}.{name}")
         return callable_instance
     
     async def create_speaker(
