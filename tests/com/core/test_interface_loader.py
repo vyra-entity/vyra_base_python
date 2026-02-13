@@ -162,7 +162,7 @@ class TestInterfaceLoader:
         
         loader = InterfaceLoader(auto_update_paths=False)
         
-        interface = loader.load_ros2_interface("vyra_module_interfaces/srv/VBASEGetInterfaceList")
+        interface = loader.load_ros2_interface("vyra_module_template_interfaces/srv/VBASEGetInterfaceList")
         
         assert interface == mock_srv_type
         mock_get_service.assert_called_once()

@@ -310,7 +310,7 @@ class VyraEntity:
             >>> 
             >>> # Set custom interface paths
             >>> module_interfaces = Path(get_package_share_directory("v2_modulemanager_interfaces"))
-            >>> vyra_interfaces = Path(get_package_share_directory("vyra_module_interfaces"))
+            >>> vyra_interfaces = Path(get_package_share_directory("vyra_module_template_interfaces"))
             >>> entity.set_interface_paths([module_interfaces, vyra_interfaces])
             >>> 
             >>> # Now set_interfaces() will use dynamic loading from these paths

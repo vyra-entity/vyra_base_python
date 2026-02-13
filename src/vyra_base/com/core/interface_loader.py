@@ -53,8 +53,8 @@ class InterfaceLoader:
         >>> loader = InterfaceLoader()
         
         # Load ROS2 service interface
-        >>> srv_type = loader.load_ros2_interface("vyra_module_interfaces/srv/VBASEGetInterfaceList")
-        >>> print(srv_type)  # <class 'vyra_module_interfaces.srv._v_b_a_s_e_get_interface_list.VBASEGetInterfaceList'>
+        >>> srv_type = loader.load_ros2_interface("vyra_module_template_interfaces/srv/VBASEGetInterfaceList")
+        >>> print(srv_type)  # <class 'vyra_module_template_interfaces.srv._v_b_a_s_e_get_interface_list.VBASEGetInterfaceList'>
         
         # Load Protocol Buffer interface
         >>> pb_type = loader.load_protobuf_interface("VBASEGetInterfaceList")
@@ -132,7 +132,7 @@ class InterfaceLoader:
             interface_path: Interface path in format "package/type/Name"
                 Examples:
                 - "std_msgs/msg/String"
-                - "vyra_module_interfaces/srv/VBASEGetInterfaceList"
+                - "vyra_module_template_interfaces/srv/VBASEGetInterfaceList"
                 - "action_msgs/action/MyAction"
         
         Returns:
@@ -411,7 +411,7 @@ class InterfaceLoader:
                 if filetype.endswith('.srv'):
                     # Extract interface path from filename
                     interface_name = filetype[:-4]  # Remove .srv
-                    # Need to determine package name - check tags or use vyra_module_interfaces
+                    # Need to determine package name - check tags or use vyra_module_template_interfaces
                     package_name = self._infer_package_name(meta, interface_name)
                     interface_path = f"{package_name}/srv/{interface_name}"
                     return self.load_ros2_interface(interface_path)
@@ -443,7 +443,7 @@ class InterfaceLoader:
     
     def _infer_package_name(self, metadata: dict, interface_name: str) -> str:
         """
-        Infer ROS2 package name from metadata or default to vyra_module_interfaces.
+        Infer ROS2 package name from metadata or default to vyra_module_template_interfaces.
         
         Args:
             metadata: Interface metadata dict
@@ -458,9 +458,9 @@ class InterfaceLoader:
         
         # Check interface name prefix for module-specific interfaces
         # E.g., "V2MMGetModules" → v2_modulemanager_interfaces
-        # For now, default to vyra_module_interfaces for all VBASE* interfaces
+        # For now, default to vyra_module_template_interfaces for all VBASE* interfaces
         if interface_name.startswith("VBASE"):
-            return "vyra_module_interfaces"
+            return "vyra_module_template_interfaces"
         
         # Try to infer from interface paths
         for interface_path in self.interface_paths:
@@ -471,7 +471,7 @@ class InterfaceLoader:
                     return interface_path.parts[share_idx + 1]
         
         # Fallback to default
-        return "vyra_module_interfaces"
+        return "vyra_module_template_interfaces"
     
     def clear_cache(self) -> None:
         """Clear all cached interfaces and metadata."""
