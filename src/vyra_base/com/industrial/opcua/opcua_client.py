@@ -16,7 +16,6 @@ import logging
 from typing import Any, Optional, Callable, List
 from pathlib import Path
 
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -84,7 +83,7 @@ class OpcuaClient:
     async def connect(self) -> None:
         """Establish connection to OPC UA server."""
         try:
-            Logger.info(f"🔌 Connecting to OPC UA server: {self.endpoint}")
+            logger.info(f"🔌 Connecting to OPC UA server: {self.endpoint}")
             
             # Create client
             self._client = Client(url=self.endpoint, timeout=self.timeout)
@@ -111,10 +110,10 @@ class OpcuaClient:
             await self._client.connect()
             
             self._connected = True
-            Logger.info(f"✅ Connected to OPC UA server: {self.endpoint}")
+            logger.info(f"✅ Connected to OPC UA server: {self.endpoint}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to connect to OPC UA server: {e}")
+            logger.error(f"❌ Failed to connect to OPC UA server: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -133,7 +132,7 @@ class OpcuaClient:
             self._client = None
         
         self._connected = False
-        Logger.debug(f"OPC UA connection closed: {self.endpoint}")
+        logger.debug(f"OPC UA connection closed: {self.endpoint}")
     
     async def _ensure_connected(self) -> Client:
         """Ensure client is connected."""
@@ -161,10 +160,10 @@ class OpcuaClient:
         try:
             node = client.get_node(node_id)
             value = await node.read_value()
-            Logger.debug(f"📖 OPC UA read: {node_id} = {value}")
+            logger.debug(f"📖 OPC UA read: {node_id} = {value}")
             return value
         except Exception as e:
-            Logger.error(f"❌ OPC UA read failed: {node_id}: {e}")
+            logger.error(f"❌ OPC UA read failed: {node_id}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -181,9 +180,9 @@ class OpcuaClient:
         try:
             node = client.get_node(node_id)
             await node.write_value(value)
-            Logger.debug(f"✏️ OPC UA write: {node_id} = {value}")
+            logger.debug(f"✏️ OPC UA write: {node_id} = {value}")
         except Exception as e:
-            Logger.error(f"❌ OPC UA write failed: {node_id}: {e}")
+            logger.error(f"❌ OPC UA write failed: {node_id}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -209,10 +208,10 @@ class OpcuaClient:
         try:
             parent = client.get_node(object_id)
             result = await parent.call_method(method_id, *args)
-            Logger.debug(f"📞 OPC UA method call: {object_id}.{method_id} -> {result}")
+            logger.debug(f"📞 OPC UA method call: {object_id}.{method_id} -> {result}")
             return result
         except Exception as e:
-            Logger.error(f"❌ OPC UA method call failed: {method_id}: {e}")
+            logger.error(f"❌ OPC UA method call failed: {method_id}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -242,10 +241,10 @@ class OpcuaClient:
             await sub.subscribe_data_change(nodes)
             
             self._subscriptions.append(sub)
-            Logger.info(f"📥 OPC UA subscribed to {len(node_ids)} nodes")
+            logger.info(f"📥 OPC UA subscribed to {len(node_ids)} nodes")
             
         except Exception as e:
-            Logger.error(f"❌ OPC UA subscription failed: {e}")
+            logger.error(f"❌ OPC UA subscription failed: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist

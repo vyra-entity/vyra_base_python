@@ -1,9 +1,10 @@
 import sys
 import asyncio
+import logging
 import traceback
 from inspect import iscoroutinefunction
 
-from vyra_base.helper.logger import Logger, LogEntry
+logger = logging.getLogger(__name__)
 
 class ErrorTraceback:
     """
@@ -28,8 +29,7 @@ class ErrorTraceback:
                 error_details.append(traceback.format_exc())
 
                 if log_print:
-                    Logger.log(LogEntry(
-                        f'{exc_type}|{exc_obj}|').error())
+                    logger.error(f'{exc_type}|{exc_obj}|')
                     
                 tb_lines: list = []
 
@@ -37,8 +37,7 @@ class ErrorTraceback:
                     tb_lines.append(line)
 
                 if log_print:
-                    Logger.log(LogEntry(
-                        '\n'.join(tb_lines)).error())
+                    logger.error('\n'.join(tb_lines))
                 return True
 
         return False

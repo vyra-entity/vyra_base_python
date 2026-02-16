@@ -474,24 +474,6 @@ Graceful Degradation
 Security Monitoing
 -------------------
 
-Logging
-~~~~~~~
-
-Enable security logging:
-
-.. code-block:: python
-
-    from vyra_base.helper.logger import Logger
-    import logging
-
-    Logger.setLevel(logging.DEBUG)
-
-Log events:
-- Authentication requests
-- Failed validations
-- Session expirations
-- Replay attack attempts
-
 Metrics
 ~~~~~~~
 

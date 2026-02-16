@@ -7,11 +7,10 @@ Provides connection management, node operations, and subscription handling.
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional, Callable, Dict, List
+from typing import Any, Optional, Callable, Dict
 from dataclasses import dataclass
 from enum import Enum
 
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -91,13 +90,13 @@ class OpcuaSubscriptionHandler(SubHandler):
                 str(node.nodeid)
             )
             
-            Logger.debug(f"📡 Data change: {node_id} = {val}")
+            logger.debug(f"📡 Data change: {node_id} = {val}")
             
             if self.callback:
                 self.callback(node_id, val)
                 
         except Exception as e:
-            Logger.error(f"❌ Error in datachange notification: {e}")
+            logger.error(f"❌ Error in datachange notification: {e}")
 
 
 class OpcuaConnectionHandler:
@@ -139,24 +138,24 @@ class OpcuaConnectionHandler:
         """Handle successful connection."""
         self._connected = True
         self._reconnecting = False
-        Logger.info(f"✅ OPC UA connected: {self.endpoint}")
+        logger.info(f"✅ OPC UA connected: {self.endpoint}")
         
         if self.on_connect:
             try:
                 await self.on_connect()
             except Exception as e:
-                Logger.error(f"❌ Error in on_connect callback: {e}")
+                logger.error(f"❌ Error in on_connect callback: {e}")
     
     async def handle_disconnect(self):
         """Handle disconnection."""
         self._connected = False
-        Logger.warning(f"⚠️  OPC UA disconnected: {self.endpoint}")
+        logger.warning(f"⚠️  OPC UA disconnected: {self.endpoint}")
         
         if self.on_disconnect:
             try:
                 await self.on_disconnect()
             except Exception as e:
-                Logger.error(f"❌ Error in on_disconnect callback: {e}")
+                logger.error(f"❌ Error in on_disconnect callback: {e}")
 
 
 class OpcuaNodeHandler:
@@ -179,7 +178,7 @@ class OpcuaNodeHandler:
             node: Node object
         """
         self._nodes[node_id] = node
-        Logger.debug(f"📝 Registered node: {node_id}")
+        logger.debug(f"📝 Registered node: {node_id}")
     
     def get_node(self, node_id: str) -> Optional[Node]:
         """
@@ -227,7 +226,7 @@ class OpcuaNodeHandler:
             return namespace_idx, identifier
             
         except Exception as e:
-            Logger.error(f"❌ Failed to parse node ID '{node_id}': {e}")
+            logger.error(f"❌ Failed to parse node ID '{node_id}': {e}")
             raise ValueError(f"Invalid node ID format: {node_id}")
     
     @staticmethod

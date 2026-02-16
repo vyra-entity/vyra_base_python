@@ -10,6 +10,8 @@ import logging
 from typing import Any, Optional
 from dataclasses import dataclass
 
+import zenoh
+
 from vyra_base.com.transport.t_zenoh.communication.serializer import (
     ZenohSerializer,
     SerializationFormat
@@ -36,7 +38,7 @@ class ZenohQueryClient:
     def __init__(
         self,
         query_client_info: QueryClientInfo,
-        zenoh_session: Any  # zenoh.Session
+        zenoh_session: zenoh.Session  # zenoh.Session
     ):
         """
         Initialize Zenoh query client.
@@ -95,7 +97,7 @@ class ZenohQueryClient:
             
             # Process replies (get first one)
             for reply in replies:
-                if reply.is_ok:
+                if reply.is_ok:  # type: ignore[attr-defined]
                     response_data = self._serializer.deserialize(
                         reply.ok.payload,
                         format=self.query_client_info.format
@@ -103,7 +105,7 @@ class ZenohQueryClient:
                     
                     logger.debug(
                         f"Received reply from '{self.query_client_info.key_expr}': "
-                        f"{len(reply.ok.payload)} bytes"
+                        f"{len(reply.ok.payload)} bytes"  # type: ignore[union-attr]
                     )
                     
                     return response_data

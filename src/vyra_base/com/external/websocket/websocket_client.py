@@ -20,7 +20,6 @@ from re import A
 from typing import Any, Optional, Callable
 import json
 
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -75,7 +74,7 @@ class WebSocketClient:
     async def connect(self) -> None:
         """Establish WebSocket connection."""
         try:
-            Logger.info(f"🔌 Connecting to WebSocket: {self.url}")
+            logger.info(f"🔌 Connecting to WebSocket: {self.url}")
             
             self._ws = await ws_connect(
                 self.url,
@@ -85,10 +84,10 @@ class WebSocketClient:
             )
             
             self._connected = True
-            Logger.info(f"✅ Connected to WebSocket: {self.url}")
+            logger.info(f"✅ Connected to WebSocket: {self.url}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to connect to WebSocket: {e}")
+            logger.error(f"❌ Failed to connect to WebSocket: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -108,7 +107,7 @@ class WebSocketClient:
             await self._ws.close()
             self._ws = None
         
-        Logger.debug(f"WebSocket connection closed: {self.url}")
+        logger.debug(f"WebSocket connection closed: {self.url}")
     
     async def _ensure_connected(self) -> ClientConnection:
         """Ensure WebSocket is connected."""
@@ -140,10 +139,10 @@ class WebSocketClient:
                 data = str(message)
             
             await ws.send(data)
-            Logger.debug(f"📤 WebSocket sent: {data[:100]}")
+            logger.debug(f"📤 WebSocket sent: {data[:100]}")
             
         except Exception as e:
-            Logger.error(f"❌ WebSocket send failed: {e}")
+            logger.error(f"❌ WebSocket send failed: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -169,13 +168,13 @@ class WebSocketClient:
             except:
                 data = message
             
-            Logger.debug(f"📥 WebSocket received: {str(data)[:100]}")
+            logger.debug(f"📥 WebSocket received: {str(data)[:100]}")
             return data
             
         except asyncio.TimeoutError:
             raise TimeoutError(f"WebSocket receive timed out after {timeout}s")
         except Exception as e:
-            Logger.error(f"❌ WebSocket receive failed: {e}")
+            logger.error(f"❌ WebSocket receive failed: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -190,7 +189,7 @@ class WebSocketClient:
         
         self._message_callback = callback
         self._listener_task = asyncio.create_task(self._listen_loop())
-        Logger.info(f"📡 WebSocket listening started: {self.url}")
+        logger.info(f"📡 WebSocket listening started: {self.url}")
     
     async def _listen_loop(self) -> None:
         """Background task for listening to messages."""
@@ -209,11 +208,11 @@ class WebSocketClient:
                     await self._message_callback(data)
                     
             except websockets.exceptions.ConnectionClosed:
-                Logger.warning("WebSocket connection closed")
+                logger.warning("WebSocket connection closed")
                 self._connected = False
                 break
             except Exception as e:
-                Logger.error(f"❌ Error in WebSocket listener: {e}")
+                logger.error(f"❌ Error in WebSocket listener: {e}")
     
     @ErrorTraceback.w_check_error_exist
     async def health_check(self) -> bool:

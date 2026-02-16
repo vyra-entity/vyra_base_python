@@ -1,0 +1,9 @@
+# Update Parameter Event
+# Communicate parameter updates in the system between different components or modules.
+# Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+string param_key  # The key of the parameter that was updated
+string changed_from  # Display the previous value of the parameter
+string changed_to  # Display the new value of the parameter
+string id  # The unique identifier of the parameter
+builtin_interfaces/Time timestamp  # The timestamp when the parameter was changed

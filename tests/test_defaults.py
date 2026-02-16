@@ -362,9 +362,9 @@ class TestFunctionConfig:
     
     def test_function_config_base_types(self):
         """Test FunctionConfigBaseTypes enumeration"""
-        assert FunctionConfigBaseTypes.speaker.value == 'speaker'
-        assert FunctionConfigBaseTypes.callable.value == 'callable'
-        assert FunctionConfigBaseTypes.job.value == 'job'
+        assert FunctionConfigBaseTypes.publisher.value == 'speaker'
+        assert FunctionConfigBaseTypes.service.value == 'callable'
+        assert FunctionConfigBaseTypes.action.value == 'job'
 
     def test_function_config_displaystyle(self):
         """Test FunctionConfigDisplaystyle"""

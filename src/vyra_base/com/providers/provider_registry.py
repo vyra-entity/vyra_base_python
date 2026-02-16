@@ -68,6 +68,7 @@ class ProviderRegistry:
             
             if protocol in self._providers and not force:
                 raise ProviderRegistrationError(
+                    f"{protocol.value}",
                     f"Provider for protocol '{protocol}' already registered. "
                     f"Use force=True to replace."
                 )

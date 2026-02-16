@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// Initialize
+// Executing initial commands and set state IDLE -> READY
+// Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+// Request message
+message VBASEInitializeRequest {
+  // An array of key-value pairs providing the necessary parameters for initialization.
+  repeated string params = 1;
+}
+
+// Response message
+message VBASEInitializeResponse {
+  // Indicates whether the transition was successful
+  bool success = 1;
+  // A message providing additional information about the transition
+  string message = 2;
+}

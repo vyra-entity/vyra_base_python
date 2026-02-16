@@ -12,7 +12,7 @@ This node acts as "Module A" that authenticates with Module B.
 Author: VYRA Framework Team
 License: Proprietary
 """
-
+import logging
 import rclpy
 import uuid
 
@@ -28,7 +28,8 @@ from vyra_base.security.security_client import (
     create_security_context
 )
 from vyra_base.security.security_levels import SecurityLevel
-from vyra_base.helper.logger import Logger
+
+logger = logging.getLogger(__name__)
 
 
 class SecureClientNode(Node):
@@ -58,7 +59,7 @@ class SecureClientNode(Node):
             'secure_server_example/request_access'
         )
         
-        Logger.info(f"SecureClientNode initialized (ID: {self.module_id})")
+        logger.info(f"SecureClientNode initialized (ID: {self.module_id})")
         
         # Authenticate with server
         self.authenticate_with_server()
@@ -67,11 +68,11 @@ class SecureClientNode(Node):
         """
         Authenticate with the secure server using RequestAccess.
         """
-        Logger.info("Requesting access from secure server...")
+        logger.info("Requesting access from secure server...")
         
         # Wait for service
         if not self.access_client.wait_for_service(timeout_sec=10.0):
-            Logger.error("RequestAccess service not available!")
+            logger.error("RequestAccess service not available!")
             return False
         
         # Create request
@@ -92,18 +93,18 @@ class SecureClientNode(Node):
             rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
             
             if not future.done():
-                Logger.error("Access request timed out!")
+                logger.error("Access request timed out!")
                 return False
             
             response = future.result()
             
             if response is None:
-                Logger.error("No response from access service!")
+                logger.error("No response from access service!")
                 return False
 
             if response.success:
-                Logger.info(f"✅ Access granted with SL{response.granted_sl}")
-                Logger.info(f"Session token: {response.session_token[:16]}...")
+                logger.info(f"✅ Access granted with SL{response.granted_sl}")
+                logger.info(f"Session token: {response.session_token[:16]}...")
                 
                 # Create security context
                 self.security_context = create_security_context(
@@ -119,11 +120,11 @@ class SecureClientNode(Node):
                 
                 return True
             else:
-                Logger.error(f"❌ Access denied: {response.message}")
+                logger.error(f"❌ Access denied: {response.message}")
                 return False
                 
         except Exception as e:
-            Logger.error(f"Error during authentication: {e}")
+            logger.error(f"Error during authentication: {e}")
             return False
 
     def setup_secure_communication(self):
@@ -146,7 +147,7 @@ class SecureClientNode(Node):
         #     self.publish_secure_message
         # )
         
-        Logger.info("Secure communication channels established")
+        logger.info("Secure communication channels established")
 
     def publish_secure_message(self):
         """
@@ -156,7 +157,6 @@ class SecureClientNode(Node):
         # msg = SecureMessage()
         # msg.data = f"Secure message at {time.time()}"
         # self.secure_pub.publish(msg)
-        # Logger.debug("Published secure message")
         pass
 
 
@@ -168,7 +168,7 @@ def main(args=None):
         node = SecureClientNode()
         
         if node.security_context:
-            Logger.info("Secure Client Node is running with authentication")
+            logger.info("Secure Client Node is running with authentication")
             
             executor = SingleThreadedExecutor()
             executor.add_node(node)
@@ -176,16 +176,16 @@ def main(args=None):
             try:
                 executor.spin()
             except KeyboardInterrupt:
-                Logger.info("Shutting down...")
+                logger.info("Shutting down...")
             finally:
                 executor.shutdown()
                 node.destroy_node()
         else:
-            Logger.error("Failed to authenticate, shutting down")
+            logger.error("Failed to authenticate, shutting down")
             node.destroy_node()
             
     except Exception as e:
-        Logger.error(f"Error in main: {e}")
+        logger.error(f"Error in main: {e}")
         raise
     finally:
         rclpy.shutdown()

@@ -81,13 +81,13 @@ class FunctionConfigBaseTypes(Enum):
 
     Represents the types of a function configuration.
 
-    :cvar speaker: Represents a speaker function (simple publisher)
-    :cvar callable: Represents a callable function (request-reply pattern)
-    :cvar job: Represents a job function (request-feedback-reply pattern)
+    :cvar publisher: Represents a publisher function (simple publisher)
+    :cvar service: Represents a service function (request-reply pattern)
+    :cvar action: Represents an action function (request-feedback-reply pattern)
     """
-    speaker = 'speaker'
-    callable = 'callable'
-    job = 'job'
+    publisher = 'publisher'
+    service = 'service'
+    action = 'action'
 
 
 @dataclass(slots=True)
@@ -137,9 +137,9 @@ class FunctionConfigDisplaystyle(DCBase):
 
 
 @dataclass(slots=True)
-class FunctionConfigPeriodicSpeaker(DCBase):
+class FunctionConfigPeriodicPublisher(DCBase):
     """
-    Stores the periodic speaker settings.
+    Stores the periodic publisher settings.
 
     :param caller: The function to be called periodically
     :type caller: Callable
@@ -215,7 +215,7 @@ class FunctionConfigEntry(DCBase):
     returns: list[FunctionConfigBaseReturn] = field(default_factory=list)
     qosprofile: Union[int, QoSProfile] = 10
     callback: Union[Callable, None] = None
-    periodic: Union[FunctionConfigPeriodicSpeaker, None] = None
+    periodic: Union[FunctionConfigPeriodicPublisher, None] = None
 
     def asdict(self):
         """

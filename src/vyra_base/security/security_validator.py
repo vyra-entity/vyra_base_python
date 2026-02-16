@@ -37,7 +37,7 @@ from vyra_base.helper.crypto_helper import (
     verify_message_rsa,
     create_hmac_payload,
 )
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 
 class SecurityValidator:
@@ -77,7 +77,7 @@ class SecurityValidator:
         """
         self.security_manager = security_manager
         self.strict_mode = strict_mode
-        Logger.debug(f"SecurityValidator initialized (strict_mode={strict_mode})")
+        logger.debug(f"SecurityValidator initialized (strict_mode={strict_mode})")
 
     def validate_metadata(
         self,
@@ -118,7 +118,7 @@ class SecurityValidator:
         
         # Level 1: No validation needed
         if security_level == SecurityLevel.NONE:
-            Logger.debug("Security level NONE: skipping validation")
+            logger.debug("Security level NONE: skipping validation")
             return None
         
         # Level 2+: Validate module ID
@@ -126,7 +126,7 @@ class SecurityValidator:
         if not sender_id:
             raise SignatureValidationError("Sender ID is required")
         
-        Logger.debug(f"Validating metadata from {sender_id} at level {security_level.name}")
+        logger.debug(f"Validating metadata from {sender_id} at level {security_level.name}")
         
         # Get session (if SecurityManager is available)
         session = None
@@ -169,7 +169,7 @@ class SecurityValidator:
                 f"Timestamp drift too large: {time_diff}s (max: {MAX_TIMESTAMP_DRIFT_SECONDS}s)"
             )
         
-        Logger.debug(f"Timestamp validation passed (drift: {time_diff}s)")
+        logger.debug(f"Timestamp validation passed (drift: {time_diff}s)")
 
     def _validate_nonce(self, metadata: Any, session: Optional[SecuritySession]) -> None:
         """
@@ -181,7 +181,7 @@ class SecurityValidator:
         """
         if not session:
             # Can't validate nonce without session
-            Logger.debug("Nonce validation skipped (no session)")
+            logger.debug("Nonce validation skipped (no session)")
             return
         
         nonce = metadata.nonce
@@ -191,7 +191,7 @@ class SecurityValidator:
         
         # Add nonce to session
         session.add_nonce(nonce)
-        Logger.debug(f"Nonce {nonce} validated and recorded")
+        logger.debug(f"Nonce {nonce} validated and recorded")
 
     def _validate_hmac(
         self,
@@ -232,7 +232,7 @@ class SecurityValidator:
             if signature != expected_signature:
                 raise SignatureValidationError("HMAC signature mismatch")
             
-            Logger.debug("HMAC signature validated successfully")
+            logger.debug("HMAC signature validated successfully")
             
             # Validate nonce
             self._validate_nonce(metadata, session)
@@ -272,7 +272,7 @@ class SecurityValidator:
             if not verify_message_rsa(message, signature, session.certificate):
                 raise SignatureValidationError("Digital signature verification failed")
             
-            Logger.debug("Digital signature validated successfully")
+            logger.debug("Digital signature validated successfully")
             
             # Validate nonce
             self._validate_nonce(metadata, session)
@@ -332,7 +332,7 @@ class MessageSecurityFilter:
         def wrapped_callback(msg: Any) -> None:
             if not hasattr(msg, 'safety_metadata'):
                 if self.required_level > SecurityLevel.NONE:
-                    Logger.warn(f"Message missing SafetyMetadata (required level: {self.required_level.name})")
+                    logger.warn(f"Message missing SafetyMetadata (required level: {self.required_level.name})")
                     return
                 else:
                     # No security required
@@ -343,7 +343,7 @@ class MessageSecurityFilter:
                 self.validator.validate_metadata(msg.safety_metadata, self.required_level)
                 callback(msg)
             except Exception as e:
-                Logger.warn(f"Message validation failed: {e}")
+                logger.warn(f"Message validation failed: {e}")
                 # Message is dropped
         
         return wrapped_callback

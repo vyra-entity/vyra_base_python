@@ -1,17 +1,14 @@
 [
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "get_interface_list",
         "displayname": "Get Interface List",
         "description": "Retrieve the list of interfaces of the vyra system.",
         "filetype": [
-            "VBASEGetInterfaceList.srv",
-            "GetInterfaceList.proto"
+            "VBASEGetInterfaceList.proto"
         ],
         "params": [],
         "returns": [
@@ -30,17 +27,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "set_parameter",
         "displayname": "Set Parameter",
         "description": "Set a parameter in the vyra system.",
         "filetype": [
-            "VBASESetParam.srv",
-            "SetParam.proto"
+            "VBASESetParam.proto"
         ],
         "params": [
             {
@@ -78,17 +72,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "get_parameter",
         "displayname": "Get Parameter",
         "description": "Get a parameter in the vyra system.",
         "filetype": [
-            "VBASEGetParam.srv",
-            "GetParam.proto"
+            "VBASEGetParam.proto"
         ],
         "params": [
             {
@@ -126,17 +117,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "param_changed_topic",
         "displayname": "Get Update Parameter Event Topic",
         "description": "Get the topic for update parameter events.",
         "filetype": [
-            "VBASEGetUpdateParamEventTopic.srv",
-            "GetUpdateParamEventTopic.proto"
+            "VBASEGetUpdateParamEventTopic.proto"
         ],
         "params": [],
         "returns": [
@@ -155,15 +143,14 @@
     },
     {
         "tags": [
-            "ros2",
             "zenoh"
         ],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "updateParamEvent",
         "displayname": "Update Parameter Event",
         "description": "Communicate parameter updates in the system between different components or modules.",
         "filetype": [
-            "VBASEUpdateParamEvent.msg"
+            "VBASEUpdateParamEvent.proto"
         ],
         "returns": [
             {

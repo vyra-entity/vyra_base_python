@@ -12,7 +12,7 @@ This node acts as "Module B" that other modules authenticate with.
 Author: VYRA Framework Team
 License: Proprietary
 """
-
+import logging
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
@@ -22,7 +22,8 @@ from vyra_base.interfaces.srv import VBASERequestAccess
 from vyra_base.security.security_manager import SecurityManager
 from vyra_base.security.security_validator import SecurityValidator, create_secure_subscription
 from vyra_base.security.security_levels import SecurityLevel
-from vyra_base.helper.logger import Logger
+
+logger = logging.getLogger(__name__)
 
 
 class SecureServerNode(Node, SecurityManager):
@@ -83,7 +84,7 @@ class SecureServerNode(Node, SecurityManager):
             self.cleanup_expired_sessions_callback
         )
         
-        Logger.info("SecureServerNode initialized with HMAC security (Level 4)")
+        logger.info("SecureServerNode initialized with HMAC security (Level 4)")
 
     def handle_request_access_callback(self, request, response):
         """
@@ -91,7 +92,7 @@ class SecureServerNode(Node, SecurityManager):
         
         This is the main authentication entry point for clients.
         """
-        Logger.info(
+        logger.info(
             f"Access request from {request.module_name} "
             f"({request.module_id.uuid}) for SL{request.requested_sl}"
         )
@@ -130,12 +131,12 @@ class SecureServerNode(Node, SecurityManager):
             response.granted_sl = granted_sl
             
             if success:
-                Logger.info(f"✅ Access granted to {request.module_name} with SL{granted_sl}")
+                logger.info(f"✅ Access granted to {request.module_name} with SL{granted_sl}")
             else:
-                Logger.warn(f"❌ Access denied to {request.module_name}: {message}")
+                logger.warn(f"❌ Access denied to {request.module_name}: {message}")
             
         except Exception as e:
-            Logger.error(f"Error handling access request: {e}")
+            logger.error(f"Error handling access request: {e}")
             response.success = False
             response.message = f"Internal error: {str(e)}"
             response.granted_sl = 0
@@ -149,7 +150,7 @@ class SecureServerNode(Node, SecurityManager):
         Messages are automatically validated by the SecurityValidator
         before reaching this callback.
         """
-        Logger.info(f"Received secure message: {msg.data}")
+        logger.info(f"Received secure message: {msg.data}")
         # Process message knowing it passed security validation
 
     def cleanup_expired_sessions_callback(self):
@@ -162,7 +163,7 @@ class SecureServerNode(Node, SecurityManager):
         
         active_count = self.get_session_count()
         if active_count > 0:
-            Logger.debug(f"Active sessions: {active_count}")
+            logger.debug(f"Active sessions: {active_count}")
 
 
 def main(args=None):
@@ -172,8 +173,8 @@ def main(args=None):
     try:
         node = SecureServerNode()
         
-        Logger.info("Secure Server Node is running...")
-        Logger.info("Waiting for access requests on 'secure_server_example/request_access'")
+        logger.info("Secure Server Node is running...")
+        logger.info("Waiting for access requests on 'secure_server_example/request_access'")
         
         executor = MultiThreadedExecutor()
         executor.add_node(node)
@@ -181,13 +182,13 @@ def main(args=None):
         try:
             executor.spin()
         except KeyboardInterrupt:
-            Logger.info("Shutting down...")
+            logger.info("Shutting down...")
         finally:
             executor.shutdown()
             node.destroy_node()
             
     except Exception as e:
-        Logger.error(f"Error in main: {e}")
+        logger.error(f"Error in main: {e}")
         raise
     finally:
         rclpy.shutdown()

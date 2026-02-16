@@ -30,7 +30,7 @@ Usage:
         speaker = await provider.create_speaker("/topic")
 """
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 # Check Eclipse Zenoh library availability
 try:
@@ -38,7 +38,7 @@ try:
     _zenoh_available = True
 except ImportError:
     _zenoh_available = False
-    Logger.debug("⚠️  Eclipse Zenoh library not available")
+    logger.debug("⚠️  Eclipse Zenoh library not available")
 
 # Try importing session layer (Zenoh-specific)
 try:
@@ -52,22 +52,22 @@ except ImportError as e:
     ZenohSession = None
     SessionConfig = None
     _session_available = False
-    Logger.debug(f"⚠️  Zenoh session layer not available: {e}")
+    logger.debug(f"⚠️  Zenoh session layer not available: {e}")
 
 # Try importing vyra models
 try:
     from vyra_base.com.transport.t_zenoh.vyra_models import (
-        ZenohCallable,
-        ZenohSpeaker,
-        ZenohJob,
+        VyraPublisherImpl,
+        VyraSubscriberImpl,
+        VyraServerImpl,
+        VyraClientImpl,
+        VyraActionServerImpl,
+        VyraActionClientImpl
     )
     _models_available = True
 except ImportError as e:
-    ZenohCallable = None
-    ZenohSpeaker = None
-    ZenohJob = None
     _models_available = False
-    Logger.debug(f"⚠️  Zenoh models not available: {e}")
+    logger.debug(f"⚠️  Zenoh models not available: {e}")
 
 # Try importing provider
 try:
@@ -76,7 +76,7 @@ try:
 except ImportError as e:
     ZenohProvider = None
     _provider_available = False
-    Logger.debug(f"⚠️  Zenoh provider not available: {e}")
+    logger.debug(f"⚠️  Zenoh provider not available: {e}")
 
 # Overall availability flag
 ZENOH_AVAILABLE = all([
@@ -91,8 +91,11 @@ __all__ = [
     "ZenohSession",
     "SessionConfig",
     "SessionMode",
-    "ZenohCallable",
-    "ZenohSpeaker",
-    "ZenohJob",
+    "VyraPublisherImpl",
+    "VyraSubscriberImpl",
+    "VyraServerImpl",
+    "VyraClientImpl",
+    "VyraActionServerImpl",
+    "VyraActionClientImpl",
     "ZenohProvider",
 ]

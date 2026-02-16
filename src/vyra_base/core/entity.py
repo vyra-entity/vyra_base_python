@@ -1,18 +1,17 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import importlib.util
-from asyncio import AbstractEventLoop
-from dataclasses import asdict
+import json
+import logging
+
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Union, TYPE_CHECKING
 
 # NEW: Import from new multi-protocol architecture
-from vyra_base.com import InterfaceFactory, remote_callable, ProtocolType
+from vyra_base.com import InterfaceFactory, remote_service, ProtocolType
 from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
-from vyra_base.com.core.types import VyraCallable
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
@@ -36,7 +35,6 @@ from vyra_base.defaults.entries import (
     NewsEntry,
     StateEntry,
 )
-from vyra_base.helper.logger import Logger
 from vyra_base.state import (
     UnifiedStateMachine,
     StateMachineConfig,
@@ -54,8 +52,9 @@ from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.security import SecurityManager, SecurityLevel
+from vyra_base.helper.logging_config import VyraLoggingConfig
 
-
+logger = logging.getLogger(__name__)
 
 
 class VyraEntity:
@@ -126,7 +125,7 @@ class VyraEntity:
         self._ros2_available = _ROS2_AVAILABLE
         
         if not self._ros2_available:
-            Logger.warn(
+            logger.warning(
                 "⚠️ ROS2 not available. "
                 "Entity will run in slim mode with SharedMemory/UDS/Redis communication. "
                 "Install ROS2 and source setup.bash to enable ROS2 features."
@@ -151,10 +150,10 @@ class VyraEntity:
                 name=f"{self.module_entry.name}_{self.module_entry.uuid}"
             )
             self._node = VyraNode(node_settings)
-            Logger.info(f"✅ ROS2 node created: {self._node.get_name()}")
+            logger.info(f"✅ ROS2 node created: {self._node.get_name()}")
         else:
             self._node = None
-            Logger.info("🔵 No ROS2 node created (slim mode)")
+            logger.info("🔵 No ROS2 node created (slim mode)")
 
         self.registered_protocols = register_protocols or [
             ProtocolType.ROS2,
@@ -172,7 +171,7 @@ class VyraEntity:
 
         self._init_security_manager(module_config)
 
-        VyraEntity.register_callables_callbacks(self)
+        VyraEntity.register_service_callbacks(self)
 
         self.news_feeder.feed("...V.Y.R.A. entity initialized")
 
@@ -225,7 +224,7 @@ class VyraEntity:
                 "use_simulation_time": self.module_config.get("use_simulation_time", False)
             })
             providers.append(ros2_provider)
-            Logger.info("✅ Registered ROS2 protocol provider")
+            logger.info("✅ Registered ROS2 protocol provider")
         
         if ProtocolType.ZENOH in register_types:
             try:
@@ -241,11 +240,11 @@ class VyraEntity:
                     })
                     await zenoh_provider.initialize(zenoh_config)
                     providers.append(zenoh_provider)
-                    Logger.info("✅ Registered Zenoh protocol provider")
+                    logger.info("✅ Registered Zenoh protocol provider")
                 else:
-                    Logger.warning("⚠️ Zenoh not available, skipping provider registration")
+                    logger.warning("⚠️ Zenoh not available, skipping provider registration")
             except Exception as e:
-                Logger.warning(f"⚠️ Failed to register Zenoh provider: {e}")
+                logger.warning(f"⚠️ Failed to register Zenoh provider: {e}")
         
         if ProtocolType.REDIS in register_types:
             from vyra_base.com.transport.t_redis.provider import RedisProvider
@@ -256,7 +255,7 @@ class VyraEntity:
             )
             
             providers.append(redis_provider)
-            Logger.info("✅ Registered Redis protocol provider")
+            logger.info("✅ Registered Redis protocol provider")
 
         if ProtocolType.UDS in register_types:
             from vyra_base.com.transport.t_uds.provider import UDSProvider
@@ -267,7 +266,7 @@ class VyraEntity:
             )
             
             providers.append(uds_provider)
-            Logger.info("✅ Registered UDS protocol provider")
+            logger.info("✅ Registered UDS protocol provider")
         
         # Register all available providers
         InterfaceFactory.register_provider(providers)
@@ -280,7 +279,7 @@ class VyraEntity:
         """
         for protocol in self.registered_protocols:
             InterfaceFactory.unregister_provider(protocol)
-            Logger.info(f"✅ Unregistered {protocol.value} protocol provider")
+            logger.info(f"✅ Unregistered {protocol.value} protocol provider")
     
     def set_interface_paths(self, interface_paths: list[str | Path]) -> None:
         """
@@ -295,7 +294,7 @@ class VyraEntity:
             interface_paths: List of base interface directory paths.
                 Each path should point to a directory containing:
                 - /config/*.json - Interface metadata
-                - /callable/*.srv - ROS2 service definitions
+                - /service/*.srv - ROS2 service definitions
                 - /speaker/*.msg - ROS2 message definitions
                 - /job/*.action - ROS2 action definitions
                 - /proto/*.proto - Protocol Buffer definitions
@@ -322,10 +321,10 @@ class VyraEntity:
         for path in interface_paths:
             path_obj = Path(path).resolve()
             if not path_obj.exists():
-                Logger.warning(f"⚠️ Interface path does not exist: {path_obj}")
+                logger.warning(f"⚠️ Interface path does not exist: {path_obj}")
                 continue
             if not path_obj.is_dir():
-                Logger.warning(f"⚠️ Interface path is not a directory: {path_obj}")
+                logger.warning(f"⚠️ Interface path is not a directory: {path_obj}")
                 continue
             validated_paths.append(path_obj)
         
@@ -338,11 +337,11 @@ class VyraEntity:
         registry = InterfacePathRegistry.get_instance()
         registry.set_interface_paths([str(p) for p in validated_paths])
         
-        Logger.info(
+        logger.info(
             f"✅ Interface paths configured: {len(validated_paths)} path(s)"
         )
         for idx, path in enumerate(validated_paths, 1):
-            Logger.info(f"  [{idx}] {path}")
+            logger.info(f"  [{idx}] {path}")
         
         # Optionally update environment for ROS2 discovery
         from vyra_base.helper.ros2_env_helper import ensure_workspace_discoverable
@@ -356,7 +355,7 @@ class VyraEntity:
                     if install_dir.name == "install":
                         count = ensure_workspace_discoverable(install_dir)
                         if count > 0:
-                            Logger.debug(
+                            logger.debug(
                                 f"✓ Made {count} package(s) discoverable from: {install_dir}"
                             )
 
@@ -364,12 +363,26 @@ class VyraEntity:
         """
         Initialize the logger for the entity.
         
-        This method sets up the logger configuration based on the provided log configuration path.
-        It should be called during the initialization of the entity.
+        This method sets up the logger configuration based on the provided log configuration.
+        Uses the centralized VyraLoggingConfig for professional logging setup.
+        
+        Args:
+            log_config: Optional custom logging configuration dict.
+                       Can include: log_level, log_directory, enable_console, enable_file
         """
-        log_config_path = Path(__file__).resolve().parent.parent
-        log_config_path: Path = log_config_path / "helper" / "logger_config.json"
-        Logger.initialize(log_config_path=log_config_path, log_config=log_config)
+        # Extract logging parameters from config
+        log_level = log_config.get("log_level") if log_config else None
+        log_directory = log_config.get("log_directory") if log_config else None
+        enable_console = log_config.get("enable_console", True) if log_config else True
+        enable_file = log_config.get("enable_file", True) if log_config else True
+        
+        # Initialize centralized logging configuration
+        VyraLoggingConfig.initialize(
+            log_level=log_level,
+            log_directory=Path(log_directory) if log_directory else None,
+            enable_console=enable_console,
+            enable_file=enable_file,
+        )
 
     def __init_feeder(
             self, 
@@ -438,7 +451,7 @@ class VyraEntity:
         :param default_config: Configuration for the database containing default parameters.
         :type default_config: Any
         """
-        Logger.debug("Initializing parameters for the entity.")
+        logger.debug("Initializing parameters for the entity.")
         
         self.default_database_access = DbAccess(
             module_name=self.module_entry.name,
@@ -453,7 +466,7 @@ class VyraEntity:
             storage_access_transient=self.redis_access
         )
 
-        VyraEntity.register_callables_callbacks(self.param_manager)
+        VyraEntity.register_service_callbacks(self.param_manager)
 
         await self.param_manager.load_defaults()
 
@@ -468,7 +481,7 @@ class VyraEntity:
         :param transient_base_types: Dictionary containing base types for volatile parameters.
         :type transient_base_types: dict[str, Any]
         """
-        Logger.debug("Initializing volatile parameters for the entity.")
+        logger.debug("Initializing volatile parameters for the entity.")
         
         self.volatile = Volatile(
             storage_access_transient=self.redis_access,
@@ -477,7 +490,7 @@ class VyraEntity:
             transient_base_types=transient_base_types
         )
 
-        VyraEntity.register_callables_callbacks(self.volatile)
+        VyraEntity.register_service_callbacks(self.volatile)
 
     def _init_state_machine(self, state_entry: StateEntry) -> UnifiedStateMachine:
         """
@@ -496,7 +509,7 @@ class VyraEntity:
         :return: Initialized unified state machine.
         :rtype: UnifiedStateMachine
         """
-        Logger.info(f"Initializing 3-layer state machine for entity '{self.module_entry.name}'")
+        logger.info(f"Initializing 3-layer state machine for entity '{self.module_entry.name}'")
         
         # Create configuration for state machine
         config = StateMachineConfig(
@@ -521,7 +534,7 @@ class VyraEntity:
         # Register state change callbacks for integration with feeders
         self._register_state_callbacks(state_machine)
         
-        Logger.info(
+        logger.info(
             f"State machine initialized: "
             f"lifecycle={state_machine.get_lifecycle_state().value}, "
             f"operational={state_machine.get_operational_state().value}, "
@@ -542,7 +555,7 @@ class VyraEntity:
         """
         def on_lifecycle_change(layer: str, old_state: str, new_state: str):
             """Callback for lifecycle state changes."""
-            Logger.info(f"Lifecycle transition: {old_state} → {new_state}")
+            logger.info(f"Lifecycle transition: {old_state} → {new_state}")
             
             # Feed state change to ROS2
             state_data = StateEntry(
@@ -566,7 +579,7 @@ class VyraEntity:
         
         def on_operational_change(layer: str, old_state: str, new_state: str):
             """Callback for operational state changes."""
-            Logger.debug(f"Operational transition: {old_state} → {new_state}")
+            logger.debug(f"Operational transition: {old_state} → {new_state}")
             
             # Feed state change to ROS2
             state_data = StateEntry(
@@ -582,7 +595,7 @@ class VyraEntity:
         
         def on_health_change(layer: str, old_state: str, new_state: str):
             """Callback for health state changes."""
-            Logger.info(f"Health transition: {old_state} → {new_state}")
+            logger.info(f"Health transition: {old_state} → {new_state}")
             
             # Feed state change to ROS2
             state_data = StateEntry(
@@ -625,7 +638,7 @@ class VyraEntity:
         state_machine.on_operational_change(on_operational_change, priority=5)
         state_machine.on_health_change(on_health_change, priority=8)
         
-        Logger.debug("State machine callbacks registered")
+        logger.debug("State machine callbacks registered")
     
     async def startup_entity(self) -> bool:
         """
@@ -641,7 +654,7 @@ class VyraEntity:
         :rtype: bool
         """
         try:
-            Logger.info(f"Starting entity '{self.module_entry.name}' startup sequence")
+            logger.info(f"Starting entity '{self.module_entry.name}' startup sequence")
             
             # Step 1: Begin initialization
             self.state_machine.start(metadata={
@@ -672,13 +685,13 @@ class VyraEntity:
                 "ready_for_tasks": True
             })
             
-            Logger.info(f"Entity '{self.module_entry.name}' startup completed successfully")
+            logger.info(f"Entity '{self.module_entry.name}' startup completed successfully")
             self.news_feeder.feed(f"Entity '{self.module_entry.name}' is ready for operation")
             
             return True
             
         except Exception as e:
-            Logger.error(f"Entity startup failed: {e}")
+            logger.error(f"Entity startup failed: {e}")
             
             # Mark initialization as failed
             try:
@@ -711,7 +724,7 @@ class VyraEntity:
         :rtype: bool
         """
         try:
-            Logger.info(f"Starting entity '{self.module_entry.name}' shutdown sequence")
+            logger.info(f"Starting entity '{self.module_entry.name}' shutdown sequence")
             
             # Step 1: Begin shutdown
             self.state_machine.shutdown(reason="graceful_shutdown")
@@ -723,13 +736,13 @@ class VyraEntity:
             # Step 3: Complete shutdown
             self.state_machine.complete_shutdown()
             
-            Logger.info(f"Entity '{self.module_entry.name}' shutdown completed")
+            logger.info(f"Entity '{self.module_entry.name}' shutdown completed")
             self.news_feeder.feed(f"Entity '{self.module_entry.name}' has been shut down")
             
             return True
             
         except Exception as e:
-            Logger.error(f"Entity shutdown failed: {e}")
+            logger.error(f"Entity shutdown failed: {e}")
             error_entry = ErrorEntry(
                 _type=self._error_entry_type,
                 level=ErrorEntry.ERROR_LEVEL.MAJOR_FAULT,
@@ -775,7 +788,7 @@ class VyraEntity:
         ca_cert_path = security_config.get('ca_cert_path')
         module_passwords = security_config.get('module_passwords', {})
         
-        Logger.info(
+        logger.info(
             f"Initializing SecurityManager with max level: "
             f"{SecurityLevel.get_name(max_level)}"
         )
@@ -788,7 +801,7 @@ class VyraEntity:
             module_passwords=module_passwords
         )
 
-        VyraEntity.register_callables_callbacks(self.security_manager)
+        VyraEntity.register_service_callbacks(self.security_manager)
 
     async def setup_storage(
             self, config: dict[str, Any], 
@@ -810,7 +823,7 @@ class VyraEntity:
         :returns: None
         """
         if not isinstance(config, dict) or config == {}:
-            Logger.warn("No storage configuration provided. Skipping storage setup.")
+            logger.warning("No storage configuration provided. Skipping storage setup.")
             return
 
         persistent_config: dict[str, Any] = {}
@@ -818,14 +831,14 @@ class VyraEntity:
 
         for config_key in config.keys():
             if config_key in (item.value for item in DBTYPE):
-                Logger.debug(f"Configuring {config_key} for persistent storage.")
+                logger.debug(f"Configuring {config_key} for persistent storage.")
                 persistent_config[config_key] = config[config_key]
             elif config_key == "redis":
-                Logger.debug(f"Configuring {config_key} for transient storage.")
+                logger.debug(f"Configuring {config_key} for transient storage.")
                 transient_config[config_key] = config[config_key]
 
         if not persistent_config or not transient_config:
-            Logger.warn(
+            logger.warning(
                 "Incomplete storage configuration provided. "
                 "Skipping storage setup.")
             raise ValueError(
@@ -838,7 +851,7 @@ class VyraEntity:
         )
 
         if 'default_database' not in persistent_config[self.database_access.db_type]:
-            Logger.warn(
+            logger.warning(
                 "No default database configuration provided. "
                 "Skipping parameter initialization.")
             return
@@ -850,7 +863,7 @@ class VyraEntity:
 
         self._init_volatiles(transient_base_types=transient_base_types)
 
-        Logger.log("Storage access initialized.")
+        logger.info("Storage access initialized.")
 
     async def set_interfaces(
             self, 
@@ -861,7 +874,7 @@ class VyraEntity:
         Interfaces are used to communicate with other modules or external systems.
         Interface types can be:
 
-        - ``!vyra-callable``: Callable function that can be invoked remotely.
+        - ``!vyra-service``: service function that can be invoked remotely.
         - ``!vyra-job``: Job that can be executed in the background.
         - ``!vyra-speaker``: Speaker that can publish messages periodically.
         
@@ -882,7 +895,7 @@ class VyraEntity:
 
         for setting in settings:
             if setting.functionname in [i.functionname for i in self._interface_list]:
-                Logger.warn(
+                logger.warning(
                     f"Interface {setting.functionname} already "
                     "exists. Skipping creation.")
                 continue
@@ -892,29 +905,29 @@ class VyraEntity:
             # Use ROS2 if available, otherwise skip ROS2-specific creation
             # (InterfaceFactory will handle protocol selection in future versions)
             if not self._ros2_available:
-                Logger.debug(
+                logger.debug(
                     f"⚠️ ROS2 not available, skipping ROS2 interface creation for {setting.functionname}. "
                     "Use InterfaceFactory for multi-protocol support."
                 )
                 continue
 
-            if setting.type == FunctionConfigBaseTypes.callable.value:
-                Logger.info(f"Creating callable: {setting.functionname}")
-                await InterfaceFactory.create_callable(
+            if setting.type == FunctionConfigBaseTypes.service.value:
+                logger.info(f"Creating callable: {setting.functionname}")
+                await InterfaceFactory.create_server(
                     name=setting.functionname,
-                    callback=setting.callback,
+                    response_callback=setting.callback,
                     protocols=[ProtocolType.ROS2],
                     service_type=setting.interfacetypes,
                     node=self._node
                 )
-            elif setting.type == FunctionConfigBaseTypes.job.value:
-                Logger.info(f"Creating job: {setting.functionname}")
+            elif setting.type == FunctionConfigBaseTypes.action.value:
+                logger.info(f"Creating job: {setting.functionname}")
                 # TBD: vyra job implementation
                 # create_vyra_job(...)
-                Logger.warn(f"Vyra Jobs are not implemented yet.")
+                logger.warning(f"Vyra Jobs are not implemented yet.")
 
-            elif setting.type == FunctionConfigBaseTypes.speaker.value:
-                Logger.info(f"Creating speaker: {setting.functionname}")
+            elif setting.type == FunctionConfigBaseTypes.publisher.value:
+                logger.info(f"Creating publisher: {setting.functionname}")
                 
                 # Extract periodic parameters
                 periodic: bool = False
@@ -926,8 +939,8 @@ class VyraEntity:
                     periodic_caller = setting.periodic.caller if periodic else None
                     periodic_interval = setting.periodic.interval if periodic else None
                 
-                # Speaker creation through InterfaceFactory
-                await InterfaceFactory.create_speaker(
+                # Publisher creation through InterfaceFactory
+                await InterfaceFactory.create_publisher(
                     name=setting.functionname,
                     protocols=[ProtocolType.ROS2],
                     message_type=setting.interfacetypes,
@@ -942,9 +955,9 @@ class VyraEntity:
             else:
                 fail_msg = (
                     f"Unsupported interface type: {setting.type}. "
-                    "Supported types are callable, job, speaker."
+                    "Supported types are publisher, service, action."
                 )
-                Logger.error(fail_msg)
+                logger.error(fail_msg)
                 raise ValueError(fail_msg) 
 
     def register_storage(self, storage: Storage) -> None:
@@ -959,7 +972,7 @@ class VyraEntity:
             raise TypeError("storage must be an instance of Storage.")
         
         self._storage_list.append(storage)
-        Logger.info(f"Storage {storage} registered successfully.")
+        logger.info(f"Storage {storage} registered successfully.")
 
     @classmethod
     def _check_node_availability(cls, node_name: str) -> bool:
@@ -972,16 +985,16 @@ class VyraEntity:
         :rtype: bool
         """
         if CheckerNode is None:
-            Logger.warning("CheckerNode not available. Check if ROS2 is available")
+            logger.warning("CheckerNode not available. Check if ROS2 is available")
             return False
         
         checker_node = CheckerNode()
         return checker_node.is_node_available(node_name)
     
-    @remote_callable()
+    @remote_service()
     async def get_interface_list(self, request: Any, response: Any) -> Any:
         """
-        Retrieves all capabilities (speaker, callable, job) of the entity that are set to
+        Retrieves all capabilities (publisher, service, action) of the entity that are set to
         visible for external access (ROS2 service interface).
         
         This is the external ROS2 service endpoint. For internal calls,
@@ -1026,7 +1039,7 @@ class VyraEntity:
     
     async def get_interface_list_impl(self) -> Optional[dict]:
         """
-        Retrieves all capabilities (speaker, callable, job) of the entity that are set to
+        Retrieves all capabilities (publisher, service, action) of the entity that are set to
         visible for external access (internal implementation).
         
         This method filters the registered interfaces for those marked as visible
@@ -1042,8 +1055,8 @@ class VyraEntity:
         
             {
                 "interface_list": [
-                    '{"functionname": "...", "type": "callable", ...}',
-                    '{"functionname": "...", "type": "speaker", ...}',
+                    '{"functionname": "...", "type": "service", ...}',
+                    '{"functionname": "...", "type": "publisher", ...}',
                     ...
                 ]
             }
@@ -1057,9 +1070,9 @@ class VyraEntity:
                 for interface_json in result["interface_list"]:
                     interface = json.loads(interface_json)
                     
-                    if interface["type"] == "callable":
+                    if interface["type"] == "service":
                         print(f"Service: {interface['functionname']}")
-                    elif interface["type"] == "speaker":
+                    elif interface["type"] == "publisher":
                         print(f"Topic: {interface['functionname']}")
         """
         response: dict = {}
@@ -1073,61 +1086,61 @@ class VyraEntity:
         return response
 
     @staticmethod
-    def register_callables_callbacks(callback_parent: object):
+    def register_service_callbacks(callback_parent: object):
         """
-        Registers all remote callables defined in the callback_parent. 
+        Registers all remote services defined in the callback_parent. 
         
-        Remote callables must be decorated with ``@vyra_base.com.datalayer.callable.remote_callable``.
+        Remote services must be decorated with ``@remote_service``.
 
         Example::
 
-            from vyra_base.com import remote_callable
+            from vyra_base.com import remote_service
 
             class MyParentClass:
-                @remote_callable
+                @remote_service
                 async def my_remote_function(self, request: Any, response: Any):
                     pass
 
             instance_my_parent = MyParentClass()
 
-        To register the remote callable in this example, the instance_my_parent
+        To register the remote service in this example, the instance_my_parent
         object must be passed to this function:
         
-        - ``register_callables_callbacks(instance_my_parent)``
+        - ``register_services_callbacks(instance_my_parent)``
 
         Inside your MyParentClass in a method you can call the same function and
-        set the callback_parent to self to register the callables of the
+        set the callback_parent to self to register the services of the
         instance itself:
         
-        - ``register_callables_callbacks(self)``
+        - ``register_services_callbacks(self)``
 
         This function will iterate over all attributes of the instance and
-        register those marked as remote callable with the DataSpace.
+        register those marked as remote service with the DataSpace.
 
         .. warning::
            This function will only register the callbacks. Run 
            ``entity.set_interfaces(your_config)`` afterwards to load the interfaces 
            in vyra.
 
-        :param callback_parent: The class or instance containing the remote callables.
+        :param callback_parent: The class or instance containing the remote services.
         :type callback_parent: Type[object]
         :raises TypeError: If callback_parent is not an instance of object.
-        :raises ValueError: If callback_parent does not have any remote callables.
-        :raises RuntimeError: If the callable registration fails.
+        :raises ValueError: If callback_parent does not have any remote services.
+        :raises RuntimeError: If the service registration fails.
         :returns: None
         :rtype: None
         """
         for attr_name in dir(callback_parent):
             attr = getattr(callback_parent, attr_name)
-            rc_active = getattr(attr, "_remote_callable", False)
+            rc_active = getattr(attr, "_remote_service", False)
 
             if callable(attr) and rc_active:
-                # Interface automatically registered via @remote_callable decorator
-                Logger.debug(
-                    f"Remote callable <{attr.__name__}> registered via decorator")
+                # Interface automatically registered via @remote_service decorator
+                logger.debug(
+                    f"Remote service <{attr.__name__}> registered via decorator")
 
                 # Set on the underlying function object
                 if hasattr(attr, "__func__"):
-                    setattr(attr.__func__, "_remote_callable", False)
+                    setattr(attr.__func__, "_remote_service", False)
                 else:
-                    setattr(attr, "_remote_callable", False)
+                    setattr(attr, "_remote_service", False)

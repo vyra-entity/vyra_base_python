@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// Pause
+// Pause the current operation and set state READY|RUNNING -> PAUSED
+// Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+// Request message
+message VBASEPauseRequest {
+  // An array of key-value pairs providing the necessary parameters for initialization.
+  repeated string params = 1;
+}
+
+// Response message
+message VBASEPauseResponse {
+  // Indicates whether the transition was successful
+  bool success = 1;
+  // A message providing additional information about the transition
+  string message = 2;
+}

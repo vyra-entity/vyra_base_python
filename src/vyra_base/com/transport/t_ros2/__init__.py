@@ -55,23 +55,23 @@ except ImportError as e:
 # Try importing communication layer
 try:
     from vyra_base.com.transport.t_ros2.communication import (
-        VyraServiceServer,
-        VyraServiceClient,
-        VyraPublisher,
-        VyraSubscriber,
-        VyraActionServer,
-        VyraActionClient,
+        ROS2ServiceServer,
+        ROS2ServiceClient,
+        ROS2Publisher,
+        ROS2Subscriber,
+        ROS2ActionServer,
+        ROS2ActionClient,
         Ros2TypeConverter,
         ROS2_COMMUNICATION_AVAILABLE,
     )
     _communication_available = ROS2_COMMUNICATION_AVAILABLE
 except ImportError as e:
-    VyraServiceServer = None
-    VyraServiceClient = None
-    VyraPublisher = None
-    VyraSubscriber = None
-    VyraActionServer = None
-    VyraActionClient = None
+    ROS2ServiceServer = None
+    ROS2ServiceClient = None
+    ROS2Publisher = None
+    ROS2Subscriber = None
+    ROS2ActionServer = None
+    ROS2ActionClient = None
     Ros2TypeConverter = None
     _communication_available = False
     logger.debug(f"⚠️  ROS2 communication layer unavailable: {e}")
@@ -127,12 +127,12 @@ __all__ = [
     "CheckerNode",
     "NodeSettings",
     # Communication layer
-    "VyraServiceServer",
-    "VyraServiceClient",
-    "VyraPublisher",
-    "VyraSubscriber",
-    "VyraActionServer",
-    "VyraActionClient",
+    "ROS2ServiceServer",
+    "ROS2ServiceClient",
+    "ROS2Publisher",
+    "ROS2Subscriber",
+    "ROS2ActionServer",
+    "ROS2ActionClient",
     "Ros2TypeConverter",
     # VYRA models layer
     "ROS2Callable",

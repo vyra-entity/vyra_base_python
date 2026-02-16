@@ -17,7 +17,7 @@ from typing import Any, Dict
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.helper.file_reader import FileReader
 from vyra_base.helper.file_writer import FileWriter
-from vyra_base.helper.logger import Logger, LogEntry, LogMode
+from vyra_base.helper.logger import logger, LogEntry, LogMode
 
 
 @pytest.mark.no_dataspace_reset
@@ -88,17 +88,17 @@ class TestLogger:
     def setup_method(self):
         """Reset Logger state before each test"""
         # Reset logger state
-        if hasattr(Logger, 'logger'):
-            delattr(Logger, 'logger')
-        Logger._initialized = False
-        Logger.pre_log_buffer.clear()
-        Logger._LOG_ACTIVE = False
-        Logger._LOG_TAG = ''
+        if hasattr(logger, 'logger'):
+            delattr(logger, 'logger')
+        logger._initialized = False
+        logger.pre_log_buffer.clear()
+        logger._LOG_ACTIVE = False
+        logger._LOG_TAG = ''
     
     def test_logger_auto_initialization(self):
         """Test that logger automatically initializes with default values"""
         # Logger should not be initialized yet
-        assert not Logger._initialized
+        assert not logger._initialized
         
         config_path = self._create_temp_logger_config()
         
@@ -112,11 +112,11 @@ class TestLogger:
                 mock_get_logger.return_value = mock_logger
                 
                 # Pass the config path explicitly
-                Logger.initialize(log_config_path=config_path, log_active=True)
+                logger.initialize(log_config_path=config_path, log_active=True)
                 
                 # Logger should now be initialized
-                assert Logger._initialized
-                assert hasattr(Logger, 'logger')
+                assert logger._initialized
+                assert hasattr(logger, 'logger')
         finally:
             config_path.unlink()
     
@@ -133,10 +133,10 @@ class TestLogger:
                 mock_logger.handlers = []
                 mock_get_logger.return_value = mock_logger
                 
-                Logger.initialize(log_config_path=config_path, log_active=True)
+                logger.initialize(log_config_path=config_path, log_active=True)
                 
-                assert Logger._initialized
-                assert Logger._LOG_ACTIVE is True
+                assert logger._initialized
+                assert logger._LOG_ACTIVE is True
         finally:
             config_path.unlink()
     
@@ -177,22 +177,22 @@ class TestLogger:
                 mock_logger.error = Mock()
                 mock_get_logger.return_value = mock_logger
                 
-                Logger.initialize(log_config_path=config_path, log_active=True)
+                logger.initialize(log_config_path=config_path, log_active=True)
                 
                 # Test info
-                Logger.info("Info message")
+                logger.info("Info message")
                 assert mock_logger.info.called
                 
                 # Test debug
-                Logger.debug("Debug message")
+                logger.debug("Debug message")
                 assert mock_logger.debug.called
                 
                 # Test warn
-                Logger.warn("Warning message")
+                logger.warn("Warning message")
                 assert mock_logger.warning.called
                 
                 # Test error
-                Logger.error("Error message")
+                logger.error("Error message")
                 assert mock_logger.error.called
         finally:
             config_path.unlink()
@@ -211,14 +211,14 @@ class TestLogger:
                 mock_logger.info = Mock()
                 mock_get_logger.return_value = mock_logger
                 
-                Logger.initialize(log_config_path=config_path, log_active=True, log_tag="TEST_MODULE")
+                logger.initialize(log_config_path=config_path, log_active=True, log_tag="TEST_MODULE")
                 
-                assert Logger._LOG_TAG == "TEST_MODULE"
+                assert logger._LOG_TAG == "TEST_MODULE"
                 
                 # Replace logger with our mock to capture calls
-                Logger.logger = mock_logger
+                logger.logger = mock_logger
                 
-                Logger.info("Test message")
+                logger.info("Test message")
                 
                 # Verify the tag was added
                 mock_logger.info.assert_called_once()
@@ -230,8 +230,8 @@ class TestLogger:
     def test_pre_log_buffer(self):
         """Test that messages are buffered before initialization and auto-init works"""
         # Reset state
-        Logger._initialized = False
-        Logger.pre_log_buffer.clear()
+        logger._initialized = False
+        logger.pre_log_buffer.clear()
         
         config_path = self._create_temp_logger_config()
         
@@ -245,21 +245,21 @@ class TestLogger:
                 mock_get_logger.return_value = mock_logger
                 
                 # Mock the _ensure_initialized to use our config
-                original_init = Logger.initialize
+                original_init = logger.initialize
                 def mock_init(*args, **kwargs):
                     if 'log_config_path' not in kwargs:
                         kwargs['log_config_path'] = config_path
                     return original_init(*args, **kwargs)
                 
-                with patch.object(Logger, 'initialize', side_effect=mock_init):
+                with patch.object(logger, 'initialize', side_effect=mock_init):
                     # Try to log before explicit initialization - should auto-initialize
                     entry = LogEntry("Buffered message", LogMode.INFO)
-                    Logger.log(entry)
+                    logger.log(entry)
                     
                     # Logger should now be initialized (auto-init triggered)
-                    assert Logger._initialized
+                    assert logger._initialized
                     # Buffer should be cleared after auto-initialization
-                    assert len(Logger.pre_log_buffer) == 0
+                    assert len(logger.pre_log_buffer) == 0
         finally:
             config_path.unlink()
     
@@ -278,9 +278,9 @@ class TestLogger:
                 mock_logger.debug = Mock()
                 mock_get_logger.return_value = mock_logger
                 
-                Logger.initialize(log_config_path=config_path, log_active=True)
+                logger.initialize(log_config_path=config_path, log_active=True)
                 
-                @Logger.logging_on
+                @logger.logging_on
                 async def async_test_function():
                     await asyncio.sleep(0.01)
                     return "async_result"
@@ -307,9 +307,9 @@ class TestLogger:
                 mock_logger.debug = Mock()
                 mock_get_logger.return_value = mock_logger
                 
-                Logger.initialize(log_config_path=config_path, log_active=True)
+                logger.initialize(log_config_path=config_path, log_active=True)
                 
-                @Logger.logging_on
+                @logger.logging_on
                 def sync_test_function():
                     return "sync_result"
                 
@@ -335,21 +335,21 @@ class TestLogger:
                 mock_logger.info = Mock()
                 mock_get_logger.return_value = mock_logger
                 
-                Logger.initialize(log_config_path=config_path, log_active=True)
+                logger.initialize(log_config_path=config_path, log_active=True)
                 
                 # Replace logger with mock to capture calls
-                Logger.logger = mock_logger
+                logger.logger = mock_logger
                 
                 # Test with string
-                Logger.log("Plain string")
+                logger.log("Plain string")
                 mock_logger.info.assert_called()
                 
                 # Test with number
-                Logger.log(42)
+                logger.log(42)
                 assert mock_logger.info.call_count >= 2
                 
                 # Test with dict
-                Logger.log({"key": "value"})
+                logger.log({"key": "value"})
                 assert mock_logger.info.call_count >= 3
         finally:
             config_path.unlink()

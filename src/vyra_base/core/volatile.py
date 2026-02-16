@@ -7,7 +7,7 @@ from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
 from vyra_base.com import InterfaceFactory, ProtocolType
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 class Volatile:
     """
@@ -115,7 +115,7 @@ class Volatile:
         new_listener: list[str] = [li for li in channel if li in self._active_shouter and li not in active_listener]
 
         if len(new_listener) == 0:
-            Logger.warning(
+            logger.warning(
                 f"No new volatile channels to listen to. Active listeners: {active_listener}, Requested: {channel}")
             
             return  # No new channels to listen to
@@ -136,7 +136,7 @@ class Volatile:
         if not isinstance(channel, list):
             channel = [channel]
 
-        Logger.info(f"Deactivating listeners for channels: {channel}")
+        logger.info(f"Deactivating listeners for channels: {channel}")
 
         await self.redis.remove_listener_channels(channels=channel)
     

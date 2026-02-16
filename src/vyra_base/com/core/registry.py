@@ -10,12 +10,14 @@ from threading import RLock
 
 from vyra_base.com.core.types import (
     VyraInterface,
-    VyraCallable,
-    VyraSpeaker,
-    VyraJob,
     InterfaceType,
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient
 )
-from vyra_base.com.core.exceptions import InterfaceError
 
 logger = logging.getLogger(__name__)
 
@@ -45,152 +47,278 @@ class DataSpaceRegistry:
         if self._initialized:
             return
         
-        self._callables: Dict[str, VyraCallable] = {}
-        self._speakers: Dict[str, VyraSpeaker] = {}
-        self._jobs: Dict[str, VyraJob] = {}
+        self._publishers: Dict[str, VyraPublisher] = {}
+        self._subscribers: Dict[str, VyraSubscriber] = {}
+        self._servers: Dict[str, VyraServer] = {}
+        self._clients: Dict[str, VyraClient] = {}
+        self._action_servers: Dict[str, VyraActionServer] = {}
+        self._action_clients: Dict[str, VyraActionClient] = {}
         self._all_interfaces: Dict[str, VyraInterface] = {}
         self._initialized = True
         
         logger.info("✅ DataSpace Registry initialized")
     
-    def register_callable(self, callable_obj: VyraCallable) -> None:
+    def register_publisher(self, publisher_obj: VyraPublisher) -> None:
         """
-        Register a callable interface.
+        Register a publisher interface.
         
         Args:
-            callable_obj: Callable to register
+            publisher_obj: Publisher to register
             
         Raises:
-            InterfaceError: If callable with same name already exists
+            InterfaceError: If publisher with same name already exists
         """
         with self._lock:
-            if callable_obj.name in self._callables:
+            if publisher_obj.name in self._publishers:
                 logger.warning(
-                    f"⚠️ Callable '{callable_obj.name}' already registered, replacing"
+                    f"⚠️ Publisher '{publisher_obj.name}' already registered, replacing"
                 )
             
-            self._callables[callable_obj.name] = callable_obj
-            self._all_interfaces[callable_obj.name] = callable_obj
+            self._publishers[publisher_obj.name] = publisher_obj
+            self._all_interfaces[publisher_obj.name] = publisher_obj
             
             logger.debug(
-                f"✅ Callable '{callable_obj.name}' registered "
-                f"(protocol: {callable_obj.protocol})"
+                f"✅ Publisher '{publisher_obj.name}' registered "
+                f"(protocol: {publisher_obj.protocol})"
             )
     
-    def register_speaker(self, speaker_obj: VyraSpeaker) -> None:
+    def register_subscriber(self, subscriber_obj: VyraSubscriber) -> None:
         """
-        Register a speaker interface.
+        Register a subscriber interface.
         
         Args:
-            speaker_obj: Speaker to register
+            subscriber_obj: Subscriber to register
         """
         with self._lock:
-            if speaker_obj.name in self._speakers:
+            if subscriber_obj.name in self._subscribers:
                 logger.warning(
-                    f"⚠️ Speaker '{speaker_obj.name}' already registered, replacing"
+                    f"⚠️ Subscriber '{subscriber_obj.name}' already registered, replacing"
                 )
             
-            self._speakers[speaker_obj.name] = speaker_obj
-            self._all_interfaces[speaker_obj.name] = speaker_obj
+            self._subscribers[subscriber_obj.name] = subscriber_obj
+            self._all_interfaces[subscriber_obj.name] = subscriber_obj
             
             logger.debug(
-                f"✅ Speaker '{speaker_obj.name}' registered "
-                f"(protocol: {speaker_obj.protocol})"
+                f"✅ Subscriber '{subscriber_obj.name}' registered "
+                f"(protocol: {subscriber_obj.protocol})"
             )
-    
-    def register_job(self, job_obj: VyraJob) -> None:
+
+    def register_server(self, server_obj: VyraServer) -> None:
         """
-        Register a job interface.
+        Register a server interface.
         
         Args:
-            job_obj: Job to register
+            server_obj: Server to register
         """
         with self._lock:
-            if job_obj.name in self._jobs:
+            if server_obj.name in self._servers:
                 logger.warning(
-                    f"⚠️ Job '{job_obj.name}' already registered, replacing"
+                    f"⚠️ Server '{server_obj.name}' already registered, replacing"
                 )
             
-            self._jobs[job_obj.name] = job_obj
-            self._all_interfaces[job_obj.name] = job_obj
+            self._servers[server_obj.name] = server_obj
+            self._all_interfaces[server_obj.name] = server_obj
             
             logger.debug(
-                f"✅ Job '{job_obj.name}' registered "
-                f"(protocol: {job_obj.protocol})"
+                f"✅ Server '{server_obj.name}' registered "
+                f"(protocol: {server_obj.protocol})"
             )
     
-    def get_callable(self, name: str) -> Optional[VyraCallable]:
-        """Get callable by name."""
-        return self._callables.get(name)
+    def register_client(self, client_obj: VyraClient) -> None:
+        """
+        Register a client interface.
+        
+        Args:
+            client_obj: Client to register
+        """
+        with self._lock:
+            if client_obj.name in self._clients:
+                logger.warning(
+                    f"⚠️ Client '{client_obj.name}' already registered, replacing"
+                )
+            
+            self._clients[client_obj.name] = client_obj
+            self._all_interfaces[client_obj.name] = client_obj
+            
+            logger.debug(
+                f"✅ Client '{client_obj.name}' registered "
+                f"(protocol: {client_obj.protocol})"
+            )
+
+    def register_action_server(self, action_server_obj: VyraActionServer) -> None:
+        """
+        Register an action server interface.
+        
+        Args:
+            action_server_obj: Action server to register
+        """
+        with self._lock:
+            if action_server_obj.name in self._action_servers:
+                logger.warning(
+                    f"⚠️ Action Server '{action_server_obj.name}' already registered, replacing"
+                )
+            
+            self._action_servers[action_server_obj.name] = action_server_obj
+            self._all_interfaces[action_server_obj.name] = action_server_obj
+            
+            logger.debug(
+                f"✅ Action Server '{action_server_obj.name}' registered "
+                f"(protocol: {action_server_obj.protocol})"
+            )
+
+    def register_action_client(self, action_client_obj: VyraActionClient) -> None:
+        """
+        Register an action client interface.
+        
+        Args:
+            action_client_obj: Action client to register
+        """
+        with self._lock:
+            if action_client_obj.name in self._action_clients:
+                logger.warning(
+                    f"⚠️ Action Client '{action_client_obj.name}' already registered, replacing"
+                )
+            
+            self._action_clients[action_client_obj.name] = action_client_obj
+            self._all_interfaces[action_client_obj.name] = action_client_obj
+            
+            logger.debug(
+                f"✅ Action Client '{action_client_obj.name}' registered "
+                f"(protocol: {action_client_obj.protocol})"
+            )
     
-    def get_speaker(self, name: str) -> Optional[VyraSpeaker]:
-        """Get speaker by name."""
-        return self._speakers.get(name)
+    def get_publisher(self, name: str) -> Optional[VyraPublisher]:
+        """Get publisher by name."""
+        return self._publishers.get(name)
     
-    def get_job(self, name: str) -> Optional[VyraJob]:
-        """Get job by name."""
-        return self._jobs.get(name)
+    def get_subscriber(self, name: str) -> Optional[VyraSubscriber]:
+        """Get subscriber by name."""
+        return self._subscribers.get(name)
+    
+    def get_server(self, name: str) -> Optional[VyraServer]:
+        """Get server by name."""
+        return self._servers.get(name)
+    
+    def get_client(self, name: str) -> Optional[VyraClient]:
+        """Get client by name."""
+        return self._clients.get(name)
+    
+    def get_action_server(self, name: str) -> Optional[VyraActionServer]:
+        """Get action server by name."""
+        return self._action_servers.get(name)
+    
+    def get_action_client(self, name: str) -> Optional[VyraActionClient]:
+        """Get action client by name."""
+        return self._action_clients.get(name)
     
     def get_interface(self, name: str) -> Optional[VyraInterface]:
         """Get any interface by name."""
         return self._all_interfaces.get(name)
     
-    def list_callables(self) -> List[VyraCallable]:
-        """Get all registered callables."""
+    def list_publishers(self) -> List[VyraPublisher]:
+        """Get all registered publishers."""
         with self._lock:
-            return list(self._callables.values())
+            return list(self._publishers.values())
     
-    def list_speakers(self) -> List[VyraSpeaker]:
-        """Get all registered speakers."""
+    def list_subscribers(self) -> List[VyraSubscriber]:
+        """Get all registered subscribers."""
         with self._lock:
-            return list(self._speakers.values())
+            return list(self._subscribers.values())
+        
+    def list_servers(self) -> List[VyraServer]:
+        """Get all registered servers."""
+        with self._lock:
+            return list(self._servers.values())
+
+    def list_clients(self) -> List[VyraClient]:
+        """Get all registered clients."""
+        with self._lock:
+            return list(self._clients.values())
     
-    def list_jobs(self) -> List[VyraJob]:
-        """Get all registered jobs."""
+    def list_action_servers(self) -> List[VyraActionServer]:
+        """Get all registered action servers."""
         with self._lock:
-            return list(self._jobs.values())
+            return list(self._action_servers.values())
+    
+    def list_action_clients(self) -> List[VyraActionClient]:
+        """Get all registered action clients."""
+        with self._lock:
+            return list(self._action_clients.values())
     
     def list_all(self) -> List[VyraInterface]:
         """Get all registered interfaces."""
         with self._lock:
             return list(self._all_interfaces.values())
     
-    def remove_callable(self, name: str) -> bool:
-        """Remove callable by name."""
+    def remove_publisher(self, name: str) -> bool:
+        """Remove publisher by name."""
         with self._lock:
-            if name in self._callables:
-                del self._callables[name]
+            if name in self._publishers:
+                del self._publishers[name]
                 del self._all_interfaces[name]
-                logger.debug(f"Removed callable '{name}'")
+                logger.debug(f"Removed publisher '{name}'")
+                return True
+            return False
+
+    def remove_subscriber(self, name: str) -> bool:
+        """Remove subscriber by name."""
+        with self._lock:
+            if name in self._subscribers:
+                del self._subscribers[name]
+                del self._all_interfaces[name]
+                logger.debug(f"Removed subscriber '{name}'")
+                return True
+            return False
+        
+    def remove_server(self, name: str) -> bool:
+        """Remove server by name."""
+        with self._lock:
+            if name in self._servers:
+                del self._servers[name]
+                del self._all_interfaces[name]
+                logger.debug(f"Removed server '{name}'")
+                return True
+            return False
+
+    def remove_client(self, name: str) -> bool:
+        """Remove client by name."""
+        with self._lock:
+            if name in self._clients:
+                del self._clients[name]
+                del self._all_interfaces[name]
+                logger.debug(f"Removed client '{name}'")
                 return True
             return False
     
-    def remove_speaker(self, name: str) -> bool:
-        """Remove speaker by name."""
+    def remove_action_server(self, name: str) -> bool:
+        """Remove action server by name."""
         with self._lock:
-            if name in self._speakers:
-                del self._speakers[name]
+            if name in self._action_servers:
+                del self._action_servers[name]
                 del self._all_interfaces[name]
-                logger.debug(f"Removed speaker '{name}'")
+                logger.debug(f"Removed action server '{name}'")
                 return True
             return False
     
-    def remove_job(self, name: str) -> bool:
-        """Remove job by name."""
+    def remove_action_client(self, name: str) -> bool:
+        """Remove action client by name."""
         with self._lock:
-            if name in self._jobs:
-                del self._jobs[name]
+            if name in self._action_clients:
+                del self._action_clients[name]
                 del self._all_interfaces[name]
-                logger.debug(f"Removed job '{name}'")
+                logger.debug(f"Removed action client '{name}'")
                 return True
             return False
     
     def clear_all(self) -> None:
         """Clear all registered interfaces."""
         with self._lock:
-            self._callables.clear()
-            self._speakers.clear()
-            self._jobs.clear()
+            self._publishers.clear()
+            self._subscribers.clear()
+            self._servers.clear()
+            self._clients.clear()
+            self._action_servers.clear()
+            self._action_clients.clear()
             self._all_interfaces.clear()
             logger.info("🗑️ All interfaces cleared from registry")
     
@@ -198,9 +326,12 @@ class DataSpaceRegistry:
         """Get registry statistics."""
         with self._lock:
             return {
-                "callables": len(self._callables),
-                "speakers": len(self._speakers),
-                "jobs": len(self._jobs),
+                "publishers": len(self._publishers),
+                "subscribers": len(self._subscribers),
+                "servers": len(self._servers),
+                "clients": len(self._clients),
+                "action_servers": len(self._action_servers),
+                "action_clients": len(self._action_clients),
                 "total": len(self._all_interfaces),
             }
 
@@ -209,26 +340,27 @@ class DataSpaceRegistry:
 DataSpace = DataSpaceRegistry()
 
 # Legacy compatibility functions (will be deprecated)
-def add_callable(callable_obj: VyraCallable) -> None:
-    """Legacy: Register callable."""
-    DataSpace.register_callable(callable_obj)
+def add_publisher(publisher_obj: VyraPublisher) -> None:
+    """Legacy: Register publisher."""
+    DataSpace.register_publisher(publisher_obj)
 
-def add_speaker(speaker_obj: VyraSpeaker) -> None:
-    """Legacy: Register speaker."""
-    DataSpace.register_speaker(speaker_obj)
+def add_subscriber(subscriber_obj: VyraSubscriber) -> None:
+    """Legacy: Register subscriber."""
+    DataSpace.register_subscriber(subscriber_obj)
 
-def add_job(job_obj: VyraJob) -> None:
-    """Legacy: Register job."""
-    DataSpace.register_job(job_obj)
+def add_server(server_obj: VyraServer) -> None:
+    """Legacy: Register server."""
+    DataSpace.register_server(server_obj)
 
-def get_callable(name: str) -> Optional[VyraCallable]:
-    """Legacy: Get callable."""
-    return DataSpace.get_callable(name)
+def add_client(client_obj: VyraClient) -> None:
+    """Legacy: Register client."""
+    DataSpace.register_client(client_obj)
 
-def get_speaker(name: str) -> Optional[VyraSpeaker]:
-    """Legacy: Get speaker."""
-    return DataSpace.get_speaker(name)
+def add_action_server(action_server_obj: VyraActionServer) -> None:
+    """Legacy: Register action server."""
+    DataSpace.register_action_server(action_server_obj)
 
-def get_job(name: str) -> Optional[VyraJob]:
-    """Legacy: Get job."""
-    return DataSpace.get_job(name)
+def add_action_client(action_client_obj: VyraActionClient) -> None:
+    """Legacy: Register action client."""
+    DataSpace.register_action_client(action_client_obj)
+

@@ -1,3 +1,5 @@
+import os
+
 from pathlib import Path
 from vyra_base.helper.file_reader import FileReader
 
@@ -22,3 +24,9 @@ class EnvHandler:
         :type env_path: Path
         """
         EnvHandler.env = await FileReader.open_env_file(env_path / '.env')
+
+def get_env_required(name: str) -> str:
+    value = os.getenv(name)
+    if value is None:
+        raise EnvironmentError(f"Kritischer Fehler: Die Umgebungsvariable '{name}' ist nicht gesetzt!")
+    return value

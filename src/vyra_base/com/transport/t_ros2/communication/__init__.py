@@ -28,35 +28,35 @@ import logging
 logger = logging.getLogger(__name__)
 
 try:
-    from vyra_base.com.transport.t_ros2.communication.service_server import VyraServiceServer
-    from vyra_base.com.transport.t_ros2.communication.service_client import VyraServiceClient
-    from vyra_base.com.transport.t_ros2.communication.publisher import VyraPublisher
-    from vyra_base.com.transport.t_ros2.communication.subscriber import VyraSubscriber
-    from vyra_base.com.transport.t_ros2.communication.action_server import VyraActionServer
-    from vyra_base.com.transport.t_ros2.communication.action_client import VyraActionClient
+    from vyra_base.com.transport.t_ros2.communication.service_server import ROS2ServiceServer
+    from vyra_base.com.transport.t_ros2.communication.service_client import ROS2ServiceClient
+    from vyra_base.com.transport.t_ros2.communication.publisher import ROS2Publisher
+    from vyra_base.com.transport.t_ros2.communication.subscriber import ROS2Subscriber
+    from vyra_base.com.transport.t_ros2.communication.action_server import ROS2ActionServer
+    from vyra_base.com.transport.t_ros2.communication.action_client import ROS2ActionClient
     from vyra_base.com.transport.t_ros2.communication.typeconverter import Ros2TypeConverter
     
     ROS2_COMMUNICATION_AVAILABLE = True
     logger.debug("✅ ROS2 communication layer available")
     
 except ImportError as e:
-    VyraServiceServer = None
-    VyraServiceClient = None
-    VyraPublisher = None
-    VyraSubscriber = None
-    VyraActionServer = None
-    VyraActionClient = None
+    ROS2ServiceServer = None
+    ROS2ServiceClient = None
+    ROS2Publisher = None
+    ROS2Subscriber = None
+    ROS2ActionServer = None
+    ROS2ActionClient = None
     Ros2TypeConverter = None
     ROS2_COMMUNICATION_AVAILABLE = False
     logger.debug(f"⚠️  ROS2 communication layer unavailable: {e}")
 
 __all__ = [
-    "VyraServiceServer",
-    "VyraServiceClient",
-    "VyraPublisher",
-    "VyraSubscriber",
-    "VyraActionServer",
-    "VyraActionClient",
+    "ROS2ServiceServer",
+    "ROS2ServiceClient",
+    "ROS2Publisher",
+    "ROS2Subscriber",
+    "ROS2ActionServer",
+    "ROS2ActionClient",
     "Ros2TypeConverter",
     "ROS2_COMMUNICATION_AVAILABLE",
 ]

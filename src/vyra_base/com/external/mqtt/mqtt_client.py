@@ -21,7 +21,7 @@ import asyncio
 from typing import Any, Optional, Callable, Dict
 import json
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ class MqttClient:
     async def connect(self) -> None:
         """Establish connection to MQTT broker."""
         try:
-            Logger.info(f"🔌 Connecting to MQTT broker: {self.broker}:{self.port}")
+            logger.info(f"🔌 Connecting to MQTT broker: {self.broker}:{self.port}")
             
             # Create MQTT client
             self._client = mqtt.Client(client_id=self.client_id)
@@ -132,28 +132,28 @@ class MqttClient:
             await asyncio.sleep(0.5)
             
             self._connected = True
-            Logger.info(f"✅ Connected to MQTT broker: {self.broker}:{self.port}")
+            logger.info(f"✅ Connected to MQTT broker: {self.broker}:{self.port}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to connect to MQTT broker: {e}")
+            logger.error(f"❌ Failed to connect to MQTT broker: {e}")
             raise
     
     def _on_connect(self, client, userdata, flags, rc):
         """MQTT on_connect callback."""
         if rc == 0:
-            Logger.debug("MQTT connected successfully")
+            logger.debug("MQTT connected successfully")
             self._connected = True
             
             # Resubscribe to topics
             for topic in self._subscriptions.keys():
                 client.subscribe(topic)
         else:
-            Logger.error(f"MQTT connection failed with code {rc}")
+            logger.error(f"MQTT connection failed with code {rc}")
             self._connected = False
     
     def _on_disconnect(self, client, userdata, rc):
         """MQTT on_disconnect callback."""
-        Logger.warning(f"MQTT disconnected with code {rc}")
+        logger.warning(f"MQTT disconnected with code {rc}")
         self._connected = False
     
     def _on_message(self, client, userdata, msg: MQTTMessage):
@@ -173,7 +173,7 @@ class MqttClient:
                     # Call callback
                     asyncio.create_task(callback(topic, payload))
                 except Exception as e:
-                    Logger.error(f"❌ Error in MQTT message callback: {e}")
+                    logger.error(f"❌ Error in MQTT message callback: {e}")
     
     @ErrorTraceback.w_check_error_exist
     async def close(self) -> None:
@@ -184,7 +184,7 @@ class MqttClient:
             self._client = None
         
         self._connected = False
-        Logger.debug(f"MQTT connection closed: {self.broker}")
+        logger.debug(f"MQTT connection closed: {self.broker}")
     
     async def _ensure_connected(self) -> mqtt.Client:
         """Ensure client is connected."""
@@ -230,10 +230,10 @@ class MqttClient:
             if result.rc != mqtt.MQTT_ERR_SUCCESS:
                 raise Exception(f"MQTT publish failed with code {result.rc}")
             
-            Logger.debug(f"📤 MQTT published to {topic}")
+            logger.debug(f"📤 MQTT published to {topic}")
             
         except Exception as e:
-            Logger.error(f"❌ MQTT publish failed: {e}")
+            logger.error(f"❌ MQTT publish failed: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -263,10 +263,10 @@ class MqttClient:
             # Store subscription
             self._subscriptions[topic] = callback
             
-            Logger.info(f"📥 MQTT subscribed to {topic}")
+            logger.info(f"📥 MQTT subscribed to {topic}")
             
         except Exception as e:
-            Logger.error(f"❌ MQTT subscribe failed: {e}")
+            logger.error(f"❌ MQTT subscribe failed: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -289,10 +289,10 @@ class MqttClient:
             if topic in self._subscriptions:
                 del self._subscriptions[topic]
             
-            Logger.info(f"🚫 MQTT unsubscribed from {topic}")
+            logger.info(f"🚫 MQTT unsubscribed from {topic}")
             
         except Exception as e:
-            Logger.error(f"❌ MQTT unsubscribe failed: {e}")
+            logger.error(f"❌ MQTT unsubscribe failed: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist

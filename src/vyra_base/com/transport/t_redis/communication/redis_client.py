@@ -10,13 +10,13 @@ import ssl
 import asyncio
 from pathlib import Path
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 from enum import Enum
 
 import redis.asyncio as redis
 from redis.asyncio.client import PubSub
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 
@@ -195,13 +195,25 @@ class RedisClient():
             if self._pubsub is None:
                 self._pubsub = client.pubsub()
             
-            Logger.info(f"✅ Redis connected for {self.module_name} at {self.host}:{self.port} (TLS: {self.use_tls})")
+            logger.info(f"✅ Redis connected for {self.module_name} at {self.host}:{self.port} (TLS: {self.use_tls})")
             
         except Exception as e:
             self._connected = False
             self._redis_engine = None
-            Logger.error(f"❌ Failed to connect to Redis: {e}")
+            logger.error(f"❌ Failed to connect to Redis: {e}")
             raise
+
+    async def ping(self) -> bool:
+        """Ping Redis server to check connectivity."""
+        if self._redis_engine is None:
+            logger.warning("Redis client not initialized for ping")
+            return False
+        
+        try:
+            return await self._redis_engine.ping()
+        except Exception as e:
+            logger.error(f"Redis ping failed: {e}")
+            return False
 
     @ErrorTraceback.w_check_error_exist
     async def configure_base_settings(self):
@@ -213,16 +225,22 @@ class RedisClient():
             if hasattr(self, '_config') and 'redis' in self._config:
                 maxmemory = self._config['redis'].get('maxmemory')
                 if maxmemory:
-                    Logger.info(f"Setting Redis maxmemory to {maxmemory}")
+                    logger.info(f"Setting Redis maxmemory to {maxmemory}")
                     await client.config_set("maxmemory", maxmemory)
         except Exception as e:
             err_msg = f"Failed to configure Redis settings: {e}"
-            Logger.error(err_msg)
+            logger.error(err_msg)
             raise RuntimeError(err_msg)
 
     @ErrorTraceback.w_check_error_exist
     async def close(self):
         """Close the Redis connection."""
+        for ac in self._active_channels:
+            try:
+                await self.remove_listener_channels(ac)
+            except Exception as e:
+                logger.warning(f"Error unsubscribing from {ac} during close: {e}")
+
         if self._pubsub:
             await self._pubsub.close()
             self._pubsub = None
@@ -232,7 +250,7 @@ class RedisClient():
             self._redis_engine = None
         
         self._connected = False
-        Logger.debug(f"Redis connection closed for {self.module_name}")
+        logger.debug(f"Redis connection closed for {self.module_name}")
 
     # ======================
     # STORAGE INTERFACE
@@ -270,7 +288,7 @@ class RedisClient():
                 return await client.get(key)
                 
         except Exception as e:
-            Logger.error(f"Error getting key {key}: {e}")
+            logger.error(f"Error getting key {key}: {e}")
             return None
 
     @ErrorTraceback.w_check_error_exist
@@ -312,7 +330,7 @@ class RedisClient():
                 result = await client.set(key, value, ex=ex)
                 return result is not None
         except Exception as e:
-            Logger.error(f"Error setting key {key}: {e}")
+            logger.error(f"Error setting key {key}: {e}")
             return False
 
     @ErrorTraceback.w_check_error_exist
@@ -332,7 +350,7 @@ class RedisClient():
             result = await client.delete(key)
             return result > 0
         except Exception as e:
-            Logger.error(f"Error deleting key {key}: {e}")
+            logger.error(f"Error deleting key {key}: {e}")
             return False
 
     @ErrorTraceback.w_check_error_exist
@@ -363,7 +381,7 @@ class RedisClient():
             await client.flushdb()
             return True
         except Exception as e:
-            Logger.error(f"Error clearing Redis database: {e}")
+            logger.error(f"Error clearing Redis database: {e}")
             return False
 
     @ErrorTraceback.w_check_error_exist
@@ -379,7 +397,7 @@ class RedisClient():
         try:
             return await client.keys('*')
         except Exception as e:
-            Logger.error(f"Error retrieving keys from Redis: {e}")
+            logger.error(f"Error retrieving keys from Redis: {e}")
             return []
 
     @ErrorTraceback.w_check_error_exist
@@ -398,7 +416,7 @@ class RedisClient():
         try:
             return await client.keys(pattern)
         except Exception as e:
-            Logger.error(f"Error retrieving keys with pattern {pattern}: {e}")
+            logger.error(f"Error retrieving keys with pattern {pattern}: {e}")
             return []
 
     @ErrorTraceback.w_check_error_exist
@@ -420,7 +438,7 @@ class RedisClient():
                 return None
             return REDIS_TYPE(type_str) if type_str in [e.value for e in REDIS_TYPE] else None
         except Exception as e:
-            Logger.error(f"Error retrieving type for key {key}: {e}")
+            logger.error(f"Error retrieving type for key {key}: {e}")
             return None
 
     @ErrorTraceback.w_check_error_exist
@@ -448,10 +466,10 @@ class RedisClient():
                 case REDIS_TYPE.SET:
                     return await client.scard(key)
                 case _:
-                    Logger.error(f"Unsupported Redis type: {redis_type}")
+                    logger.error(f"Unsupported Redis type: {redis_type}")
                     return -1
         except Exception as e:
-            Logger.error(f"Error getting length for key {key}: {e}")
+            logger.error(f"Error getting length for key {key}: {e}")
             return -1
 
     # ======================
@@ -477,14 +495,14 @@ class RedisClient():
                 message = json.dumps(message)
             
             result = await client.publish(channel, message)
-            Logger.debug(f"📤 Published to {channel}: {message}")
+            logger.debug(f"📤 Published to {channel}: {message}")
             return result
         except Exception as e:
-            Logger.error(f"❌ Failed to publish message to {channel}: {e}")
+            logger.error(f"❌ Failed to publish message to {channel}: {e}")
             return 0
 
     @ErrorTraceback.w_check_error_exist
-    async def subscribe_channel(self, channel: str):
+    async def subscribe_channel(self, *channel: str) -> None:
         """
         Subscribe to Redis channel
         
@@ -496,12 +514,13 @@ class RedisClient():
         if self._pubsub is None:
             self._pubsub = client.pubsub()
         
-        try:
-            await self._pubsub.subscribe(channel)
-            Logger.debug(f"📥 Subscribed to channel: {channel}")
-        except Exception as e:
-            Logger.error(f"❌ Failed to subscribe to {channel}: {e}")
-            raise
+        for ch in channel:
+            try:
+                await self._pubsub.subscribe(ch)
+                logger.debug(f"📥 Subscribed to channel: {ch}")
+            except Exception as e:
+                logger.error(f"❌ Failed to subscribe to {ch}: {e}")
+                continue
 
     @ErrorTraceback.w_check_error_exist
     async def subscribe_to_key(self, key: str) -> None:
@@ -519,7 +538,7 @@ class RedisClient():
         try:
             await self._pubsub.subscribe(key)
         except Exception as e:
-            Logger.error(f"Error subscribing to key {key}: {e}")
+            logger.error(f"Error subscribing to key {key}: {e}")
 
     @ErrorTraceback.w_check_error_exist
     async def unsubscribe_from_key(self, key: str) -> None:
@@ -537,7 +556,7 @@ class RedisClient():
         try:
             await self._pubsub.unsubscribe(key)
         except Exception as e:
-            Logger.error(f"Error unsubscribing from key {key}: {e}")
+            logger.error(f"Error unsubscribing from key {key}: {e}")
 
     @ErrorTraceback.w_check_error_exist
     async def health_check(self) -> bool:
@@ -578,10 +597,10 @@ class RedisClient():
         
         try:
             await self._pubsub.psubscribe(pattern)
-            Logger.debug(f"📥 Subscribed to pattern: {pattern}")
+            logger.debug(f"📥 Subscribed to pattern: {pattern}")
             return self._pubsub
         except Exception as e:
-            Logger.error(f"❌ Failed to subscribe to pattern {pattern}: {e}")
+            logger.error(f"❌ Failed to subscribe to pattern {pattern}: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -612,9 +631,9 @@ class RedisClient():
 
     @ErrorTraceback.w_check_error_exist
     async def create_pubsub_listener(self, 
-                                     channels: list[str], 
-                                     callback_handler,
-                                     callback_context=None,
+                                     channels: str|list[str], 
+                                     callback_handler: Callable|Coroutine,
+                                     callback_context: Any=None,
                                      start_loop: bool = True) -> None:
         """
         Create a persistent PubSub listener with callback (supports multiple calls)
@@ -636,6 +655,8 @@ class RedisClient():
         if self._pubsub is None:
             self._pubsub = client.pubsub()
         
+        if isinstance(channels, str):
+            channels = [channels]
         try:
             # Subscribe to new channels
             new_channels = []
@@ -643,18 +664,18 @@ class RedisClient():
                 if channel not in self._active_channels:
                     if "*" in channel:
                         await self._pubsub.psubscribe(channel)
-                        Logger.debug(f"📥 Pattern subscribed: {channel}")
+                        logger.debug(f"📥 Pattern subscribed: {channel}")
                     else:
                         await self._pubsub.subscribe(channel)
-                        Logger.debug(f"📥 Channel subscribed: {channel}")
+                        logger.debug(f"📥 Channel subscribed: {channel}")
                     
                     self._active_channels.add(channel)
                     new_channels.append(channel)
                 else:
-                    Logger.debug(f"⏭️  Channel already subscribed: {channel}")
+                    logger.debug(f"⏭️  Channel already subscribed: {channel}")
             
             if new_channels:
-                Logger.info(f"🎧 PubSub listener added channels: {new_channels}")
+                logger.info(f"🎧 PubSub listener added channels: {new_channels}")
             
             # Start listening loop if not already running and start_loop is True
             if start_loop and callback_handler and not self._listener_running:
@@ -662,14 +683,14 @@ class RedisClient():
                 self._listener_task = asyncio.create_task(
                     self._start_pubsub_loop(callback_handler, callback_context)
                 )
-                Logger.info(f"🔄 PubSub listener loop started for {len(self._active_channels)} channels")
+                logger.info(f"🔄 PubSub listener loop started for {len(self._active_channels)} channels")
             elif self._listener_running:
-                Logger.debug(f"🔄 PubSub loop already running, new channels automatically active")
+                logger.debug(f"🔄 PubSub loop already running, new channels automatically active")
             elif not callback_handler:
-                Logger.warning("⚠️ No callback handler provided for PubSub listener")
+                logger.warning("⚠️ No callback handler provided for PubSub listener")
                 
         except Exception as e:
-            Logger.error(f"❌ Failed to create PubSub listener: {e}")
+            logger.error(f"❌ Failed to create PubSub listener: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -685,11 +706,11 @@ class RedisClient():
             raise RuntimeError("PubSub not available")
         
         try:
-            Logger.info(f"🔄 Starting Redis PubSub message loop for {len(self._active_channels)} channels...")
+            logger.info(f"🔄 Starting Redis PubSub message loop for {len(self._active_channels)} channels...")
             
             async for message in self._pubsub.listen():
                 if not self._listener_running:
-                    Logger.info("⏹️  PubSub loop stopped by flag")
+                    logger.info("⏹️  PubSub loop stopped by flag")
                     break
                 
                 if message["type"] in ["message", "pmessage"]:
@@ -700,21 +721,21 @@ class RedisClient():
                         else:
                             callback_handler(message, callback_context)
                             
-                        Logger.debug(f"📨 Processed message from {message.get('channel', 'unknown')}")
+                        logger.debug(f"📨 Processed message from {message.get('channel', 'unknown')}")
                         
                     except Exception as e:
-                        Logger.error(f"❌ Error processing message: {e}")
+                        logger.error(f"❌ Error processing message: {e}")
                         # Continue processing other messages
                         
         except asyncio.CancelledError:
-            Logger.info("⏹️  PubSub loop cancelled")
+            logger.info("⏹️  PubSub loop cancelled")
             raise
         except Exception as e:
-            Logger.error(f"❌ PubSub loop error: {e}")
+            logger.error(f"❌ PubSub loop error: {e}")
             raise
         finally:
             self._listener_running = False
-            Logger.info("🛑 PubSub message loop stopped")
+            logger.info("🛑 PubSub message loop stopped")
 
     @ErrorTraceback.w_check_error_exist
     async def parse_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
@@ -755,7 +776,7 @@ class RedisClient():
             }
             
         except Exception as e:
-            Logger.error(f"❌ Error parsing message: {e}")
+            logger.error(f"❌ Error parsing message: {e}")
             return {"channel": "unknown", "data": {}, "error": str(e)}
 
     @ErrorTraceback.w_check_error_exist
@@ -774,7 +795,7 @@ class RedisClient():
         }
     
     @ErrorTraceback.w_check_error_exist
-    async def remove_listener_channels(self, channels: list[str]) -> Dict[str, Any]:
+    async def remove_listener_channels(self, channels: str | list[str]) -> Dict[str, Any]:
         """
         Remove specific channels from the active listeners
         
@@ -784,8 +805,11 @@ class RedisClient():
         Returns:
             Dictionary with removal status and remaining channels
         """
+        if isinstance(channels, str):
+            channels = [channels]
+
         if self._pubsub is None:
-            Logger.warning("⚠️ No PubSub connection available")
+            logger.warning("⚠️ No PubSub connection available")
             return {
                 "success": False,
                 "removed": [],
@@ -802,20 +826,20 @@ class RedisClient():
                     # Unsubscribe based on pattern or regular channel
                     if "*" in channel:
                         await self._pubsub.punsubscribe(channel)
-                        Logger.debug(f"📤 Pattern unsubscribed: {channel}")
+                        logger.debug(f"📤 Pattern unsubscribed: {channel}")
                     else:
                         await self._pubsub.unsubscribe(channel)
-                        Logger.debug(f"📤 Channel unsubscribed: {channel}")
+                        logger.debug(f"📤 Channel unsubscribed: {channel}")
                     
                     self._active_channels.remove(channel)
                     removed.append(channel)
                 else:
                     not_found.append(channel)
-                    Logger.debug(f"⚠️  Channel not found in active listeners: {channel}")
+                    logger.debug(f"⚠️  Channel not found in active listeners: {channel}")
             
             remaining = list(self._active_channels)
             
-            Logger.info(f"🗑️  Removed {len(removed)} channels, {len(remaining)} remaining")
+            logger.info(f"🗑️  Removed {len(removed)} channels, {len(remaining)} remaining")
             
             return {
                 "success": True,
@@ -826,7 +850,7 @@ class RedisClient():
             }
             
         except Exception as e:
-            Logger.error(f"❌ Failed to remove listener channels: {e}")
+            logger.error(f"❌ Failed to remove listener channels: {e}")
             return {
                 "success": False,
                 "removed": removed,
@@ -856,13 +880,13 @@ class RedisClient():
             if self._pubsub and self._active_channels:
                 all_channels = list(self._active_channels)
                 result = await self.remove_listener_channels(all_channels)
-                Logger.info(f"🛑 Stopped PubSub listener and unsubscribed from {len(result['removed'])} channels")
+                logger.info(f"🛑 Stopped PubSub listener and unsubscribed from {len(result['removed'])} channels")
             
             self._listener_task = None
             return True
             
         except Exception as e:
-            Logger.error(f"❌ Failed to stop PubSub listener: {e}")
+            logger.error(f"❌ Failed to stop PubSub listener: {e}")
             return False
     
     # ======================
@@ -919,11 +943,11 @@ class RedisClient():
             else:
                 result = await client.xadd(stream, str_fields, id=message_id)
             
-            Logger.debug(f"📝 Added entry to stream {stream}: {result}")
+            logger.debug(f"📝 Added entry to stream {stream}: {result}")
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to add entry to stream {stream}: {e}")
+            logger.error(f"❌ Failed to add entry to stream {stream}: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -951,11 +975,11 @@ class RedisClient():
                 block=block
             )
             
-            Logger.debug(f"📖 Read from streams: {list(streams.keys())}")
+            logger.debug(f"📖 Read from streams: {list(streams.keys())}")
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to read from streams: {e}")
+            logger.error(f"❌ Failed to read from streams: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -992,11 +1016,11 @@ class RedisClient():
                 noack=noack
             )
             
-            Logger.debug(f"📖 Consumer {consumername} read from group {groupname}")
+            logger.debug(f"📖 Consumer {consumername} read from group {groupname}")
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to read as consumer group: {e}")
+            logger.error(f"❌ Failed to read as consumer group: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -1019,11 +1043,11 @@ class RedisClient():
         
         try:
             result = await client.xack(stream, groupname, *message_ids)
-            Logger.debug(f"✅ Acknowledged {result} messages in {stream}/{groupname}")
+            logger.debug(f"✅ Acknowledged {result} messages in {stream}/{groupname}")
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to acknowledge messages: {e}")
+            logger.error(f"❌ Failed to acknowledge messages: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -1053,15 +1077,15 @@ class RedisClient():
                 id=id,
                 mkstream=mkstream
             )
-            Logger.info(f"👥 Created consumer group {groupname} on stream {stream}")
+            logger.info(f"👥 Created consumer group {groupname} on stream {stream}")
             return True
             
         except Exception as e:
             # Group might already exist
             if "BUSYGROUP" in str(e):
-                Logger.debug(f"Consumer group {groupname} already exists on {stream}")
+                logger.debug(f"Consumer group {groupname} already exists on {stream}")
                 return True
-            Logger.error(f"❌ Failed to create consumer group: {e}")
+            logger.error(f"❌ Failed to create consumer group: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -1080,11 +1104,11 @@ class RedisClient():
         
         try:
             result = await client.xgroup_destroy(stream, groupname)
-            Logger.info(f"🗑️ Destroyed consumer group {groupname} on stream {stream}")
+            logger.info(f"🗑️ Destroyed consumer group {groupname} on stream {stream}")
             return bool(result)
             
         except Exception as e:
-            Logger.error(f"❌ Failed to destroy consumer group: {e}")
+            logger.error(f"❌ Failed to destroy consumer group: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -1105,7 +1129,7 @@ class RedisClient():
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to get stream length: {e}")
+            logger.error(f"❌ Failed to get stream length: {e}")
             return 0
 
     @ErrorTraceback.w_check_error_exist
@@ -1132,11 +1156,11 @@ class RedisClient():
                 maxlen=maxlen,
                 approximate=approximate
             )
-            Logger.debug(f"✂️ Trimmed stream {stream}: removed {result} entries")
+            logger.debug(f"✂️ Trimmed stream {stream}: removed {result} entries")
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to trim stream: {e}")
+            logger.error(f"❌ Failed to trim stream: {e}")
             raise
 
     @ErrorTraceback.w_check_error_exist
@@ -1185,5 +1209,5 @@ class RedisClient():
             return result
             
         except Exception as e:
-            Logger.error(f"❌ Failed to get pending messages: {e}")
+            logger.error(f"❌ Failed to get pending messages: {e}")
             raise

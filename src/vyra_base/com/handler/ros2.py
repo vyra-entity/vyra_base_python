@@ -5,7 +5,6 @@ from rclpy.node import Node
 
 from vyra_base.com.handler.communication import CommunicationHandler
 from vyra_base.com.core.types import VyraSpeaker
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 
@@ -55,7 +54,7 @@ class ROS2Handler(CommunicationHandler):
         :type record: LogRecord
         """
         try:
-            Logger.debug(
+            logger.debug(
                 f"{self._initiator} instruct {ROS2Handler.__handlerName__} "
                 f"publish -> {record.msg}"
             )
@@ -70,7 +69,7 @@ class ROS2Handler(CommunicationHandler):
             for field in type_fields:
                 value = getattr(record_msg, field, '__not_found__')
                 if value == '__not_found__':
-                    Logger.warn(
+                    logger.warn(
                         f"Ros2-Field '{field}' not found in msg-type "
                         f"{record_msg.__class__.__name__}. "
                         f"Needed fields are: {type_fields}. "

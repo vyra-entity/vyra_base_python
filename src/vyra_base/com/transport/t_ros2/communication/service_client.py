@@ -10,7 +10,7 @@ from rclpy.client import Client
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
 from vyra_base.helper.error_handler import ErrorTraceback
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 def _base_request(*args, **kwargs) -> NoReturn:
     """
@@ -51,7 +51,7 @@ class ServiceClientInfo:
     timeout: float | None = None
     last_responses: list = field(default_factory=list)
 
-class VyraServiceClient:
+class ROS2ServiceClient:
     """
     Base class for ROS2 services.
 
@@ -60,7 +60,7 @@ class VyraServiceClient:
 
     def __init__(self, serviceInfo: ServiceClientInfo, node: VyraNode) -> None:
         """
-        Initialize the VyraServiceClient.
+        Initialize the ROS2ServiceClient.
 
         Parameters
         ----------
@@ -102,7 +102,7 @@ class VyraServiceClient:
             self._service_info.name
         )
 
-        Logger.debug(f"🔍 Waiting for service <{self._service_info.name}> to become available (timeout: {self._service_info.timeout}s)...")
+        logger.debug(f"🔍 Waiting for service <{self._service_info.name}> to become available (timeout: {self._service_info.timeout}s)...")
         
         # Use async loop to avoid blocking the event loop
         start_time = asyncio.get_event_loop().time()
@@ -111,19 +111,19 @@ class VyraServiceClient:
         while True:
             # Non-blocking check with short timeout
             if self._service_info.client.wait_for_service(timeout_sec=0):
-                Logger.info(f'✅ Service <{self._service_info.name}> is now available!')
+                logger.info(f'✅ Service <{self._service_info.name}> is now available!')
                 break
             
             # Check if total timeout exceeded
             elapsed = asyncio.get_event_loop().time() - start_time
             if self._service_info.timeout and elapsed >= self._service_info.timeout:
-                Logger.error(
+                logger.error(
                     f'❌ Service <{self._service_info.name}> not available after {elapsed:.1f}s timeout')
                 raise TimeoutError(
                     f'Service <{self._service_info.name}> not available, timeout after {elapsed:.1f}s')
             
             # Yield control to event loop to allow spinner to run
-            Logger.debug(f"⏳ Service <{self._service_info.name}> not ready yet (elapsed: {elapsed:.1f}s), yielding to event loop...")
+            logger.debug(f"⏳ Service <{self._service_info.name}> not ready yet (elapsed: {elapsed:.1f}s), yielding to event loop...")
             await asyncio.sleep(check_interval)
 
         self._service_info.request = self._service_info.type.Request()
@@ -151,3 +151,9 @@ class VyraServiceClient:
         self._service_info.last_responses.append((datetime.now(), result))
 
         return result
+    
+    def destroy_service_caller(self) -> None:
+        """Destroy the service caller."""
+        if self._service_info.client:
+            self._node.destroy_client(self._service_info.client)
+            self._service_info.client = None

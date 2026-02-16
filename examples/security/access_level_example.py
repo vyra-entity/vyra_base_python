@@ -91,6 +91,7 @@ INTERFACE_CONFIG = """
 # =============================================================================
 # 2. Module Base Configuration (src/module_name/_base_.py)
 # =============================================================================
+import logging
 
 from vyra_base.core.entity import VyraEntity
 from vyra_base.security import SecurityLevel
@@ -144,9 +145,10 @@ async def build_base():
 # =============================================================================
 
 from vyra_base.state import OperationalStateMachine
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service
 from vyra_base.security import security_required, SecurityLevel
-from vyra_base.helper.logger import Logger
+
+logger = logging.getLogger(__name__)
 
 class Application(OperationalStateMachine):
     """
@@ -159,22 +161,22 @@ class Application(OperationalStateMachine):
         
         # Log security status
         if entity.security_manager:
-            Logger.info(f"Security enabled: Max level {entity.security_manager.max_security_level}")
+            logger.info(f"Security enabled: Max level {entity.security_manager.max_security_level}")
         else:
-            Logger.warning("Security disabled - all services are public")
+            logger.warning("Security disabled - all services are public")
     
     # -------------------------------------------------------------------------
     # Level 1: Public Service (No authentication required)
     # -------------------------------------------------------------------------
     
-    @remote_callable()
+    @remote_service()
     @security_required(security_level=SecurityLevel.NONE)
     def get_status(self, request=None, response=None):
         """
         Public service - anyone can call without authentication.
         Matches access_level: 1 in module_meta.json
         """
-        Logger.info("get_status called")
+        logger.info("get_status called")
         
         if response is None:
             return response
@@ -187,7 +189,7 @@ class Application(OperationalStateMachine):
     # Level 3: Password Required
     # -------------------------------------------------------------------------
     
-    @remote_callable()
+    @remote_service()
     @security_required(security_level=SecurityLevel.EXTENDED_AUTH)
     def set_config(self, request=None, response=None):
         """
@@ -201,7 +203,7 @@ class Application(OperationalStateMachine):
         
         If validation fails, response.success = False automatically.
         """
-        Logger.info(f"set_config called: {request.key} = {request.value}")
+        logger.info(f"set_config called: {request.key} = {request.value}")
         
         # If we get here, access is granted
         # Store configuration
@@ -215,7 +217,7 @@ class Application(OperationalStateMachine):
     # Level 4: HMAC Signature Required
     # -------------------------------------------------------------------------
     
-    @remote_callable()
+    @remote_service()
     @security_required(security_level=SecurityLevel.HMAC)
     def start_operation(self, request=None, response=None):
         """
@@ -227,7 +229,7 @@ class Application(OperationalStateMachine):
         - Valid session with Level 4 access
         - Calling module has been granted HMAC level
         """
-        Logger.info(f"start_operation called: {request.operation_id}")
+        logger.info(f"start_operation called: {request.operation_id}")
         
         # If we get here, HMAC validation passed
         # Execute operation

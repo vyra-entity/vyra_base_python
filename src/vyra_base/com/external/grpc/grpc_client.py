@@ -18,7 +18,7 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -105,7 +105,7 @@ class GrpcClient:
     async def connect(self) -> None:
         """Establish connection to gRPC server."""
         try:
-            Logger.info(f"🔌 Connecting to gRPC server: {self.target}")
+            logger.info(f"🔌 Connecting to gRPC server: {self.target}")
             
             # Create channel
             if self.credentials:
@@ -130,10 +130,10 @@ class GrpcClient:
                 raise ConnectionError(f"Connection timeout to {self.target}")
             
             self._connected = True
-            Logger.info(f"✅ Connected to gRPC server: {self.target}")
+            logger.info(f"✅ Connected to gRPC server: {self.target}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to connect to gRPC server: {e}")
+            logger.error(f"❌ Failed to connect to gRPC server: {e}")
             self._connected = False
             if self._channel:
                 await self._channel.close()
@@ -144,11 +144,11 @@ class GrpcClient:
     async def close(self) -> None:
         """Close connection to gRPC server."""
         if self._channel:
-            Logger.info(f"🔌 Closing gRPC connection: {self.target}")
+            logger.info(f"🔌 Closing gRPC connection: {self.target}")
             await self._channel.close()
             self._channel = None
             self._connected = False
-            Logger.info("✅ gRPC connection closed")
+            logger.info("✅ gRPC connection closed")
     
     def _ensure_connected(self):
         """Ensure client is connected."""
@@ -181,7 +181,7 @@ class GrpcClient:
             raise RuntimeError("gRPC channel is not initialized")
 
         try:
-            Logger.debug(f"📤 Calling gRPC method: {method}")
+            logger.debug(f"📤 Calling gRPC method: {method}")
             
             # Create unary-unary call
             call = self._channel.unary_unary(
@@ -197,14 +197,14 @@ class GrpcClient:
                 metadata=metadata
             )
             
-            Logger.debug(f"✅ gRPC call completed: {method}")
+            logger.debug(f"✅ gRPC call completed: {method}")
             return response
             
         except grpc.RpcError as e:
-            Logger.error(f"❌ gRPC call failed: {method} - {e.code()}: {e.details()}")
+            logger.error(f"❌ gRPC call failed: {method} - {e.code()}: {e.details()}")
             raise
         except Exception as e:
-            Logger.error(f"❌ gRPC call failed: {method} - {e}")
+            logger.error(f"❌ gRPC call failed: {method} - {e}")
             raise
     
     async def __aenter__(self):

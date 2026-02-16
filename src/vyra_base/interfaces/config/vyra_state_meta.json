@@ -1,17 +1,14 @@
 [
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "initialize",
         "displayname": "Initialize",
         "description": "Executing initial commands and set state IDLE -> READY",
         "filetype": [
-            "VBASEStateInitialize.srv",
-            "StateInitialize.proto"
+            "VBASEStateInitialize.proto"
         ],
         "params": [
             {
@@ -43,17 +40,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "pause",
         "displayname": "Pause",
         "description": "Pause the current operation and set state READY|RUNNING -> PAUSED",
         "filetype": [
-            "VBASEStatePause.srv",
-            "StatePause.proto"
+            "VBASEStatePause.proto"
         ],
         "params": [
             {
@@ -85,17 +79,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "stop",
         "displayname": "Stop",
         "description": "Stop the current operation and set state READY|RUNNING|PAUSED -> STOPPED",
         "filetype": [
-            "VBASEStateStop.srv",
-            "StateStop.proto"
+            "VBASEStateStop.proto"
         ],
         "params": [
             {
@@ -127,17 +118,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "resume",
         "displayname": "Resume",
         "description": "Resume the current operation and set state PAUSED -> RUNNING",
         "filetype": [
-            "VBASEStateResume.srv",
-            "StateResume.proto"
+            "VBASEStateResume.proto"
         ],
         "params": [
             {
@@ -169,17 +157,14 @@
     },
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "reset",
         "displayname": "Reset",
         "description": "Reset the current operation and set state STOPPED -> IDLE",
         "filetype": [
-            "VBASEStateReset.srv",
-            "StateReset.proto"
+            "VBASEStateReset.proto"
         ],
         "params": [
             {

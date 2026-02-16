@@ -19,7 +19,9 @@ from .feeder import BaseFeeder
 from vyra_base.defaults.entries import ModuleEntry
 from vyra_base.defaults.entries import StateEntry
 from vyra_base.defaults.exceptions import FeederException
-from vyra_base.helper.logger import Logger
+
+logger = logging.getLogger(__name__)
+
 
 class StateFeeder(BaseFeeder):
     """

@@ -9,7 +9,7 @@ import concurrent.futures
 from rclpy.service import Service as rclService
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 import asyncio
 
@@ -44,7 +44,7 @@ class ServiceServerInfo:
     service: Union[rclService, None] = None
     callback_timeout: int | None = None
 
-class VyraServiceServer:
+class ROS2ServiceServer:
     """
     Base class for ROS2 services.
 
@@ -53,10 +53,10 @@ class VyraServiceServer:
 
     def __init__(self, serviceInfo: ServiceServerInfo, node: VyraNode, async_loop = None) -> None:
         """
-        Initialize the VyraServiceServer.
+        Initialize the ROS2ServiceServer.
 
         :param serviceInfo: Information about the service.
-        :type serviceInfo: ServiceInfo
+        :type serviceInfo: ServiceServerInfo
         :param node: The ROS2 node to attach the service to.
         :type node: VyraNode
         :param async_loop: Optional asyncio event loop.
@@ -86,7 +86,7 @@ class VyraServiceServer:
         :raises TypeError: If the callback is not callable.
         :raises ValueError: If the service type or name is not provided.
         """
-        Logger.info(f"Creating service: {self._service_info.name}")
+        logger.info(f"Creating service: {self._service_info.name}")
         
         self._service_info.callback = callback
         
@@ -110,7 +110,7 @@ class VyraServiceServer:
             self._service_callback
         )
 
-        Logger.info(
+        logger.info(
             f"ROS2 Service {self._service_info.name} created with "
             f"type {self._service_info.type} and "
             f"callback {callback}.")
@@ -124,7 +124,7 @@ class VyraServiceServer:
         if self._service_info.service:
             self._node.destroy_service(self._service_info.service)
             self._service_info.service = None
-            Logger.info(f"Service '{self._service_info.name}' destroyed.")
+            logger.info(f"Service '{self._service_info.name}' destroyed.")
 
     @ErrorTraceback.w_check_error_exist
     def _service_callback(self, request, response) -> None:
@@ -141,7 +141,7 @@ class VyraServiceServer:
         :rtype: Any
         """
         
-        Logger.info(f"Service callback triggered for: {self._service_info.name}")
+        logger.info(f"Service callback triggered for: {self._service_info.name}")
 
         # Check if it's an async function or async method
         is_async = (iscoroutinefunction(self._service_info.callback) or 
@@ -149,7 +149,7 @@ class VyraServiceServer:
                     iscoroutinefunction(self._service_info.callback.__func__)))
 
         if self._async_loop is not None and is_async:
-            Logger.debug(
+            logger.debug(
                 f"Scheduling async callback for service {self._service_info.name}."
             )
 
@@ -157,12 +157,12 @@ class VyraServiceServer:
                 self._service_info.callback(request, response),
                 self._service_info.callback_timeout
             )
-            Logger.debug(
+            logger.debug(
                 f"Async callback for {self._service_info.name} completed: {result}"
             )
         
         elif callable(self._service_info.callback):
-            Logger.log(f"Executing sync callback for service {self._service_info.name}.")
+            logger.log(f"Executing sync callback for service {self._service_info.name}.")
             # Fallback: just call the callback directly (sync)
             self._service_info.callback(request=request, response=response)
 
@@ -186,7 +186,7 @@ class VyraServiceServer:
             # Prüfe ob bereits ein Loop im aktuellen Thread existiert
             try:
                 existing_loop = asyncio.get_running_loop()
-                Logger.debug(
+                logger.debug(
                     f"Warning: Thread already has running loop: {existing_loop}"
                 )
                 # Das sollte in einem neuen Thread nie passieren
@@ -199,7 +199,7 @@ class VyraServiceServer:
             asyncio.set_event_loop(loop)
             
             try:
-                Logger.debug(
+                logger.debug(
                     f"Created new event loop in thread: {threading.current_thread().name}"
                 )
                 if timeout is not None:

@@ -16,7 +16,6 @@ import logging
 from typing import Any, Optional
 
 from vyra_base.com.industrial.modbus.base import ModbusBaseClient
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -91,7 +90,7 @@ class ModbusTCPClient(ModbusBaseClient):
     async def connect(self) -> None:
         """Establish TCP connection to Modbus server."""
         try:
-            Logger.info(f"🔌 Connecting to Modbus TCP: {self.host}:{self.port}")
+            logger.info(f"🔌 Connecting to Modbus TCP: {self.host}:{self.port}")
             
             self._client = AsyncModbusTcpClient(
                 host=self.host,
@@ -105,10 +104,10 @@ class ModbusTCPClient(ModbusBaseClient):
                 raise ConnectionError("Modbus TCP connection failed")
             
             self._connected = True
-            Logger.info(f"✅ Connected to Modbus TCP: {self.host}:{self.port}")
+            logger.info(f"✅ Connected to Modbus TCP: {self.host}:{self.port}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to connect to Modbus TCP: {e}")
+            logger.error(f"❌ Failed to connect to Modbus TCP: {e}")
             self._connected = False
             raise
     
@@ -116,11 +115,11 @@ class ModbusTCPClient(ModbusBaseClient):
     async def close(self) -> None:
         """Close TCP connection to Modbus server."""
         if self._client:
-            Logger.info(f"🔌 Closing Modbus TCP connection: {self.host}:{self.port}")
+            logger.info(f"🔌 Closing Modbus TCP connection: {self.host}:{self.port}")
             self._client.close()
             self._client = None
             self._connected = False
-            Logger.info("✅ Modbus TCP connection closed")
+            logger.info("✅ Modbus TCP connection closed")
     
     def _get_client(self) -> Optional[AsyncModbusTcpClient]:
         """Get underlying pymodbus TCP client."""

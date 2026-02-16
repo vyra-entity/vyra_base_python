@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import sessionmaker
 
 from vyra_base.helper.logger import (
-    Logger, 
+    logger, 
     LogEntry, 
     LogMode
 )
@@ -129,7 +129,7 @@ class DbAccess(Storage):
 
             self.db_engine: AsyncEngine = self._build_engine()
 
-            Logger.add_external('sqlalchemy.engine')
+            logger.add_external('sqlalchemy.engine')
 
             # Configure sqlalchemy logger to use application logging format
             root_logger = logging.getLogger()
@@ -151,7 +151,7 @@ class DbAccess(Storage):
         :returns: An instance of AsyncEngine.
         :rtype: AsyncEngine
         """
-        Logger.info("Building database engine: "
+        logger.info("Building database engine: "
                     f"Type: {self.db_type}, Name: {self._database}, "
                     f"Path: {self._path}, Host: {self._host}, "
                     f"Port: {self._port}")
@@ -200,7 +200,7 @@ class DbAccess(Storage):
         try:
             async with self.db_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-                Logger.log(
+                logger.log(
                     LogEntry(f'Successfully created all defined tables', mode=LogMode.INFO))
 
             return DBSTATUS.SUCCESS
@@ -240,7 +240,7 @@ class DbAccess(Storage):
             async with self.db_engine.begin() as conn:
                 await conn.run_sync(meta.create_all)
 
-                Logger.log(LogEntry(
+                logger.log(LogEntry(
                     f'Successfully created table {table_name}'))
 
             return DBSTATUS.SUCCESS
@@ -279,9 +279,9 @@ class DbAccess(Storage):
 
                 if table_obj is not None:
                     await async_conn.run_sync(lambda sync_conn: table_obj.drop(sync_conn))
-                    Logger.log(LogEntry(f"Tabelle '{table_name}' wurde gelöscht."))
+                    logger.log(LogEntry(f"Tabelle '{table_name}' wurde gelöscht."))
                 else:
-                    Logger.log(LogEntry(f"Tabelle '{table_name}' existiert nicht."))
+                    logger.log(LogEntry(f"Tabelle '{table_name}' existiert nicht."))
                     return DBSTATUS.NOT_FOUND
 
             return DBSTATUS.SUCCESS

@@ -23,7 +23,7 @@ from typing import Any, Dict, Optional, List
 from dataclasses import dataclass, field
 from enum import Enum
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -113,11 +113,11 @@ class ExternalRegistry:
     async def start(self):
         """Start registry and health monitoring."""
         if self._running:
-            Logger.warning("Registry already running")
+            logger.warning("Registry already running")
             return
         
         self._running = True
-        Logger.info("🚀 External protocol registry started")
+        logger.info("🚀 External protocol registry started")
         
         # Start health check task
         self._health_check_task = asyncio.create_task(self._health_check_loop())
@@ -129,7 +129,7 @@ class ExternalRegistry:
             return
         
         self._running = False
-        Logger.info("⏹️  Stopping external protocol registry")
+        logger.info("⏹️  Stopping external protocol registry")
         
         # Cancel health check task
         if self._health_check_task:
@@ -143,7 +143,7 @@ class ExternalRegistry:
         for name in list(self._connections.keys()):
             await self.unregister(name)
         
-        Logger.info("✅ External protocol registry stopped")
+        logger.info("✅ External protocol registry stopped")
     
     @ErrorTraceback.w_check_error_exist
     async def register(
@@ -168,7 +168,7 @@ class ExternalRegistry:
             ProtocolConnection object
         """
         if name in self._connections:
-            Logger.warning(f"Connection '{name}' already registered, updating")
+            logger.warning(f"Connection '{name}' already registered, updating")
             await self.unregister(name)
         
         connection = ProtocolConnection(
@@ -180,7 +180,7 @@ class ExternalRegistry:
         )
         
         self._connections[name] = connection
-        Logger.info(f"✅ Registered {protocol_type} connection: {name} -> {endpoint}")
+        logger.info(f"✅ Registered {protocol_type} connection: {name} -> {endpoint}")
         
         return connection
     
@@ -196,7 +196,7 @@ class ExternalRegistry:
             True if unregistered, False if not found
         """
         if name not in self._connections:
-            Logger.warning(f"Connection '{name}' not found")
+            logger.warning(f"Connection '{name}' not found")
             return False
         
         connection = self._connections[name]
@@ -210,10 +210,10 @@ class ExternalRegistry:
                     else:
                         connection.client.close()
             except Exception as e:
-                Logger.error(f"Error closing client: {e}")
+                logger.error(f"Error closing client: {e}")
         
         del self._connections[name]
-        Logger.info(f"✅ Unregistered connection: {name}")
+        logger.info(f"✅ Unregistered connection: {name}")
         return True
     
     def get_connection(self, name: str) -> Optional[ProtocolConnection]:
@@ -305,7 +305,7 @@ class ExternalRegistry:
             try:
                 healthy = connection.client.is_connected
             except Exception as e:
-                Logger.error(f"Health check error for '{name}': {e}")
+                logger.error(f"Health check error for '{name}': {e}")
                 healthy = False
                 connection.update_status(ProtocolStatus.ERROR, str(e))
         
@@ -350,7 +350,7 @@ class ExternalRegistry:
                 # Log unhealthy connections
                 for result in results:
                     if not result["healthy"]:
-                        Logger.warning(
+                        logger.warning(
                             f"⚠️  Unhealthy connection: {result['name']} "
                             f"({result['protocol_type']}) - {result['last_error']}"
                         )
@@ -358,7 +358,7 @@ class ExternalRegistry:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                Logger.error(f"Error in health check loop: {e}")
+                logger.error(f"Error in health check loop: {e}")
     
     def get_statistics(self) -> Dict[str, Any]:
         """

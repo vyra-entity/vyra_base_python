@@ -1,0 +1,13 @@
+# Get Parameter
+# Get a parameter in the vyra system.
+# Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+# Request
+string key  # The key of the parameter to get.
+
+---
+
+# Response
+bool success  # Indicates whether the transition was successful
+string message  # A message providing additional information about the transition
+string value  # The value of the parameter.

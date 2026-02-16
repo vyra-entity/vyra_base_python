@@ -10,7 +10,6 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional
 
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -104,7 +103,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"📖 Reading {count} coils from address {address}")
+            logger.debug(f"📖 Reading {count} coils from address {address}")
             
             result = await self._get_client().read_coils(
                 address=address,
@@ -118,7 +117,7 @@ class ModbusBaseClient(ABC):
             return result.bits[:count]
             
         except Exception as e:
-            Logger.error(f"❌ Failed to read coils: {e}")
+            logger.error(f"❌ Failed to read coils: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -140,7 +139,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"📖 Reading {count} discrete inputs from address {address}")
+            logger.debug(f"📖 Reading {count} discrete inputs from address {address}")
             
             result = await self._get_client().read_discrete_inputs(
                 address=address,
@@ -154,7 +153,7 @@ class ModbusBaseClient(ABC):
             return result.bits[:count]
             
         except Exception as e:
-            Logger.error(f"❌ Failed to read discrete inputs: {e}")
+            logger.error(f"❌ Failed to read discrete inputs: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -176,7 +175,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"📖 Reading {count} holding registers from address {address}")
+            logger.debug(f"📖 Reading {count} holding registers from address {address}")
             
             result = await self._get_client().read_holding_registers(
                 address=address,
@@ -190,7 +189,7 @@ class ModbusBaseClient(ABC):
             return result.registers
             
         except Exception as e:
-            Logger.error(f"❌ Failed to read holding registers: {e}")
+            logger.error(f"❌ Failed to read holding registers: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -212,7 +211,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"📖 Reading {count} input registers from address {address}")
+            logger.debug(f"📖 Reading {count} input registers from address {address}")
             
             result = await self._get_client().read_input_registers(
                 address=address,
@@ -226,7 +225,7 @@ class ModbusBaseClient(ABC):
             return result.registers
             
         except Exception as e:
-            Logger.error(f"❌ Failed to read input registers: {e}")
+            logger.error(f"❌ Failed to read input registers: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -245,7 +244,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"✍️  Writing coil {address} = {value}")
+            logger.debug(f"✍️  Writing coil {address} = {value}")
             
             result = await self._get_client().write_coil(
                 address=address,
@@ -256,10 +255,10 @@ class ModbusBaseClient(ABC):
             if result.isError():
                 raise ModbusException(f"Failed to write coil: {result}")
             
-            Logger.debug(f"✅ Coil {address} written successfully")
+            logger.debug(f"✅ Coil {address} written successfully")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to write coil: {e}")
+            logger.error(f"❌ Failed to write coil: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -278,7 +277,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"✍️  Writing register {address} = {value}")
+            logger.debug(f"✍️  Writing register {address} = {value}")
             
             result = await self._get_client().write_register(
                 address=address,
@@ -289,10 +288,10 @@ class ModbusBaseClient(ABC):
             if result.isError():
                 raise ModbusException(f"Failed to write register: {result}")
             
-            Logger.debug(f"✅ Register {address} written successfully")
+            logger.debug(f"✅ Register {address} written successfully")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to write register: {e}")
+            logger.error(f"❌ Failed to write register: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -311,7 +310,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"✍️  Writing {len(values)} coils from address {address}")
+            logger.debug(f"✍️  Writing {len(values)} coils from address {address}")
             
             result = await self._get_client().write_coils(
                 address=address,
@@ -322,10 +321,10 @@ class ModbusBaseClient(ABC):
             if result.isError():
                 raise ModbusException(f"Failed to write coils: {result}")
             
-            Logger.debug(f"✅ {len(values)} coils written successfully")
+            logger.debug(f"✅ {len(values)} coils written successfully")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to write coils: {e}")
+            logger.error(f"❌ Failed to write coils: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -344,7 +343,7 @@ class ModbusBaseClient(ABC):
         self._require_connection()
         
         try:
-            Logger.debug(f"✍️  Writing {len(values)} registers from address {address}")
+            logger.debug(f"✍️  Writing {len(values)} registers from address {address}")
             
             result = await self._get_client().write_registers(
                 address=address,
@@ -355,8 +354,8 @@ class ModbusBaseClient(ABC):
             if result.isError():
                 raise ModbusException(f"Failed to write registers: {result}")
             
-            Logger.debug(f"✅ {len(values)} registers written successfully")
+            logger.debug(f"✅ {len(values)} registers written successfully")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to write registers: {e}")
+            logger.error(f"❌ Failed to write registers: {e}")
             raise

@@ -10,9 +10,12 @@ from typing import Any, Callable, Optional, Dict
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
-    VyraCallable,
-    VyraSpeaker,
-    VyraJob,
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient,
 )
 from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
@@ -20,6 +23,14 @@ from vyra_base.com.core.exceptions import (
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 from vyra_base.com.transport.t_redis.communication.redis_client import RedisClient
+from vyra_base.com.transport.t_redis.vyra_models import (
+    RedisPublisherImpl,
+    RedisSubscriberImpl,
+    RedisServerImpl,
+    RedisClientImpl,
+    RedisActionServerImpl,
+    RedisActionClientImpl,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -150,109 +161,278 @@ class RedisProvider(AbstractProtocolProvider):
         self._initialized = False
         self._client = None
     
-    async def create_callable(
+    # ============================================================================
+    # UNIFIED TRANSPORT LAYER METHODS
+    # ============================================================================
+    
+    async def create_publisher(
         self,
         name: str,
-        callback: Optional[Callable] = None,
+        topic_builder: TopicBuilder,
+        message_type: type,
         **kwargs
-    ) -> VyraCallable:
+    ) -> VyraPublisher:
         """
-        Create Redis Callable (request-response via key-value).
-        
-        Redis Callable supports request-response pattern:
-        - Server-side: Listens to request keys, executes callback, writes response
-        - Client-side: Writes request key, waits for response key
+        Create Redis Publisher (Pub/Sub).
         
         Args:
-            name: Callable name (used as key prefix)
-            callback: Server-side callback function (None for client)
-            **kwargs: Additional parameters
-                - is_callable: True for server, False for client (auto-detected from callback if not provided)
+            name: Publisher name
+            topic_builder: TopicBuilder instance
+            message_type: Message type class
+            **kwargs: Additional publisher options
             
         Returns:
-            VyraCallable: Redis callable instance
+            RedisPublisherImpl instance
         """
-        if not self._initialized:
+        if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
-        from vyra_base.com.transport.t_redis.vyra_models import RedisCallable
-        
-        # Check is_callable flag (defaults to True if callback provided, False otherwise)
-        is_callable = kwargs.pop("is_callable", callback is not None)
-        
-        role = "server" if is_callable else "client"
-        logger.info(f"🔧 Creating Redis callable {role}: {name}")
-        
-        # Ensure callback matches is_callable flag
-        if is_callable and callback is None:
-            raise ProviderError("Callback required for callable server (is_callable=True)")
-        if not is_callable and callback is not None:
-            logger.debug("Ignoring callback for callable client (is_callable=False)")
-            callback = None
-        
-        callable_obj = RedisCallable(
-            name=name,
-            topic_builder=self._topic_builder,
-            callback=callback,
-            redis_client=self._client,
-            **kwargs
-        )
-        
-        await callable_obj.initialize()
-        logger.info(f"✅ Redis callable {role} created: {name}")
-        return callable_obj
+        try:
+            publisher = RedisPublisherImpl(
+                name=name,
+                topic_builder=topic_builder,
+                redis_client=self._client,
+                message_type=message_type,
+                **kwargs
+            )
+            
+            await publisher.initialize()
+            
+            logger.info(f"✅ Redis Publisher created: {name}")
+            return publisher
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis Publisher '{name}': {e}")
+            raise ProviderError(f"Failed to create publisher: {e}")
     
-    async def create_speaker(
+    async def create_subscriber(
         self,
         name: str,
-        callback: Optional[Callable] = None,
+        topic_builder: TopicBuilder,
+        subscriber_callback: Callable,
+        message_type: type,
         **kwargs
-    ) -> VyraSpeaker:
+    ) -> VyraSubscriber:
         """
-        Create Redis Speaker (Pub/Sub).
+        Create Redis Subscriber (Pub/Sub).
         
         Args:
-            name: Channel name
-            callback: Optional callback for subscriber
-            **kwargs: Additional parameters
+            name: Subscriber name
+            topic_builder: TopicBuilder instance
+            subscriber_callback: Async callback for received messages
+            message_type: Message type class
+            **kwargs: Additional subscriber options
             
         Returns:
-            VyraSpeaker: Redis speaker instance
+            RedisSubscriberImpl instance
         """
-        if not self._initialized:
+        if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
-        from vyra_base.com.transport.t_redis.vyra_models import RedisSpeaker
-        
-        speaker = RedisSpeaker(
-            name=name,
-            topic_builder=self._topic_builder,
-            redis_client=self._client,
-            module_name=self.module_name,
-            callback=callback,
-            **kwargs
-        )
-        
-        await speaker.initialize()
-        return speaker
+        try:
+            subscriber = RedisSubscriberImpl(
+                name=name,
+                topic_builder=topic_builder,
+                subscriber_callback=subscriber_callback,
+                redis_client=self._client,
+                message_type=message_type,
+                **kwargs
+            )
+            
+            await subscriber.initialize()
+            await subscriber.subscribe()
+            
+            logger.info(f"✅ Redis Subscriber created: {name}")
+            return subscriber
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis Subscriber '{name}': {e}")
+            raise ProviderError(f"Failed to create subscriber: {e}")
     
-    async def create_job(
+    async def create_server(
         self,
         name: str,
-        callback: Optional[Callable] = None,
+        topic_builder: TopicBuilder,
+        response_callback: Callable,
+        service_type: type,
         **kwargs
-    ) -> VyraJob:
+    ) -> VyraServer:
         """
-        Create Redis Job (Redis Streams consumer).
+        Create Redis Server (request/response pattern).
         
-        Note:
-            Redis Jobs use Redis Streams for long-running tasks
-            with progress feedback.
+        Args:
+            name: Server name
+            topic_builder: TopicBuilder instance
+            response_callback: Async callback for handling requests
+            service_type: Service type class
+            **kwargs: Additional server options
+            
+        Returns:
+            RedisServerImpl instance
         """
-        raise NotImplementedError(
-            "Redis Job not yet implemented. "
-            "Consider using Redis Streams or async tasks."
-        )
+        if not self._initialized or not self._client:
+            raise ProviderError("Provider not initialized")
+        
+        try:
+            server = RedisServerImpl(
+                name=name,
+                topic_builder=topic_builder,
+                response_callback=response_callback,
+                redis_client=self._client,
+                service_type=service_type,
+                **kwargs
+            )
+            
+            await server.initialize()
+            await server.serve()
+            
+            logger.info(f"✅ Redis Server created: {name}")
+            return server
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis Server '{name}': {e}")
+            raise ProviderError(f"Failed to create server: {e}")
+    
+    async def create_client(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        service_type: type,
+        request_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraClient:
+        """
+        Create Redis Client (request/response pattern).
+        
+        Args:
+            name: Client name
+            topic_builder: TopicBuilder instance
+            service_type: Service type class
+            request_callback: Optional async callback for responses
+            **kwargs: Additional client options
+            
+        Returns:
+            RedisClientImpl instance
+        """
+        if not self._initialized or not self._client:
+            raise ProviderError("Provider not initialized")
+        
+        try:
+            client = RedisClientImpl(
+                name=name,
+                topic_builder=topic_builder,
+                request_callback=request_callback,
+                redis_client=self._client,
+                service_type=service_type,
+                **kwargs
+            )
+            
+            await client.initialize()
+            
+            logger.info(f"✅ Redis Client created: {name}")
+            return client
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis Client '{name}': {e}")
+            raise ProviderError(f"Failed to create client: {e}")
+    
+    async def create_action_server(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        handle_goal_request: Callable,
+        handle_cancel_request: Callable,
+        execution_callback: Callable,
+        action_type: type,
+        **kwargs
+    ) -> VyraActionServer:
+        """
+        Create Redis Action Server (state tracking + pub/sub).
+        
+        Args:
+            name: Action server name
+            topic_builder: TopicBuilder instance
+            handle_goal_request: Async callback for goal requests
+            handle_cancel_request: Async callback for cancel requests
+            execution_callback: Async callback for goal execution
+            action_type: Action type class
+            **kwargs: Additional action server options
+            
+        Returns:
+            RedisActionServerImpl instance
+        """
+        if not self._initialized or not self._client:
+            raise ProviderError("Provider not initialized")
+        
+        try:
+            action_server = RedisActionServerImpl(
+                name=name,
+                topic_builder=topic_builder,
+                handle_goal_request=handle_goal_request,
+                handle_cancel_request=handle_cancel_request,
+                execution_callback=execution_callback,
+                redis_client=self._client,
+                action_type=action_type,
+                **kwargs
+            )
+            
+            await action_server.initialize()
+            
+            logger.info(f"✅ Redis Action Server created: {name}")
+            return action_server
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis Action Server '{name}': {e}")
+            raise ProviderError(f"Failed to create action server: {e}")
+    
+    async def create_action_client(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        action_type: type,
+        direct_response: Optional[Callable] = None,
+        feedback_callback: Optional[Callable] = None,
+        goal_response_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraActionClient:
+        """
+        Create Redis Action Client.
+        
+        Args:
+            name: Action client name
+            topic_builder: TopicBuilder instance
+            action_type: Action type class
+            direct_response: Optional async callback for results
+            feedback_callback: Optional async callback for feedback
+            goal_response_callback: Optional async callback for goal responses
+            **kwargs: Additional action client options
+            
+        Returns:
+            RedisActionClientImpl instance
+        """
+        if not self._initialized or not self._client:
+            raise ProviderError("Provider not initialized")
+        
+        try:
+            action_client = RedisActionClientImpl(
+                name=name,
+                topic_builder=topic_builder,
+                direct_response=direct_response,
+                feedback_callback=feedback_callback,
+                goal_response_callback=goal_response_callback,
+                redis_client=self._client,
+                action_type=action_type,
+                **kwargs
+            )
+            
+            await action_client.initialize()
+            
+            logger.info(f"✅ Redis Action Client created: {name}")
+            return action_client
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Redis Action Client '{name}': {e}")
+            raise ProviderError(f"Failed to create action client: {e}")
     
     def get_client(self) -> Any:
         """

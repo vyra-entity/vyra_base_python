@@ -45,7 +45,7 @@ class ActionClientInfo:
     TIMEOUT_SEC: Final[float] = 1.0
 
 
-class VyraActionClient:
+class ROS2ActionClient:
     """
     Base class for ROS2 action client.
 
@@ -54,10 +54,10 @@ class VyraActionClient:
 
     def __init__(self, actionInfo: ActionClientInfo, node: VyraNode) -> None:
         """
-        Initialize the VyraActionClient.
+        Initialize the ROS2ActionClient.
 
         :param actionInfo: Information about the action.
-        :type actionInfo: ActionInfo
+        :type actionInfo: ActionClientInfo
         :param node: The ROS2 node.
         :type node: VyraNode
         """

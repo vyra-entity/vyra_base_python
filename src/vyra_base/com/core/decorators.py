@@ -13,7 +13,7 @@ from vyra_base.com.core.factory import InterfaceFactory
 logger = logging.getLogger(__name__)
 
 
-def remote_callable(
+def remote_service(
     name: Optional[str] = None,
     protocols: Optional[List[ProtocolType]] = None,
     auto_register: bool = True,
@@ -263,4 +263,4 @@ def get_decorated_methods(obj: Any) -> dict:
 
 
 # Backward compatibility alias
-remote_callable_ros2 = remote_callable  # Old decorator name
+remote_callable_ros2 = remote_service  # Old decorator name

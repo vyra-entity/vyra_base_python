@@ -523,18 +523,3 @@ Resources
 - **API Docs**: :doc:`api`
 - **Integration**: ``docs/security/INTEGRATION_GUIDE.md``
 
-Support
--------
-
-For issues:
-
-1. Check :doc:`overview` troubleshooting section
-2. Review example code
-3. Enable debug logging:
-
-   .. code-block:: python
-
-      from vyra_base.helper.logger import Logger
-      import logging
-      Logger.setLevel(logging.DEBUG)
-

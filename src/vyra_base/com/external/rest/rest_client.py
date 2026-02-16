@@ -14,7 +14,7 @@ import logging
 from typing import Any, Optional, Dict
 import json
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ class RestClient:
             headers=self.headers,
             verify=self.verify_ssl
         )
-        Logger.debug(f"REST client initialized: {self.base_url}")
+        logger.debug(f"REST client initialized: {self.base_url}")
     
     @ErrorTraceback.w_check_error_exist
     async def close(self) -> None:
@@ -90,7 +90,7 @@ class RestClient:
         if self._client:
             await self._client.aclose()
             self._client = None
-        Logger.debug(f"REST client closed: {self.base_url}")
+        logger.debug(f"REST client closed: {self.base_url}")
     
     async def _ensure_connected(self) -> httpx.AsyncClient:
         """Ensure client is created."""
@@ -123,7 +123,7 @@ class RestClient:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            Logger.error(f"❌ REST GET failed: {path}: {e}")
+            logger.error(f"❌ REST GET failed: {path}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -149,7 +149,7 @@ class RestClient:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            Logger.error(f"❌ REST POST failed: {path}: {e}")
+            logger.error(f"❌ REST POST failed: {path}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -175,7 +175,7 @@ class RestClient:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            Logger.error(f"❌ REST PUT failed: {path}: {e}")
+            logger.error(f"❌ REST PUT failed: {path}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -197,7 +197,7 @@ class RestClient:
             response.raise_for_status()
             return response.json() if response.content else None
         except Exception as e:
-            Logger.error(f"❌ REST DELETE failed: {path}: {e}")
+            logger.error(f"❌ REST DELETE failed: {path}: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist

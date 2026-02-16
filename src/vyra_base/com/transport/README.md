@@ -4,22 +4,23 @@ Complete implementation of pluggable communication protocols for the VYRA framew
 
 ## Overview
 
-The VYRA Transport Layer provides a unified abstraction for multiple communication protocols, implementing the **Provider Pattern** for seamless protocol switching.
+The VYRA Transport Layer provides a unified abstraction for multiple communication protocols, implementing the **Provider Pattern** for seamless protocol switching with automatic fallback.
 
 ### Architecture
 
 ```
 vyra_base/com/
 ├── core/                    # Base types and exceptions
-│   ├── types.py            # VyraCallable, VyraSpeaker, VyraJob
-│   └── exceptions.py       # Transport exceptions
+│   ├── types.py            # VyraPublisher, VyraSubscriber, VyraServer, VyraClient, VyraActionServer, VyraActionClient
+│   ├── topic_builder.py    # Dynamic topic/service name generation
+│   └── exceptions.py       # InterfaceError, ProtocolUnavailableError
 ├── providers/              # Provider interface
-│   └── protocol_provider.py
+│   └── protocol_provider.py  # AbstractProtocolProvider
 └── transport/              # Protocol implementations
-    ├── zenoh/             # ✅ Eclipse Zenoh transport (DEFAULT)
-    ├── ros2/              # ✅ ROS2/DDS transport
-    ├── redis/             # ✅ Redis Pub/Sub
-    └── uds/               # ✅ Unix domain sockets
+    ├── t_zenoh/           # ✅ Eclipse Zenoh transport (DEFAULT)
+    ├── t_ros2/            # ✅ ROS2/DDS transport
+    ├── t_redis/           # ✅ Redis Pub/Sub
+    └── t_uds/             # ✅ Unix domain sockets
 ```
 
 ## Supported Protocols
@@ -40,7 +41,7 @@ vyra_base/com/
 - `eclipse-zenoh` package: `pip install eclipse-zenoh`
 - Zenoh router (Docker service)
 
-See [Zenoh Transport README](zenoh/README.md)
+See [Zenoh Transport README](t_zenoh/README.md)
 
 ### 2. ROS2 Transport 🤖
 
@@ -48,7 +49,7 @@ See [Zenoh Transport README](zenoh/README.md)
 
 #### Features
 - ROS2 services, topics, and actions
-- QoS policies
+- QoS policies for reliability/latency tradeoffs
 - Discovery and introspection
 - SROS2 security support
 
@@ -56,251 +57,269 @@ See [Zenoh Transport README](zenoh/README.md)
 - ROS2 installation (Humble, Iron, Jazzy, or Kilted)
 - Source `/opt/ros/<distro>/setup.bash`
 
-See [ROS2 Transport README](ros2/README.md)
+### 3. Redis Transport 📮
+
+**Message broker with pub/sub and state tracking**
+
+#### Features
+- Redis Pub/Sub for messaging
+- Key-value storage for state
+- Async client via redis.asyncio
+- JSON serialization
+
+#### Requirements
+- Redis server running
+- `redis` package: `pip install redis`
+
+### 4. UDS Transport 🔌
 
 **Stream-based local IPC via Unix domain sockets**
 
 #### Features
 - Low-latency stream communication
-- JSON serialization
+- JSON serialization with length-prefix framing
 - Automatic connection management
-- Request-response pattern
+- Request-response and action patterns
 
 #### Requirements
 - Unix-like OS (Linux, macOS, BSD)
+- Local communication only
 
-#### Usage
+---
 
-```python
-from vyra_base.com.transport.t_uds import UDSProvider
-from vyra_base.com.core.types import ProtocolType
+## Unified Interface Types
 
-# Initialize provider
-provider = UDSProvider(
-    protocol=ProtocolType.UDS,
-    module_name="service_module"
-)
+The VYRA Transport Layer implements **6 unified interface types** replacing the legacy 3-pattern system:
 
-if await provider.check_availability():
-    await provider.initialize()
-    
-    # Create callable (server)
-    async def handle_request(request):
-        return {"result": request["value"] * 2}
-    
-    server = await provider.create_callable(
-        "calculate",
-        handle_request
-    )
-    
-    # Create callable (client)
-    client = await provider.create_callable(
-        "calculate",
-        None  # No callback for client
-    )
-    
-    result = await client.call({"value": 21}, timeout=5.0)
-    # result = {"result": 42}
-```
-
-#### Components
-
-- **`socket.py`**: Unix socket management with length-prefixed framing
-- **`callable.py`**: Request-response interface
-- **`provider.py`**: Protocol provider implementation
-
-#### Limitations
-
-- **Local only**: Cannot communicate across network
-- **No pub/sub**: Only request-response pattern (use Redis or ROS2 for pub/sub)
-
-## Communication Patterns
-
-All transport protocols implement three core communication patterns with consistent role terminology:
-
-### 1. Speaker (Publish-Subscribe)
+### 1. Publisher & Subscriber (Pub/Sub)
 
 **One-to-many message broadcasting**
 
-#### Roles
-- **Shouter (Publisher)**: Broadcasts messages to a topic/channel
-- **Listener (Subscriber)**: Receives messages from a topic/channel
-
-#### Usage
+#### Publisher
+Broadcasts messages to a topic without expecting responses.
 
 ```python
-# Shouter (Publisher)
-speaker = await provider.create_speaker("sensor/temperature", is_publisher=True)
-await speaker.shout({"value": 23.5, "unit": "celsius"})
+from vyra_base.com.transport.t_ros2 import ROS2Provider
 
-# Listener (Subscriber)
-listener = await provider.create_speaker("sensor/temperature", is_publisher=False)
+provider = ROS2Provider(protocol=ProtocolType.ROS2, module_name="sensor_node")
+await provider.initialize()
 
-def handle_message(data):
-    print(f"Temperature: {data['value']}°C")
+# Create publisher
+publisher = await provider.create_publisher(
+    name="temperature",
+    msg_type=TemperatureMsg
+)
 
-await listener.listen(handle_message)
+# Publish messages
+await publisher.publish(TemperatureMsg(value=23.5, unit="celsius"))
+```
+
+#### Subscriber
+Receives messages from a topic via callback.
+
+```python
+# Create subscriber
+async def handle_temperature(msg):
+    print(f"Temperature: {msg.value}°{msg.unit}")
+
+subscriber = await provider.create_subscriber(
+    name="temperature",
+    msg_type=TemperatureMsg,
+    callback=handle_temperature
+)
 ```
 
 **Supported by**: Zenoh, ROS2, Redis
 
-#### Methods
-- `shout(data)`: Publish message (shouter/publisher only)
-- `listen(callback)`: Subscribe to messages (listener/subscriber only)
-- `shutdown()`: Cleanup resources
-
 ---
 
-### 2. Callable (Request-Response)
+### 2. Server & Client (Request/Response)
 
-**One-to-one bidirectional communication with response**
+**One-to-one bidirectional communication with immediate response**
 
-#### Roles
-- **Responder (Server)**: Handles requests and returns responses
-- **Requester (Client)**: Sends requests and waits for responses
-
-#### Usage
+#### Server
+Handles requests and returns responses synchronously.
 
 ```python
-# Responder (Server)
-async def handle_calculate(request):
-    result = request["a"] + request["b"]
-    return {"result": result}
+# Create server
+async def handle_calculate(request, response=None):
+    result = request.a + request.b
+    if response:
+        response.result = result
+        return response
+    return CalculateResponse(result=result)
 
-responder = await provider.create_callable(
-    "calculate",
+server = await provider.create_server(
+    name="calculate",
     callback=handle_calculate,
-    is_server=True
+    srv_type=CalculateService
+)
+```
+
+#### Client
+Sends requests and awaits responses.
+
+```python
+# Create client
+client = await provider.create_client(
+    name="calculate",
+    srv_type=CalculateService
 )
 
-# Requester (Client)
-requester = await provider.create_callable("calculate", is_server=False)
-response = await requester.call({"a": 10, "b": 32}, timeout=5.0)
-print(response["result"])  # 42
+# Call service
+request = CalculateRequest(a=10, b=32)
+response = await client.call(request, timeout=5.0)
+print(response.result)  # 42
 ```
 
-**Supported by**: Zenoh, ROS2, UDS
-
-#### Methods
-- `call(request, timeout)`: Send request and wait for response (requester/client only)
-- Server automatically responds when callback returns
+**Supported by**: Zenoh, ROS2, Redis, UDS
 
 ---
 
-### 3. Job (Long-Running Task with Feedback)
+### 3. ActionServer & ActionClient (Long-Running Tasks)
 
-**Asynchronous task execution with progress updates**
+**Asynchronous task execution with progress feedback**
 
-#### Roles
-- **Greeter**: Starts the job and provides parameters
-- **Talker**: Sends progress updates during execution
-- **Finisher**: Completes job and sends final result
-
-#### Workflow
-```
-Greeting → Talking* → Finishing
-   ↓         ↓          ↓
-  Start   Feedback   Complete
-```
-
-#### Usage
+#### ActionServer
+Executes goals, publishes feedback, and returns results.
 
 ```python
-# Server side (handles greeting, talking, finishing)
-async def process_data(params, publish_feedback):
-    """
-    params: Job parameters (greeting phase)
-    publish_feedback: Callback for progress updates (talking phase)
-    returns: Final result (finishing phase)
-    """
-    total_steps = 100
-    
-    for i in range(total_steps):
-        # Talking - send progress feedback
-        await publish_feedback({
-            "progress": (i + 1) / total_steps * 100,
-            "current_step": i + 1,
-            "message": f"Processing step {i + 1}/{total_steps}"
-        })
+# Create action server
+async def handle_goal_request(goal):
+    # Accept or reject goal
+    return True
+
+async def handle_cancel_request(goal_handle):
+    # Handle cancellation
+    return True
+
+async def execute_goal(goal_handle):
+    # Execute task with feedback
+    for i in range(100):
+        if goal_handle.is_canceled:
+            return ProcessResult(status="canceled")
+        
+        # Publish feedback
+        await goal_handle.publish_feedback(
+            ProcessFeedback(progress=i, message=f"Step {i}/100")
+        )
         await asyncio.sleep(0.1)
     
-    # Finishing - return final result
-    return {
-        "status": "complete",
-        "result": params["input"] * 2,
-        "steps_completed": total_steps
-    }
+    return ProcessResult(status="complete", data=goal_handle.goal.input * 2)
 
-job_server = await provider.create_job(
-    "data_processing",
-    result_callback=process_data,
-    is_server=True
+action_server = await provider.create_action_server(
+    name="data_processing",
+    handle_goal_request=handle_goal_request,
+    handle_cancel_request=handle_cancel_request,
+    execution_callback=execute_goal,
+    action_type=ProcessAction
 )
-
-# Client side (greeting and receiving updates)
-job_client = await provider.create_job("data_processing", is_server=False)
-
-# Greeting - start the job
-async def handle_feedback(feedback):
-    """Called during talking phase"""
-    print(f"Progress: {feedback['progress']}% - {feedback['message']}")
-
-async def handle_result(result):
-    """Called during finishing phase"""
-    print(f"Job completed: {result['status']}, Result: {result['result']}")
-
-# Listen for talking (feedback) and finishing (result)
-await job_client.listen_feedback(handle_feedback)
-await job_client.listen_result(handle_result)
-
-# Send greeting (start job)
-await job_client.start({"input": 42})
 ```
 
-**Supported by**: Zenoh, ROS2 (Actions)
-
-#### Methods
-- **Server**:
-  - `result_callback(params, publish_feedback)`: Job execution logic
-  - Callback receives `publish_feedback` for progress updates
-  
-- **Client**:
-  - `start(params)`: Greeting - initiate job with parameters
-  - `listen_feedback(callback)`: Subscribe to talking - progress updates
-  - `listen_result(callback)`: Subscribe to finishing - final result
-  - `cancel()`: Cancel running job
-
-#### Phases
-
-1. **Greeting Phase**: Client sends job parameters via `start()`
-2. **Talking Phase**: Server sends progress via `publish_feedback()`, client receives via `listen_feedback()`
-3. **Finishing Phase**: Server returns final result, client receives via `listen_result()`
-
----
-
-## Pattern Comparison
-
-| Pattern | Direction | Response | Use Case | Roles |
-|---------|-----------|----------|----------|-------|
-| Speaker | One-to-many | None | Sensor data, events | Shouter → Listener |
-| Callable | One-to-one | Immediate | Service calls, queries | Requester ↔ Responder |
-| Job | One-to-one | Deferred + Progress | Long tasks, batch processing | Greeter → Talker → Finisher |
-
----
-
-## Monitoring Integration
-
-All transport operations are automatically monitored via Prometheus metrics:
+#### ActionClient
+Sends goals, receives feedback, and gets results.
 
 ```python
-from vyra_base.com.monitoring import metrics
+# Create action client
+async def handle_feedback(feedback):
+    print(f"Progress: {feedback.progress}% - {feedback.message}")
 
-# Metrics recorded automatically:
-# - vyra_com_calls_total
-# - vyra_com_call_duration_seconds
-# - vyra_com_errors_total
-# - vyra_com_message_size_bytes
+async def handle_result(result):
+    print(f"Completed: {result.status}, Data: {result.data}")
+
+action_client = await provider.create_action_client(
+    name="data_processing",
+    feedback_callback=handle_feedback,
+    goal_callback=handle_result,
+    action_type=ProcessAction
+)
+
+# Send goal
+goal_id = await action_client.send_goal(ProcessGoal(input=42))
+
+# Cancel goal (optional)
+await action_client.cancel_goal(goal_id)
 ```
+
+**Supported by**: Zenoh, ROS2, Redis, UDS
+
+---
+
+## Interface Comparison
+
+| Interface | Direction | Response | Feedback | Use Case |
+|-----------|-----------|----------|----------|----------|
+| Publisher | One-to-many | None | No | Sensor data, events, state broadcasts |
+| Subscriber | Many-to-one | None | No | Event listening, data collection |
+| Server | One-to-one | Immediate | No | Configuration, queries, fast operations |
+| Client | One-to-one | Immediate | No | Service calls, RPC |
+| ActionServer | One-to-one | Deferred | Yes | Data processing, long tasks |
+| ActionClient | One-to-one | Deferred | Yes | Progress tracking, cancelable operations |
+
+---
+
+## Provider Pattern
+
+All transports implement `AbstractProtocolProvider` with 6 create methods:
+
+```python
+from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
+
+class CustomProvider(AbstractProtocolProvider):
+    async def create_publisher(self, name: str, msg_type: type, **kwargs) -> VyraPublisher:
+        """Create publisher for broadcasting messages"""
+        
+    async def create_subscriber(self, name: str, msg_type: type, callback: Callable, **kwargs) -> VyraSubscriber:
+        """Create subscriber for receiving messages"""
+        
+    async def create_server(self, name: str, srv_type: type, callback: Callable, **kwargs) -> VyraServer:
+        """Create server for handling requests"""
+        
+    async def create_client(self, name: str, srv_type: type, **kwargs) -> VyraClient:
+        """Create client for sending requests"""
+        
+    async def create_action_server(self, name: str, action_type: type, 
+                                   handle_goal_request: Callable,
+                                   handle_cancel_request: Callable,
+                                   execution_callback: Callable, **kwargs) -> VyraActionServer:
+        """Create action server for long-running tasks"""
+        
+    async def create_action_client(self, name: str, action_type: type,
+                                   feedback_callback: Callable = None,
+                                   goal_callback: Callable = None, **kwargs) -> VyraActionClient:
+        """Create action client for goal execution"""
+```
+
+---
+
+## Automatic Protocol Fallback
+
+The VYRA framework automatically selects the best available protocol:
+
+**Default Fallback Order**:
+1. **ROS2** (primary) - Well-tested, full feature support
+2. **Zenoh** (fallback) - High performance when ROS2 unavailable
+3. **Redis** (fallback) - Simple pub/sub when DDS unavailable
+4. **UDS** (fallback) - Local-only fallback
+
+```python
+from vyra_base.com.core.decorators import remote_callable
+
+# Automatic protocol selection with fallback
+@remote_callable
+async def my_service(request, response=None):
+    response.result = request.value * 2
+    return response
+# Framework tries ROS2 → Zenoh → Redis → UDS
+
+# Explicit protocol override
+@remote_callable(protocols=[ProtocolType.ROS2])
+async def ros2_only_service(request, response=None):
+    response.result = request.value
+    return response
+```
+
+---
 
 ## Error Handling
 
@@ -308,173 +327,193 @@ Transport layer uses hierarchical exceptions:
 
 ```python
 from vyra_base.com.core.exceptions import (
-    CommunicationError,          # Base exception
+    InterfaceError,              # Base interface exception
     ProtocolUnavailableError,    # Protocol not installed
     ProtocolNotInitializedError, # Provider not initialized
     TransportError,              # Transport-level error
     ConnectionError,             # Connection failed
     TimeoutError,                # Operation timeout
-    CallableError,               # Callable-specific error
-    SpeakerError,                # Speaker-specific error
 )
 
 try:
-    result = await callable.call(request, timeout=5.0)
+    result = await client.call(request, timeout=5.0)
 except TimeoutError:
     logger.error("Service timeout")
-except CallableError as e:
+except InterfaceError as e:
     logger.error(f"Service error: {e}")
 ```
 
-## Testing
-
-Run transport tests:
-
-```bash
-# Unit tests (no dependencies)
-pytest tests/com/transport/shared_memory/test_segment.py -v
-
-# Integration tests (requires posix_ipc)
-pytest tests/com/transport/shared_memory/ -m integration
-
-# Run examples
-python examples/transport_examples.py
-```
-
-## Performance Characteristics
-
-| Protocol | Latency   | Throughput | Scope   | Default |
-|----------|-----------|------------|---------|---------|
-| Zenoh    | <1ms      | Very High  | Network | ✅ Yes  |
-| ROS2     | 1-10ms    | High       | Network | Fallback |
-| Redis    | 2-5ms     | Medium     | Network | Fallback |
-| UDS      | <1ms      | High       | Local   | Fallback |
-
-## Migration from `datalayer`
-
-All ROS2 components are now available in both locations:
-
-```python
-# Old (still works)
-from vyra_base.com.datalayer.node import VyraNode
-
-# New (recommended)
-from vyra_base.com.transport.t_ros2 import VyraNode
-```
-
-The `datalayer` module remains for backward compatibility.
-
-## Discovery
-
-### Shared Memory Discovery
-
-PID-tracked filesystem-based discovery:
-
-```python
-from vyra_base.com.transport.shared_memory import get_discovery
-
-discovery = get_discovery()
-
-# Register segment
-discovery.register("motor_control", "start", "/vyra_motor_start", 4096)
-
-# Discover segments
-all_segments = discovery.discover_all()
-motor_segments = discovery.discover_by_module("motor_control")
-
-# Cleanup stale segments
-cleaned = discovery.cleanup_stale_segments(max_age=300.0)
-
-# Get statistics
-stats = discovery.get_statistics()
-```
-
-Discovery files: `/tmp/vyra_sockets/<module>.<interface>.sm.pid`
+---
 
 ## Best Practices
- (Automatic Fallback)
 
-The VYRA framework automatically selects the best available protocol:
+### 1. Provider Initialization
 
-**Default Fallback Order**:
-1. **Zenoh** (primary) - Zero-copy, scalable, efficient
-2. **ROS2** (fallback) - Distributed DDS-based communication
-3. *3Redis** (fallback) - Pub/sub messaging
-4. **UDS** (fallback) - Local-only request-response
+Always check availability before initializing:
 
 ```python
-# Automatic protocol selection
-@remote_callable
-async def my_service(request, response=None):
-    return {"result": request["value"] * 2}
-# Uses Zenoh if available, falls back to ROS2, then Redis, then UDS
+from vyra_base.com.transport.t_ros2 import ROS2Provider, ROS2_AVAILABLE
 
-# Explicit protocol override
-@remote_callable(protocols=[ProtocolType.ROS2])
-async def ros2_only_service(request, response=None):
-    return {"result": request["value"]}
-```
-
-### 2. Pattern Selection
-
-- **Speaker (Shouter/Listener)**: Sensor data, events, state broadcasts
-- **Callable (Requester/Responder)**: Configuration, queries, fast operations
-- **Job (Greeter/Talker/Finisher)**: Data processing, long tasks, progress track
-### 2. Error Handling
-
-Always check availability and handle initialization:
-
-```python
-from vyra_base.com.transport.t_zenoh import ZenohProvider, ZENOH_AVAILABLE
-
-if not ZENOH_AVAILABLE:
-    logger.warningProvider not available")
-    # Framework will auto-fallback to next protocol
-    return
+if not ROS2_AVAILABLE:
+    logger.warning("ROS2 not available, falling back")
+    # Framework will auto-select next protocol
+    provider = ZenohProvider(...)
+else:
+    provider = ROS2Provider(...)
 
 if not await provider.initialize():
     logger.error("Failed to initialize provider")
     return
 ```
 
-### 4t await provider.initialize():
-    logger.error("Failed to initialize provider")
-    return
-```
-
-### 3. Resource Cleanup
+### 2. Resource Cleanup
 
 Always shutdown interfaces and providers:
 
 ```python
 try:
-    callable = await provider.create_callable("service", callback)
-    # Use callable
+    server = await provider.create_server("service", callback, srv_type)
+    # Use server
 finally:
-    await callable.shutdown()
+    await server.shutdown()
     await provider.shutdown()
 ```
 
-### 5. Timeout Configuration
+### 3. Timeout Configuration
 
 Set appropriate timeouts based on operation:
 
 ```python
 # Fast local operation
-result = await callable.call(request, timeout=1.0)
+result = await client.call(request, timeout=1.0)
 
 # Network operation
-result = await callable.call(request, timeout=5.0)
+result = await client.call(request, timeout=5.0)
 
-# Long-running task
-result = await job.execute(goal, timeout=30.0)
+# Long-running action
+goal_id = await action_client.send_goal(goal, timeout=30.0)
 ```
 
-## Examples
+### 4. Interface Selection Guidelines
 
-See [`examples/transport_examples.py`](../../examples/transport_examples.py) for complete working examples of all three protocols.
+- **Publisher**: Sensor data, periodic updates, events
+- **Subscriber**: Data collection, event handling
+- **Server/Client**: Configuration, queries, synchronous operations (<1 second)
+- **ActionServer/ActionClient**: Data processing, tasks with progress (>1 second)
+
+---
+
+## Performance Characteristics
+
+| Protocol | Latency   | Throughput | Scope   | Default Priority |
+|----------|-----------|------------|---------|------------------|
+| ROS2     | 1-10ms    | High       | Network | 1 (Primary)      |
+| Zenoh    | <1ms      | Very High  | Network | 2 (Fallback)     |
+| Redis    | 2-5ms     | Medium     | Network | 3 (Fallback)     |
+| UDS      | <1ms      | High       | Local   | 4 (Fallback)     |
+
+---
+
+## Testing
+
+Run transport tests:
+
+```bash
+# Unit tests (no external dependencies)
+pytest tests/com/transport/ -m unit -v
+
+# Integration tests (requires Redis, ROS2, Zenoh)
+pytest tests/com/transport/ -m integration -v
+
+# Specific transport
+pytest tests/com/transport/t_ros2/ -v
+pytest tests/com/transport/t_zenoh/ -v
+pytest tests/com/transport/t_redis/ -v
+pytest tests/com/transport/t_uds/ -v
+```
+
+---
+
+## Migration from Legacy API
+
+### Old 3-Pattern System → New 6-Interface System
+
+| Legacy Pattern | Legacy Method | New Interface | New Method |
+|----------------|---------------|---------------|------------|
+| Speaker (Publisher) | `create_speaker(name, is_publisher=True)` | Publisher | `create_publisher(name, msg_type)` |
+| Speaker (Subscriber) | `create_speaker(name, is_publisher=False)` | Subscriber | `create_subscriber(name, msg_type, callback)` |
+| Callable (Server) | `create_callable(name, callback, is_server=True)` | Server | `create_server(name, srv_type, callback)` |
+| Callable (Client) | `create_callable(name, is_server=False)` | Client | `create_client(name, srv_type)` |
+| Job (Server) | `create_job(name, result_callback, is_server=True)` | ActionServer | `create_action_server(name, action_type, ...)` |
+| Job (Client) | `create_job(name, is_server=False)` | ActionClient | `create_action_client(name, action_type, ...)` |
+
+### Legacy Code Example
+
+```python
+# ❌ OLD (Deprecated)
+speaker = await provider.create_speaker("temp", is_publisher=True)
+await speaker.shout({"value": 23.5})
+
+callable_server = await provider.create_callable("calc", callback, is_server=True)
+callable_client = await provider.create_callable("calc", is_server=False)
+result = await callable_client.call(request)
+
+job = await provider.create_job("process", result_callback, is_server=True)
+```
+
+### New API Example
+
+```python
+# ✅ NEW (Current)
+publisher = await provider.create_publisher("temp", TemperatureMsg)
+await publisher.publish(TemperatureMsg(value=23.5))
+
+server = await provider.create_server("calc", CalculateService, callback)
+client = await provider.create_client("calc", CalculateService)
+result = await client.call(request)
+
+action_server = await provider.create_action_server(
+    "process", ProcessAction, 
+    handle_goal_request, handle_cancel_request, execution_callback
+)
+```
+
+---
 
 ## Troubleshooting
+
+### General Issues
+
+**Error**: `No protocol available`
+- Install at least one transport: `pip install rclpy` or `pip install eclipse-zenoh` or `pip install redis`
+- Check availability: `await provider.check_availability()`
+
+**Error**: `Provider not initialized`
+- Call `await provider.initialize()` before creating interfaces
+- Check initialization return value: `if not await provider.initialize(): ...`
+
+### ROS2 Issues
+
+**Error**: `rclpy not available`
+```bash
+# Install ROS2
+sudo apt install ros-humble-desktop
+source /opt/ros/humble/setup.bash
+```
+
+**Error**: SROS2 permission denied
+```bash
+# Check keystore permissions
+ls -la sros2_keystore/
+
+# Disable security (development only)
+export ROS_SECURITY_ENABLE=false
+```
+
+**Error**: Service not found
+- Verify service name matches: use `ros2 service list`
+- Check node discovery: `ros2 node list`
+- Ensure both nodes in same ROS_DOMAIN_ID
 
 ### Zenoh Issues
 
@@ -483,49 +522,292 @@ See [`examples/transport_examples.py`](../../examples/transport_examples.py) for
 pip install eclipse-zenoh
 ```
 
-**Error**: Cannot connect to router
+**Error**: Cannot connect to Zenoh router
 ```bash
 # Check router status
-docker ps | grep zenoh-router
+docker ps | grep zenoh
 
-# View logs
-docker logs zenoh-router -f
+# Start router
+docker run -d --name zenoh-router -p 7447:7447 eclipse/zenoh:latest
 
 # Test connection
-telnet zenoh-router 7447
+python -c "import zenoh; session = zenoh.open({}); print('Connected')"
 ```
 
-### ROS2 Issues
+**Error**: Zenoh session None
+- Ensure Zenoh router is running
+- Check network connectivity
+- Verify Zenoh config in provider initialization
 
-**Error**: `rclpy not available`
+### Redis Issues
+
+**Error**: `redis not installed`
 ```bash
-source /opt/ros/<distro>/setup.bash
+pip install redis
 ```
 
-**Error**: SROS2 permission denied
-- Check keystore permissions in `sros2_keystore/`
-- Disable security: `export ROS_SECURITY_ENABLE=false`
+**Error**: Connection refused
+```bash
+# Check Redis server
+redis-cli ping  # Should return "PONG"
+
+# Start Redis (Docker)
+docker run -d --name redis -p 6379:6379 redis:latest
+
+# Start Redis (Linux)
+sudo systemctl start redis
+```
+
+**Error**: SSL/TLS errors
+- Check certificate paths in RedisClient initialization
+- Verify certificates exist and are readable
+- For testing, disable TLS: `RedisClient(ssl=False)`
 
 ### UDS Issues
 
 **Error**: Socket file not found
-- Check `/tmp/vyra_sockets/` exists
-- Verify server is running
+```bash
+# Check socket directory exists
+ls -la /tmp/vyra_sockets/
+
+# Create if missing
+mkdir -p /tmp/vyra_sockets/
+```
+
+**Error**: Permission denied
+```bash
+# Fix permissions
+chmod 755 /tmp/vyra_sockets/
+```
 
 **Error**: Connection refused
-- Server not listening
-- Socket path mismatch
+- Ensure server is running before client connects
+- Check socket path matches between server and client
+- Verify module_name is consistent
+
+---
+
+## Examples
+
+### Complete Publisher/Subscriber Example
+
+```python
+import asyncio
+from vyra_base.com.transport.t_ros2 import ROS2Provider
+from vyra_base.com.core.types import ProtocolType
+from example_msgs.msg import Temperature  # Your message type
+
+async def main():
+    # Initialize provider
+    provider = ROS2Provider(
+        protocol=ProtocolType.ROS2,
+        module_name="temperature_node"
+    )
+    
+    if not await provider.initialize():
+        print("Failed to initialize provider")
+        return
+    
+    try:
+        # Create publisher
+        publisher = await provider.create_publisher(
+            name="temperature",
+            msg_type=Temperature
+        )
+        
+        # Create subscriber
+        async def handle_temp(msg):
+            print(f"Received: {msg.value}°C")
+        
+        subscriber = await provider.create_subscriber(
+            name="temperature",
+            msg_type=Temperature,
+            callback=handle_temp
+        )
+        
+        # Publish messages
+        for i in range(10):
+            await publisher.publish(Temperature(value=20.0 + i))
+            await asyncio.sleep(1.0)
+            
+    finally:
+        await provider.shutdown()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Complete Server/Client Example
+
+```python
+import asyncio
+from vyra_base.com.transport.t_uds import UDSProvider
+from vyra_base.com.core.types import ProtocolType
+from example_srvs.srv import Calculate  # Your service type
+
+async def main():
+    provider = UDSProvider(
+        protocol=ProtocolType.UDS,
+        module_name="calculator"
+    )
+    
+    if not await provider.initialize():
+        return
+    
+    try:
+        # Create server
+        async def calculate_handler(request, response=None):
+            if response is None:
+                response = Calculate.Response()
+            response.result = request.a + request.b
+            return response
+        
+        server = await provider.create_server(
+            name="calculate",
+            srv_type=Calculate,
+            callback=calculate_handler
+        )
+        
+        # Create client
+        client = await provider.create_client(
+            name="calculate",
+            srv_type=Calculate
+        )
+        
+        # Call service
+        request = Calculate.Request(a=10, b=32)
+        response = await client.call(request, timeout=5.0)
+        print(f"Result: {response.result}")  # 42
+        
+    finally:
+        await provider.shutdown()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Complete Action Example
+
+```python
+import asyncio
+from vyra_base.com.transport.t_ros2 import ROS2Provider
+from vyra_base.com.core.types import ProtocolType
+from example_actions.action import Process  # Your action type
+
+async def main():
+    provider = ROS2Provider(
+        protocol=ProtocolType.ROS2,
+        module_name="processor"
+    )
+    
+    if not await provider.initialize():
+        return
+    
+    try:
+        # Create action server
+        async def handle_goal(goal):
+            return True  # Accept goal
+        
+        async def handle_cancel(goal_handle):
+            return True  # Allow cancellation
+        
+        async def execute_goal(goal_handle):
+            for i in range(100):
+                if goal_handle.is_canceled:
+                    return Process.Result(status="canceled")
+                
+                # Publish feedback
+                await goal_handle.publish_feedback(
+                    Process.Feedback(progress=i, message=f"Step {i}/100")
+                )
+                await asyncio.sleep(0.1)
+            
+            return Process.Result(
+                status="complete",
+                data=goal_handle.goal.input * 2
+            )
+        
+        action_server = await provider.create_action_server(
+            name="process",
+            action_type=Process,
+            handle_goal_request=handle_goal,
+            handle_cancel_request=handle_cancel,
+            execution_callback=execute_goal
+        )
+        
+        # Create action client
+        async def handle_feedback(feedback):
+            print(f"Progress: {feedback.progress}%")
+        
+        async def handle_result(result):
+            print(f"Result: {result.status}, Data: {result.data}")
+        
+        action_client = await provider.create_action_client(
+            name="process",
+            action_type=Process,
+            feedback_callback=handle_feedback,
+            goal_callback=handle_result
+        )
+        
+        # Send goal
+        goal = Process.Goal(input=42)
+        goal_id = await action_client.send_goal(goal)
+        
+        # Wait for completion
+        await asyncio.sleep(15)
+        
+    finally:
+        await provider.shutdown()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
 
 ## Contributing
 
 When adding new transport protocols:
 
-1. Implement `AbstractProtocolProvider`
-2. Create protocol-specific callable/speaker/job classes
-3. Add availability check with graceful fallback
-4. Write unit and integration tests
-5. Update documentation and examples
+1. **Implement Provider**: Extend `AbstractProtocolProvider` with all 6 create methods
+2. **Create vyra_models**: Implement VyraPublisher, VyraSubscriber, VyraServer, VyraClient, VyraActionServer, VyraActionClient
+3. **Add Availability Check**: Implement `check_availability()` with graceful failure
+4. **Write Tests**: Unit tests (no dependencies) + Integration tests (with protocol)
+5. **Update Docs**: Add protocol-specific README.md with examples
+6. **Register Provider**: Add to provider registry for auto-discovery
+
+### Code Structure
+
+```
+t_myprotocol/
+├── __init__.py                 # Exports + MYPROTOCOL_AVAILABLE flag
+├── provider.py                 # MyProtocolProvider(AbstractProtocolProvider)
+├── vyra_models/
+│   ├── __init__.py
+│   ├── publisher.py           # MyProtocolPublisherImpl(VyraPublisher)
+│   ├── subscriber.py          # MyProtocolSubscriberImpl(VyraSubscriber)
+│   ├── server.py              # MyProtocolServerImpl(VyraServer)
+│   ├── client.py              # MyProtocolClientImpl(VyraClient)
+│   ├── action_server.py       # MyProtocolActionServerImpl(VyraActionServer)
+│   └── action_client.py       # MyProtocolActionClientImpl(VyraActionClient)
+├── communication/             # Protocol-specific helpers
+│   └── ...
+└── README.md                  # Protocol documentation
+```
+
+---
 
 ## License
 
-Part of the VYRA framework - see main LICENSE file.
+Part of the VYRA framework - see main repository LICENSE file.
+
+---
+
+## See Also
+
+- [Core Types Documentation](../core/README.md)
+- [Provider Pattern Documentation](../providers/README.md)
+- [ROS2 Transport Details](t_ros2/README.md)
+- [Zenoh Transport Details](t_zenoh/README.md)
+- [Redis Transport Details](../../docs/com/transport/redis/README.md)
+- [UDS Transport Details](../../docs/com/transport/uds/README.md)

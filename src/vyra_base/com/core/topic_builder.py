@@ -32,10 +32,12 @@ logger = logging.getLogger(__name__)
 
 class InterfaceType(Enum):
     """Type of communication interface."""
-    CALLABLE = "callable"  # Service/Request-Response (ROS2 Service, Zenoh Query, Redis Callable)
-    SPEAKER = "speaker"    # Pub/Sub (ROS2 Topic, Zenoh Pub/Sub, Redis Pub/Sub)
-    JOB = "job"           # Action/Long-running task (ROS2 Action)
-
+    PUBLISHER = "publisher"  # publisher topic (ROS2), publisher key (Redis), Zenoh publisher, UDS speaker
+    SUBSCRIBER = "subscriber"  # subscriber topic (ROS2), subscriber key (Redis), Zenoh subscriber, UDS listener
+    SERVER = "server"  # service server (ROS2), request handler (Redis), Zenoh responder, UDS server
+    CLIENT = "client"  # service client (ROS2), request sender (Redis), Zenoh requester, UDS client
+    ACTION_SERVER = "action_server"  # action server (ROS2), long-running task handler (Redis/Zenoh/UDS)
+    ACTION_CLIENT = "action_client"  # action client (ROS2), long-running task initiator (Redis/Zenoh/UDS)
 
 @dataclass
 class TopicComponents:
@@ -425,7 +427,7 @@ class TopicBuilder:
         Args:
             function_name: Name of the function/interface
             subaction: Optional subaction
-            interface_type: Type of interface (callable/speaker/job)
+            interface_type: Type of interface (InterfaceType) for logging
             protocol: Protocol for interface loading
         
         Returns:
@@ -436,7 +438,7 @@ class TopicBuilder:
             >>> # Build topic and load ROS2 service
             >>> topic, service_type = builder.build_with_interface(
             ...     "get_interface_list",
-            ...     interface_type=InterfaceType.CALLABLE,
+            ...     interface_type=InterfaceType.SERVER,
             ...     protocol="ros2"
             ... )
             >>> print(topic)  # 'v2_modulemanager_abc123/get_interface_list'

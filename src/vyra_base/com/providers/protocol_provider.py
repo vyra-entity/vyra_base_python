@@ -10,9 +10,14 @@ from typing import Any, Callable, Optional, Dict, List
 
 from vyra_base.com.core.types import (
     ProtocolType,
-    VyraCallable,
-    VyraSpeaker,
-    VyraJob,
+    # New unified types
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient,
+
 )
 from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
@@ -71,62 +76,132 @@ class AbstractProtocolProvider(ABC):
     async def shutdown(self) -> None:
         """Shutdown the protocol provider and cleanup resources."""
         pass
-    
+
+    # ========================================================================
+    # NEW UNIFIED INTERFACE CREATION METHODS
+    # ========================================================================
+
     @abstractmethod
-    async def create_callable(
+    async def create_publisher(
         self,
         name: str,
-        callback: Optional[Callable],
         **kwargs
-    ) -> VyraCallable:
+    ) -> VyraPublisher:
         """
-        Create a callable interface.
+        Create a publisher interface.
         
         Args:
-            name: Callable name
-            callback: Callback function (async or sync)
-            **kwargs: Protocol-specific parameters
+            name: Publisher name
+            **kwargs: Protocol-specific parameters (message_type, qos, etc.)
             
         Returns:
-            VyraCallable: Created callable interface
+            VyraPublisher: Created publisher interface
         """
         pass
-    
+
     @abstractmethod
-    async def create_speaker(
+    async def create_subscriber(
         self,
         name: str,
+        subscriber_callback: Optional[Callable],
         **kwargs
-    ) -> VyraSpeaker:
+    ) -> VyraSubscriber:
         """
-        Create a speaker interface.
+        Create a subscriber interface.
         
         Args:
-            name: Speaker name
-            **kwargs: Protocol-specific parameters
+            name: Subscriber name
+            subscriber_callback: Callback for received messages (async)
+            **kwargs: Protocol-specific parameters (message_type, qos, etc.)
             
         Returns:
-            VyraSpeaker: Created speaker interface
+            VyraSubscriber: Created subscriber interface
         """
         pass
-    
+
     @abstractmethod
-    async def create_job(
+    async def create_server(
         self,
         name: str,
-        callback: Callable,
+        response_callback: Optional[Callable],
         **kwargs
-    ) -> VyraJob:
+    ) -> VyraServer:
         """
-        Create a job interface.
+        Create a server interface.
         
         Args:
-            name: Job name
-            callback: Job execution callback
-            **kwargs: Protocol-specific parameters
+            name: Server name
+            response_callback: Callback for requests (async)
+            **kwargs: Protocol-specific parameters (service_type, qos, etc.)
             
         Returns:
-            VyraJob: Created job interface
+            VyraServer: Created server interface
+        """
+        pass
+
+    @abstractmethod
+    async def create_client(
+        self,
+        name: str,
+        **kwargs
+    ) -> VyraClient:
+        """
+        Create a client interface.
+        
+        Args:
+            name: Client name
+            **kwargs: Protocol-specific parameters (service_type, qos, etc.)
+            
+        Returns:
+            VyraClient: Created client interface
+        """
+        pass
+
+    @abstractmethod
+    async def create_action_server(
+        self,
+        name: str,
+        handle_goal_request: Optional[Callable] = None,
+        handle_cancel_request: Optional[Callable] = None,
+        execution_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraActionServer:
+        """
+        Create an action server interface.
+        
+        Args:
+            name: Action server name
+            handle_goal_request: Callback to accept/reject goals (async)
+            handle_cancel_request: Callback to handle cancellations (async)
+            execution_callback: Callback for goal execution (async)
+            **kwargs: Protocol-specific parameters (action_type, qos, etc.)
+            
+        Returns:
+            VyraActionServer: Created action server interface
+        """
+        pass
+
+    @abstractmethod
+    async def create_action_client(
+        self,
+        name: str,
+        direct_response_callback: Optional[Callable] = None,
+        feedback_callback: Optional[Callable] = None,
+        goal_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraActionClient:
+        """
+        Create an action client interface.
+        
+        Args:
+            name: Action client name
+            direct_response_callback: Callback for goal acceptance (async)
+            feedback_callback: Callback for feedback updates (async)
+            goal_callback: Callback for final result (async)
+            **kwargs: Protocol-specific parameters (action_type, qos, etc.)
+            
+        Returns:
+            VyraActionClient: Created action client interface
         """
         pass
 

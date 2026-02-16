@@ -1,17 +1,14 @@
 [
     {
         "tags": [
-            "ros2",
-            "zenoh",
-            "redis"
+            "zenoh"
         ],
-        "type": "callable",
+        "type": "server",
         "functionname": "request_access",
         "displayname": "Request Access",
         "description": "Request access to this module with a specific security level. This service is used by Module A to authenticate with Module B. The latest successful authentication replaces all previous sessions.",
         "filetype": [
-            "VBASESecurityRequestAccess.srv",
-            "SecurityRequestAccess.proto"
+            "VBASESecurityRequestAccess.proto"
         ],
         "params": [
             {

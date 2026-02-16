@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// Reset
+// Reset the current operation and set state STOPPED -> IDLE
+// Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+// Request message
+message VBASEResetRequest {
+  // An array of key-value pairs providing the necessary parameters for initialization.
+  repeated string params = 1;
+}
+
+// Response message
+message VBASEResetResponse {
+  // Indicates whether the transition was successful
+  bool success = 1;
+  // A message providing additional information about the transition
+  string message = 2;
+}

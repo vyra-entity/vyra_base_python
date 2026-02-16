@@ -1,16 +1,18 @@
 from datetime import datetime
 import json
+import logging
 from typing import Any, Optional
 
 from sqlalchemy import event
 from sqlalchemy import inspect
 
-from vyra_base.com import InterfaceFactory, ProtocolType, remote_callable
+from vyra_base.com import InterfaceFactory, ProtocolType, remote_service
 from vyra_base.helper.error_handler import ErrorTraceback
-from vyra_base.helper.logger import Logger
 from vyra_base.storage.db_access import DBSTATUS, DbAccess
 from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
 from vyra_base.storage.tb_params import Parameter as DbParameter
+
+logger = logging.getLogger(__name__)
 
 
 class Parameter:
@@ -90,7 +92,7 @@ class Parameter:
 
         if storage_access_default is None:
             if self.storage_access_persistant_default is None:
-                Logger.warning("No default storage access provided. Skipping default "
+                logger.warning("No default storage access provided. Skipping default "
                             "parameter loading.")
                 return False
             storage_access_default = self.storage_access_persistant_default
@@ -104,7 +106,7 @@ class Parameter:
         )
 
         if not await storage_access_default.check_table_exists(DbParameter):
-            Logger.warn(
+            logger.warn(
                 f"Table '{DbParameter.__tablename__}' does not exist in the default "
                 "database. Skipping default parameter loading.")
             return False
@@ -129,7 +131,7 @@ class Parameter:
 
         for default_item in all_default:
             if default_item["name"] not in param_name_list:
-                Logger.info("Loading default parameter "
+                logger.info("Loading default parameter "
                             f"'{default_item['name']}: {default_item['value']}'")
 
                 param_obj: dict[str, Any] = {
@@ -137,7 +139,7 @@ class Parameter:
                 }
                 await self.persistant_manipulator.add(param_obj)
             elif override_exist:
-                Logger.info("Overriding existing parameter "
+                logger.info("Overriding existing parameter "
                             f"'{default_item['name']}: {default_item['value']}'")
 
                 param_obj: dict[str, Any] = {
@@ -150,7 +152,7 @@ class Parameter:
 
         return True
 
-    @remote_callable()
+    @remote_service()
     async def get_parameter(self, request: Any, response: Any) -> bool:
         """
         Get a parameter value by its key (ROS2 service interface).
@@ -237,13 +239,13 @@ class Parameter:
         if all_params.status != DBSTATUS.SUCCESS:
             response['success'] = False
             response['message'] = f"Failed to retrieve parameter with key '{key}'." 
-            Logger.warn(response['message'])
+            logger.warn(response['message'])
             return None
 
         if not isinstance(all_params.value, list):
             response['success'] = False
             response['message'] = "Internal error: all_params.value is not a list."
-            Logger.warn(response['message'])
+            logger.warn(response['message'])
             return None
 
         all_params.value = self.persistant_manipulator.to_dict(all_params.value[0])
@@ -253,7 +255,7 @@ class Parameter:
 
         return response
 
-    @remote_callable()
+    @remote_service()
     async def set_parameter(self, request: Any, response: Any) -> None:
         """
         Set a parameter value by its key (ROS2 service interface).
@@ -344,23 +346,23 @@ class Parameter:
         if param_ret.status != DBSTATUS.SUCCESS:
             response['success'] = False
             response['message'] = f"Failed to retrieve parameter with key '{key}'."
-            Logger.warn(response['message'])
+            logger.warn(response['message'])
             return response
 
         if not isinstance(param_ret.value, list):
             response['success'] = False
             response['message'] = "Internal error: param_ret.value is not a list."
-            Logger.error(response['message'])
+            logger.error(response['message'])
             return response
             
         if len(param_ret.value) == 0:
             response['success'] = False
             response['message'] = f"Parameter with key '{key}' does not exist."
-            Logger.warn(response['message'])
+            logger.warn(response['message'])
             return response
             
         if len(param_ret.value) > 1:
-            Logger.warn(
+            logger.warn(
                 f"Multiple parameters found with key '{key}'. "
                 "Updating the first one found.")
 
@@ -373,7 +375,7 @@ class Parameter:
             response['message'] = (
                 f"Failed to convert value '{value}' to type "
                 f"'{param_ret.value[0].type.value}': {ve}")
-            Logger.error(response['message'])
+            logger.error(response['message'])
             return response
 
         update_ret: DBReturnValue = await self.persistant_manipulator.update(
@@ -382,15 +384,15 @@ class Parameter:
         if update_ret.status != DBSTATUS.SUCCESS:
             response['success'] = False
             response['message'] = f"Failed to update parameter with key '{key}'."
-            Logger.error(response['message'])
+            logger.error(response['message'])
             return response
 
         response['success'] = True
         response['message'] = f"Parameter '{key}' updated successfully."
-        Logger.info(response['message'])
+        logger.info(response['message'])
         return response
 
-    @remote_callable()
+    @remote_service()
     async def read_all_params(self, request: Any, response: Any) -> None:
         """
         Read all parameters (ROS2 service interface).
@@ -473,7 +475,7 @@ class Parameter:
         ret_obj: DBReturnValue = await self.persistant_manipulator.get_all()
         
         if not isinstance(ret_obj.value, list):
-            Logger.error("Internal error: ret_obj.value is not a list.")
+            logger.error("Internal error: ret_obj.value is not a list.")
             return None
 
         all_params = [
@@ -492,20 +494,20 @@ class Parameter:
         :param connection: The database connection.
         :param target: The target object that was updated.
         """
-        Logger.info(f"Parameter '{target.name}' updated to '{target.value}'")
+        logger.info(f"Parameter '{target.name}' updated to '{target.value}'")
         insp = inspect(target)
 
         for attr in insp.attrs:
             if attr.history.has_changes():
                 old_value = attr.history.deleted
                 new_value = attr.history.added
-                Logger.debug(f"Feld {attr.key} changed: {old_value} -> {new_value}")
+                logger.debug(f"Feld {attr.key} changed: {old_value} -> {new_value}")
         
         # NOTE: SQLAlchemy event callbacks must be synchronous - cannot use await
         # TODO: Implement async event queue for parameter change notifications via ROS2
-        Logger.debug(f"Parameter '{target.name}' updated (ROS2 change event not published)")
+        logger.debug(f"Parameter '{target.name}' updated (ROS2 change event not published)")
 
-    @remote_callable()
+    @remote_service()
     async def param_changed_topic(self, request: Any, response: Any) -> None:
         """
         Get the ROS2 topic name for parameter change events (ROS2 service interface).
@@ -587,7 +589,7 @@ class Parameter:
         # Access internal publisher from ROS2Speaker
         pub_server = getattr(self.update_parameter_speaker, '_publisher', None)
         if pub_server is None:
-            Logger.error("Publisher server is not initialized.")
+            logger.error("Publisher server is not initialized.")
             return None
         
         response['topic'] = pub_server.publisher_info.name

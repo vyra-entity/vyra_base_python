@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// Resume
+// Resume the current operation and set state PAUSED -> RUNNING
+// Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+// Request message
+message VBASEResumeRequest {
+  // An array of key-value pairs providing the necessary parameters for initialization.
+  repeated string params = 1;
+}
+
+// Response message
+message VBASEResumeResponse {
+  // Indicates whether the transition was successful
+  bool success = 1;
+  // A message providing additional information about the transition
+  string message = 2;
+}

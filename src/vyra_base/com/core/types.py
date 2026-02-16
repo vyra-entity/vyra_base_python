@@ -38,9 +38,13 @@ class ProtocolType(str, Enum):
 
 class InterfaceType(str, Enum):
     """VYRA communication interface types."""
-    CALLABLE = "callable"  # Request-Response
-    SPEAKER = "speaker"    # Publish-Subscribe
-    JOB = "job"            # Long-Running Task
+    # New unified types
+    PUBLISHER = "publisher"        # Publish-only (no callback)
+    SUBSCRIBER = "subscriber"      # Subscribe with callback
+    SERVER = "server"              # Request-Response server
+    CLIENT = "client"              # Request-Response client
+    ACTION_SERVER = "actionServer" # Long-running task server
+    ACTION_CLIENT = "actionClient" # Long-running task client
 
 
 class AccessLevel(str, Enum):
@@ -159,46 +163,200 @@ class VyraInterface(ABC):
         return self._initialized
 
 
+# ============================================================================
+# NEW UNIFIED TRANSPORT LAYER CLASSES (Async-first)
+# ============================================================================
+
 @dataclass
-class VyraCallable(VyraInterface):
+class VyraPublisher(VyraInterface):
     """
-    Callable interface for request-response communication.
+    Publisher interface for one-way message publishing.
     
-    Represents synchronous/asynchronous service calls across protocols:
-    - ROS2: Service
-    - gRPC: Unary RPC
-    - REST: HTTP Request
+    Represents publish-only communication (no callbacks):
+    - ROS2: Topic Publisher
+    - Zenoh: Publisher
+    - Redis: Pub/Sub Publisher
+    - UDS: Datagram Socket Sender
     """
     
     def __init__(
         self,
         name: str,
         topic_builder: TopicBuilder,
-        callback: Optional[Callable] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
-        super().__init__(name, protocol, InterfaceType.CALLABLE, **kwargs)
-        self.callback = callback
-        self._transport_handle: Optional[Any] = None
-
+        super().__init__(name, protocol, InterfaceType.PUBLISHER, **kwargs)
         if not topic_builder:
-            raise InterfaceError("TopicBuilder is required for ROS2Callable")
+            raise InterfaceError("TopicBuilder is required for Publisher")
         self.topic_builder: TopicBuilder = topic_builder
+        self._transport_handle: Optional[Any] = None
     
     async def initialize(self) -> bool:
-        """Initialize callable with transport layer."""
+        """Initialize publisher with transport layer."""
         self._initialized = True
         return True
     
     async def shutdown(self) -> None:
-        """Shutdown callable."""
+        """Shutdown publisher."""
+        self._initialized = False
+        self._transport_handle = None
+    
+    async def publish(self, message: Any) -> bool:
+        """
+        Publish a message (async).
+        
+        Args:
+            message: Message data to publish
+            
+        Returns:
+            bool: True if published successfully
+        """
+        if not self._initialized:
+            raise InterfaceError(f"Publisher '{self.name}' not initialized")
+        
+        # Will be implemented by transport-specific subclasses
+        raise NotImplementedError
+
+
+@dataclass
+class VyraSubscriber(VyraInterface):
+    """
+    Subscriber interface for receiving messages with callback.
+    
+    Represents subscribe-only communication:
+    - ROS2: Topic Subscriber
+    - Zenoh: Subscriber
+    - Redis: Pub/Sub Subscriber
+    - UDS: Datagram Socket Receiver
+    """
+    
+    def __init__(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        subscriber_callback: Optional[Callable] = None,
+        protocol: ProtocolType = ProtocolType.ROS2,
+        **kwargs
+    ):
+        super().__init__(name, protocol, InterfaceType.SUBSCRIBER, **kwargs)
+        if not topic_builder:
+            raise InterfaceError("TopicBuilder is required for Subscriber")
+        self.topic_builder: TopicBuilder = topic_builder
+        self.subscriber_callback = subscriber_callback  # async def callback(msg: Any) -> None
+        self._transport_handle: Optional[Any] = None
+    
+    async def initialize(self) -> bool:
+        """Initialize subscriber with transport layer."""
+        self._initialized = True
+        return True
+    
+    async def shutdown(self) -> None:
+        """Shutdown subscriber."""
+        self._initialized = False
+        self._transport_handle = None
+    
+    async def subscribe(self) -> None:
+        """
+        Start subscribing to messages.
+        Calls subscriber_callback for each received message.
+        """
+        if not self._initialized:
+            raise InterfaceError(f"Subscriber '{self.name}' not initialized")
+        
+        # Will be implemented by transport-specific subclasses
+        raise NotImplementedError
+
+
+@dataclass
+class VyraServer(VyraInterface):
+    """
+    Server interface for request-response communication.
+    
+    Represents service server:
+    - ROS2: Service Server
+    - Zenoh: Queryable
+    - Redis: Request-Response Pattern
+    - UDS: Stream Socket RPC Server
+    """
+    
+    def __init__(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        response_callback: Optional[Callable] = None,
+        protocol: ProtocolType = ProtocolType.ROS2,
+        **kwargs
+    ):
+        super().__init__(name, protocol, InterfaceType.SERVER, **kwargs)
+        if not topic_builder:
+            raise InterfaceError("TopicBuilder is required for Server")
+        self.topic_builder: TopicBuilder = topic_builder
+        self.response_callback = response_callback  # async def callback(request: Any) -> Any
+        self._transport_handle: Optional[Any] = None
+    
+    async def initialize(self) -> bool:
+        """Initialize server with transport layer."""
+        self._initialized = True
+        return True
+    
+    async def shutdown(self) -> None:
+        """Shutdown server."""
+        self._initialized = False
+        self._transport_handle = None
+    
+    async def serve(self) -> None:
+        """
+        Start serving requests.
+        Calls response_callback for each request and returns response.
+        """
+        if not self._initialized:
+            raise InterfaceError(f"Server '{self.name}' not initialized")
+        
+        # Will be implemented by transport-specific subclasses
+        raise NotImplementedError
+
+
+@dataclass
+class VyraClient(VyraInterface):
+    """
+    Client interface for request-response communication.
+    
+    Represents service client:
+    - ROS2: Service Client
+    - Zenoh: Query Client
+    - Redis: Request-Response Pattern
+    - UDS: Stream Socket RPC Client
+    """
+    
+    def __init__(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        request_callback: Optional[Callable] = None,  # Optional for async pattern
+        protocol: ProtocolType = ProtocolType.ROS2,
+        **kwargs
+    ):
+        super().__init__(name, protocol, InterfaceType.CLIENT, **kwargs)
+        if not topic_builder:
+            raise InterfaceError("TopicBuilder is required for Client")
+        self.topic_builder: TopicBuilder = topic_builder
+        self.request_callback = request_callback  # async def callback(response: Any) -> None
+        self._transport_handle: Optional[Any] = None
+    
+    async def initialize(self) -> bool:
+        """Initialize client with transport layer."""
+        self._initialized = True
+        return True
+    
+    async def shutdown(self) -> None:
+        """Shutdown client."""
         self._initialized = False
         self._transport_handle = None
     
     async def call(self, request: Any, timeout: float = 5.0) -> Any:
         """
-        Invoke the callable remotely.
+        Send request and await response (async).
         
         Args:
             request: Request data
@@ -208,138 +366,141 @@ class VyraCallable(VyraInterface):
             Response data
         """
         if not self._initialized:
-            raise InterfaceError(f"Callable '{self.name}' not initialized")
+            raise InterfaceError(f"Client '{self.name}' not initialized")
         
         # Will be implemented by transport-specific subclasses
         raise NotImplementedError
 
 
 @dataclass
-class VyraSpeaker(VyraInterface):
+class VyraActionServer(VyraInterface):
     """
-    Speaker interface for publish-subscribe communication.
+    Action Server interface for long-running tasks.
     
-    Represents one-way broadcasting across protocols:
-    - ROS2: Topic Publisher
-    - MQTT: Publisher
-    - Redis: Pub/Sub Publisher
+    Represents async task server with progress feedback:
+    - ROS2: Action Server
+    - Zenoh: Callable + Publishers (control/feedback/result)
+    - Redis: State tracking with Pub/Sub
+    - UDS: Stream-based state messages
     """
     
     def __init__(
         self,
         name: str,
         topic_builder: TopicBuilder,
+        handle_goal_request: Optional[Callable] = None,
+        handle_cancel_request: Optional[Callable] = None,
+        execution_callback: Optional[Callable] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
-        super().__init__(name, protocol, InterfaceType.SPEAKER, **kwargs)
-
+        super().__init__(name, protocol, InterfaceType.ACTION_SERVER, **kwargs)
         if not topic_builder:
-            raise InterfaceError("TopicBuilder is required for ROS2Speaker")
+            raise InterfaceError("TopicBuilder is required for ActionServer")
         self.topic_builder: TopicBuilder = topic_builder
+        
+        # Three callbacks for action lifecycle
+        self.handle_goal_request = handle_goal_request          # async def(goal: Any) -> bool
+        self.handle_cancel_request = handle_cancel_request      # async def(goal_handle: Any) -> bool
+        self.execution_callback = execution_callback            # async def(goal_handle: Any) -> Any
+        
         self._transport_handle: Optional[Any] = None
     
     async def initialize(self) -> bool:
-        """Initialize speaker with transport layer."""
+        """Initialize action server with transport layer."""
         self._initialized = True
         return True
     
     async def shutdown(self) -> None:
-        """Shutdown speaker."""
+        """Shutdown action server."""
         self._initialized = False
         self._transport_handle = None
     
-    async def shout(self, message: Any) -> bool:
+    async def start(self) -> None:
         """
-        Publish a message.
-        
-        Args:
-            message: Message data to publish
-            
-        Returns:
-            bool: True if published successfully
+        Start action server.
+        Handles goal requests, cancellations, and executions.
         """
         if not self._initialized:
-            raise InterfaceError(f"Speaker '{self.name}' not initialized")
-        
-        # Will be implemented by transport-specific subclasses
-        raise NotImplementedError
-    
-    async def listen(
-        self,
-        callback: Callable[[Any], None],
-        **kwargs
-    ) -> None:
-        """
-        Subscribe and listen for messages.
-        
-        Args:
-            callback: Callback function to process messages
-            **kwargs: Additional protocol-specific parameters
-        """
-        if not self._initialized:
-            raise InterfaceError(f"Speaker '{self.name}' not initialized")
+            raise InterfaceError(f"ActionServer '{self.name}' not initialized")
         
         # Will be implemented by transport-specific subclasses
         raise NotImplementedError
 
 
 @dataclass
-class VyraJob(VyraInterface):
+class VyraActionClient(VyraInterface):
     """
-    Job interface for long-running tasks.
+    Action Client interface for long-running tasks.
     
-    Represents asynchronous tasks with progress feedback:
-    - ROS2: Action
-    - gRPC: Server Streaming
-    - Async Task: Python asyncio
+    Represents async task client:
+    - ROS2: Action Client
+    - Zenoh: Query + Subscribers (control/feedback/result)
+    - Redis: State tracking with Pub/Sub
+    - UDS: Stream-based state messages
     """
     
     def __init__(
         self,
         name: str,
         topic_builder: TopicBuilder,
-        result_callback: Optional[Callable] = None,
+        direct_response_callback: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
+        goal_callback: Optional[Callable] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
-        super().__init__(name, protocol, InterfaceType.JOB, **kwargs)
-        self.result_callback = result_callback
-        self.feedback_callback = feedback_callback
-        self._transport_handle: Optional[Any] = None
-
+        super().__init__(name, protocol, InterfaceType.ACTION_CLIENT, **kwargs)
         if not topic_builder:
-            raise InterfaceError("TopicBuilder is required for ROS2Job")
+            raise InterfaceError("TopicBuilder is required for ActionClient")
         self.topic_builder: TopicBuilder = topic_builder
+        
+        # Three callbacks for action lifecycle
+        self.direct_response_callback = direct_response_callback  # async def(accepted: bool) -> None
+        self.feedback_callback = feedback_callback                # async def(feedback: Any) -> None
+        self.goal_callback = goal_callback                        # async def(result: Any) -> None
+        
+        self._transport_handle: Optional[Any] = None
     
     async def initialize(self) -> bool:
-        """Initialize job with transport layer."""
+        """Initialize action client with transport layer."""
         self._initialized = True
         return True
     
     async def shutdown(self) -> None:
-        """Shutdown job."""
+        """Shutdown action client."""
         self._initialized = False
         self._transport_handle = None
     
-    async def execute(
-        self,
-        goal: Any,
-        feedback_callback: Optional[Callable] = None
-    ) -> Any:
+    async def send_goal(self, goal: Any, **kwargs) -> Any:
         """
-        Execute the job.
+        Send goal to action server.
         
         Args:
-            goal: Goal/input data
-            feedback_callback: Optional callback for progress updates
+            goal: Goal data
+            **kwargs: Additional parameters (timeout, etc.)
             
         Returns:
-            Result data
+            Goal handle or result
         """
         if not self._initialized:
-            raise InterfaceError(f"Job '{self.name}' not initialized")
+            raise InterfaceError(f"ActionClient '{self.name}' not initialized")
+        
+        # Will be implemented by transport-specific subclasses
+        raise NotImplementedError
+    
+    async def cancel_goal(self, goal_handle: Any) -> bool:
+        """
+        Cancel a running goal.
+        
+        Args:
+            goal_handle: Handle returned from send_goal
+            
+        Returns:
+            bool: True if cancellation accepted
+        """
+        if not self._initialized:
+            raise InterfaceError(f"ActionClient '{self.name}' not initialized")
         
         # Will be implemented by transport-specific subclasses
         raise NotImplementedError

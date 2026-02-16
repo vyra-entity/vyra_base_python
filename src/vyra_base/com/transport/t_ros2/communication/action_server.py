@@ -21,7 +21,7 @@ def _base_callback(goal_handle) -> NoReturn:
 @dataclass
 class ActionServerInfo:
     """
-    Represents an action for the VyraActionServer.
+    Represents an action for the ROS2ActionServer.
 
     Attributes
     ----------
@@ -43,7 +43,7 @@ class ActionServerInfo:
     server: Union[ActionServer, None] = None
 
 
-class VyraActionServer:
+class ROS2ActionServer:
     """
     Base class for ROS2 actions.
 
@@ -52,7 +52,7 @@ class VyraActionServer:
 
     def __init__(self, actionInfo: ActionServerInfo, node: VyraNode) -> None:
         """
-        Initialize the VyraActionServer.
+        Initialize the ROS2ActionServer.
 
         Parameters
         ----------

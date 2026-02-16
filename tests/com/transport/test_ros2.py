@@ -224,9 +224,9 @@ class TestROS2BackwardCompatibility:
     def test_remote_callable_decorator_datalayer(self):
         """Test remote_callable decorator from datalayer."""
         try:
-            from vyra_base.com.core.decorators import remote_callable
+            from vyra_base.com.core.decorators import remote_service
             
-            @remote_callable
+            @remote_service
             async def test_function(request):
                 return {"result": "ok"}
             
@@ -237,9 +237,9 @@ class TestROS2BackwardCompatibility:
     
     def test_remote_callable_decorator_new_api(self):
         """Test remote_callable decorator from new com API."""
-        from vyra_base.com import remote_callable
+        from vyra_base.com import remote_service
         
-        @remote_callable
+        @remote_service
         async def test_function(request):
             return {"result": "ok"}
         
@@ -249,8 +249,8 @@ class TestROS2BackwardCompatibility:
     def test_decorators_are_same(self):
         """Test that old and new decorators are compatible."""
         try:
-             from vyra_base.com.core.decorators import remote_callable as old_decorator
-            from vyra_base.com import remote_callable as new_decorator
+             from vyra_base.com.core.decorators import remote_service as old_decorator
+            from vyra_base.com import remote_service as new_decorator
             
             # Both should exist
             assert old_decorator is not None
@@ -341,12 +341,12 @@ class TestROS2GracefulDegradation:
         with patch.dict('sys.modules', {'rclpy': None}):
             try:
                 from vyra_base.com import (
-                    remote_callable,
+                    remote_service,
                     InterfaceFactory,
                     ProtocolType
                 )
                 
-                assert all([remote_callable, InterfaceFactory, ProtocolType])
+                assert all([remote_service, InterfaceFactory, ProtocolType])
             except ImportError as e:
                 pytest.fail(f"Com module should work without ROS2: {e}")
     

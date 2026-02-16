@@ -19,7 +19,7 @@ import logging
 from typing import Any, Optional, Callable, List, Dict
 from pathlib import Path
 
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class OpcuaServer:
     async def start(self) -> None:
         """Start OPC UA server."""
         try:
-            Logger.info(f"🚀 Starting OPC UA server: {self.endpoint}")
+            logger.info(f"🚀 Starting OPC UA server: {self.endpoint}")
             
             # Create server
             self._server = Server()
@@ -111,10 +111,10 @@ class OpcuaServer:
             await self._server.start()
             self._running = True
             
-            Logger.info(f"✅ OPC UA server started: {self.endpoint}")
+            logger.info(f"✅ OPC UA server started: {self.endpoint}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to start OPC UA server: {e}")
+            logger.error(f"❌ Failed to start OPC UA server: {e}")
             self._running = False
             raise
     
@@ -122,13 +122,13 @@ class OpcuaServer:
     async def stop(self) -> None:
         """Stop OPC UA server."""
         if self._server and self._running:
-            Logger.info(f"⏹️  Stopping OPC UA server: {self.endpoint}")
+            logger.info(f"⏹️  Stopping OPC UA server: {self.endpoint}")
             await self._server.stop()
             self._server = None
             self._running = False
             self._namespaces.clear()
             self._nodes.clear()
-            Logger.info("✅ OPC UA server stopped")
+            logger.info("✅ OPC UA server stopped")
     
     @property
     def is_running(self) -> bool:
@@ -154,7 +154,7 @@ class OpcuaServer:
         self._require_running()
         
         if uri in self._namespaces:
-            Logger.debug(f"Namespace already registered: {uri}")
+            logger.debug(f"Namespace already registered: {uri}")
             return self._namespaces[uri]
         
         if not self._server:
@@ -163,11 +163,11 @@ class OpcuaServer:
         try:
             idx = await self._server.register_namespace(uri)
             self._namespaces[uri] = idx
-            Logger.info(f"✅ Registered namespace: {uri} (idx={idx})")
+            logger.info(f"✅ Registered namespace: {uri} (idx={idx})")
             return idx
             
         except Exception as e:
-            Logger.error(f"❌ Failed to register namespace: {e}")
+            logger.error(f"❌ Failed to register namespace: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -209,7 +209,7 @@ class OpcuaServer:
             
             # Check if node already exists
             if full_node_id in self._nodes:
-                Logger.debug(f"Variable already exists: {full_node_id}")
+                logger.debug(f"Variable already exists: {full_node_id}")
                 return self._nodes[full_node_id]
             
             # Add variable
@@ -224,11 +224,11 @@ class OpcuaServer:
                 await node.set_writable()
             
             self._nodes[full_node_id] = node
-            Logger.info(f"✅ Added variable: {full_node_id} = {value}")
+            logger.info(f"✅ Added variable: {full_node_id} = {value}")
             return node
             
         except Exception as e:
-            Logger.error(f"❌ Failed to add variable: {e}")
+            logger.error(f"❌ Failed to add variable: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -266,7 +266,7 @@ class OpcuaServer:
             
             # Check if node already exists
             if full_node_id in self._nodes:
-                Logger.debug(f"Object already exists: {full_node_id}")
+                logger.debug(f"Object already exists: {full_node_id}")
                 return self._nodes[full_node_id]
             
             # Add object
@@ -276,11 +276,11 @@ class OpcuaServer:
             )
             
             self._nodes[full_node_id] = node
-            Logger.info(f"✅ Added object: {full_node_id}")
+            logger.info(f"✅ Added object: {full_node_id}")
             return node
             
         except Exception as e:
-            Logger.error(f"❌ Failed to add object: {e}")
+            logger.error(f"❌ Failed to add object: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -305,10 +305,10 @@ class OpcuaServer:
                 node = self._nodes[node_id]
             
             await node.write_value(value)
-            Logger.debug(f"✍️  Set {node_id} = {value}")
+            logger.debug(f"✍️  Set {node_id} = {value}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to set variable value: {e}")
+            logger.error(f"❌ Failed to set variable value: {e}")
             raise
     
     @ErrorTraceback.w_check_error_exist
@@ -335,11 +335,11 @@ class OpcuaServer:
                 node = self._nodes[node_id]
             
             value = await node.read_value()
-            Logger.debug(f"📖 Read {node_id} = {value}")
+            logger.debug(f"📖 Read {node_id} = {value}")
             return value
             
         except Exception as e:
-            Logger.error(f"❌ Failed to get variable value: {e}")
+            logger.error(f"❌ Failed to get variable value: {e}")
             raise
     
     async def __aenter__(self):

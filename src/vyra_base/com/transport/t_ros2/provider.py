@@ -14,16 +14,28 @@ from typing import Any, Callable, Optional, Dict, TYPE_CHECKING
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
-    VyraCallable,
-    VyraSpeaker,
-    VyraJob,
+    # New unified types
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient
 )
 from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     ProviderError,
 )
 from vyra_base.com.transport.t_ros2.node import NodeSettings, VyraNode
-from vyra_base.com.transport.t_ros2.vyra_models import ROS2Speaker, ROS2Callable, ROS2Job
+from vyra_base.com.transport.t_ros2.vyra_models import (
+    # New unified
+    VyraPublisherImpl,
+    VyraSubscriberImpl,
+    VyraServerImpl,
+    VyraClientImpl,
+    VyraActionServerImpl,
+    VyraActionClientImpl
+)
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 
 logger = logging.getLogger(__name__)
@@ -210,189 +222,205 @@ class ROS2Provider(AbstractProtocolProvider):
         self._initialized = False
         logger.info("✅ ROS2 provider shutdown complete")
     
-    async def create_callable(
-        self,
-        name: str,
-        callback: Optional[Callable],
-        **kwargs
-    ) -> VyraCallable:
-        """
-        Create a ROS2 callable (service server or client).
-        
-        Args:
-            name: Service name
-            callback: Server-side callback function (None for client)
-            **kwargs: Additional parameters
-                - service_type: ROS2 service type (required)
-                - qos_profile: QoS profile
-                - is_callable: True for server, False for client (auto-detected from callback if not provided)
-                
-        Returns:
-            VyraCallable instance
-            
-        Raises:
-            ProviderError: If provider not initialized
-            ValueError: If service_type not provided
-        """
-        self.require_initialization()
-        
-        service_type = kwargs.pop("service_type", None)
-        if not service_type:
-            raise ArgumentError("service_type is required for ROS2 callable")
-        
-        node = kwargs.pop("node", None)
-        
-        # Check is_callable flag (defaults to True if callback provided, False otherwise)
-        is_callable = kwargs.pop("is_callable", callback is not None)
-        
-        role = "server" if is_callable else "client"
 
-        logger.info(
-            f"🔧 Creating ROS2 service {role}: {name} (type: {service_type})"
-        )
-        
-        # Ensure callback matches is_callable flag
-        if is_callable and callback is None:
-            raise ArgumentError("Callback required for service server (is_callable=True)")
-        if not is_callable and callback is not None:
-            logger.debug("Ignoring callback for service client (is_callable=False)")
-            callback = None
-        
-        # Create ROS2 callable
-        callable_instance = ROS2Callable(
-            name=name,
-            topic_builder=self._topic_builder,
-            callback=callback,
-            node=node or self._node,
-            service_type=service_type,
-            **kwargs
-        )
-        
-        await callable_instance.initialize()
-        
-        logger.info(f"✅ ROS2 service {role} created: {name}")
-        return callable_instance
     
-    async def create_speaker(
+    # ========================================================================
+    # UNIFIED INTERFACE CREATION METHODS
+    # ========================================================================
+    
+    async def create_publisher(
         self,
         name: str,
         **kwargs
-    ) -> VyraSpeaker:
-        """
-        Create a ROS2 speaker (topic publisher/subscriber).
-        
-        Args:
-            name: Topic name
-            **kwargs: Additional parameters
-                - message_type: ROS2 message type (required)
-                - qos_profile: QoS profile
-                - is_publisher: True for publisher, False for subscriber (default: True)
-                
-        Returns:
-            VyraSpeaker instance
-            
-        Raises:
-            ProviderError: If provider not initialized
-            ArgumentError: If message_type not provided
-        """
+    ) -> VyraPublisher:
+        """Create ROS2 publisher."""
         self.require_initialization()
         
         message_type = kwargs.pop("message_type", None)
         if not message_type:
-            raise ArgumentError("message_type is required for ROS2 speaker")
-
-        node = kwargs.pop("node", None)
-
-        is_publisher = kwargs.get("is_publisher", True)
-        kwargs.pop("is_publisher", None)
-        role = "publisher" if is_publisher else "subscriber"
+            raise ArgumentError("message_type is required for ROS2 publisher")
         
-        logger.info(
-            f"🔧 Creating ROS2 {role}: {name} (type: {message_type})"
-        )
-                
-        # Create ROS2 speaker
-        speaker_instance = ROS2Speaker(
+        node = kwargs.pop("node", None)
+        qos_profile = kwargs.pop("qos_profile", None)
+        
+        logger.info(f"🔧 Creating ROS2 publisher: {name} (type: {message_type})")
+        
+        publisher = VyraPublisherImpl(
             name=name,
             topic_builder=self._topic_builder,
             node=node or self._node,
             message_type=message_type,
-            is_publisher=is_publisher,
+            qos_profile=qos_profile,
             **kwargs
         )
         
-        await speaker_instance.initialize()
-        
-        logger.info(f"✅ ROS2 {role} created: {name}")
-        return speaker_instance
+        await publisher.initialize()
+        logger.info(f"✅ ROS2 publisher created: {name}")
+        return publisher
     
-    async def create_job(
+    async def create_subscriber(
         self,
         name: str,
-        callback: Callable,
+        subscriber_callback: Optional[Callable],
         **kwargs
-    ) -> VyraJob:
-        """
-        Create a ROS2 job (action server or client).
+    ) -> VyraSubscriber:
+        """Create ROS2 subscriber."""
+        self.require_initialization()
         
-        Args:
-            name: Action name
-            callback: Action execution callback (for server) or None (for client)
-            **kwargs: Additional parameters
-                - action_type: ROS2 action type (required)
-                - is_job: True for server, False for client (auto-detected from callback if not provided)
-                - feedback_callback: Optional feedback callback (client-side)
-                
-        Returns:
-            VyraJob instance
-            
-        Raises:
-            ProviderError: If provider not initialized
-            ArgumentError: If action_type not provided
-        """
+        message_type = kwargs.pop("message_type", None)
+        if not message_type:
+            raise ArgumentError("message_type is required for ROS2 subscriber")
+        
+        node = kwargs.pop("node", None)
+        qos_profile = kwargs.pop("qos_profile", None)
+        
+        logger.info(f"🔧 Creating ROS2 subscriber: {name} (type: {message_type})")
+        
+        subscriber = VyraSubscriberImpl(
+            name=name,
+            topic_builder=self._topic_builder,
+            node=node or self._node,
+            message_type=message_type,
+            subscriber_callback=subscriber_callback,
+            qos_profile=qos_profile,
+            **kwargs
+        )
+        
+        await subscriber.initialize()
+        logger.info(f"✅ ROS2 subscriber created: {name}")
+        return subscriber
+    
+    async def create_server(
+        self,
+        name: str,
+        response_callback: Optional[Callable],
+        **kwargs
+    ) -> VyraServer:
+        """Create ROS2 service server."""
+        self.require_initialization()
+        
+        service_type = kwargs.pop("service_type", None)
+        if not service_type:
+            raise ArgumentError("service_type is required for ROS2 server")
+        
+        node = kwargs.pop("node", None)
+        qos_profile = kwargs.pop("qos_profile", None)
+        
+        logger.info(f"🔧 Creating ROS2 server: {name} (type: {service_type})")
+        
+        server = VyraServerImpl(
+            name=name,
+            topic_builder=self._topic_builder,
+            node=node or self._node,
+            service_type=service_type,
+            response_callback=response_callback,
+            qos_profile=qos_profile,
+            **kwargs
+        )
+        
+        await server.initialize()
+        logger.info(f"✅ ROS2 server created: {name}")
+        return server
+    
+    async def create_client(
+        self,
+        name: str,
+        **kwargs
+    ) -> VyraClient:
+        """Create ROS2 service client."""
+        self.require_initialization()
+        
+        service_type = kwargs.pop("service_type", None)
+        if not service_type:
+            raise ArgumentError("service_type is required for ROS2 client")
+        
+        node = kwargs.pop("node", None)
+        qos_profile = kwargs.pop("qos_profile", None)
+        request_callback = kwargs.pop("request_callback", None)
+        
+        logger.info(f"🔧 Creating ROS2 client: {name} (type: {service_type})")
+        
+        client = VyraClientImpl(
+            name=name,
+            topic_builder=self._topic_builder,
+            node=node or self._node,
+            service_type=service_type,
+            request_callback=request_callback,
+            qos_profile=qos_profile,
+            **kwargs
+        )
+        
+        await client.initialize()
+        logger.info(f"✅ ROS2 client created: {name}")
+        return client
+    
+    async def create_action_server(
+        self,
+        name: str,
+        handle_goal_request: Optional[Callable] = None,
+        handle_cancel_request: Optional[Callable] = None,
+        execution_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraActionServer:
+        """Create ROS2 action server."""
         self.require_initialization()
         
         action_type = kwargs.pop("action_type", None)
         if not action_type:
-            raise ArgumentError("action_type is required for ROS2 job")
+            raise ArgumentError("action_type is required for ROS2 action server")
         
         node = kwargs.pop("node", None)
         
-        # Check is_job flag (defaults to True if callback provided, False otherwise)
-        is_job = kwargs.pop("is_job", callback is not None)
+        logger.info(f"🔧 Creating ROS2 action server: {name} (type: {action_type})")
         
-        role = "server" if is_job else "client"
-
-        logger.info(
-            f"🔧 Creating ROS2 action {role}: {name} (type: {action_type})"
-        )
-        
-        # Ensure callback matches is_job flag
-        if is_job and callback is None:
-            raise ArgumentError("Callback required for action server (is_job=True)")
-        if not is_job and callback is not None:
-            logger.debug("Ignoring callback for action client (is_job=False)")
-            callback = None
-        
-        # Extract feedback and result callbacks for compatibility
-        feedback_callback = kwargs.pop("feedback_callback", None)
-        result_callback = callback if is_job else None
-        
-        # Create ROS2 job
-        job_instance = ROS2Job(
+        action_server = VyraActionServerImpl(
             name=name,
             topic_builder=self._topic_builder,
-            result_callback=result_callback,
-            feedback_callback=feedback_callback,
             node=node or self._node,
             action_type=action_type,
+            handle_goal_request=handle_goal_request,
+            handle_cancel_request=handle_cancel_request,
+            execution_callback=execution_callback,
             **kwargs
         )
         
-        await job_instance.initialize()
+        await action_server.initialize()
+        logger.info(f"✅ ROS2 action server created: {name}")
+        return action_server
+    
+    async def create_action_client(
+        self,
+        name: str,
+        direct_response_callback: Optional[Callable] = None,
+        feedback_callback: Optional[Callable] = None,
+        goal_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraActionClient:
+        """Create ROS2 action client."""
+        self.require_initialization()
         
-        logger.info(f"✅ ROS2 action {role} created: {name}")
-        return job_instance
+        action_type = kwargs.pop("action_type", None)
+        if not action_type:
+            raise ArgumentError("action_type is required for ROS2 action client")
+        
+        node = kwargs.pop("node", None)
+        
+        logger.info(f"🔧 Creating ROS2 action client: {name} (type: {action_type})")
+        
+        action_client = VyraActionClientImpl(
+            name=name,
+            topic_builder=self._topic_builder,
+            node=node or self._node,
+            action_type=action_type,
+            direct_response_callback=direct_response_callback,
+            feedback_callback=feedback_callback,
+            goal_callback=goal_callback,
+            **kwargs
+        )
+        
+        await action_client.initialize()
+        logger.info(f"✅ ROS2 action client created: {name}")
+        return action_client
     
     def get_node(self) -> Node:
         """

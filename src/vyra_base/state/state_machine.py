@@ -31,7 +31,7 @@ from .state_types import (
     is_operational_allowed_in_lifecycle,
 )
 from .state_events import StateEvent, EventType, get_event_target_layer, is_interrupt_event
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 
 class StateMachineError(Exception):
@@ -162,7 +162,7 @@ class StateMachine:
             "any": [],
         }
         
-        Logger.info(f"StateMachine initialized: lifecycle={self._lifecycle.value}, "
+        logger.info(f"StateMachine initialized: lifecycle={self._lifecycle.value}, "
                    f"operational={self._operational.value}, health={self._health.value}")
     
     # -------------------------------------------------------------------------
@@ -230,7 +230,7 @@ class StateMachine:
             LayerViolationError: If layer rules are violated
         """
         with self._lock:
-            Logger.debug(f"Processing event: {event}")
+            logger.debug(f"Processing event: {event}")
             
             try:
                 # Handle interrupt events first (highest priority)
@@ -249,12 +249,12 @@ class StateMachine:
                 elif target_layer == "operational":
                     self._handle_operational_event(event)
                 else:
-                    Logger.warning(f"Unknown event target layer: {target_layer}")
+                    logger.warning(f"Unknown event target layer: {target_layer}")
                 
                 return self.get_current_state()
                 
             except Exception as e:
-                Logger.error(f"Error processing event {event}: {e}")
+                logger.error(f"Error processing event {event}: {e}")
                 if self.config.strict_mode:
                     raise
                 return self.get_current_state()
@@ -285,7 +285,7 @@ class StateMachine:
             # Sort by priority (descending)
             self._callbacks[layer].sort(key=lambda x: x[1], reverse=True)
             
-            Logger.debug(f"Subscribed callback to {layer} layer with priority {priority}")
+            logger.debug(f"Subscribed callback to {layer} layer with priority {priority}")
     
     def unsubscribe(self, layer: str, callback: Callable):
         """Remove a callback subscription."""
@@ -317,7 +317,7 @@ class StateMachine:
         """Clear transition history."""
         with self._lock:
             self._history.clear()
-            Logger.info("State machine history cleared")
+            logger.info("State machine history cleared")
     
     def get_diagnostic_info(self) -> Dict[str, Any]:
         """
@@ -353,7 +353,7 @@ class StateMachine:
         new_state = self._get_lifecycle_target(current, event.event_type)
         
         if new_state is None:
-            Logger.debug(f"No lifecycle transition for event {event.event_type} in state {current}")
+            logger.debug(f"No lifecycle transition for event {event.event_type} in state {current}")
             return
         
         # Validate transition
@@ -361,7 +361,7 @@ class StateMachine:
             msg = f"Invalid lifecycle transition: {current.value} -> {new_state.value}"
             if self.config.strict_mode:
                 raise InvalidTransitionError(msg)
-            Logger.warning(msg)
+            logger.warning(msg)
             return
         
         # Execute transition
@@ -369,7 +369,7 @@ class StateMachine:
         self._record_transition("lifecycle", current.value, new_state.value, event, True)
         self._notify_callbacks("lifecycle", current.value, new_state.value)
         
-        Logger.info(f"Lifecycle: {current.value} -> {new_state.value}")
+        logger.info(f"Lifecycle: {current.value} -> {new_state.value}")
         
         # Apply lifecycle → operational rules
         self._apply_lifecycle_to_operational_rules(new_state, event)
@@ -380,7 +380,7 @@ class StateMachine:
         new_state = self._get_operational_target(current, event.event_type)
         
         if new_state is None:
-            Logger.debug(f"No operational transition for event {event.event_type} in state {current}")
+            logger.debug(f"No operational transition for event {event.event_type} in state {current}")
             return
         
         # Validate transition
@@ -388,7 +388,7 @@ class StateMachine:
             msg = f"Invalid operational transition: {current.value} -> {new_state.value}"
             if self.config.strict_mode:
                 raise InvalidTransitionError(msg)
-            Logger.warning(msg)
+            logger.warning(msg)
             return
         
         # Check if lifecycle allows this operational state
@@ -396,7 +396,7 @@ class StateMachine:
             msg = f"Operational state {new_state.value} not allowed in lifecycle {self._lifecycle.value}"
             if self.config.strict_mode:
                 raise LayerViolationError(msg)
-            Logger.warning(msg)
+            logger.warning(msg)
             # Force to safe state
             new_state = OperationalState.IDLE
         
@@ -405,7 +405,7 @@ class StateMachine:
         self._record_transition("operational", current.value, new_state.value, event, True)
         self._notify_callbacks("operational", current.value, new_state.value)
         
-        Logger.info(f"Operational: {current.value} -> {new_state.value}")
+        logger.info(f"Operational: {current.value} -> {new_state.value}")
     
     def _handle_health_event(self, event: StateEvent):
         """Handle events targeting health layer."""
@@ -413,7 +413,7 @@ class StateMachine:
         new_state = self._get_health_target(current, event.event_type)
         
         if new_state is None:
-            Logger.debug(f"No health transition for event {event.event_type} in state {current}")
+            logger.debug(f"No health transition for event {event.event_type} in state {current}")
             return
         
         # Validate transition
@@ -421,7 +421,7 @@ class StateMachine:
             msg = f"Invalid health transition: {current.value} -> {new_state.value}"
             if self.config.strict_mode:
                 raise InvalidTransitionError(msg)
-            Logger.warning(msg)
+            logger.warning(msg)
             return
         
         # Execute transition
@@ -429,14 +429,14 @@ class StateMachine:
         self._record_transition("health", current.value, new_state.value, event, True)
         self._notify_callbacks("health", current.value, new_state.value)
         
-        Logger.info(f"Health: {current.value} -> {new_state.value}")
+        logger.info(f"Health: {current.value} -> {new_state.value}")
         
         # Apply health escalation rules
         self._apply_health_escalation_rules(current, new_state, event)
     
     def _handle_interrupt(self, event: StateEvent):
         """Handle system interrupt events."""
-        Logger.warning(f"Processing interrupt: {event.event_type}")
+        logger.warning(f"Processing interrupt: {event.event_type}")
         
         if event.event_type == EventType.EMERGENCY_STOP:
             # Emergency stop: immediately deactivate
@@ -445,7 +445,7 @@ class StateMachine:
             old_health = self._health
             
             if self._lifecycle != LifecycleState.ACTIVE:
-                Logger.info(
+                logger.info(
                     f"Lifecycle state is not ACTIVE during emergency "
                     f"stop: {self._lifecycle.value}"
                 )
@@ -477,7 +477,7 @@ class StateMachine:
     
         elif event.event_type == EventType.PRIORITY_OVERRIDE:
             # Priority override: no state change, just log
-            Logger.info("Priority override event received - no state change applied")
+            logger.info("Priority override event received - no state change applied")
 
 
     # -------------------------------------------------------------------------
@@ -592,14 +592,14 @@ class StateMachine:
             try:
                 callback(layer, old_state, new_state)
             except Exception as e:
-                Logger.error(f"Callback error on {layer}: {e}")
+                logger.error(f"Callback error on {layer}: {e}")
         
         # Notify global callbacks
         for callback, _ in self._callbacks.get("any", []):
             try:
                 callback(layer, old_state, new_state)
             except Exception as e:
-                Logger.error(f"Global callback error: {e}")
+                logger.error(f"Global callback error: {e}")
     
     def __repr__(self) -> str:
         """String representation for debugging."""

@@ -3,7 +3,7 @@ Unit tests for decorators (@remote_callable, @remote_speaker, @remote_job).
 """
 import pytest
 import asyncio
-from vyra_base.com.core.decorators import remote_callable, remote_speaker, remote_job
+from vyra_base.com.core.decorators import remote_service, remote_speaker, remote_job
 from vyra_base.com.core.types import ProtocolType
 
 
@@ -12,7 +12,7 @@ class TestRemoteCallableDecorator:
     
     def test_decorator_on_async_function(self):
         """Test decorator works on async functions."""
-        @remote_callable(name="test_callable")
+        @remote_service(name="test_callable")
         async def test_func(request):
             return {"result": "success"}
         
@@ -22,7 +22,7 @@ class TestRemoteCallableDecorator:
     
     def test_decorator_on_sync_function(self):
         """Test decorator converts sync to async."""
-        @remote_callable(name="sync_callable")
+        @remote_service(name="sync_callable")
         def sync_func(request):
             return {"result": "sync"}
         
@@ -32,7 +32,7 @@ class TestRemoteCallableDecorator:
     
     def test_decorator_default_name(self):
         """Test decorator uses function name if name not provided."""
-        @remote_callable()
+        @remote_service()
         async def my_function(request):
             return {}
         
@@ -40,7 +40,7 @@ class TestRemoteCallableDecorator:
     
     def test_decorator_with_protocols(self):
         """Test decorator stores protocol list."""
-        @remote_callable(protocols=[ProtocolType.ROS2, ProtocolType.REDIS])
+        @remote_service(protocols=[ProtocolType.ROS2, ProtocolType.REDIS])
         async def test_func(request):
             return {}
         
@@ -48,7 +48,7 @@ class TestRemoteCallableDecorator:
     
     def test_decorator_auto_register_false(self):
         """Test decorator with auto_register=False."""
-        @remote_callable(auto_register=False)
+        @remote_service(auto_register=False)
         async def test_func(request):
             return {}
         
@@ -57,7 +57,7 @@ class TestRemoteCallableDecorator:
     @pytest.mark.asyncio
     async def test_decorated_function_callable(self):
         """Test decorated function can be called."""
-        @remote_callable()
+        @remote_service()
         async def add_numbers(request):
             return request['a'] + request['b']
         

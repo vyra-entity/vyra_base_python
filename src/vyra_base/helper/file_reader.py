@@ -3,7 +3,7 @@ import os
 import sys
 from asyncio import Lock
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from dotenv import load_dotenv
 
@@ -111,7 +111,7 @@ class FileReader:
             await release_lock_for_file(config_file)
 
     @classmethod
-    async def open_env_file(cls, env_path: Path) -> Optional[dict]:
+    async def open_env_file(cls, env_path: Path) -> dict:
         """Reads an environment (.env) file.
 
         :param env_path: Path to the directory containing the .env file.
@@ -133,7 +133,7 @@ class FileReader:
             await release_lock_for_file(env_path / '.env')
 
     @classmethod
-    async def open_toml_file(cls, config_file: Path) -> Optional[Any]:
+    async def open_toml_file(cls, config_file: Path) -> Any:
         """Reads a TOML file.
 
         :param config_file: TOML formatted file.
@@ -175,7 +175,7 @@ class FileReader:
             await release_lock_for_file(config_file)
 
     @classmethod
-    async def open_ini_file(cls, config_file: Path) -> Optional[Any]:
+    async def open_ini_file(cls, config_file: Path) -> Any:
         """Reads an INI file.
 
         :param config_file: INI formatted file.
@@ -200,7 +200,7 @@ class FileReader:
             await release_lock_for_file(config_file)
 
     @classmethod
-    async def open_yaml_file(cls, config_file: Path) -> Optional[Any]:
+    async def open_yaml_file(cls, config_file: Path) -> Any:
         """Reads a YAML file.
 
         :param config_file: YAML formatted file.

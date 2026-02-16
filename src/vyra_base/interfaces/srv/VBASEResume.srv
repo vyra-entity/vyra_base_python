@@ -1,0 +1,12 @@
+# Resume
+# Resume the current operation and set state PAUSED -> RUNNING
+# Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+# Request
+string[] params  # An array of key-value pairs providing the necessary parameters for initialization.
+
+---
+
+# Response
+bool success  # Indicates whether the transition was successful
+string message  # A message providing additional information about the transition

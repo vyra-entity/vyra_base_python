@@ -47,12 +47,10 @@ except ImportError as e:
 # Try importing VYRA models layer
 try:
     from vyra_base.com.transport.t_uds.vyra_models import (
-        UDSCallable,
         UDS_MODELS_AVAILABLE,
     )
     _models_available = UDS_MODELS_AVAILABLE
 except ImportError as e:
-    UDSCallable = None
     _models_available = False
     logger.debug(f"⚠️  UDS VYRA models layer unavailable: {e}")
 
@@ -84,7 +82,5 @@ __all__ = [
     "UnixSocket",
     "UDS_SOCKET_DIR",
     "MESSAGE_HEADER_FORMAT",
-    "MESSAGE_HEADER_SIZE",
-    # VYRA models layer
-    "UDSCallable",
+    "MESSAGE_HEADER_SIZE"
 ]

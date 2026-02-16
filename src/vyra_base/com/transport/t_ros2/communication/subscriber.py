@@ -7,7 +7,7 @@ from rclpy.subscription import Subscription as rclpySubscription
 from rclpy.timer import Timer
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 def _base_callback(*args, **kwargs) -> NoReturn:
     """
@@ -19,7 +19,7 @@ def _base_callback(*args, **kwargs) -> NoReturn:
 
 
 @dataclass
-class SubscriptionInfo:
+class SubscriberInfo:
     """
     Data class for storing subscription information.
 
@@ -40,7 +40,7 @@ class SubscriptionInfo:
     qos_profile: Union[QoSProfile, int] = 10
     subscription: Union[rclpySubscription, None] = None
 
-class VyraSubscriber:
+class ROS2Subscriber:
     """
     Base class for ROS2 subscriptions.
 
@@ -50,17 +50,17 @@ class VyraSubscriber:
 
     def __init__(
             self, 
-            subscriptionInfo: SubscriptionInfo, 
+            subscriptionInfo: SubscriberInfo, 
             node: VyraNode) -> None:
         """
-        Initialize the VyraSubscription.
+        Initialize the ROS2Subscriber.
 
         :param subscriptionInfo: Information about the subscription.
-        :type subscriptionInfo: SubscriptionInfo
+        :type subscriptionInfo: SubscriberInfo
         :param node: The ROS2 node to attach the subscription to.
         :type node: VyraNode
         """
-        self._subscription_info: SubscriptionInfo = subscriptionInfo
+        self._subscription_info: SubscriberInfo = subscriptionInfo
         self._node = node
 
     def create_subscription(self) -> None:
@@ -71,7 +71,7 @@ class VyraSubscriber:
         """
         if self._subscription_info.subscription is not None:
             self.remove_subscription()
-            Logger.warn(f"Subscription '{self._subscription_info.name}' already exists. It will be replaced.")
+            logger.warn(f"Subscription '{self._subscription_info.name}' already exists. It will be replaced.")
         
         self._node.get_logger().info(
             f"Creating subscription: {self._subscription_info.name}")

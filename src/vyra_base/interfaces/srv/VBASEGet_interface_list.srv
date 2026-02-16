@@ -1,0 +1,11 @@
+# Get Interface List
+# Retrieve the list of interfaces of the vyra system.
+# Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+# Request
+# No request parameters
+
+---
+
+# Response
+string[] capabilities  # A list of strings representing the system capabilities

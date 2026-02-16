@@ -407,21 +407,6 @@ Exception Handling Pattern
         # Handle general security error
         pass
 
-Logging
-~~~~~~~
-
-.. code-block:: python
-
-    from vyra_base.helper.logger import Logger
-    import logging
-
-    # Set log level
-    Logger.setLevel(logging.DEBUG)
-
-    # Log security events
-    Logger.info("✅ Access granted")
-    Logger.warn("⚠️ Timestamp drift detected")
-    Logger.error("❌ Signature validation failed")
 
 Testing
 -------

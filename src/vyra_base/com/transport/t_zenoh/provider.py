@@ -13,16 +13,26 @@ from typing import Any, Callable, Optional, Dict
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
     ProtocolType,
-    VyraCallable,
-    VyraSpeaker,
-    VyraJob,
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient
 )
 from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     ProviderError,
 )
 from vyra_base.com.transport.t_zenoh.session import ZenohSession, SessionConfig, SessionMode
-from vyra_base.com.transport.t_zenoh.vyra_models import ZenohSpeaker, ZenohCallable, ZenohJob
+from vyra_base.com.transport.t_zenoh.vyra_models import (
+    VyraPublisherImpl,
+    VyraSubscriberImpl,
+    VyraServerImpl,
+    VyraClientImpl,
+    VyraActionServerImpl,
+    VyraActionClientImpl
+)
 from vyra_base.com.transport.t_zenoh.communication.serializer import SerializationFormat
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 
@@ -191,166 +201,290 @@ class ZenohProvider(AbstractProtocolProvider):
             logger.error(f"❌ Error shutting down Zenoh provider: {e}")
             raise
     
-    async def create_callable(
-        self,
-        name: str,
-        callback: Optional[Callable],
-        **kwargs
-    ) -> VyraCallable:
-        """
-        Create a Zenoh callable (query/reply).
-        
-        Args:
-            name: Service name (key expression)
-            callback: Async callback for request handling (None for client)
-            **kwargs: Additional parameters:
-                - is_callable: True for server, False for client (auto-detected from callback if not provided)
-                - timeout: Timeout for client calls in seconds (default: 5.0)
-                - format: Override serialization format
-                
-        Returns:
-            VyraCallable: Zenoh callable interface
-        """
-        self.require_initialization()
-        
-        try:
-            logger.debug(f"Creating Zenoh callable: {name}")
-            
-            # Check is_callable flag (defaults to True if callback provided, False otherwise)
-            is_callable = kwargs.pop("is_callable", callback is not None)
-            is_server = is_callable  # For compatibility with existing code
-            
-            role = "server" if is_callable else "client"
-            logger.info(f"🔧 Creating Zenoh callable {role}: {name}")
-            
-            # Ensure callback matches is_callable flag
-            if is_callable and callback is None:
-                raise ProviderError("Callback required for callable server (is_callable=True)")
-            if not is_callable and callback is not None:
-                logger.debug("Ignoring callback for callable client (is_callable=False)")
-                callback = None
-            
-            timeout = kwargs.get("timeout", 5.0)
-            format = kwargs.get("format", self._format)
-            
-            callable = ZenohCallable(
-                name=name,
-                topic_builder=self._topic_builder,
-                session=self._session,
-                callback=callback,
-                format=format,
-                is_server=is_server,
-                timeout=timeout
-            )
-            
-            await callable.initialize()
-            
-            logger.info(f"✅ Zenoh callable {role} created: {name}")
-            return callable
-            
-        except Exception as e:
-            logger.error(f"❌ Failed to create Zenoh callable '{name}': {e}")
-            raise ProviderError(f"Failed to create callable: {e}")
+    # ============================================================================
+    # UNIFIED TRANSPORT LAYER METHODS
+    # ============================================================================
     
-    async def create_speaker(
+    async def create_publisher(
         self,
         name: str,
+        topic_builder: TopicBuilder,
+        message_type: type,
         **kwargs
-    ) -> VyraSpeaker:
+    ) -> VyraPublisher:
         """
-        Create a Zenoh speaker (pub/sub).
+        Create Zenoh Publisher.
         
         Args:
-            name: Topic name (key expression)
-            **kwargs: Additional parameters:
-                - is_publisher: True for publisher, False for subscriber (default: True)
-                - format: Override serialization format
-                
+            name: Publisher name
+            topic_builder: TopicBuilder instance
+            message_type: Message type class
+            **kwargs: Additional publisher options
+            
         Returns:
-            VyraSpeaker: Zenoh speaker interface
+            ZenohPublisherImpl instance
         """
         self.require_initialization()
         
         try:
-            logger.debug(f"Creating Zenoh speaker: {name}")
+            if not self._session or not self._session.is_open:
+                raise ProviderError("Zenoh session not open")
             
-            is_publisher = kwargs.get("is_publisher", True)
-            format = kwargs.get("format", self._format)
-            
-            speaker = ZenohSpeaker(
+            publisher = VyraPublisherImpl(
                 name=name,
-                topic_builder=self._topic_builder,
-                session=self._session,
-                format=format,
-                is_publisher=is_publisher
+                topic_builder=topic_builder,
+                zenoh_session=self._session.session,
+                message_type=message_type,
+                **kwargs
             )
             
-            await speaker.initialize()
+            await publisher.initialize()
             
-            logger.info(f"✅ Zenoh speaker created: {name}")
-            return speaker
+            logger.info(f"✅ Zenoh Publisher created: {name}")
+            return publisher
             
         except Exception as e:
-            logger.error(f"❌ Failed to create Zenoh speaker '{name}': {e}")
-            raise ProviderError(f"Failed to create speaker: {e}")
+            logger.error(f"❌ Failed to create Zenoh Publisher '{name}': {e}")
+            raise ProviderError(f"Failed to create publisher: {e}")
     
-    async def create_job(
+    async def create_subscriber(
         self,
         name: str,
-        callback: Callable,
+        topic_builder: TopicBuilder,
+        subscriber_callback: Callable,
+        message_type: type,
         **kwargs
-    ) -> VyraJob:
+    ) -> VyraSubscriber:
         """
-        Create a Zenoh job (long-running task).
+        Create Zenoh Subscriber.
         
         Args:
-            name: Job name (base key expression)
-            callback: Async callback for job execution (None for client)
-            **kwargs: Additional parameters:
-                - is_job: True for server, False for client (auto-detected from callback if not provided)
-                - format: Override serialization format
-                
+            name: Subscriber name
+            topic_builder: TopicBuilder instance
+            subscriber_callback: Async callback for received messages
+            message_type: Message type class
+            **kwargs: Additional subscriber options
+            
         Returns:
-            VyraJob: Zenoh job interface
+            ZenohSubscriberImpl instance
         """
         self.require_initialization()
         
         try:
-            logger.debug(f"Creating Zenoh job: {name}")
-            
-            # Check is_job flag (defaults to True if callback provided, False otherwise)
-            is_job = kwargs.pop("is_job", callback is not None)
-            is_server = is_job  # For compatibility with existing code
-            
-            role = "server" if is_job else "client"
-            logger.info(f"🔧 Creating Zenoh job {role}: {name}")
-            
-            # Ensure callback matches is_job flag
-            if is_job and callback is None:
-                raise ProviderError("Callback required for job server (is_job=True)")
-            if not is_job and callback is not None:
-                logger.debug("Ignoring callback for job client (is_job=False)")
-                callback = None
-            
-            format = kwargs.get("format", self._format)
-            
-            job = ZenohJob(
+            if not self._session or not self._session.is_open:
+                raise ProviderError("Zenoh session not open")
+
+            subscriber = VyraSubscriberImpl(
                 name=name,
-                topic_builder=self._topic_builder,
-                session=self._session,
-                callback=callback,
-                format=format,
-                is_server=is_server
+                topic_builder=topic_builder,
+                subscriber_callback=subscriber_callback,
+                zenoh_session=self._session.session,
+                message_type=message_type,
+                **kwargs
             )
             
-            await job.initialize()
+            await subscriber.initialize()
+            await subscriber.subscribe()
             
-            logger.info(f"✅ Zenoh job {role} created: {name}")
-            return job
+            logger.info(f"✅ Zenoh Subscriber created: {name}")
+            return subscriber
             
         except Exception as e:
-            logger.error(f"❌ Failed to create Zenoh job '{name}': {e}")
-            raise ProviderError(f"Failed to create job: {e}")
+            logger.error(f"❌ Failed to create Zenoh Subscriber '{name}': {e}")
+            raise ProviderError(f"Failed to create subscriber: {e}")
+    
+    async def create_server(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        response_callback: Callable,
+        service_type: type,
+        **kwargs
+    ) -> VyraServer:
+        """
+        Create Zenoh Server (Queryable).
+        
+        Args:
+            name: Server name
+            topic_builder: TopicBuilder instance
+            response_callback: Async callback for handling requests
+            service_type: Service type class
+            **kwargs: Additional server options
+            
+        Returns:
+            ZenohServerImpl instance
+        """
+        self.require_initialization()
+        
+        try:
+            if not self._session or not self._session.is_open:
+                raise ProviderError("Zenoh session not open")
+            
+            server = VyraServerImpl(
+                name=name,
+                topic_builder=topic_builder,
+                response_callback=response_callback,
+                zenoh_session=self._session.session,
+                service_type=service_type,
+                **kwargs
+            )
+            
+            await server.initialize()
+            await server.serve()
+            
+            logger.info(f"✅ Zenoh Server created: {name}")
+            return server
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Zenoh Server '{name}': {e}")
+            raise ProviderError(f"Failed to create server: {e}")
+    
+    async def create_client(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        service_type: type,
+        request_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraClient:
+        """
+        Create Zenoh Client (Query sender).
+        
+        Args:
+            name: Client name
+            topic_builder: TopicBuilder instance
+            service_type: Service type class
+            request_callback: Optional async callback for responses
+            **kwargs: Additional client options
+            
+        Returns:
+            ZenohClientImpl instance
+        """
+        self.require_initialization()
+        
+        try:
+            if not self._session or not self._session.is_open:
+                raise ProviderError("Zenoh session not open")
+            
+            client = VyraClientImpl(
+                name=name,
+                topic_builder=topic_builder,
+                request_callback=request_callback,
+                zenoh_session=self._session.session,
+                service_type=service_type,
+                **kwargs
+            )
+            
+            await client.initialize()
+            
+            logger.info(f"✅ Zenoh Client created: {name}")
+            return client
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Zenoh Client '{name}': {e}")
+            raise ProviderError(f"Failed to create client: {e}")
+    
+    async def create_action_server(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        handle_goal_request: Callable,
+        handle_cancel_request: Callable,
+        execution_callback: Callable,
+        action_type: type,
+        **kwargs
+    ) -> VyraActionServer:
+        """
+        Create Zenoh Action Server.
+        
+        Args:
+            name: Action server name
+            topic_builder: TopicBuilder instance
+            handle_goal_request: Async callback for goal requests
+            handle_cancel_request: Async callback for cancel requests
+            execution_callback: Async callback for goal execution
+            action_type: Action type class
+            **kwargs: Additional action server options
+            
+        Returns:
+            ZenohActionServerImpl instance
+        """
+        self.require_initialization()
+        
+        try:
+            if not self._session or not self._session.is_open:
+                raise ProviderError("Zenoh session not open")
+            
+            action_server = VyraActionServerImpl(
+                name=name,
+                topic_builder=topic_builder,
+                handle_goal_request=handle_goal_request,
+                handle_cancel_request=handle_cancel_request,
+                execution_callback=execution_callback,
+                zenoh_session=self._session.session,
+                action_type=action_type,
+                **kwargs
+            )
+            
+            await action_server.initialize()
+            
+            logger.info(f"✅ Zenoh Action Server created: {name}")
+            return action_server
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Zenoh Action Server '{name}': {e}")
+            raise ProviderError(f"Failed to create action server: {e}")
+    
+    async def create_action_client(
+        self,
+        name: str,
+        topic_builder: TopicBuilder,
+        action_type: type,
+        direct_response: Optional[Callable] = None,
+        feedback_callback: Optional[Callable] = None,
+        goal_response_callback: Optional[Callable] = None,
+        **kwargs
+    ) -> VyraActionClient:
+        """
+        Create Zenoh Action Client.
+        
+        Args:
+            name: Action client name
+            topic_builder: TopicBuilder instance
+            action_type: Action type class
+            direct_response: Optional async callback for results
+            feedback_callback: Optional async callback for feedback
+            goal_response_callback: Optional async callback for goal responses
+            **kwargs: Additional action client options
+            
+        Returns:
+            ZenohActionClientImpl instance
+        """
+        self.require_initialization()
+        
+        try:
+            if not self._session or not self._session.is_open:
+                raise ProviderError("Zenoh session not open")
+            
+            action_client = VyraActionClientImpl(
+                name=name,
+                topic_builder=topic_builder,
+                direct_response=direct_response,
+                feedback_callback=feedback_callback,
+                goal_response_callback=goal_response_callback,
+                zenoh_session=self._session.session,
+                action_type=action_type,
+                **kwargs
+            )
+            
+            await action_client.initialize()
+            
+            logger.info(f"✅ Zenoh Action Client created: {name}")
+            return action_client
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to create Zenoh Action Client '{name}': {e}")
+            raise ProviderError(f"Failed to create action client: {e}")
     
     def require_initialization(self) -> None:
         """

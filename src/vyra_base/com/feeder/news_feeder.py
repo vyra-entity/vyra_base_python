@@ -21,7 +21,8 @@ else:
 from .feeder import BaseFeeder
 from vyra_base.defaults.entries import ModuleEntry, NewsEntry
 from vyra_base.defaults.exceptions import FeederException
-from vyra_base.helper.logger import Logger
+
+logger = logging.getLogger(__name__)
 
 
 class NewsFeeder(BaseFeeder):

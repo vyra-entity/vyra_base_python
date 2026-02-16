@@ -31,6 +31,14 @@ from vyra_base.com.core.types import (
     DisplayStyle,
     InterfaceMetadata,
     VyraInterface,
+    # New unified types
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient,
+    # Legacy types (deprecated)
     VyraCallable,
     VyraSpeaker,
     VyraJob,
@@ -39,7 +47,7 @@ from vyra_base.com.core.types import (
 from vyra_base.com.core.factory import InterfaceFactory
 
 from vyra_base.com.core.decorators import (
-    remote_callable,
+    remote_service,
     remote_speaker,
     remote_job,
     get_decorated_methods,
@@ -95,13 +103,18 @@ __all__ = [
     "DisplayStyle",
     "InterfaceMetadata",
     "VyraInterface",
-    "VyraCallable",
-    "VyraSpeaker",
-    "VyraJob",
+    # New unified types
+    "VyraPublisher",
+    "VyraSubscriber",
+    "VyraServer",
+    "VyraClient",
+    "VyraActionServer",
+    "VyraActionClient",
+
     # Factory
     "InterfaceFactory",
     # Decorators
-    "remote_callable",
+    "remote_service",
     "remote_speaker",
     "remote_job",
     "get_decorated_methods",

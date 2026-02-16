@@ -47,7 +47,7 @@ class PublisherInfo:
     qos_profile: Union[QoSProfile, int] = 10
     publisher: Union[rclpyPublisher, None] = None
 
-class VyraPublisher:
+class ROS2Publisher:
     """
     Base class for ROS2 publishers.
 
@@ -56,7 +56,7 @@ class VyraPublisher:
 
     def __init__(self, publisherInfo: PublisherInfo, node: VyraNode) -> None:
         """
-        Initialize the VyraPublisher.
+        Initialize the ROS2Publisher.
 
         :param publisherInfo: PublisherInfo instance containing publisher configuration.
         :type publisherInfo: PublisherInfo

@@ -8,7 +8,7 @@ to provide ROS2 services using ROS2Provider.
 import asyncio
 import rclpy
 from example_interfaces.srv import AddTwoInts
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service
 from vyra_base.com.core.types import ProtocolType
 from vyra_base.com.transport.t_ros2 import ROS2Provider
 from vyra_base.com.transport.t_ros2.node import VyraNode, NodeSettings

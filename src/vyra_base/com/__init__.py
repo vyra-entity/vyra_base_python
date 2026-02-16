@@ -37,7 +37,7 @@ from vyra_base.com.core import (
     InterfaceType,
     # Factory & Decorators
     InterfaceFactory,
-    remote_callable,
+    remote_service,
     remote_speaker,
     remote_job,
 )
@@ -94,22 +94,22 @@ except ImportError:
 
 # ROS2 infrastructure - Using transport/t_ros2 implementations (optional)
 try:
-    from vyra_base.com.transport.t_ros2.communication.publisher import VyraPublisher
-    from vyra_base.com.transport.t_ros2.communication.subscriber import VyraSubscriber
+    from vyra_base.com.transport.t_ros2.communication.publisher import ROS2Publisher
+    from vyra_base.com.transport.t_ros2.communication.subscriber import ROS2Subscriber
     from vyra_base.com.transport.t_ros2.node import VyraNode, CheckerNode, NodeSettings
-    from vyra_base.com.transport.t_ros2.communication.action_client import VyraActionClient
-    from vyra_base.com.transport.t_ros2.communication.action_server import VyraActionServer
-    from vyra_base.com.transport.t_ros2.communication.service_client import VyraServiceClient
-    from vyra_base.com.transport.t_ros2.communication.service_server import VyraServiceServer
+    from vyra_base.com.transport.t_ros2.communication.action_client import ROS2ActionClient
+    from vyra_base.com.transport.t_ros2.communication.action_server import ROS2ActionServer
+    from vyra_base.com.transport.t_ros2.communication.service_client import ROS2ServiceClient
+    from vyra_base.com.transport.t_ros2.communication.service_server import ROS2ServiceServer
 except ImportError:
-    VyraSubscriber = None
+    ROS2Subscriber = None
     VyraNode = None
     CheckerNode = None
     NodeSettings = None
-    VyraActionClient = None
-    VyraActionServer = None
-    VyraServiceClient = None
-    VyraServiceServer = None
+    ROS2ActionClient = None
+    ROS2ActionServer = None
+    ROS2ServiceClient = None
+    ROS2ServiceServer = None
 
 # IPC - Inter-Process Communication (moved to external/grpc)
 try:
@@ -142,7 +142,7 @@ __all__ = [
     "InterfaceFactory",
     
     # Decorators (Multi-protocol)
-    "remote_callable",
+    "remote_service",
     "remote_speaker",
     "remote_job",
     
@@ -172,15 +172,15 @@ __all__ = [
     "ROS2Job",
     "ROS2Callable",
     "ROS2Speaker",
-    "VyraPublisher",
-    "VyraSubscriber",
+    "ROS2Publisher",
+    "ROS2Subscriber",
     "VyraNode",
     "CheckerNode",
     "NodeSettings",
-    "VyraActionClient",
-    "VyraActionServer",
-    "VyraServiceClient",
-    "VyraServiceServer",
+    "ROS2ActionClient",
+    "ROS2ActionServer",
+    "ROS2ServiceClient",
+    "ROS2ServiceServer",
     
     # IPC Classes
     "GrpcServer",

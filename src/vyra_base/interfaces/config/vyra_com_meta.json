@@ -1,15 +1,14 @@
 [
     {
         "tags": [
-            "ros2",
             "zenoh"
         ],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "ErrorFeed",
         "displayname": "Error Feed",
         "description": "Communicate error information in the system between different components or modules.",
         "filetype": [
-            "VBASEErrorFeed.msg"
+            "VBASEErrorFeed.proto"
         ],
         "returns": [
             {
@@ -49,15 +48,14 @@
     },
     {
         "tags": [
-            "ros2",
             "zenoh"
         ],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "StateFeed",
         "displayname": "State Feed",
         "description": "Communicate state information in the system between different components or modules.",
         "filetype": [
-            "VBASEStateFeed.msg"
+            "VBASEStateFeed.proto"
         ],
         "returns": [
             {
@@ -84,15 +82,14 @@
     },
     {
         "tags": [
-            "ros2",
             "zenoh"
         ],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "NewsFeed",
         "displayname": "News Feed",
         "description": "Communicate news in the system between different components or modules.",
         "filetype": [
-            "VBASENewsFeed.msg"
+            "VBASENewsFeed.proto"
         ],
         "returns": [
             {

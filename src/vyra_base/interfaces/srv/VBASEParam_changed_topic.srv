@@ -1,0 +1,11 @@
+# Get Update Parameter Event Topic
+# Get the topic for update parameter events.
+# Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+# Request
+# No request parameters
+
+---
+
+# Response
+string topic  # The topic for update parameter events.

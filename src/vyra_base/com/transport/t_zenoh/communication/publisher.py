@@ -6,6 +6,7 @@ Implements publishing functionality for Zenoh transport.
 from __future__ import annotations
 
 import logging
+import zenoh
 from typing import Any, Optional
 from dataclasses import dataclass
 
@@ -35,7 +36,7 @@ class ZenohPublisher:
     def __init__(
         self,
         publisher_info: PublisherInfo,
-        zenoh_publisher: Any  # zenoh.Publisher
+        zenoh_publisher: zenoh.Publisher  # zenoh.Publisher
     ):
         """
         Initialize Zenoh publisher.

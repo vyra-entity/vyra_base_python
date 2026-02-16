@@ -34,7 +34,7 @@ except ImportError:
     Time = None
     ROS2_AVAILABLE = False
 
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service
 from vyra_base.security.security_levels import (
     SecurityLevel,
     AccessStatus,
@@ -51,7 +51,7 @@ from vyra_base.helper.crypto_helper import (
     load_private_key,
     create_self_signed_cert,
 )
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 
 @dataclass
@@ -150,16 +150,16 @@ class SecurityManager:
         if max_security_level >= SecurityLevel.DIGITAL_SIGNATURE:
             self._load_or_create_ca(ca_key_path, ca_cert_path)
         
-        Logger.info(f"SecurityManager initialized with max level: {SecurityLevel.get_name(max_security_level)}")
+        logger.info(f"SecurityManager initialized with max level: {SecurityLevel.get_name(max_security_level)}")
 
     def _load_or_create_ca(self, ca_key_path: Optional[Path], ca_cert_path: Optional[Path]) -> None:
         """Load or create CA infrastructure for Level 5."""
         try:
             if ca_key_path and ca_key_path.exists():
                 self.ca_private_key = load_private_key(ca_key_path)
-                Logger.info(f"Loaded CA private key from {ca_key_path}")
+                logger.info(f"Loaded CA private key from {ca_key_path}")
             else:
-                Logger.warn("CA key not found, Level 5 authentication will not be available")
+                logger.warn("CA key not found, Level 5 authentication will not be available")
                 
             if ca_cert_path and ca_cert_path.exists():
                 # Load both PEM string and parsed certificate object
@@ -168,13 +168,13 @@ class SecurityManager:
                 from cryptography.hazmat.backends import default_backend
                 cert_bytes = ca_cert_path.read_bytes()
                 self.ca_cert = x509.load_pem_x509_certificate(cert_bytes, default_backend())
-                Logger.info(f"Loaded CA certificate from {ca_cert_path}")
+                logger.info(f"Loaded CA certificate from {ca_cert_path}")
             else:
                 self.ca_cert = None
         except Exception as e:
-            Logger.error(f"Failed to load CA infrastructure: {e}")
+            logger.error(f"Failed to load CA infrastructure: {e}")
 
-    @remote_callable()
+    @remote_service()
     async def request_access(self, request, response) -> bool:
         """
         Remote callable wrapper for request_access_impl.
@@ -212,7 +212,7 @@ class SecurityManager:
             
             return True
         except Exception as e:
-            Logger.error(f"Error handling request_access: {e}")
+            logger.error(f"Error handling request_access: {e}")
             return False
     
 
@@ -242,7 +242,7 @@ class SecurityManager:
         
         # Validate security level
         if not SecurityLevel.is_valid(requested_sl):
-            Logger.warn(f"Invalid security level requested: {requested_sl}")
+            logger.warn(f"Invalid security level requested: {requested_sl}")
             return (
                 False,
                 f"Invalid security level: {requested_sl}",
@@ -258,7 +258,7 @@ class SecurityManager:
         # Password validation for Level 3+
         if requested_level >= SecurityLevel.EXTENDED_AUTH:
             if module_id_str not in self.module_passwords:
-                Logger.warn(f"No password configured for module {module_name} ({module_id_str})")
+                logger.warn(f"No password configured for module {module_name} ({module_id_str})")
                 return (
                     False,
                     "Password required for Level 3+ authentication",
@@ -270,7 +270,7 @@ class SecurityManager:
                 )
             
             if not password or password != self.module_passwords[module_id_str]:
-                Logger.warn(f"Invalid password for module {module_name} ({module_id_str})")
+                logger.warn(f"Invalid password for module {module_name} ({module_id_str})")
                 return (
                     False,
                     "Invalid password",
@@ -283,10 +283,10 @@ class SecurityManager:
         
         # Check if requested level is supported
         if requested_level > self.max_security_level:
-            Logger.warn(f"Security level {requested_level.name} not supported (max: {self.max_security_level.name})")
+            logger.warn(f"Security level {requested_level.name} not supported (max: {self.max_security_level.name})")
             # Downgrade to maximum supported level
             granted_level = self.max_security_level
-            Logger.info(f"Downgrading to security level {granted_level.name}")
+            logger.info(f"Downgrading to security level {granted_level.name}")
         else:
             granted_level = requested_level
         
@@ -306,7 +306,7 @@ class SecurityManager:
         certificate = ""
         if granted_level >= SecurityLevel.DIGITAL_SIGNATURE:
             if not certificate_csr:
-                Logger.warn("Certificate CSR required for Level 5 but not provided")
+                logger.warn("Certificate CSR required for Level 5 but not provided")
                 return (
                     False,
                     "Certificate CSR required for Level 5 authentication",
@@ -318,7 +318,7 @@ class SecurityManager:
                 )
             
             if not self.ca_private_key or not self.ca_cert:
-                Logger.error("CA infrastructure not available for Level 5")
+                logger.error("CA infrastructure not available for Level 5")
                 return (
                     False,
                     "Certificate signing not available",
@@ -339,7 +339,7 @@ class SecurityManager:
                     validity_days=365
                 )
             except Exception as e:
-                Logger.error(f"Failed to sign certificate: {e}")
+                logger.error(f"Failed to sign certificate: {e}")
                 return (
                     False,
                     f"Certificate signing failed: {str(e)}",
@@ -366,7 +366,7 @@ class SecurityManager:
         self.sessions[session_token] = session
         self.sessions_by_module[module_id_str] = session_token
         
-        Logger.info(
+        logger.info(
             f"Access granted to {module_name} ({module_id_str}) "
             f"with security level {granted_level.name}, role: {requested_role}"
         )
@@ -387,7 +387,7 @@ class SecurityManager:
             old_token = self.sessions_by_module[module_id]
             if old_token in self.sessions:
                 del self.sessions[old_token]
-                Logger.debug(f"Invalidated old session for module {module_id}")
+                logger.debug(f"Invalidated old session for module {module_id}")
             del self.sessions_by_module[module_id]
 
     def get_session(self, session_token: str) -> Optional[SecuritySession]:
@@ -402,7 +402,7 @@ class SecurityManager:
             return None
         
         if session.is_expired():
-            Logger.warn(f"Session {session_token} has expired")
+            logger.warn(f"Session {session_token} has expired")
             self._invalidate_session(session_token)
             return None
         
@@ -427,7 +427,7 @@ class SecurityManager:
             self._invalidate_session(token)
         
         if expired_tokens:
-            Logger.debug(f"Cleaned up {len(expired_tokens)} expired sessions")
+            logger.debug(f"Cleaned up {len(expired_tokens)} expired sessions")
 
     def get_session_count(self) -> int:
         """Get the number of active sessions."""

@@ -16,7 +16,6 @@ import logging
 from typing import Any, Optional
 
 from vyra_base.com.industrial.modbus.base import ModbusBaseClient
-from vyra_base.helper.logger import Logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)
@@ -109,7 +108,7 @@ class ModbusRTUClient(ModbusBaseClient):
     async def connect(self) -> None:
         """Establish serial connection to Modbus RTU device."""
         try:
-            Logger.info(
+            logger.info(
                 f"🔌 Connecting to Modbus RTU: {self.port} "
                 f"({self.baudrate} {self.bytesize}{self.parity}{self.stopbits})"
             )
@@ -129,10 +128,10 @@ class ModbusRTUClient(ModbusBaseClient):
                 raise ConnectionError("Modbus RTU connection failed")
             
             self._connected = True
-            Logger.info(f"✅ Connected to Modbus RTU: {self.port}")
+            logger.info(f"✅ Connected to Modbus RTU: {self.port}")
             
         except Exception as e:
-            Logger.error(f"❌ Failed to connect to Modbus RTU: {e}")
+            logger.error(f"❌ Failed to connect to Modbus RTU: {e}")
             self._connected = False
             raise
     
@@ -140,11 +139,11 @@ class ModbusRTUClient(ModbusBaseClient):
     async def close(self) -> None:
         """Close serial connection to Modbus RTU device."""
         if self._client:
-            Logger.info(f"🔌 Closing Modbus RTU connection: {self.port}")
+            logger.info(f"🔌 Closing Modbus RTU connection: {self.port}")
             self._client.close()
             self._client = None
             self._connected = False
-            Logger.info("✅ Modbus RTU connection closed")
+            logger.info("✅ Modbus RTU connection closed")
     
     def _get_client(self) -> AsyncModbusSerialClient:
         """Get underlying pymodbus serial client."""

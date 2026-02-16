@@ -42,7 +42,7 @@ from vyra_base.helper.crypto_helper import (
     sign_message_rsa,
     load_private_key,
 )
-from vyra_base.helper.logger import Logger
+from vyra_base.helper.logger import logger
 
 
 @dataclass
@@ -180,7 +180,7 @@ class SecurePublisher:
         self.security_context = security_context
         self.node = node
         
-        Logger.debug(f"SecurePublisher created for topic '{topic}' with SL{security_context.security_level}")
+        logger.debug(f"SecurePublisher created for topic '{topic}' with SL{security_context.security_level}")
 
     def publish(self, msg: Any, additional_data: str = "") -> None:
         """
@@ -213,7 +213,7 @@ class SecurePublisher:
             self.publisher.publish(msg)
             
         except Exception as e:
-            Logger.error(f"Failed to publish secure message: {e}")
+            logger.error(f"Failed to publish secure message: {e}")
             raise
 
     def destroy(self) -> None:
@@ -260,7 +260,7 @@ class SecureServiceClient:
         self.security_context = security_context
         self.node = node
         
-        Logger.debug(f"SecureServiceClient created for service '{service_name}' with SL{security_context.security_level}")
+        logger.debug(f"SecureServiceClient created for service '{service_name}' with SL{security_context.security_level}")
 
     async def call_async(self, request: Any, additional_data: str = "") -> Any:
         """
@@ -298,7 +298,7 @@ class SecureServiceClient:
             return await future
             
         except Exception as e:
-            Logger.error(f"Failed to call secure service: {e}")
+            logger.error(f"Failed to call secure service: {e}")
             raise
 
     def destroy(self) -> None:
@@ -354,7 +354,7 @@ def security_required(
             security_manager = getattr(entity, 'security_manager', None)
             
             if security_manager is None:
-                Logger.debug(
+                logger.debug(
                     f"Security not enabled for {func.__name__}, "
                     f"skipping access level check (required: {security_level.value})"
                 )
@@ -362,7 +362,7 @@ def security_required(
             
             # Check if request has SafetyMetadata
             if not hasattr(request, 'safety_metadata'):
-                Logger.warn(f"Service call to {func.__name__} missing SafetyMetadata")
+                logger.warn(f"Service call to {func.__name__} missing SafetyMetadata")
                 response.success = False
                 response.message = "Missing SafetyMetadata - authentication required"
                 return response
@@ -374,7 +374,7 @@ def security_required(
             session = security_manager.get_session(session_token)
             
             if session is None:
-                Logger.error(
+                logger.error(
                     f"No valid session found for service call to {func.__name__} "
                     f"(module_id: {metadata.module_id})"
                 )
@@ -385,7 +385,7 @@ def security_required(
             # Check if session's granted level is sufficient
             granted_level = session.security_level
             if granted_level < security_level.value:
-                Logger.warning(
+                logger.warning(
                     f"Access denied: Module {metadata.module_id} (granted level {granted_level}) "
                     f"attempted to call {func.__name__} (requires level {security_level.value})"
                 )
@@ -396,7 +396,7 @@ def security_required(
                 )
                 return response
             
-            Logger.debug(
+            logger.debug(
                 f"Access granted: Module {metadata.module_id} (level {granted_level}) "
                 f"calling {func.__name__} (requires {security_level.value})"
             )

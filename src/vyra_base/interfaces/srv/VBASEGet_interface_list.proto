@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// Get Interface List
+// Retrieve the list of interfaces of the vyra system.
+// Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+// Request message
+message VBASEGet_interface_listRequest {
+  // No request parameters
+}
+
+// Response message
+message VBASEGet_interface_listResponse {
+  // A list of strings representing the system capabilities
+  repeated string capabilities = 1;
+}

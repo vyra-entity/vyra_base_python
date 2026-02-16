@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// Get Update Parameter Event Topic
+// Get the topic for update parameter events.
+// Generated from JSON metadata - DO NOT EDIT MANUALLY
+
+// Request message
+message VBASEParam_changed_topicRequest {
+  // No request parameters
+}
+
+// Response message
+message VBASEParam_changed_topicResponse {
+  // The topic for update parameter events.
+  string topic = 1;
+}

@@ -44,6 +44,5 @@ class DBCommunicationHandler(CommunicationHandler):
 
         :param record: The log record to emit.
         """
-        # await self._feedLogger.add(record)
         # tbd
         pass
