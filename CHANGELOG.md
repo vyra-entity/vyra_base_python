@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.51] - 2026-02-16
+
+### Build
+
+Update logger ,docs, and transport structure to use publisher, service and action in the future instead ob speaker, callable and job
+
+
 ## [0.1.8+build.50] - 2026-02-16
 
 ### Build
