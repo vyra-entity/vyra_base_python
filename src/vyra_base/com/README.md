@@ -47,16 +47,37 @@ callable = await InterfaceFactory.create_callable(
 
 ### 🎯 Protocol-Agnostic Decorators
 ```python
-from vyra_base.com import remote_callable, remote_speaker
+from vyra_base.com import remote_service, remote_publisher, remote_actionServer
+from vyra_base.com.core import IActionHandler, IGoalHandle, ActionStatus
 
-class MyComponent:
-    @remote_callable
+class MyComponent(IActionHandler):
+    @remote_service
     async def process(self, request, response=None):
         return {"result": request["value"] * 2}
     
-    @remote_speaker(protocols=[ProtocolType.REDIS])
+    @remote_publisher(protocols=[ProtocolType.REDIS])
     async def publish_status(self, message):
         pass  # Automatically uses Redis Pub/Sub
+    
+    # NEW: Multi-callback ActionServer pattern (Blueprint System)
+    @remote_actionServer.on_goal(name="long_task")
+    async def accept_goal(self, goal_request) -> bool:
+        return True  # Accept goal
+    
+    @remote_actionServer.on_cancel(name="long_task")
+    async def handle_cancel(self, goal_handle: IGoalHandle) -> bool:
+        return True  # Accept cancellation
+    
+    @remote_actionServer.execute(name="long_task")
+    async def execute_task(self, goal_handle: IGoalHandle) -> dict:
+        # Long-running execution with feedback
+        for i in range(10):
+            if goal_handle.is_cancel_requested():
+                goal_handle.canceled()
+                return {"status": ActionStatus.CANCELED}
+            goal_handle.publish_feedback({"progress": (i+1)*10})
+        goal_handle.succeed()
+        return {"status": ActionStatus.SUCCEEDED, "result": "done"}
 ```
 
 ### 📊 Built-in Monitoring
@@ -255,13 +276,50 @@ class Component:
 
 **After:**
 ```python
-from vyra_base.com import remote_callable
+from vyra_base.com import remote_service  # Renamed from remote_callable
 
 class Component:
-    @remote_callable  # Now supports multi-protocol
+    @remote_service  # Now supports multi-protocol
     async def my_method(self, request, response=None):
         return result
 ```
+
+### ActionServer Migration
+
+**Before (Legacy Single Callback):**
+```python
+@remote_actionServer(name="process")
+async def execute_action(self, goal_handle):
+    # Mixed concerns: validation, cancellation, execution
+    ...
+```
+
+**After (Multi-Callback Blueprint Pattern):**
+```python
+from vyra_base.com.core import IActionHandler, IGoalHandle
+
+class Component(IActionHandler):  # REQUIRED interface
+    @remote_actionServer.on_goal(name="process")
+    async def accept_goal(self, goal_request) -> bool:
+        # Clean goal validation
+        return goal_request.count <= 100
+    
+    @remote_actionServer.on_cancel(name="process")
+    async def handle_cancel(self, goal_handle: IGoalHandle) -> bool:
+        # Dedicated cancellation logic
+        return True
+    
+    @remote_actionServer.execute(name="process")
+    async def execute(self, goal_handle: IGoalHandle) -> dict:
+        # Pure execution logic
+        ...
+```
+
+**Benefits:**
+- ✅ Separation of concerns
+- ✅ Early goal rejection
+- ✅ Better testability
+- ✅ Aligns with IActionHandler interface (REQUIRED)
 
 ### Protocol-Specific Methods
 

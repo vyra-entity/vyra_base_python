@@ -183,6 +183,40 @@ print(response.result)  # 42
 #### ActionServer
 Executes goals, publishes feedback, and returns results.
 
+**NEW**: Multi-callback pattern with decorators for better code organization. See [Blueprint System](../core/README.md#blueprint-system-blueprintspy).
+
+**Recommended: Decorator Pattern**
+```python
+from vyra_base.com import remote_actionServer
+from vyra_base.com.core import IActionHandler, IGoalHandle, ActionStatus
+
+class MyComponent(IActionHandler):  # REQUIRED interface
+    @remote_actionServer.on_goal(name="data_processing")
+    async def accept_goal(self, goal_request) -> bool:
+        """Validate and accept/reject goal"""
+        return goal_request.input > 0
+    
+    @remote_actionServer.on_cancel(name="data_processing")
+    async def handle_cancel(self, goal_handle: IGoalHandle) -> bool:
+        """Handle cancellation request"""
+        return True
+    
+    @remote_actionServer.execute(name="data_processing")
+    async def execute(self, goal_handle: IGoalHandle) -> dict:
+        """Execute with feedback"""
+        for i in range(100):
+            if goal_handle.is_cancel_requested():
+                goal_handle.canceled()
+                return {"status": ActionStatus.CANCELED}
+            
+            goal_handle.publish_feedback({"progress": i, "message": f"Step {i}/100"})
+            await asyncio.sleep(0.1)
+        
+        goal_handle.succeed()
+        return {"status": ActionStatus.SUCCEEDED, "data": goal_handle.goal.input * 2}
+```
+
+**Direct Provider Usage (Low-Level)**
 ```python
 # Create action server
 async def handle_goal_request(goal):

@@ -733,9 +733,12 @@ class InterfaceFactory:
             )
         
         elif isinstance(blueprint, ActionBlueprint):
+            # Extract all three callbacks from ActionBlueprint
             return await InterfaceFactory.create_action_server(
                 name=blueprint.name,
-                execution_callback=blueprint.callback,
+                handle_goal_request=blueprint.get_callback('on_goal'),
+                handle_cancel_request=blueprint.get_callback('on_cancel'),
+                execution_callback=blueprint.get_callback('execute'),
                 protocols=protocols,
                 action_type=blueprint.action_type,
                 **kwargs

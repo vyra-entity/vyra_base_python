@@ -233,96 +233,209 @@ def remote_publisher(
     return decorator
 
 
-def remote_actionServer(
-    name: Optional[str] = None,
-    protocols: Optional[List[ProtocolType]] = None,
-    auto_register: bool = True,
-    namespace: Optional[str] = None,
-    **kwargs
-):
+class ActionServerDecorator:
     """
-    Decorator for long-running task communication (ROS2 Action, job queues, etc.)
+    Class-based decorator for ActionServer with multi-callback support.
     
-    Creates an ActionBlueprint and registers it in CallbackRegistry.
-    The decorated method will handle action goals with feedback and cancellation support.
+    Provides sub-decorators for separate goal acceptance, cancellation, and execution callbacks.
+    This enables clean separation of concerns for action server implementations.
     
-    Args:
-        name: Action name (defaults to function name)
-        protocols: Preferred protocols (will use factory fallback if None)
-        auto_register: Whether to auto-register blueprint
-        namespace: Optional module namespace
-        **kwargs: Additional metadata (action_type, timeout, etc.)
-        
-    Example:
+    Usage:
         >>> class Component:
-        ...     @remote_actionServer(protocols=[ProtocolType.ROS2])
-        ...     async def process_batch(self, goal_handle):
-        ...         # Long-running job with feedback
-        ...         for i, item in enumerate(goal_handle.goal.items):
+        ...     @remote_actionServer.on_goal(name="process_batch")
+        ...     async def accept_goal(self, goal_request):
+        ...         '''Validate and accept/reject the goal'''
+        ...         return True  # Accept goal
+        ...     
+        ...     @remote_actionServer.on_cancel(name="process_batch")
+        ...     async def handle_cancel(self, goal_handle):
+        ...         '''Handle cancellation request'''
+        ...         return True  # Accept cancellation
+        ...     
+        ...     @remote_actionServer.execute(name="process_batch")
+        ...     async def execute_batch(self, goal_handle):
+        ...         '''Execute the action with feedback'''
+        ...         for i in range(10):
         ...             if goal_handle.is_cancel_requested():
+        ...                 goal_handle.canceled()
         ...                 return {"cancelled": True}
-        ...             process(item)
-        ...             goal_handle.publish_feedback({"progress": i+1})
-        ...         return {"processed": len(goal_handle.goal.items)}
-        
-    Note:
-        - The goal_handle provides: goal, publish_feedback(), is_cancel_requested()
-        - Async methods recommended for long-running operations
+        ...             goal_handle.publish_feedback({"progress": (i+1)*10})
+        ...         goal_handle.succeed()
+        ...         return {"result": "completed"}
     """
-    def decorator(func: Callable) -> Callable:
-        # Create blueprint
-        blueprint_name = name or func.__name__
-        blueprint = ActionBlueprint(
-            name=blueprint_name,
-            protocols=protocols or [],
-            metadata=kwargs,
-            action_type=kwargs.get('action_type')
-        )
-        
-        # Register blueprint if auto_register is True
-        if auto_register:
-            try:
-                CallbackRegistry.register_blueprint(blueprint, namespace=namespace)
-                logger.debug(f"📝 Registered action blueprint '{blueprint_name}'")
-            except ValueError as e:
-                logger.warning(f"⚠️  Blueprint '{blueprint_name}' already registered: {e}")
-        
-        # Store metadata on function
-        func._vyra_remote_action = True
-        func._vyra_action_name = blueprint_name
-        func._vyra_protocols = protocols
-        func._vyra_auto_register = auto_register
-        func._vyra_kwargs = kwargs
-        func._vyra_blueprint = blueprint
-        func._vyra_namespace = namespace
-        
-        # Wrap async functions
-        if asyncio.iscoroutinefunction(func):
-            @functools.wraps(func)
-            async def async_wrapper(*args, **wrapper_kwargs):
-                return await func(*args, **wrapper_kwargs)
-            
-            wrapper = async_wrapper
-        else:
-            # Wrap sync functions with async wrapper
-            @functools.wraps(func)
-            async def async_wrapper(*args, **wrapper_kwargs):
-                return func(*args, **wrapper_kwargs)
-            
-            wrapper = async_wrapper
-        
-        # Transfer metadata to wrapper
-        setattr(wrapper, "_vyra_remote_action", True)
-        setattr(wrapper, "_vyra_action_name", blueprint_name)
-        setattr(wrapper, "_vyra_protocols", protocols)
-        setattr(wrapper, "_vyra_auto_register", auto_register)
-        setattr(wrapper, "_vyra_kwargs", kwargs)
-        setattr(wrapper, "_vyra_blueprint", blueprint)
-        setattr(wrapper, "_vyra_namespace", namespace)
-        
-        return wrapper
     
-    return decorator
+    @staticmethod
+    def on_goal(
+        name: str,
+        protocols: Optional[List[ProtocolType]] = None,
+        auto_register: bool = True,
+        namespace: Optional[str] = None,
+        **kwargs
+    ):
+        """
+        Decorator for goal acceptance callback.
+        
+        Args:
+            name: Action name (REQUIRED for multi-callback pattern)
+            protocols: Preferred protocols
+            auto_register: Whether to auto-register blueprint
+            namespace: Optional module namespace
+            **kwargs: Additional metadata
+            
+        The decorated method should:
+        - Accept (self, goal_request) parameters
+        - Return bool (True=accept, False=reject)
+        """
+        return ActionServerDecorator._create_callback_decorator(
+            name=name,
+            callback_type='on_goal',
+            protocols=protocols,
+            auto_register=auto_register,
+            namespace=namespace,
+            **kwargs
+        )
+    
+    @staticmethod
+    def on_cancel(
+        name: str,
+        protocols: Optional[List[ProtocolType]] = None,
+        auto_register: bool = False,  # Don't re-register
+        namespace: Optional[str] = None,
+        **kwargs
+    ):
+        """
+        Decorator for cancellation callback.
+        
+        Args:
+            name: Action name (must match on_goal/execute)
+            protocols: Preferred protocols
+            auto_register: Usually False (blueprint already registered by on_goal)
+            namespace: Optional module namespace
+            **kwargs: Additional metadata
+            
+        The decorated method should:
+        - Accept (self, goal_handle) parameters
+        - Return bool (True=accept cancel, False=reject cancel)
+        """
+        return ActionServerDecorator._create_callback_decorator(
+            name=name,
+            callback_type='on_cancel',
+            protocols=protocols,
+            auto_register=auto_register,
+            namespace=namespace,
+            **kwargs
+        )
+    
+    @staticmethod
+    def execute(
+        name: str,
+        protocols: Optional[List[ProtocolType]] = None,
+        auto_register: bool = False,  # Don't re-register
+        namespace: Optional[str] = None,
+        **kwargs
+    ):
+        """
+        Decorator for action execution callback.
+        
+        Args:
+            name: Action name (must match on_goal/on_cancel)
+            protocols: Preferred protocols
+            auto_register: Usually False (blueprint already registered by on_goal)
+            namespace: Optional module namespace
+            **kwargs: Additional metadata
+            
+        The decorated method should:
+        - Accept (self, goal_handle) parameters
+        - Return Dict with result data
+        - Use goal_handle.publish_feedback() for progress updates
+        - Use goal_handle.succeed()/abort()/canceled() to complete
+        """
+        return ActionServerDecorator._create_callback_decorator(
+            name=name,
+            callback_type='execute',
+            protocols=protocols,
+            auto_register=auto_register,
+            namespace=namespace,
+            **kwargs
+        )
+    
+    @staticmethod
+    def _create_callback_decorator(
+        name: str,
+        callback_type: str,
+        protocols: Optional[List[ProtocolType]] = None,
+        auto_register: bool = True,
+        namespace: Optional[str] = None,
+        **kwargs
+    ):
+        """
+        Internal: Create decorator for specific callback type.
+        """
+        def decorator(func: Callable) -> Callable:
+            # Get or create blueprint
+            blueprint = CallbackRegistry.get_blueprint(name, namespace=namespace)
+            
+            if blueprint is None and auto_register:
+                # Create new blueprint (typically for on_goal)
+                blueprint = ActionBlueprint(
+                    name=name,
+                    protocols=protocols or [],
+                    metadata=kwargs,
+                    action_type=kwargs.get('action_type')
+                )
+                try:
+                    CallbackRegistry.register_blueprint(blueprint, namespace=namespace)
+                    logger.debug(f"📝 Registered action blueprint '{name}'")
+                except ValueError as e:
+                    logger.warning(f"⚠️  Blueprint '{name}' already registered: {e}")
+            elif blueprint is None:
+                logger.warning(
+                    f"⚠️  No blueprint found for '{name}'. "
+                    f"Ensure @remote_actionServer.on_goal() is decorated first with auto_register=True."
+                )
+            
+            # Store metadata on function
+            func._vyra_remote_action = True
+            func._vyra_action_name = name
+            func._vyra_action_callback_type = callback_type  # NEW: callback type
+            func._vyra_protocols = protocols
+            func._vyra_auto_register = auto_register
+            func._vyra_kwargs = kwargs
+            func._vyra_blueprint = blueprint
+            func._vyra_namespace = namespace
+            
+            # Wrap async functions
+            if asyncio.iscoroutinefunction(func):
+                @functools.wraps(func)
+                async def async_wrapper(*args, **wrapper_kwargs):
+                    return await func(*args, **wrapper_kwargs)
+                
+                wrapper = async_wrapper
+            else:
+                # Wrap sync functions with async wrapper
+                @functools.wraps(func)
+                async def async_wrapper(*args, **wrapper_kwargs):
+                    return func(*args, **wrapper_kwargs)
+                
+                wrapper = async_wrapper
+            
+            # Transfer metadata to wrapper
+            setattr(wrapper, "_vyra_remote_action", True)
+            setattr(wrapper, "_vyra_action_name", name)
+            setattr(wrapper, "_vyra_action_callback_type", callback_type)
+            setattr(wrapper, "_vyra_protocols", protocols)
+            setattr(wrapper, "_vyra_auto_register", auto_register)
+            setattr(wrapper, "_vyra_kwargs", kwargs)
+            setattr(wrapper, "_vyra_blueprint", blueprint)
+            setattr(wrapper, "_vyra_namespace", namespace)
+            
+            return wrapper
+        
+        return decorator
+
+
+# Create singleton instance for decorator usage
+remote_actionServer = ActionServerDecorator()
 
 
 def remote_subscriber(
@@ -495,9 +608,11 @@ def get_decorated_methods(obj: Any) -> dict:
             # Action
             if hasattr(attr, "_vyra_remote_action"):
                 blueprint = getattr(attr, "_vyra_blueprint", None)
+                callback_type = getattr(attr, "_vyra_action_callback_type", "execute")  # Default to 'execute'
                 result["actions"].append({
                     "name": attr._vyra_action_name,
                     "method": attr,
+                    "callback_type": callback_type,  # NEW: Include callback type
                     "protocols": attr._vyra_protocols,
                     "kwargs": attr._vyra_kwargs,
                     "blueprint": blueprint,
@@ -603,16 +718,30 @@ def bind_decorated_callbacks(
     # Bind actions
     for item in decorated["actions"]:
         blueprint = item.get("blueprint")
+        callback_type = item.get("callback_type", "execute")  # Default to 'execute' for backward compat
+        
         if blueprint:
             try:
-                if force_rebind:
-                    blueprint.unbind_callback()
-                blueprint.bind_callback(item["method"])
-                results[item["name"]] = True
-                logger.debug(f"✅ Bound action callback: {item['name']}")
+                if force_rebind and isinstance(blueprint, ActionBlueprint):
+                    # For ActionBlueprint, unbind specific callback type
+                    if blueprint.is_bound(callback_type):
+                        logger.debug(f"⚙️  Unbinding existing {callback_type} callback for action '{item['name']}'")
+                        # Note: ActionBlueprint doesn't have unbind_callback(callback_type),
+                        # so we'll just overwrite by binding the new callback
+                
+                # Bind callback with callback_type (ActionBlueprint supports this)
+                if isinstance(blueprint, ActionBlueprint):
+                    blueprint.bind_callback(item["method"], callback_type=callback_type)
+                    results[f"{item['name']}/{callback_type}"] = True
+                    logger.debug(f"✅ Bound action callback: {item['name']} ({callback_type})")
+                else:
+                    # Fallback for non-ActionBlueprint (shouldn't happen, but safe)
+                    blueprint.bind_callback(item["method"])
+                    results[item["name"]] = True
+                    logger.debug(f"✅ Bound action callback: {item['name']}")
             except Exception as e:
-                results[item["name"]] = False
-                logger.error(f"❌ Failed to bind action {item['name']}: {e}")
+                results[f"{item['name']}/{callback_type}"] = False
+                logger.error(f"❌ Failed to bind action {item['name']} ({callback_type}): {e}")
     
     # Summary
     total = len(results)

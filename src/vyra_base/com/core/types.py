@@ -65,6 +65,21 @@ class AccessLevel(str, Enum):
     INTERNAL = "internal"
 
 
+class ActionStatus(Enum):
+    """
+    Status values for action goals (ROS2 Action compatible).
+    
+    Used to track the lifecycle state of action server goals.
+    """
+    UNKNOWN = 0       # Unknown state
+    ACCEPTED = 1      # Goal accepted by server
+    EXECUTING = 2     # Goal is currently executing
+    CANCELING = 3     # Goal is being canceled
+    SUCCEEDED = 4     # Goal completed successfully
+    CANCELED = 5      # Goal was canceled
+    ABORTED = 6       # Goal aborted due to error
+
+
 @dataclass
 class DisplayStyle:
     """Display configuration for interface visibility."""

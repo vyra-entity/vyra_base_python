@@ -187,25 +187,227 @@ job = await InterfaceFactory.create_job(
 - Unregister a protocol provider
 - **Parameter**: `ProtocolType` enum value
 
+### Blueprint System (`blueprints.py`)
+
+**NEW**: Two-phase interface initialization pattern for late binding.
+
+The Blueprint System decouples interface definition from implementation, enabling:
+- Late binding of callbacks
+- Dynamic interface registration
+- Better testing (mock callbacks easily)
+- Clear separation of concerns
+
+```python
+from vyra_base.com.core import (
+    ServiceBlueprint,
+    ActionBlueprint,
+    PublisherBlueprint,
+    SubscriberBlueprint,
+    CallbackRegistry
+)
+```
+
+#### ActionBlueprint - Multi-Callback Pattern
+
+ActionBlueprint supports **three separate callbacks** for clean separation of concerns:
+
+```python
+# Phase 1: Create and register blueprint
+blueprint = ActionBlueprint(
+    name="process_batch",
+    protocols=[ProtocolType.ROS2],
+    action_type=ProcessBatch
+)
+CallbackRegistry.register_blueprint(blueprint)
+
+# Phase 2: Bind callbacks
+blueprint.bind_callbacks(
+    on_goal=accept_goal_handler,      # Validate/accept goals
+    on_cancel=handle_cancel_handler,  # Handle cancellation
+    execute=execute_batch_handler     # Main execution logic
+)
+
+# Check binding status
+if blueprint.is_fully_bound():
+    # Create action server from blueprint
+    action_server = await InterfaceFactory.create_from_blueprint(blueprint)
+```
+
+#### Using Decorators (Automatic Binding)
+
+```python
+from vyra_base.com import remote_actionServer
+from vyra_base.com.core import IActionHandler, IGoalHandle, ActionStatus
+
+class Component(IActionHandler):  # REQUIRED interface
+    
+    @remote_actionServer.on_goal(name="process_batch", auto_register=True)
+    async def accept_goal(self, goal_request) -> bool:
+        """
+        Goal acceptance callback - validates and accepts/rejects goals.
+        Returns: True to accept, False to reject
+        """
+        return goal_request.batch_size <= 100
+    
+    @remote_actionServer.on_cancel(name="process_batch")
+    async def handle_cancel(self, goal_handle: IGoalHandle) -> bool:
+        """
+        Cancellation callback - handles cancel requests.
+        Returns: True to accept cancellation, False to reject
+        """
+        return True  # Always allow cancellation
+    
+    @remote_actionServer.execute(name="process_batch")
+    async def execute_batch(self, goal_handle: IGoalHandle) -> dict:
+        """
+        Execution callback - main action logic with feedback.
+        Returns: Result dictionary
+        """
+        for i in range(goal_handle.goal.batch_size):
+            # Check for cancellation
+            if goal_handle.is_cancel_requested():
+                goal_handle.canceled()
+                return {"status": ActionStatus.CANCELED, "processed": i}
+            
+            # Publish feedback
+            goal_handle.publish_feedback({"progress": (i+1)*10})
+            
+            # Do work
+            await process_item(i)
+        
+        # Mark as successful
+        goal_handle.succeed()
+        return {"status": ActionStatus.SUCCEEDED, "processed": i+1}
+```
+
+#### ActionStatus Enum
+
+```python
+from vyra_base.com.core import ActionStatus
+
+class ActionStatus(Enum):
+    UNKNOWN = 0
+    ACCEPTED = 1
+    EXECUTING = 2
+    CANCELING = 3
+    SUCCEEDED = 4
+    CANCELED = 5
+    ABORTED = 6
+```
+
+#### Abstract Handler Interfaces (REQUIRED)
+
+All complex handlers **MUST** implement these interfaces:
+
+```python
+from vyra_base.com.core import IServiceHandler, IActionHandler, IGoalHandle
+
+class IServiceHandler(ABC):
+    @abstractmethod
+    async def handle_request(self, request: Any) -> Any:
+        """Handle service request"""
+        pass
+
+class IActionHandler(ABC):
+    @abstractmethod
+    async def on_goal(self, goal: Any) -> bool:
+        """Validate and accept/reject goal"""
+        pass
+    
+    @abstractmethod
+    async def execute(self, handle: IGoalHandle) -> Dict[str, Any]:
+        """Execute action with feedback"""
+        pass
+    
+    @abstractmethod
+    async def on_cancel(self) -> bool:
+        """Handle cancellation request"""
+        pass
+
+class IGoalHandle(ABC):
+    @abstractmethod
+    def publish_feedback(self, feedback: Dict[str, Any]) -> None:
+        """Send progress feedback"""
+        pass
+    
+    @abstractmethod
+    def is_cancel_requested(self) -> bool:
+        """Check if cancellation was requested"""
+        pass
+    
+    @abstractmethod
+    def succeed(self) -> None:
+        """Mark action as successful"""
+        pass
+    
+    @abstractmethod
+    def abort(self) -> None:
+        """Mark action as failed"""
+        pass
+    
+    @abstractmethod
+    def canceled(self) -> None:
+        """Mark action as canceled"""
+        pass
+```
+
+**Benefits of Multi-Callback Pattern:**
+- ✅ Separation of concerns
+- ✅ Early goal rejection (before execution starts)
+- ✅ Explicit cancellation handling
+- ✅ Better testability (test each callback independently)
+- ✅ Cleaner code organization
+
+**Migration from Single Callback:**
+```python
+# OLD (DEPRECATED)
+@remote_actionServer(name="process")
+async def execute_action(self, goal_handle):
+    # Mixed concerns: validation + cancellation + execution
+    ...
+
+# NEW (REQUIRED)
+@remote_actionServer.on_goal(name="process")
+async def on_goal(self, goal_request): return True
+
+@remote_actionServer.on_cancel(name="process")
+async def on_cancel(self, goal_handle): return True
+
+@remote_actionServer.execute(name="process")
+async def execute(self, goal_handle): ...
+```
+
+See:
+- [Implementation Phase 1](../../../IMPLEMENTATION_PHASE1_COMPLETE.md)
+- [Implementation Phase 2](../../../IMPLEMENTATION_PHASE2_COMPLETE.md)
+- [Example: Multi-Callback ActionServer](../../../docs/examples/example_action_server_multicallback.py)
+
 ### Decorators (`decorators.py`)
 
 Protocol-agnostic decorators for automatic interface creation.
 
 ```python
 from vyra_base.com.core.decorators import (
-    remote_callable,  # Service decorator
-    remote_speaker,   # Publisher decorator
-    remote_job        # Job decorator
+    remote_service,     # Service decorator (renamed from remote_callable)
+    remote_publisher,   # Publisher decorator (renamed from remote_speaker)
+    remote_subscriber,  # Subscriber decorator
+    remote_actionServer,  # ActionServer decorator (NEW: multi-callback)
+    
+    # Backward compatibility aliases (DEPRECATED)
+    remote_callable,    # Use remote_service instead
+    remote_speaker,     # Use remote_publisher instead
+    remote_listener,    # Use remote_subscriber instead
+    remote_job          # Use remote_actionServer instead
 )
 ```
 
-#### @remote_callable
+#### @remote_service (formerly @remote_callable)
 
-Automatically creates callable interface for method:
+Automatically creates service interface for method:
 
 ```python
 class MyComponent:
-    @remote_callable
+    @remote_service
     async def calculate(self, request, response=None):
         """
         Args:
@@ -216,24 +418,26 @@ class MyComponent:
         """
         return {"result": request["x"] + request["y"]}
     
-    @remote_callable(protocols=[ProtocolType.GRPC, ProtocolType.UDS])
+    @remote_service(protocols=[ProtocolType.GRPC, ProtocolType.UDS])
     async def fast_method(self, request, response=None):
         """Explicit protocol selection"""
         return {"data": process(request)}
 ```
 
 **Decorator Parameters**:
-- `protocols`: List of protocols to try (optional)
-- `timeout`: Default call timeout in seconds (default: 5.0)
 - `name`: Custom interface name (default: method name)
+- `protocols`: List of protocols to try (optional)
+- `auto_register`: Whether to auto-register blueprint (default: True)
+- `namespace`: Optional namespace for blueprint registration
+- `**kwargs`: Additional metadata (service_type, qos, etc.)
 
-#### @remote_speaker
+#### @remote_publisher (formerly @remote_speaker)
 
-Automatically creates speaker interface for method:
+Automatically creates publisher interface for method:
 
 ```python
 class MyComponent:
-    @remote_speaker
+    @remote_publisher
     async def publish_status(self, message):
         """
         Args:
@@ -241,41 +445,114 @@ class MyComponent:
         """
         pass  # Implementation auto-generated
     
-    @remote_speaker(protocols=[ProtocolType.REDIS])
+    @remote_publisher(protocols=[ProtocolType.REDIS])
     async def redis_only(self, message):
         """Explicit protocol"""
         pass
 ```
 
 **Decorator Parameters**:
-- `protocols`: List of protocols to try (optional)
 - `name`: Custom interface name (default: method name)
+- `protocols`: List of protocols to try (optional)
+- `auto_register`: Whether to auto-register blueprint (default: True)
+- `namespace`: Optional namespace for blueprint registration
+- `**kwargs`: Additional metadata (message_type, qos, retain, etc.)
 
-#### @remote_job
+#### @remote_actionServer (NEW: Multi-Callback Pattern)
 
-Automatically creates job interface for method:
+**Class-based decorator** with sub-decorators for goal acceptance, cancellation, and execution:
 
 ```python
-class MyComponent:
-    @remote_job
-    async def process_dataset(self, goal, feedback_callback=None):
+from vyra_base.com import remote_actionServer
+from vyra_base.com.core import IActionHandler, IGoalHandle, ActionStatus
+
+class Component(IActionHandler):  # REQUIRED interface
+    
+    @remote_actionServer.on_goal(name="process_batch", auto_register=True)
+    async def accept_goal(self, goal_request) -> bool:
         """
+        Goal acceptance callback (FIRST decorator must set auto_register=True)
+        
         Args:
-            goal: Job parameters
-            feedback_callback: Optional callback for progress updates
+            goal_request: The goal request data
+        
         Returns:
-            Dict with results
+            bool: True to accept goal, False to reject
         """
-        for i in range(100):
-            if feedback_callback:
-                await feedback_callback({"progress": i})
+        # Validate goal parameters
+        return goal_request.batch_size <= self.max_batch_size
+    
+    @remote_actionServer.on_cancel(name="process_batch")
+    async def handle_cancel(self, goal_handle: IGoalHandle) -> bool:
+        """
+        Cancellation callback (auto_register=False, blueprint already registered)
+        
+        Args:
+            goal_handle: Handle to the active goal
+        
+        Returns:
+            bool: True to accept cancellation, False to reject
+        """
+        # Decide whether to allow cancellation
+        return not self.in_critical_section
+    
+    @remote_actionServer.execute(name="process_batch")
+    async def execute_batch(self, goal_handle: IGoalHandle) -> dict:
+        """
+        Execution callback (auto_register=False, blueprint already registered)
+        
+        Args:
+            goal_handle: Provides:
+                - goal_handle.goal: Goal request data
+                - goal_handle.publish_feedback(dict): Send progress updates
+                - goal_handle.is_cancel_requested(): Check for cancellation
+                - goal_handle.succeed(): Mark as successful
+                - goal_handle.abort(): Mark as failed
+                - goal_handle.canceled(): Mark as canceled
+        
+        Returns:
+            dict: Result data (available to action client)
+        
+        IMPORTANT: Must call succeed(), abort(), or canceled() before returning!
+        """
+        for i in range(goal_handle.goal.batch_size):
+            # Check for cancellation
+            if goal_handle.is_cancel_requested():
+                goal_handle.canceled()
+                return {"status": ActionStatus.CANCELED, "processed": i}
+            
+            # Publish feedback
+            goal_handle.publish_feedback({"progress": (i+1)*10})
+            
+            # Do work
             await process_item(i)
-        return {"status": "completed"}
+        
+        # Mark as successful
+        goal_handle.succeed()
+        return {"status": ActionStatus.SUCCEEDED, "processed": i+1}
 ```
 
-**Decorator Parameters**:
-- `protocols`: List of protocols to try (default: ROS2 only)
-- `name`: Custom interface name (default: method name)
+**Decorator Parameters (all sub-decorators)**:
+- `name`: Action name (**REQUIRED**, must match across all three decorators)
+- `protocols`: List of protocols to try (optional)
+- `auto_register`: Whether to auto-register blueprint (default: True for on_goal, False for others)
+- `namespace`: Optional namespace for blueprint registration
+- `**kwargs`: Additional metadata (action_type, timeout, etc.)
+
+**Important Notes**:
+1. **All three decorators are REQUIRED** for full functionality
+2. **`on_goal` must be first** with `auto_register=True` to create blueprint
+3. **`on_cancel` and `execute`** should set `auto_register=False` (blueprint already exists)
+4. **Component MUST implement `IActionHandler`** interface
+5. **Name must be identical** across all three decorators
+
+**Legacy Single-Callback (DEPRECATED)**:
+```python
+@remote_job  # DEPRECATED - Do not use
+async def process_dataset(self, goal, feedback_callback=None):
+    # Mixed concerns - NOT RECOMMENDED
+    ...
+```
 
 ### Registry (`registry.py`)
 

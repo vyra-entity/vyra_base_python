@@ -11,6 +11,8 @@ from typing import Any, Optional, Union, TYPE_CHECKING
 
 # NEW: Import from new multi-protocol architecture
 from vyra_base.com import InterfaceFactory, remote_service, ProtocolType
+from vyra_base.com.core.decorators import get_decorated_methods
+from vyra_base.com.core.blueprints import ActionBlueprint
 from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
@@ -922,9 +924,52 @@ class VyraEntity:
                 )
             elif setting.type == FunctionConfigBaseTypes.action.value:
                 logger.info(f"Creating actionServer: {setting.functionname}")
-                # TBD: vyra actionServer implementation
-                # create_vyra_actionServer(...)
-                logger.warning(f"Vyra actionServers are not implemented yet.")
+                
+                # Check if this is a multi-callback ActionServer (new blueprint pattern)
+                # For multi-callback, callbacks are stored in setting metadata
+                callbacks = setting.metadata.get('callbacks', {}) if hasattr(setting, 'metadata') else {}
+                
+                if callbacks:
+                    # New multi-callback pattern
+                    logger.debug(
+                        f"ActionServer '{setting.functionname}' using multi-callback pattern: "
+                        f"on_goal={bool(callbacks.get('on_goal'))}, "
+                        f"on_cancel={bool(callbacks.get('on_cancel'))}, "
+                        f"execute={bool(callbacks.get('execute'))}"
+                    )
+                    await InterfaceFactory.create_action_server(
+                        name=setting.functionname,
+                        handle_goal_request=callbacks.get('on_goal'),
+                        handle_cancel_request=callbacks.get('on_cancel'),
+                        execution_callback=callbacks.get('execute'),
+                        protocols=[ProtocolType.ROS2],
+                        action_type=setting.interfacetypes,
+                        node=self._node
+                    )
+                elif setting.callback:
+                    # Legacy single callback (backward compatibility)
+                    logger.warning(
+                        f"⚠️  ActionServer '{setting.functionname}' using deprecated single-callback pattern. "
+                        "Please migrate to multi-callback pattern with @remote_actionServer.on_goal/on_cancel/execute"
+                    )
+                    await InterfaceFactory.create_action_server(
+                        name=setting.functionname,
+                        handle_goal_request=None,  # Will use default: accept all
+                        handle_cancel_request=None,  # Will use default: accept all
+                        execution_callback=setting.callback,
+                        protocols=[ProtocolType.ROS2],
+                        action_type=setting.interfacetypes,
+                        node=self._node
+                    )
+                else:
+                    logger.error(
+                        f"❌ ActionServer '{setting.functionname}' has no callbacks defined. "
+                        "Use @remote_actionServer.on_goal/on_cancel/execute decorators."
+                    )
+                    raise ValueError(
+                        f"ActionServer '{setting.functionname}' requires callbacks. "
+                        "Use the multi-callback decorator pattern."
+                    )
 
             elif setting.type == FunctionConfigBaseTypes.publisher.value:
                 logger.info(f"Creating publisher: {setting.functionname}")
@@ -959,6 +1004,142 @@ class VyraEntity:
                 )
                 logger.error(fail_msg)
                 raise ValueError(fail_msg) 
+
+    def bind_interface_callbacks(
+            self, 
+            component: Any,
+            settings: Optional[list[FunctionConfigEntry]] = None) -> dict[str, bool]:
+        """
+        Bind decorated callbacks from a component to interface settings.
+        
+        This method discovers decorated methods (e.g., @remote_actionServer.on_goal/on_cancel/execute)
+        from a component and binds them to the corresponding FunctionConfigEntry objects.
+        
+        For ActionServers with multi-callback pattern, callbacks are stored in:
+        - setting.metadata['callbacks']['on_goal']
+        - setting.metadata['callbacks']['on_cancel']
+        - setting.metadata['callbacks']['execute']
+        
+        Args:
+            component: Component instance with decorated methods
+            settings: Optional list of FunctionConfigEntry to update. 
+                     If None, uses self._interface_list
+                     
+        Returns:
+            dict[str, bool]: Mapping of interface names to binding success status
+            
+        Example:
+            >>> class MyComponent:
+            ...     @remote_actionServer.on_goal(name="process")
+            ...     async def accept_goal(self, goal_request): return True
+            ...     
+            ...     @remote_actionServer.on_cancel(name="process")
+            ...     async def cancel(self, goal_handle): return True
+            ...     
+            ...     @remote_actionServer.execute(name="process")
+            ...     async def execute(self, goal_handle): return {"done": True}
+            >>> 
+            >>> component = MyComponent()
+            >>> entity.bind_interface_callbacks(component)
+            {'process/on_goal': True, 'process/on_cancel': True, 'process/execute': True}
+        """
+        if settings is None:
+            settings = self._interface_list
+        
+        # Discover decorated methods
+        decorated = get_decorated_methods(component)
+        results = {}
+        
+        # Process ActionServer callbacks (multi-callback pattern)
+        action_callbacks = {}  # {action_name: {callback_type: method}}
+        
+        for action_item in decorated['actions']:
+            action_name = action_item['name']
+            callback_type = action_item.get('callback_type', 'execute')
+            method = action_item['method']
+            
+            if action_name not in action_callbacks:
+                action_callbacks[action_name] = {}
+            
+            action_callbacks[action_name][callback_type] = method
+            logger.debug(
+                f"Discovered ActionServer callback: {action_name}/{callback_type}"
+            )
+        
+        # Bind ActionServer callbacks to settings
+        for action_name, callbacks in action_callbacks.items():
+            # Find corresponding FunctionConfigEntry
+            matching_settings = [
+                s for s in settings 
+                if s.functionname == action_name and 
+                   s.type == FunctionConfigBaseTypes.action.value
+            ]
+            
+            if not matching_settings:
+                logger.warning(
+                    f"⚠️  No FunctionConfigEntry found for ActionServer '{action_name}'. "
+                    f"Callbacks will not be bound."
+                )
+                for callback_type in callbacks:
+                    results[f"{action_name}/{callback_type}"] = False
+                continue
+            
+            setting = matching_settings[0]
+            
+            # Initialize metadata if needed
+            if not hasattr(setting, 'metadata'):
+                setting.metadata = {}
+            if 'callbacks' not in setting.metadata:
+                setting.metadata['callbacks'] = {}
+            
+            # Bind each callback
+            for callback_type, method in callbacks.items():
+                setting.metadata['callbacks'][callback_type] = method
+                results[f"{action_name}/{callback_type}"] = True
+                logger.debug(
+                    f"✅ Bound ActionServer callback: {action_name}/{callback_type}"
+                )
+            
+            # Verify all required callbacks are present
+            required = ['on_goal', 'on_cancel', 'execute']
+            missing = [cb for cb in required if cb not in setting.metadata['callbacks']]
+            
+            if missing:
+                logger.warning(
+                    f"⚠️  ActionServer '{action_name}' missing callbacks: {missing}. "
+                    "Will use default implementations (accept all)."
+                )
+        
+        # Process Service callbacks (single callback pattern)
+        for service_item in decorated['servers']:
+            service_name = service_item['name']
+            method = service_item['method']
+            
+            matching_settings = [
+                s for s in settings 
+                if s.functionname == service_name and 
+                   s.type == FunctionConfigBaseTypes.service.value
+            ]
+            
+            if matching_settings:
+                setting = matching_settings[0]
+                setting.callback = method
+                results[service_name] = True
+                logger.debug(f"✅ Bound service callback: {service_name}")
+            else:
+                results[service_name] = False
+                logger.warning(
+                    f"⚠️  No FunctionConfigEntry found for service '{service_name}'"
+                )
+        
+        # Summary
+        total = len(results)
+        success = sum(results.values())
+        logger.info(
+            f"📊 Interface callback binding complete: {success}/{total} successful"
+        )
+        
+        return results
 
     def register_storage(self, storage: Storage) -> None:
         """

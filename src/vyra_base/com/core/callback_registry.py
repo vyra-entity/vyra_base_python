@@ -171,14 +171,21 @@ class CallbackRegistry:
         cls,
         name: str,
         callback: callable,
+        callback_type: str = 'default',
         namespace: Optional[str] = None
     ) -> bool:
         """
         Bind a callback to a registered blueprint.
         
+        For ActionBlueprint, callback_type specifies which lifecycle callback
+        to bind ('on_goal', 'on_cancel', 'execute'). For other blueprints,
+        use 'default'.
+        
         Args:
             name: Blueprint name to bind to
             callback: Implementation function
+            callback_type: For ActionBlueprint: 'on_goal', 'on_cancel', 'execute'
+                          For others: 'default' (ignored)
             namespace: Optional namespace
             
         Returns:
@@ -186,12 +193,21 @@ class CallbackRegistry:
             
         Raises:
             RuntimeError: If blueprint already has a bound callback
-            ValueError: If callback signature is invalid
+            ValueError: If callback signature is invalid or callback_type invalid
             
         Example:
+            >>> # Service binding
             >>> async def my_service(request, response=None):
             ...     return {"status": "ok"}
             >>> CallbackRegistry.bind_callback("my_service", my_service)
+            True
+            
+            >>> # ActionServer binding (multi-callback)
+            >>> async def execute_action(goal_handle):
+            ...     return {"result": "done"}
+            >>> CallbackRegistry.bind_callback(
+            ...     "process", execute_action, callback_type='execute'
+            ... )
             True
         """
         with cls._lock:
@@ -203,9 +219,18 @@ class CallbackRegistry:
                 return False
             
             try:
-                blueprint.bind_callback(callback)
-                full_name = cls._find_full_name(blueprint)
-                logger.info(f"✅ Bound callback to '{full_name}'")
+                # ActionBlueprint has multi-callback support
+                from vyra_base.com.core.blueprints import ActionBlueprint
+                
+                if isinstance(blueprint, ActionBlueprint) and callback_type != 'default':
+                    blueprint.bind_callback(callback, callback_type)
+                    full_name = cls._find_full_name(blueprint)
+                    logger.info(f"✅ Bound '{callback_type}' callback to '{full_name}'")
+                else:
+                    blueprint.bind_callback(callback)
+                    full_name = cls._find_full_name(blueprint)
+                    logger.info(f"✅ Bound callback to '{full_name}'")
+                
                 return True
             except (RuntimeError, ValueError) as e:
                 logger.error(f"❌ Failed to bind callback to '{name}': {e}")
@@ -424,11 +449,15 @@ class CallbackRegistry:
         """
         Print registry contents for debugging.
         
+        For ActionBlueprints, shows multi-callback status (on_goal/on_cancel/execute).
+        
         Args:
             namespace: Filter by namespace
         """
         with cls._lock:
             cls.initialize()
+            
+            from vyra_base.com.core.blueprints import ActionBlueprint
             
             print("\n" + "="*60)
             print("📋 CALLBACK REGISTRY DEBUG")
@@ -449,7 +478,17 @@ class CallbackRegistry:
                     bp = cls._blueprints[name]
                     bound_icon = "✓" if bp.is_bound() else "✗"
                     protocols = ",".join(p.value for p in bp.protocols[:2])
-                    print(f"   [{bound_icon}] {name:40s} {bp.interface_type.value:12s} [{protocols}]")
+                    
+                    # For ActionBlueprint, show multi-callback status
+                    if isinstance(bp, ActionBlueprint):
+                        callbacks_status = {
+                            k: ("✓" if v else "✗")
+                            for k, v in bp._callbacks.items()
+                        }
+                        callback_detail = f"({callbacks_status['on_goal']}/goal {callbacks_status['on_cancel']}/cancel {callbacks_status['execute']}/exec)"
+                        print(f"   [{bound_icon}] {name:40s} {bp.interface_type.value:12s} [{protocols}] {callback_detail}")
+                    else:
+                        print(f"   [{bound_icon}] {name:40s} {bp.interface_type.value:12s} [{protocols}]")
             
             unbound = cls.list_unbound(namespace)
             if unbound:

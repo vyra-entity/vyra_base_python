@@ -34,27 +34,50 @@ pip install vyra_base-<version>-py3-none-any.whl
 
 ```python
 from vyra_base.state import OperationalStateMachine
-from vyra_base.com.datalayer.interface_factory import remote_callable
+from vyra_base.com import remote_service, remote_actionServer
+from vyra_base.com.core import IActionHandler, IGoalHandle
 
-class MyComponent(OperationalStateMachine):
+class MyComponent(OperationalStateMachine, IActionHandler):
     """Example VYRA component with automatic state management."""
     
-    @remote_callable
-    def initialize(self, request=None, response=None) -> bool:
+    @remote_service
+    async def initialize(self, request=None, response=None) -> bool:
         """Initialize component - state transition handled automatically."""
         # Your initialization logic here
         return True
     
-    @remote_callable
-    def start_operation(self, request=None, response=None) -> bool:
+    @remote_service
+    async def start_operation(self, request=None, response=None) -> bool:
         """Start operation - transitions to RUNNING state."""
         # Your operation logic here
         return True
+    
+    # NEW: Multi-callback ActionServer pattern
+    @remote_actionServer.on_goal(name="process_batch")
+    async def accept_goal(self, goal_request) -> bool:
+        """Validate and accept/reject goals."""
+        return goal_request.count <= 100
+    
+    @remote_actionServer.on_cancel(name="process_batch")
+    async def handle_cancel(self, goal_handle: IGoalHandle) -> bool:
+        """Handle cancellation requests."""
+        return True
+    
+    @remote_actionServer.execute(name="process_batch")
+    async def execute_batch(self, goal_handle: IGoalHandle) -> dict:
+        """Execute long-running action with feedback."""
+        for i in range(goal_handle.goal.count):
+            if goal_handle.is_cancel_requested():
+                goal_handle.canceled()
+                return {"cancelled": True}
+            goal_handle.publish_feedback({"progress": i})
+        goal_handle.succeed()
+        return {"processed": goal_handle.goal.count}
 
 # Use the component
 component = MyComponent()
-component.initialize()  # IDLE → READY
-component.start_operation()  # READY → RUNNING
+await component.initialize()  # IDLE → READY
+await component.start_operation()  # READY → RUNNING
 ```
 
 ## 📚 Documentation
@@ -88,10 +111,11 @@ print(states)  # {'lifecycle': 'Active', 'operational': 'Running', 'health': 'He
 
 See [State Machine Documentation](docs/statemachine/README.md) for details.
 
-#### 2. ROS2 Communication
+#### 2. ROS2 Communication & Blueprint System
 
 ```python
 from vyra_base.core import VyraEntity
+from vyra_base.com.core import ActionBlueprint, ActionStatus
 
 # Create entity with ROS2 node
 entity = await VyraEntity.create("my_module")
@@ -101,6 +125,20 @@ entity.publish_news("Module started")
 
 # Call remote service
 result = await entity.call_service('other_module/service_name', request_data)
+
+# NEW: Blueprint System - Two-phase initialization
+# Phase 1: Register blueprint (interface definition)
+blueprint = ActionBlueprint(name="process_batch")
+CallbackRegistry.register_blueprint(blueprint)
+
+# Phase 2: Bind callbacks (implementation)
+blueprint.bind_callback(accept_goal, callback_type='on_goal')
+blueprint.bind_callback(handle_cancel, callback_type='on_cancel')
+blueprint.bind_callback(execute_batch, callback_type='execute')
+
+# Or use decorators (automatic binding)
+@remote_actionServer.on_goal(name="process_batch")
+async def accept_goal(self, goal_request): ...
 ```
 
 #### 3. Redis Storage

@@ -28,6 +28,7 @@ from vyra_base.com.core.types import (
     ProtocolType,
     InterfaceType,
     AccessLevel,
+    ActionStatus,
     DisplayStyle,
     InterfaceMetadata,
     VyraTransport,
@@ -50,6 +51,12 @@ from vyra_base.com.core.blueprints import (
     ActionBlueprint,
     InterfaceType as BlueprintInterfaceType,
     AnyBlueprint,
+)
+
+from vyra_base.com.core.abstract_handlers import (
+    IServiceHandler,
+    IActionHandler,
+    IGoalHandle,
 )
 
 from vyra_base.com.core.callback_registry import CallbackRegistry
@@ -116,6 +123,7 @@ __all__ = [
     "ProtocolType",
     "InterfaceType",
     "AccessLevel",
+    "ActionStatus",
     "DisplayStyle",
     "InterfaceMetadata",
     "VyraTransport",
@@ -126,14 +134,27 @@ __all__ = [
     "VyraClient",
     "VyraActionServer",
     "VyraActionClient",
-
+    # Blueprints
+    "HandlerBlueprint",
+    "ServiceBlueprint",
+    "PublisherBlueprint",
+    "SubscriberBlueprint",
+    "ActionBlueprint",
+    "AnyBlueprint",
+    "CallbackRegistry",
+    # Abstract Handlers (REQUIRED)
+    "IServiceHandler",
+    "IActionHandler",
+    "IGoalHandle",
     # Factory
     "InterfaceFactory",
     # Decorators
     "remote_service",
     "remote_publisher",
+    "remote_subscriber",
     "remote_actionServer",
     "get_decorated_methods",
+    "bind_decorated_callbacks",
     # Topic Builder
     "TopicBuilder",
     "TopicComponents",
