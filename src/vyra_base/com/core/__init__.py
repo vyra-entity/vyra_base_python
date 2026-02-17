@@ -42,11 +42,31 @@ from vyra_base.com.core.types import (
 
 from vyra_base.com.core.factory import InterfaceFactory
 
+from vyra_base.com.core.blueprints import (
+    HandlerBlueprint,
+    ServiceBlueprint,
+    PublisherBlueprint,
+    SubscriberBlueprint,
+    ActionBlueprint,
+    InterfaceType as BlueprintInterfaceType,
+    AnyBlueprint,
+)
+
+from vyra_base.com.core.callback_registry import CallbackRegistry
+
 from vyra_base.com.core.decorators import (
     remote_service,
     remote_publisher,
+    remote_subscriber,
     remote_actionServer,
     get_decorated_methods,
+    bind_decorated_callbacks,
+    # Backward compatibility aliases
+    remote_callable,
+    remote_callable_ros2,
+    remote_speaker,
+    remote_listener,
+    remote_job,
 )
 
 from vyra_base.com.core.topic_builder import (

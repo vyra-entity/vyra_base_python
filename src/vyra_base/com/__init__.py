@@ -37,9 +37,25 @@ from vyra_base.com.core import (
     InterfaceType,
     # Factory & Decorators
     InterfaceFactory,
-    remove_server,
+    remote_service,
     remote_publisher,
+    remote_subscriber,
     remote_actionServer,
+    get_decorated_methods,
+    bind_decorated_callbacks,
+    # Blueprint Infrastructure
+    HandlerBlueprint,
+    ServiceBlueprint,
+    PublisherBlueprint,
+    SubscriberBlueprint,
+    ActionBlueprint,
+    CallbackRegistry,
+    # Backward compatibility aliases
+    remote_callable,
+    remote_callable_ros2,
+    remote_speaker,
+    remote_listener,
+    remote_job,
 )
 
 # Topic Builder for naming conventions

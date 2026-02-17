@@ -142,7 +142,7 @@ class InterfaceFactory:
                     del InterfaceFactory._pending_interface[name]
                 except Exception as e:
                     logger.error(f"❌ Failed to initialize pending interface '{name}': {e}")
-                    
+
     @staticmethod
     def register_provider(provider: Union[AbstractProtocolProvider, list]) -> None:
         """
@@ -662,3 +662,204 @@ class InterfaceFactory:
         
         logger.info(f"✅ Fallback chain for {interface_type} updated")
         return protocols
+    
+    # ========================================================================
+    # BLUEPRINT-BASED INTERFACE CREATION
+    # ========================================================================
+    
+    @staticmethod
+    async def create_from_blueprint(
+        blueprint: 'HandlerBlueprint',  # type: ignore
+        **override_kwargs
+    ) -> Optional[Union[VyraServer, VyraPublisher, VyraSubscriber, VyraActionServer]]:
+        """
+        Create interface from a HandlerBlueprint.
+        
+        This is the primary method for two-phase initialization:
+        1. Blueprint created during decoration/configuration
+        2. Interface created when blueprint is bound with callback
+        
+        Args:
+            blueprint: HandlerBlueprint instance
+            **override_kwargs: Override blueprint metadata
+            
+        Returns:
+            Created interface or None if pending (callback not bound yet)
+            
+        Example:
+            >>> from vyra_base.com.core.blueprints import ServiceBlueprint
+            >>> blueprint = ServiceBlueprint(name="my_service")
+            >>> # ... later when callback available ...
+            >>> blueprint.bind_callback(my_callback)
+            >>> server = await InterfaceFactory.create_from_blueprint(blueprint)
+        """
+        from vyra_base.com.core.blueprints import (
+            ServiceBlueprint,
+            PublisherBlueprint,
+            SubscriberBlueprint,
+            ActionBlueprint,
+            InterfaceType as BlueprintInterfaceType
+        )
+        
+        # Merge blueprint metadata with overrides
+        kwargs = {**blueprint.metadata, **override_kwargs}
+        protocols = blueprint.protocols if blueprint.protocols else None
+        
+        # Dispatch to appropriate creation method
+        if isinstance(blueprint, ServiceBlueprint):
+            return await InterfaceFactory.create_server(
+                name=blueprint.name,
+                response_callback=blueprint.callback,
+                protocols=protocols,
+                service_type=blueprint.service_type,
+                **kwargs
+            )
+        
+        elif isinstance(blueprint, PublisherBlueprint):
+            return await InterfaceFactory.create_publisher(
+                name=blueprint.name,
+                protocols=protocols,
+                message_type=blueprint.message_type,
+                **kwargs
+            )
+        
+        elif isinstance(blueprint, SubscriberBlueprint):
+            return await InterfaceFactory.create_subscriber(
+                name=blueprint.name,
+                subscriber_callback=blueprint.callback,
+                protocols=protocols,
+                message_type=blueprint.message_type,
+                **kwargs
+            )
+        
+        elif isinstance(blueprint, ActionBlueprint):
+            return await InterfaceFactory.create_action_server(
+                name=blueprint.name,
+                execution_callback=blueprint.callback,
+                protocols=protocols,
+                action_type=blueprint.action_type,
+                **kwargs
+            )
+        
+        else:
+            raise InterfaceError(f"Unknown blueprint type: {type(blueprint)}")
+    
+    @staticmethod
+    async def bind_pending_callback(
+        name: str,
+        callback: Callable
+    ) -> Optional[Union[VyraServer, VyraSubscriber, VyraActionServer]]:
+        """
+        Bind a callback to a pending interface and initialize it.
+        
+        Args:
+            name: Interface name (must match pending registration)
+            callback: Implementation callback
+            
+        Returns:
+            Initialized interface or None if not found in pending
+            
+        Example:
+            >>> # Phase 1: Create server without callback
+            >>> await InterfaceFactory.create_server("my_service", response_callback=None)
+            >>> # Phase 2: Bind callback later
+            >>> server = await InterfaceFactory.bind_pending_callback(
+            ...  "my_service", my_callback_function
+            ... )
+        """
+        if name not in InterfaceFactory._pending_interface:
+            logger.warning(f"⚠️  No pending interface found for '{name}'")
+            return None
+        
+        info = InterfaceFactory._pending_interface[name]
+        provider_func = info["provider"]
+        kwargs = info["kwargs"]
+        
+        # Update kwargs with callback
+        # Determine callback key based on provider function name
+        if "subscriber" in provider_func.__name__:
+            kwargs["subscriber_callback"] = callback
+        elif "server" in provider_func.__name__:
+            kwargs["response_callback"] = callback
+        elif "action" in provider_func.__name__:
+            kwargs["execution_callback"] = callback
+        else:
+            logger.error(f"❌ Unknown provider type for pending interface '{name}'")
+            return None
+        
+        try:
+            # Create the interface with bound callback
+            interface = await provider_func(**kwargs)
+            
+            # Add to registry based on type
+            if "subscriber_callback" in kwargs:
+                add_subscriber_registry(interface)
+            elif "response_callback" in kwargs:
+                add_server_registry(interface)
+            elif "execution_callback" in kwargs:
+                add_action_server_registry(interface)
+            
+            # Remove from pending
+            del InterfaceFactory._pending_interface[name]
+            
+            logger.info(f"✅ Bound callback and initialized pending interface '{name}'")
+            return interface
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize pending interface '{name}': {e}")
+            return None
+    
+    @staticmethod
+    async def process_pending_interfaces() -> Dict[str, bool]:
+        """
+        Process all pending interfaces, attempting to initialize those with callbacks.
+        
+        This should be called periodically (e.g., from entity event loop) or after
+        binding callbacks via CallbackRegistry.
+        
+        Returns:
+            Dictionary mapping interface names to initialization success status
+            
+        Example:
+            >>> # In entity event loop
+            >>> while running:
+            ...     results = await InterfaceFactory.process_pending_interfaces()
+            ...     await asyncio.sleep(1.0)
+        """
+        results = {}
+        
+        for name in list(InterfaceFactory._pending_interface.keys()):
+            info = InterfaceFactory._pending_interface[name]
+            kwargs = info["kwargs"]
+            
+            # Check if callback is now available
+            has_callback = (
+                kwargs.get("subscriber_callback") or
+                kwargs.get("response_callback") or
+                kwargs.get("execution_callback")
+            )
+            
+            if has_callback:
+                interface = await InterfaceFactory.bind_pending_callback(name, None)
+                results[name] = interface is not None
+        
+        if results:
+            success_count = sum(results.values())
+            logger.info(f"📊 Processed {len(results)} pending interfaces: {success_count} successful")
+        
+        return results
+    
+    @staticmethod
+    def get_pending_count() -> int:
+        """Get count of pending interfaces awaiting callback binding."""
+        return len(InterfaceFactory._pending_interface)
+    
+    @staticmethod
+    def list_pending() -> List[str]:
+        """Get list of pending interface names."""
+        return list(InterfaceFactory._pending_interface.keys())
+    
+    @staticmethod
+    def has_pending(name: str) -> bool:
+        """Check if an interface is pending callback binding."""
+        return name in InterfaceFactory._pending_interface
