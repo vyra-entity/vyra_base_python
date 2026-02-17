@@ -5,7 +5,7 @@ Uses Zenoh Query (get) for request/response pattern.
 """
 import asyncio
 import logging
-from typing import Optional, Any, Callable, Awaitable
+from typing import Coroutine, Optional, Any, Callable, Awaitable
 
 from vyra_base.com.core.types import VyraClient, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
@@ -30,7 +30,7 @@ class VyraClientImpl(VyraClient):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        request_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
+        request_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
         zenoh_session: Any = None,  # zenoh.Session
         service_type: type = None,
         **kwargs

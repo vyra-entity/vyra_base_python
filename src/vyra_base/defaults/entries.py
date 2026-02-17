@@ -157,7 +157,7 @@ class FunctionConfigPeriodicPublisher(DCBase):
 
     def asdict(self):
         """
-        Convert periodic speaker config to dictionary, replacing callable with name.
+        Convert periodic publisher config to dictionary, replacing callable with name.
         
         :return: Dictionary with caller function name instead of reference.
         :rtype: dict
@@ -201,8 +201,8 @@ class FunctionConfigEntry(DCBase):
     :type qosprofile: Union[int, QoSProfile]
     :param callback: Function to be called when the function is invoked (only for callable)
     :type callback: Callable, Optional
-    :param periodic: Function to be called periodically (only for speaker)
-    :type periodic: FunctionConfigPeriodicSpeaker, Optional
+    :param periodic: Function to be called periodically (only for publisher)
+    :type periodic: FunctionConfigPeriodicPublisher, Optional
     """
     tags: list[str]
     type: FunctionConfigBaseTypes

@@ -5,13 +5,13 @@ Provides Zenoh-based transport implementation with layered architecture:
 
 Layers:
     - communication/: Core Zenoh functionality (Query/Reply, Pub/Sub, Tasks)
-    - vyra_models/: VYRA abstractions (ZenohCallable, ZenohSpeaker, ZenohJob)
+    - vyra_models/: VYRA abstractions (ZenohCallable, ZenohPublisher, ZenohJob)
     - session.py: Zenoh session management and lifecycle
     - provider.py: Interface layer for VYRA integration
 
 Features:
     - Query/Reply pattern for request-response (ZenohCallable)
-    - Pub/Sub for topic-based messaging (ZenohSpeaker)
+    - Pub/Sub for topic-based messaging (ZenohPublisher)
     - Task-based long-running operations (ZenohJob)
     - Zero-copy and efficient serialization
     - Router-based architecture for scalability
@@ -27,7 +27,7 @@ Usage:
             "connect": ["tcp/zenoh-router:7447"]
         })
         callable = await provider.create_callable("/service", callback)
-        speaker = await provider.create_speaker("/topic")
+        publisher = await provider.create_publisher("/topic")
 """
 
 from vyra_base.helper.logger import logger

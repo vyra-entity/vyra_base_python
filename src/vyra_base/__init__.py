@@ -10,7 +10,7 @@ def extract_interfaces(target_path: str | Path):
     """
     Extract VYRA interface files from the pip-installed library into a module interface package.
 
-    Extracts speaker (.msg), callable (.srv + .proto), and job (.action) interfaces
+    Extracts publisher (.msg), server (.srv + .proto), and job (.action) interfaces
     using VYRA-specific terminology independent of ROS2 naming conventions.
 
     :param target_path: Path to the target package where interfaces will be extracted.
@@ -20,12 +20,12 @@ def extract_interfaces(target_path: str | Path):
     :rtype: None
 
     This function copies interface files from the installed vyra_base library:
-    - .msg files → target/msg/ (from speaker/ directory)
-    - .srv files → target/srv/ (from callable/ directory)
-    - .action files → target/action/ (from job/ directory)
+    - .msg files → target/msg/ (from publisher/ directory)
+    - .srv files → target/srv/ (from server/ directory)
+    - .action files → target/action/ (from actionServer/ directory)
     - .proto files → target/proto/ (from proto/ directory, for others)
     
-    The source uses VYRA terminology (speaker/callable/job/proto) but outputs
+    The source uses VYRA terminology (publisher/server/actionServer/proto) but outputs
     to ROS2-compatible directories (msg/srv/action) plus proto/ for gRPC.
     """
     import importlib.resources
@@ -50,10 +50,10 @@ def extract_interfaces(target_path: str | Path):
     # Map VYRA interface types to file extensions and target directories
     # source_dir → (file_ext, target_dir)
     interface_mapping = {
-        'speaker': ('msg', 'msg'),      # Speaker → .msg files for ROS2
-        'callable': ('srv', 'srv'),     # Callable → .srv files for ROS2
-        'job': ('action', 'action'),    # Job → .action files for ROS2
-        'proto': ('proto', 'proto')     # Proto → .proto files for others
+        'publisher': ('msg', 'msg'),                # Publisher → .msg files for ROS2
+        'server': ('srv', 'srv'),                   # Server → .srv files for ROS2
+        'actionServer': ('action', 'action'),       # actionServer → .action files for ROS2
+        'proto': ('proto', 'proto')                 # Proto → .proto files for others
     }
     
     for source_type, (file_ext, target_type) in interface_mapping.items():

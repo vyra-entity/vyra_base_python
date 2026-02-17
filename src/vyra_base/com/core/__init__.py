@@ -15,9 +15,9 @@ from vyra_base.com.core.exceptions import (
     ProviderNotFoundError,
     ProviderRegistrationError,
     InterfaceError,
-    CallableError,
-    SpeakerError,
-    JobError,
+    TServerError,
+    TSubscriberError,
+    ActionServerError,
     IndustrialBusError,
     BusConnectionError,
     BusTimeoutError,
@@ -30,26 +30,22 @@ from vyra_base.com.core.types import (
     AccessLevel,
     DisplayStyle,
     InterfaceMetadata,
-    VyraInterface,
+    VyraTransport,
     # New unified types
     VyraPublisher,
     VyraSubscriber,
     VyraServer,
     VyraClient,
     VyraActionServer,
-    VyraActionClient,
-    # Legacy types (deprecated)
-    VyraCallable,
-    VyraSpeaker,
-    VyraJob,
+    VyraActionClient
 )
 
 from vyra_base.com.core.factory import InterfaceFactory
 
 from vyra_base.com.core.decorators import (
     remote_service,
-    remote_speaker,
-    remote_job,
+    remote_publisher,
+    remote_actionServer,
     get_decorated_methods,
 )
 
@@ -89,9 +85,9 @@ __all__ = [
     "ProviderNotFoundError",
     "ProviderRegistrationError",
     "InterfaceError",
-    "CallableError",
-    "SpeakerError",
-    "JobError",
+    "TServerError",
+    "TSubscriberError",
+    "ActionServerError",
     "IndustrialBusError",
     "BusConnectionError",
     "BusTimeoutError",
@@ -102,7 +98,7 @@ __all__ = [
     "AccessLevel",
     "DisplayStyle",
     "InterfaceMetadata",
-    "VyraInterface",
+    "VyraTransport",
     # New unified types
     "VyraPublisher",
     "VyraSubscriber",
@@ -115,8 +111,8 @@ __all__ = [
     "InterfaceFactory",
     # Decorators
     "remote_service",
-    "remote_speaker",
-    "remote_job",
+    "remote_publisher",
+    "remote_actionServer",
     "get_decorated_methods",
     # Topic Builder
     "TopicBuilder",

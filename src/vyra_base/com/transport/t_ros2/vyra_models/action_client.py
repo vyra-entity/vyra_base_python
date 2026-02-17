@@ -5,7 +5,9 @@ Async-first action client for ROS2 with response/feedback/goal callbacks.
 """
 import asyncio
 import logging
-from typing import Any, Callable, Optional
+from typing import _T, Any, Callable, Optional
+
+from grpc import Future
 
 from vyra_base.com.core.types import VyraActionClient, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
@@ -118,15 +120,11 @@ class VyraActionClientImpl(VyraActionClient):
             loop = asyncio.get_event_loop()
             
             # Send goal async
-            goal_future = await loop.run_in_executor(
-                None,
-                self._ros2_action_client.send_goal_async,
-                goal
-            )
+            goal_coro = self._ros2_action_client.send_goal_async(goal)
             
             # Wait for acceptance
             goal_handle = await asyncio.wait_for(
-                asyncio.wrap_future(goal_future),  # type: ignore[arg-type]
+                goal_coro,
                 timeout=timeout
             )
             

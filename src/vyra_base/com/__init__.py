@@ -6,14 +6,14 @@ Multi-protocol communication system with automatic protocol selection and fallba
 Provides:
 - Multi-protocol support (ROS2, Redis, gRPC, MQTT, REST, WebSocket, Modbus, OPC UA)
 - Automatic protocol fallback
-- Protocol-agnostic decorators (@remote_callable, @remote_speaker, @remote_job)
+- Protocol-agnostic decorators (@remove_server, @remote_publisher, @remote_job)
 - Backward compatibility with legacy ROS2-only datalayer API
 
 New Code (Recommended):
-    from vyra_base.com import remote_callable, InterfaceFactory, ProtocolType
+    from vyra_base.com import remove_server, InterfaceFactory, ProtocolType
     
 Legacy Code (Still Supported):
-    from vyra_base.com import remote_callable
+    from vyra_base.com import remove_server
 """
 
 # ============================================================================
@@ -29,17 +29,17 @@ from vyra_base.com.core import (
     TransportError,
     ProviderError,
     InterfaceError,
-    CallableError,
-    SpeakerError,
-    JobError,
+    TServerError,
+    TSubscriberError,
+    ActionServerError,
     # Types
     ProtocolType,
     InterfaceType,
     # Factory & Decorators
     InterfaceFactory,
-    remote_service,
-    remote_speaker,
-    remote_job,
+    remove_server,
+    remote_publisher,
+    remote_actionServer,
 )
 
 # Topic Builder for naming conventions
@@ -76,21 +76,11 @@ except ImportError:
 #
 # NOTE: Legacy functions (create_vyra_callable, create_vyra_speaker, etc.) have been removed.
 # External modules using them should migrate to:
-#   from vyra_base.com import InterfaceFactory, remote_callable, ProtocolType
+#   from vyra_base.com import InterfaceFactory, remove_server, ProtocolType
 #
-# The @remote_callable decorator now supports multi-protocol.
+# The @remove_server decorator now supports multi-protocol.
 # Old code using it will continue to work but gets ROS2-only behavior.
 #
-
-# Use new ROS2 implementations (optional)
-try:
-    from vyra_base.com.transport.t_ros2.vyra_models.callable import ROS2Callable
-    from vyra_base.com.transport.t_ros2.vyra_models.speaker import ROS2Speaker
-    from vyra_base.com.transport.t_ros2.vyra_models.job import ROS2Job
-except ImportError:
-    ROS2Callable = None
-    ROS2Speaker = None
-    ROS2Job = None
 
 # ROS2 infrastructure - Using transport/t_ros2 implementations (optional)
 try:
@@ -130,9 +120,9 @@ __all__ = [
     "TransportError",
     "ProviderError",
     "InterfaceError",
-    "CallableError",
-    "SpeakerError",
-    "JobError",
+    "TServerError",
+    "TSubscriberError",
+    "ActionServerError",
     
     # Types
     "ProtocolType",
@@ -143,8 +133,8 @@ __all__ = [
     
     # Decorators (Multi-protocol)
     "remote_service",
-    "remote_speaker",
-    "remote_job",
+    "remote_publisher",
+    "remote_actionServer",
     
     # Providers
     "AbstractProtocolProvider",

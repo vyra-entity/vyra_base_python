@@ -86,7 +86,7 @@ class ZenohQueryClient:
             
             # Send query (blocking, wrap in executor)
             loop = asyncio.get_event_loop()
-            replies = await loop.run_in_executor(
+            replies: zenoh.Handler[zenoh.Reply] = await loop.run_in_executor(
                 None,
                 lambda: self._session.get(
                     self.query_client_info.key_expr,
@@ -97,9 +97,10 @@ class ZenohQueryClient:
             
             # Process replies (get first one)
             for reply in replies:
-                if reply.is_ok:  # type: ignore[attr-defined]
+                if reply.ok:  # type: ignore[attr-defined]
+                    sample = reply.ok
                     response_data = self._serializer.deserialize(
-                        reply.ok.payload,
+                        bytes(sample.payload),
                         format=self.query_client_info.format
                     )
                     

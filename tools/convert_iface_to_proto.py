@@ -133,17 +133,17 @@ service {srv_name}Service {{
 def main():
     # Paths
     base_dir = Path(__file__).parent.parent
-    speaker_dir = base_dir / "src" / "vyra_base" / "interfaces" / "speaker"
-    callable_dir = base_dir / "src" / "vyra_base" / "interfaces" / "callable"
-    job_dir = base_dir / "src" / "vyra_base" / "interfaces" / "job"
+    publisher_dir = base_dir / "src" / "vyra_base" / "interfaces" / "publisher"
+    service_dir = base_dir / "src" / "vyra_base" / "interfaces" / "service"
+    action_dir = base_dir / "src" / "vyra_base" / "interfaces" / "action"
     proto_dir = base_dir / "src" / "vyra_base" / "interfaces" / "proto"
     
     # Create proto directory
     proto_dir.mkdir(parents=True, exist_ok=True)
     
-    print(f"Converting .srv files from {callable_dir} to {proto_dir}")
+    print(f"Converting .srv files from {service_dir} to {proto_dir}")
     
-    for type, dir in [(".msg",speaker_dir), (".srv", callable_dir), (".action", job_dir)]:
+    for type, dir in [(".msg",publisher_dir), (".srv", service_dir), (".action", action_dir)]:
         for iface_file in dir.glob(f"*{type}"):
             iface_name = iface_file.stem
             

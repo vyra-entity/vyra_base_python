@@ -160,7 +160,7 @@ class InterfaceGenerator:
             logger.warning("Metadata missing functionname")
             return None
             
-        # For publisher (formerly speaker), only 'returns' are used as message fields
+        # For publisher (formerly publisher), only 'returns' are used as message fields
         returns = metadata.get("returns", [])
         
         if not returns:

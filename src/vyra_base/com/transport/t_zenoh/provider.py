@@ -84,8 +84,8 @@ class ZenohProvider(AbstractProtocolProvider):
         ...         handle_request
         ...     )
         ...     
-        ...     # Create speaker (pub/sub)
-        ...     speaker = await provider.create_speaker("/sensor_data")
+        ...     # Create publisher (pub/sub)
+        ...     publisher = await provider.create_publisher("/sensor_data")
     """
     
     def __init__(

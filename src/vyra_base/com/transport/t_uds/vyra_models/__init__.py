@@ -36,9 +36,11 @@ logger = logging.getLogger(__name__)
 try:
     
     # Unified transport layer imports
-    from vyra_base.com.transport.t_uds.vyra_models.publisher import UdsPublisherImpl
-    from vyra_base.com.transport.t_uds.vyra_models.subscriber import UdsSubscriberImpl
-    from vyra_base.com.transport.t_uds.vyra_models.server import UdsServerImpl
+    from vyra_base.com.transport.t_uds.vyra_models.publisher import VyraPublisherImpl
+    from vyra_base.com.transport.t_uds.vyra_models.subscriber import VyraSubscriberImpl
+    from vyra_base.com.transport.t_uds.vyra_models.publisher import VyraPublisherImpl
+    from vyra_base.com.transport.t_uds.vyra_models.subscriber import VyraSubscriberImpl
+    from vyra_base.com.transport.t_uds.vyra_models.server import VyraServerImpl
     from vyra_base.com.transport.t_uds.vyra_models.client import VyraClientImpl
     from vyra_base.com.transport.t_uds.vyra_models.action_server import VyraActionServerImpl
     from vyra_base.com.transport.t_uds.vyra_models.action_client import VyraActionClientImpl
@@ -48,9 +50,9 @@ try:
     
 except ImportError as e:
     # Unified
-    UdsPublisherImpl = None
-    UdsSubscriberImpl = None
-    UdsServerImpl = None
+    VyraPublisherImpl = None
+    VyraSubscriberImpl = None
+    VyraServerImpl = None
     VyraClientImpl = None
     VyraActionServerImpl = None
     VyraActionClientImpl = None
@@ -59,9 +61,9 @@ except ImportError as e:
 
 __all__ = [
     # Unified transport layer
-    "UdsPublisherImpl",
-    "UdsSubscriberImpl",
-    "UdsServerImpl",
+    "VyraPublisherImpl",
+    "VyraSubscriberImpl",
+    "VyraServerImpl",
     "VyraClientImpl",
     "VyraActionServerImpl",
     "VyraActionClientImpl",

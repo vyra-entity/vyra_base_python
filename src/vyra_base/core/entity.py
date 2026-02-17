@@ -295,8 +295,8 @@ class VyraEntity:
                 Each path should point to a directory containing:
                 - /config/*.json - Interface metadata
                 - /service/*.srv - ROS2 service definitions
-                - /speaker/*.msg - ROS2 message definitions
-                - /job/*.action - ROS2 action definitions
+                - /publisher/*.msg - ROS2 message definitions
+                - /actionServer/*.action - ROS2 action definitions
                 - /proto/*.proto - Protocol Buffer definitions
                 - /proto/*_pb2.py - Generated Python protobuf modules
         
@@ -875,8 +875,8 @@ class VyraEntity:
         Interface types can be:
 
         - ``!vyra-service``: service function that can be invoked remotely.
-        - ``!vyra-job``: Job that can be executed in the background.
-        - ``!vyra-speaker``: Speaker that can publish messages periodically.
+        - ``!vyra-actionServer``: actionServer that can be executed in the background.
+        - ``!vyra-publisher``: Publisher that can publish messages periodically.
         
         Protocols used depend on availability:
         - ROS2 (if available)
@@ -921,10 +921,10 @@ class VyraEntity:
                     node=self._node
                 )
             elif setting.type == FunctionConfigBaseTypes.action.value:
-                logger.info(f"Creating job: {setting.functionname}")
-                # TBD: vyra job implementation
-                # create_vyra_job(...)
-                logger.warning(f"Vyra Jobs are not implemented yet.")
+                logger.info(f"Creating actionServer: {setting.functionname}")
+                # TBD: vyra actionServer implementation
+                # create_vyra_actionServer(...)
+                logger.warning(f"Vyra actionServers are not implemented yet.")
 
             elif setting.type == FunctionConfigBaseTypes.publisher.value:
                 logger.info(f"Creating publisher: {setting.functionname}")

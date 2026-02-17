@@ -3,7 +3,7 @@ Unit tests for decorators (@remote_callable, @remote_speaker, @remote_job).
 """
 import pytest
 import asyncio
-from vyra_base.com.core.decorators import remote_service, remote_speaker, remote_job
+from vyra_base.com.core.decorators import remote_service, remote_publisher, remote_actionServer
 from vyra_base.com.core.types import ProtocolType
 
 
@@ -70,7 +70,7 @@ class TestRemoteSpeakerDecorator:
     
     def test_decorator_on_async_function(self):
         """Test decorator works on async functions."""
-        @remote_speaker(name="test_speaker")
+        @remote_publisher(name="test_speaker")
         async def test_func(self, message):
             pass
         
@@ -80,7 +80,7 @@ class TestRemoteSpeakerDecorator:
     
     def test_decorator_default_name(self):
         """Test decorator uses function name if name not provided."""
-        @remote_speaker()
+        @remote_publisher()
         async def broadcast_status(self, message):
             pass
         
@@ -88,7 +88,7 @@ class TestRemoteSpeakerDecorator:
     
     def test_decorator_with_protocols(self):
         """Test decorator stores protocol list."""
-        @remote_speaker(protocols=[ProtocolType.REDIS, ProtocolType.MQTT])
+        @remote_publisher(protocols=[ProtocolType.REDIS, ProtocolType.MQTT])
         async def test_func(self, message):
             pass
         
@@ -100,7 +100,7 @@ class TestRemoteJobDecorator:
     
     def test_decorator_on_async_function(self):
         """Test decorator works on async functions."""
-        @remote_job(name="test_job")
+        @remote_actionServer(name="test_job")
         async def test_func(self, goal):
             return {"status": "completed"}
         
@@ -110,7 +110,7 @@ class TestRemoteJobDecorator:
     
     def test_decorator_default_name(self):
         """Test decorator uses function name if name not provided."""
-        @remote_job()
+        @remote_actionServer()
         async def long_running_task(self, goal):
             return {}
         
@@ -118,7 +118,7 @@ class TestRemoteJobDecorator:
     
     def test_decorator_with_protocols(self):
         """Test decorator stores protocol list."""
-        @remote_job(protocols=[ProtocolType.ROS2])
+        @remote_actionServer(protocols=[ProtocolType.ROS2])
         async def test_func(self, goal):
             return {}
         
@@ -127,7 +127,7 @@ class TestRemoteJobDecorator:
     @pytest.mark.asyncio
     async def test_decorated_function_callable(self):
         """Test decorated function can be called."""
-        @remote_job()
+        @remote_actionServer()
         async def process_data(self, goal):
             return {"processed": goal['data']}
         

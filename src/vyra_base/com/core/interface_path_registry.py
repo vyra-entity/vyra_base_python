@@ -24,9 +24,9 @@ class InterfacePathRegistry:
     
     Stores paths to interface directories containing:
     - /config/*.json - Interface metadata
-    - /callable/*.srv - ROS2 service definitions
-    - /speaker/*.msg - ROS2 message definitions  
-    - /job/*.action - ROS2 action definitions
+    - /server/*.srv - ROS2 service definitions
+    - /publisher/*.msg - ROS2 message definitions  
+    - /actionServer/*.action - ROS2 action definitions
     - /proto/*.proto - Protocol Buffer definitions
     - /proto/*_pb2.py - Generated Python protobuf modules
     

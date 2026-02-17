@@ -5,7 +5,7 @@ Wraps ZenohSubscriber from communication layer for async callback handling.
 """
 import asyncio
 import logging
-from typing import Optional, Any, Callable, Awaitable
+from typing import Coroutine, Optional, Any, Callable, Awaitable
 
 from vyra_base.com.core.types import VyraSubscriber, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
@@ -29,7 +29,7 @@ class VyraSubscriberImpl(VyraSubscriber):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        subscriber_callback: Callable[[Any], Awaitable[None]],
+        subscriber_callback: Callable[[Any], Coroutine[Any, Any, Any]],
         zenoh_session: Any,  # zenoh.Session
         message_type: type,
         **kwargs

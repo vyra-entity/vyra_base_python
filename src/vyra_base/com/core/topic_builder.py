@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 
 class InterfaceType(Enum):
     """Type of communication interface."""
-    PUBLISHER = "publisher"  # publisher topic (ROS2), publisher key (Redis), Zenoh publisher, UDS speaker
-    SUBSCRIBER = "subscriber"  # subscriber topic (ROS2), subscriber key (Redis), Zenoh subscriber, UDS listener
+    PUBLISHER = "publisher"  # publisher topic (ROS2), publisher key (Redis), Zenoh publisher, UDS publisher
+    SUBSCRIBER = "subscriber"  # subscriber topic (ROS2), subscriber key (Redis), Zenoh subscriber, UDS subscriber
     SERVER = "server"  # service server (ROS2), request handler (Redis), Zenoh responder, UDS server
     CLIENT = "client"  # service client (ROS2), request sender (Redis), Zenoh requester, UDS client
     ACTION_SERVER = "action_server"  # action server (ROS2), long-running task handler (Redis/Zenoh/UDS)

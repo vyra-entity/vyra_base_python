@@ -18,7 +18,7 @@ from vyra_base.com.core.exceptions import InterfaceError
 logger = logging.getLogger(__name__)
 
 
-class UdsPublisherImpl(VyraPublisher):
+class VyraPublisherImpl(VyraPublisher):
     """
     Unix Domain Socket publisher implementation using datagram sockets.
     
@@ -48,7 +48,7 @@ class UdsPublisherImpl(VyraPublisher):
     async def initialize(self) -> bool:
         """Initialize UDS publisher."""
         try:
-            topic_name = self.topic_builder.build_topic(self.name)
+            topic_name = self.topic_builder.build(self.name)
             self._socket_path = self._socket_dir / f"pub_{self._module_name}_{topic_name}.sock"
             
             # TODO: Initialize UDS publisher socket
@@ -69,7 +69,7 @@ class UdsPublisherImpl(VyraPublisher):
             self._socket = None
         if self._socket_path and self._socket_path.exists():
             self._socket_path.unlink()
-        logger.debug(f"UDS Publisher '{self.name}' cleaned up")
+        logger.debug(f"✅ VyraPublisher '{self.name}' cleaned up")
     
     async def shutdown(self) -> None:
         """Shutdown UDS publisher."""
@@ -79,12 +79,12 @@ class UdsPublisherImpl(VyraPublisher):
     async def publish(self, message: Any) -> bool:
         """Publish message (async)."""
         if not self._initialized:
-            raise InterfaceError(f"Publisher '{self.name}' not initialized")
+            raise InterfaceError(f"VyraPublisher '{self.name}' not initialized")
         
         try:
             # TODO: Implement UDS publish via datagram broadcast
-            logger.warning(f"{self.name} - UDS publish not fully implemented")
+            logger.warning(f"⚠️ VyraPublisher '{self.name}' - UDS publish not fully implemented")
             return True
         except Exception as e:
-            logger.error(f"❌ Failed to publish on '{self.name}': {e}")
+            logger.error(f"❌ VyraPublisher '{self.name}' failed to publish: {e}")
             return False

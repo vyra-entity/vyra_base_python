@@ -87,7 +87,7 @@ def remote_service(
     return decorator
 
 
-def remote_speaker(
+def remote_publisher(
     name: Optional[str] = None,
     protocols: Optional[List[ProtocolType]] = None,
     auto_register: bool = True,
@@ -127,15 +127,15 @@ def remote_speaker(
             
             if not hasattr(self_obj, speaker_attr):
                 # Create speaker on first use
-                speaker = await InterfaceFactory.create_speaker(
+                publisher = await InterfaceFactory.create_publisher(
                     name=func._vyra_speaker_name,
                     protocols=protocols,
                     **kwargs
                 )
-                setattr(self_obj, speaker_attr, speaker)
+                setattr(self_obj, speaker_attr, publisher)
             
-            speaker = getattr(self_obj, speaker_attr)
-            return await speaker.shout(message)
+            publisher = getattr(self_obj, speaker_attr)
+            return await publisher.shout(message)
         
         setattr(wrapper, "_vyra_remote_speaker", True)
         setattr(wrapper, "_vyra_speaker_name", func._vyra_speaker_name)
@@ -148,7 +148,7 @@ def remote_speaker(
     return decorator
 
 
-def remote_job(
+def remote_actionServer(
     name: Optional[str] = None,
     protocols: Optional[List[ProtocolType]] = None,
     auto_register: bool = True,

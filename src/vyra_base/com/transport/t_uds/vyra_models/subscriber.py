@@ -19,7 +19,7 @@ from vyra_base.com.core.exceptions import InterfaceError
 logger = logging.getLogger(__name__)
 
 
-class UdsSubscriberImpl(VyraSubscriber):
+class VyraSubscriberImpl(VyraSubscriber):
     """
     Unix Domain Socket subscriber implementation using datagram sockets.
     
@@ -66,12 +66,12 @@ class UdsSubscriberImpl(VyraSubscriber):
             self._socket.bind(str(self._socket_path))
             
             self._initialized = True
-            logger.info(f"✅ UdsSubscriber '{self.name}' initialized: {self._socket_path}")
+            logger.info(f"✅ VyraSubscriber '{self.name}' initialized: {self._socket_path}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize UdsSubscriber '{self.name}': {e}")
-            raise InterfaceError(f"Subscriber initialization failed: {e}")
+            logger.error(f"❌ Failed to initialize VyraSubscriber '{self.name}': {e}")
+            raise InterfaceError(f"VyraSubscriber initialization failed: {e}")
     
     async def subscribe(self) -> bool:
         """
@@ -81,18 +81,18 @@ class UdsSubscriberImpl(VyraSubscriber):
             True on success
         """
         if not self._socket:
-            logger.error("Subscriber not initialized")
+            logger.error("❌ VyraSubscriber not initialized")
             return False
             
         try:
             # Start listen task
             self._listen_task = asyncio.create_task(self._listen_loop())
             
-            logger.info(f"📡 UdsSubscriber listening on: {self._socket_path}")
+            logger.info(f"📡 VyraSubscriber listening on: {self._socket_path}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Subscribe failed: {e}")
+            logger.error(f"❌ VyraSubscriber subscribe failed: {e}")
             return False
     
     async def _listen_loop(self):
@@ -101,11 +101,11 @@ class UdsSubscriberImpl(VyraSubscriber):
             loop = asyncio.get_event_loop()
             
             if not self._socket:
-                logger.error("Subscriber socket not available in listen loop")
+                logger.error("❌ VyraSubscriber socket not available in listen loop")
                 return
 
             if not self.subscriber_callback:
-                logger.error("Subscriber callback not set")
+                logger.error("❌ VyraSubscriber callback not set")
                 return
 
             while True:
@@ -138,13 +138,13 @@ class UdsSubscriberImpl(VyraSubscriber):
                 except BlockingIOError:
                     await asyncio.sleep(0.01)
                 except Exception as e:
-                    logger.error(f"❌ Message handling failed: {e}")
+                    logger.error(f"❌ VyraSubscriber message handling failed: {e}")
                     await asyncio.sleep(0.1)
                     
         except asyncio.CancelledError:
-            logger.debug("Listen loop canceled")
+            logger.debug("VyraSubscriber listen loop canceled")
         except Exception as e:
-            logger.error(f"❌ Listen loop failed: {e}")
+            logger.error(f"❌ VyraSubscriber listen loop failed: {e}")
     
     async def cleanup(self):
         """Cleanup UDS resources."""
@@ -165,9 +165,9 @@ class UdsSubscriberImpl(VyraSubscriber):
             try:
                 self._socket_path.unlink()
             except Exception as e:
-                logger.warning(f"Failed to remove socket file: {e}")
+                logger.warning(f"❌ Failed to remove socket file: {e}")
                 
-        logger.info(f"🔄 UdsSubscriber cleaned up: {self._socket_path}")
+        logger.info(f"🔄 VyraSubscriber cleaned up: {self._socket_path}")
     
     @property
     def interface_type(self) -> InterfaceType:

@@ -24,7 +24,7 @@ class ZenohSerializer:
     """
     Serialization helper for Zenoh transport.
     
-    Provides consistent serialization across callable/speaker/job interfaces.
+    Provides consistent serialization across publisher/server/actionServer interfaces.
     """
     
     @staticmethod

@@ -33,7 +33,7 @@ class AbstractProtocolProvider(ABC):
     Abstract base class for all protocol providers.
     
     Each protocol (ROS2, Shared Memory, MQTT, etc.) implements this interface
-    to provide consistent callable/speaker/job creation across transports.
+    to provide consistent publisher/subscriber/server/client/actionServer/actionClient creation across transports.
     """
     
     def __init__(self, protocol: ProtocolType):

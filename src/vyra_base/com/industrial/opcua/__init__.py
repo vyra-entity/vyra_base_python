@@ -7,9 +7,6 @@ Components:
     - OpcuaClient: Client for connecting to OPC UA servers
     - OpcuaServer: Server for hosting OPC UA endpoints
     - Handlers: Connection, subscription, and node handlers
-    - Provider: VYRA integration provider
-    - Callable: VYRA Callable wrapper for method calls
-    - Speaker: VYRA Speaker wrapper for subscriptions
 
 Features:
     - Client/Server architecture
@@ -85,19 +82,6 @@ except ImportError as e:
     _handlers_available = False
     logger.debug(f"⚠️  OPC UA handlers unavailable: {e}")
 
-# Try importing provider and VYRA abstractions
-try:
-    from vyra_base.com.industrial.opcua.provider import OpcuaProvider
-    from vyra_base.com.industrial.opcua.callable import OpcuaCallable
-    from vyra_base.com.industrial.opcua.speaker import OpcuaSpeaker
-    _vyra_available = True
-except ImportError as e:
-    OpcuaProvider = None
-    OpcuaCallable = None
-    OpcuaSpeaker = None
-    _vyra_available = False
-    logger.debug(f"⚠️  OPC UA VYRA abstractions unavailable: {e}")
-
 if _client_available and _server_available:
     logger.info("✅ OPC UA fully available (client + server + handlers)")
 elif _client_available:
@@ -120,9 +104,5 @@ __all__ = [
     "OpcuaNodeHandler",
     "OpcuaSecurityMode",
     "OpcuaSecurityPolicy",
-    "OpcuaNodeInfo",
-    # VYRA abstractions
-    "OpcuaProvider",
-    "OpcuaCallable",
-    "OpcuaSpeaker",
+    "OpcuaNodeInfo"
 ]

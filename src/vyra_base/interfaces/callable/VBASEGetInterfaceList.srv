@@ -9,4 +9,4 @@ string[] interface_list
 # The capabilities field contains a list of strings representing the capabilities.
 # Example usage:
 # - Request: (empty)
-# - Response: "capabilities": see config/[file.json] -> List of speaker, callables and jobs
+# - Response: "capabilities": see config/[file.json] -> List of publisher, server and actionServer

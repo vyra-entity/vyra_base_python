@@ -5,7 +5,7 @@ Hybrid pattern: Query for goal send + Subscriber for feedback/result.
 """
 
 import logging
-from typing import Optional, Any, Callable, Awaitable
+from typing import Coroutine, Optional, Any, Callable, Awaitable
 
 from vyra_base.com.core.types import VyraActionClient, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
@@ -37,9 +37,9 @@ class VyraActionClientImpl(VyraActionClient):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        direct_response: Optional[Callable[[Any], Awaitable[None]]] = None,
-        feedback_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
-        goal_response_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
+        direct_response: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        feedback_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        goal_response_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
         zenoh_session: Any = None,  # zenoh.Session
         action_type: type = None,
         **kwargs

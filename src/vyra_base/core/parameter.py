@@ -53,18 +53,18 @@ class Parameter:
         )
 
         self.parameter_base_types = parameter_base_types
-        self.update_param_event_ident = "param_update_event_speaker"
+        self.update_param_event_ident = "param_update_event_publisher"
 
-        # Store node reference for lazy speaker initialization
+        # Store node reference for lazy publisher initialization
         self._node = node
-        self.update_parameter_speaker: Optional[Any] = None  # Will be ROS2Speaker
+        self.update_parameter_publisher: Optional[Any] = None  # Will be ROS2Publisher
 
         self.storage_access_transient: Any|None = storage_access_transient
 
-    async def _init_speaker(self) -> None:
-        """Initialize the parameter update speaker lazily."""
-        if self.update_parameter_speaker is None:
-            self.update_parameter_speaker = await InterfaceFactory.create_speaker(
+    async def _init_publisher(self) -> None:
+        """Initialize the parameter update publisher lazily."""
+        if self.update_parameter_publisher is None:
+            self.update_parameter_publisher = await InterfaceFactory.create_publisher(
                 name=self.update_param_event_ident,
                 protocols=[ProtocolType.ROS2],
                 message_type=self.parameter_base_types['UpdateParamEvent'],
@@ -582,12 +582,12 @@ class Parameter:
         """
         response: dict = {}
         
-        # Ensure speaker is initialized
-        if self.update_parameter_speaker is None:
-            await self._init_speaker()
+        # Ensure publisher is initialized
+        if self.update_parameter_publisher is None:
+            await self._init_publisher()
         
-        # Access internal publisher from ROS2Speaker
-        pub_server = getattr(self.update_parameter_speaker, '_publisher', None)
+        # Access internal publisher from ROS2Publisher
+        pub_server = getattr(self.update_parameter_publisher, '_publisher', None)
         if pub_server is None:
             logger.error("Publisher server is not initialized.")
             return None

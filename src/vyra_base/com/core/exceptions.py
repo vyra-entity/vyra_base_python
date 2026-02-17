@@ -261,71 +261,74 @@ class InterfaceNotInitializedError(InterfaceError):
         )
 
 
-class CallableError(InterfaceError):
-    """Raised when callable creation or invocation fails."""
+class TServerError(InterfaceError):
+    """Raised when transport server creation or invocation fails."""
     pass
 
 
-class CallableInvocationError(CallableError):
-    """Raised when callable invocation fails."""
+class TServerInvocationError(TServerError):
+    """Raised when transport server invocation fails."""
     def __init__(
         self,
-        callable_name: str,
+        server_name: str,
         reason: Optional[str] = None,
         original_exception: Optional[Exception] = None
     ):
         super().__init__(
-            f"Callable '{callable_name}' invocation failed" + (f": {reason}" if reason else ""),
-            details={"callable": callable_name},
+            f"Transport server '{server_name}' invocation failed" + (f": {reason}" if reason else ""),
+            details={"server": server_name},
             original_exception=original_exception
         )
 
 
-class CallableTimeoutError(CallableError):
-    """Raised when callable invocation times out."""
-    def __init__(self, callable_name: str, timeout: float):
+class TServerTimeoutError(TServerError):
+    """Raised when transport server invocation times out."""
+    def __init__(self, server_name: str, timeout: float):
         super().__init__(
-            f"Callable '{callable_name}' timed out after {timeout}s",
-            details={"callable": callable_name, "timeout": timeout}
+            f"Transport server '{server_name}' timed out after {timeout}s",
+            details={"server": server_name, "timeout": timeout}
         )
 
 
-class SpeakerError(InterfaceError):
-    """Raised when speaker creation or publishing fails."""
+class TPublisherError(InterfaceError):
+    """Raised when transport publisher creation or publishing fails."""
     pass
 
 
-class SpeakerPublishError(SpeakerError):
+class TPublisherPublishError(TPublisherError):
     """Raised when message publication fails."""
     def __init__(
         self,
-        speaker_name: str,
+        publisher_name: str,
         reason: Optional[str] = None,
         original_exception: Optional[Exception] = None
     ):
         super().__init__(
-            f"Speaker '{speaker_name}' publish failed" + (f": {reason}" if reason else ""),
-            details={"speaker": speaker_name},
+            f"Publisher '{publisher_name}' publish failed" + (f": {reason}" if reason else ""),
+            details={"publisher": publisher_name},
             original_exception=original_exception
         )
 
+class TSubscriberError(InterfaceError):
+    """Raised when transport subscriber creation or subscription fails."""
+    pass
 
-class SpeakerSubscriptionError(SpeakerError):
+class TSubscriberSubscribeError(TSubscriberError):
     """Raised when subscription fails."""
-    def __init__(self, speaker_name: str, reason: Optional[str] = None):
+    def __init__(self, subscriber_name: str, reason: Optional[str] = None):
         super().__init__(
-            f"Speaker '{speaker_name}' subscription failed" + (f": {reason}" if reason else ""),
-            details={"speaker": speaker_name}
+            f"Subscriber '{subscriber_name}' subscription failed" + (f": {reason}" if reason else ""),
+            details={"subscriber": subscriber_name}
         )
 
 
-class JobError(InterfaceError):
-    """Raised when job creation or execution fails."""
+class ActionServerError(InterfaceError):
+    """Raised when actionServer creation or execution fails."""
     pass
 
 
-class JobExecutionError(JobError):
-    """Raised when job execution fails."""
+class ActionServerExecutionError(ActionServerError):
+    """Raised when actionServer execution fails."""
     def __init__(
         self,
         job_name: str,
@@ -339,20 +342,20 @@ class JobExecutionError(JobError):
         )
 
 
-class JobCancellationError(JobError):
-    """Raised when job cancellation fails."""
+class ActionServerCancellationError(ActionServerError):
+    """Raised when actionServer cancellation fails."""
     def __init__(self, job_name: str, reason: Optional[str] = None):
         super().__init__(
-            f"Job '{job_name}' cancellation failed" + (f": {reason}" if reason else ""),
+            f"ActionServer '{job_name}' cancellation failed" + (f": {reason}" if reason else ""),
             details={"job": job_name}
         )
 
 
-class JobTimeoutError(JobError):
-    """Raised when job execution times out."""
+class ActionServerTimeoutError(ActionServerError):
+    """Raised when actionServer execution times out."""
     def __init__(self, job_name: str, timeout: float):
         super().__init__(
-            f"Job '{job_name}' timed out after {timeout}s",
+            f"ActionServer '{job_name}' timed out after {timeout}s",
             details={"job": job_name, "timeout": timeout}
         )
 

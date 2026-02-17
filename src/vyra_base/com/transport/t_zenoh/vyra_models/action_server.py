@@ -7,7 +7,7 @@ Hybrid pattern: Queryable for goal/cancel requests + Publisher for feedback.
 import logging
 import zenoh
 
-from typing import Optional, Any, Callable, Awaitable, Dict, TypedDict
+from typing import Coroutine, Optional, Any, Callable, Awaitable, Dict, TypedDict
 from enum import Enum
 
 from vyra_base.com.core.types import VyraActionServer, ProtocolType
@@ -58,9 +58,9 @@ class VyraActionServerImpl(VyraActionServer):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        handle_goal_request: Callable[[Any], Awaitable[bool]],
-        handle_cancel_request: Callable[[Any], Awaitable[bool]],
-        execution_callback: Callable[[Any], Awaitable[Any]],
+        handle_goal_request: Callable[[Any], Coroutine[Any, Any, Any]],
+        handle_cancel_request: Callable[[Any], Coroutine[Any, Any, bool]],
+        execution_callback: Callable[[Any], Coroutine[Any, Any, Any]],
         zenoh_session: zenoh.Session = None,  # zenoh.Session
         action_type: type = None,
         **kwargs

@@ -36,8 +36,8 @@ Example Usage:
     >>> provider = RedisProvider(ProtocolType.REDIS)
     >>> if await provider.check_availability():
     ...     await provider.initialize()
-    ...     callable = await provider.create_callable("service", callback)
-    ...     speaker = await provider.create_speaker("topic")
+    ...     server = await provider.create_server("service", callback)
+    ...     publisher = await provider.create_publisher("topic")
     >>> 
     >>> # UDS Transport
     >>> from vyra_base.com.transport.uds import UDSProvider
@@ -45,7 +45,7 @@ Example Usage:
     >>> provider = UDSProvider(ProtocolType.UDS)
     >>> if await provider.check_availability():
     ...     await provider.initialize()
-    ...     callable = await provider.create_callable("service", callback)
+    ...     server = await provider.create_server("service", callback)
 """
 
 # Redis Transport (optional)
@@ -53,8 +53,6 @@ try:
     from vyra_base.com.transport.t_redis import (
         RedisProvider,
         RedisClient,
-        RedisCallable,
-        RedisSpeaker,
         REDIS_AVAILABLE,
     )
 except ImportError:
@@ -75,9 +73,6 @@ try:
     from vyra_base.com.transport.t_zenoh import (
         ZenohProvider,
         ZenohSession,
-        ZenohCallable,
-        ZenohSpeaker,
-        ZenohJob,
         ZENOH_AVAILABLE,
     )
 except ImportError:
@@ -87,7 +82,6 @@ except ImportError:
 try:
     from vyra_base.com.transport.t_uds import (
         UDSProvider,
-        UDSCallable,
         UnixSocket,
     )
     UDS_AVAILABLE = True
@@ -106,9 +100,7 @@ __all__ = [
 if REDIS_AVAILABLE:
     __all__.extend([
         "RedisProvider",
-        "RedisClient",
-        "RedisCallable",
-        "RedisSpeaker",
+        "RedisClient"
     ])
 
 if ROS2_AVAILABLE:
@@ -120,16 +112,12 @@ if ROS2_AVAILABLE:
 if ZENOH_AVAILABLE:
     __all__.extend([
         "ZenohProvider",
-        "ZenohSession",
-        "ZenohCallable",
-        "ZenohSpeaker",
-        "ZenohJob",
+        "ZenohSession"
     ])
 
 if UDS_AVAILABLE:
     __all__.extend([
         "UDSProvider",
-        "UDSCallable",
         "UnixSocket",
     ])
 

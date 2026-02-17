@@ -1,11 +1,14 @@
+import logging
 from logging import LogRecord
 from typing import Any
 
 from rclpy.node import Node
 
 from vyra_base.com.handler.communication import CommunicationHandler
-from vyra_base.com.core.types import VyraSpeaker
+from vyra_base.com.core.types import VyraPublisher
 from vyra_base.helper.error_handler import ErrorTraceback
+
+logger = logging.getLogger(__name__)
 
 
 class ROS2Handler(CommunicationHandler):
@@ -18,8 +21,8 @@ class ROS2Handler(CommunicationHandler):
     :type __doc__: str
     :param initiator: The initiator of the handler.
     :type initiator: str
-    :param speaker: The speaker instance to use.
-    :type speaker: Vyraspeaker
+    :param publisher: The publisher instance to use.
+    :type publisher: VyraPublisher
     :param type: The ROS2 message type.
     :type type: Any
     """
@@ -27,19 +30,19 @@ class ROS2Handler(CommunicationHandler):
     __handlerName__: str = 'ROS2Handler'
     __doc__: str = 'ROS2 communication handler'
 
-    def __init__(self, initiator: str, speaker: VyraSpeaker, type: Any):
+    def __init__(self, initiator: str, publisher: VyraPublisher, type: Any):
         """
         Initialize the ROS2Handler.
 
         :param initiator: The initiator of the handler.
         :type initiator: str
-        :param speaker: The speaker instance to use.
-        :type speaker: VyraSpeaker
+        :param publisher: The publisher instance to use.
+        :type publisher: VyraPublisher
         :param type: The ROS2 message type.
         :type type: Any
         """
         self._initiator = initiator
-        self._speaker: VyraSpeaker = speaker
+        self._publisher: VyraPublisher = publisher
         self._type: Any = type
         super().__init__()
 
@@ -80,6 +83,6 @@ class ROS2Handler(CommunicationHandler):
 
                 setattr(ros_msg, field, value)
 
-            await self._speaker.shout(ros_msg)
+            await self._publisher.publish(ros_msg)
         finally:
             ErrorTraceback.check_error_exist()

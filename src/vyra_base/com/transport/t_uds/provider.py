@@ -24,9 +24,9 @@ from vyra_base.com.core.exceptions import (
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 from vyra_base.com.transport.t_uds.vyra_models import (
-    UdsPublisherImpl,
-    UdsSubscriberImpl,
-    UdsServerImpl,
+    VyraPublisherImpl,
+    VyraSubscriberImpl,
+    VyraServerImpl,
     VyraClientImpl,
     VyraActionServerImpl,
     VyraActionClientImpl,
@@ -214,7 +214,7 @@ class UDSProvider(AbstractProtocolProvider):
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
-            publisher = UdsPublisherImpl(
+            publisher = VyraPublisherImpl(
                 name=name,
                 topic_builder=topic_builder,
                 message_type=message_type,
@@ -258,7 +258,7 @@ class UDSProvider(AbstractProtocolProvider):
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
-            subscriber = UdsSubscriberImpl(
+            subscriber = VyraSubscriberImpl(
                 name=name,
                 topic_builder=topic_builder,
                 subscriber_callback=subscriber_callback,
@@ -304,7 +304,7 @@ class UDSProvider(AbstractProtocolProvider):
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
-            server = UdsServerImpl(
+            server = VyraServerImpl(
                 name=name,
                 topic_builder=topic_builder,
                 response_callback=response_callback,

@@ -39,11 +39,6 @@ try:
     from vyra_base.com.transport.t_ros2.vyra_models.action_server import VyraActionServerImpl
     from vyra_base.com.transport.t_ros2.vyra_models.action_client import VyraActionClientImpl
     
-    # Legacy implementations (deprecated)
-    from vyra_base.com.transport.t_ros2.vyra_models.callable import ROS2Callable
-    from vyra_base.com.transport.t_ros2.vyra_models.speaker import ROS2Speaker
-    from vyra_base.com.transport.t_ros2.vyra_models.job import ROS2Job
-    
     ROS2_MODELS_AVAILABLE = True
     logger.debug("✅ ROS2 VYRA models layer available")
     
@@ -65,6 +60,5 @@ __all__ = [
     "VyraClientImpl",
     "VyraActionServerImpl",
     "VyraActionClientImpl",
-    # Legacy (deprecated)
     "ROS2_MODELS_AVAILABLE",
 ]

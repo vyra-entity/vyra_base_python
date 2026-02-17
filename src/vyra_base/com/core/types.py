@@ -11,7 +11,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-from typing import Any, Callable, Optional, Dict, List
+from typing import Any, Callable, Coroutine, Optional, Dict, List
 from datetime import datetime
 
 from vyra_base.com.core.topic_builder import TopicBuilder
@@ -46,6 +46,16 @@ class InterfaceType(str, Enum):
     ACTION_SERVER = "actionServer" # Long-running task server
     ACTION_CLIENT = "actionClient" # Long-running task client
 
+class CallbackType(str, Enum):
+    """Types of callbacks for communication interfaces."""
+    SUBSCRIBER = "subscriber_callback"
+    SERVER = "response_callback"
+    ACTION_SERVER_GOAL = "handle_goal_request"
+    ACTION_SERVER_CANCEL = "handle_cancel_request"
+    ACTION_SERVER_EXECUTION = "execution_callback"
+    ACTION_CLIENT_DIRECT_RESPONSE = "direct_response_callback"
+    ACTION_CLIENT_FEEDBACK = "feedback_callback"
+    ACTION_CLIENT_GOAL = "goal_callback"
 
 class AccessLevel(str, Enum):
     """Access control levels for interfaces."""
@@ -92,11 +102,11 @@ class InterfaceMetadata:
         return json.dumps(data)
 
 
-class VyraInterface(ABC):
+class VyraTransport(ABC):
     """
     Abstract base class for all VYRA communication interfaces.
     
-    All communication paradigms (Callable, Speaker, Job) inherit from this.
+    All communication paradigms (Publisher, Server, ActionServer) inherit from this.
     """
     
     def __init__(
@@ -168,7 +178,7 @@ class VyraInterface(ABC):
 # ============================================================================
 
 @dataclass
-class VyraPublisher(VyraInterface):
+class VyraPublisher(VyraTransport):
     """
     Publisher interface for one-way message publishing.
     
@@ -220,7 +230,7 @@ class VyraPublisher(VyraInterface):
 
 
 @dataclass
-class VyraSubscriber(VyraInterface):
+class VyraSubscriber(VyraTransport):
     """
     Subscriber interface for receiving messages with callback.
     
@@ -269,7 +279,7 @@ class VyraSubscriber(VyraInterface):
 
 
 @dataclass
-class VyraServer(VyraInterface):
+class VyraServer(VyraTransport):
     """
     Server interface for request-response communication.
     
@@ -284,7 +294,7 @@ class VyraServer(VyraInterface):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        response_callback: Optional[Callable] = None,
+        response_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
@@ -318,7 +328,7 @@ class VyraServer(VyraInterface):
 
 
 @dataclass
-class VyraClient(VyraInterface):
+class VyraClient(VyraTransport):
     """
     Client interface for request-response communication.
     
@@ -333,7 +343,7 @@ class VyraClient(VyraInterface):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        request_callback: Optional[Callable] = None,  # Optional for async pattern
+        request_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,  # Optional for async pattern
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
@@ -341,7 +351,7 @@ class VyraClient(VyraInterface):
         if not topic_builder:
             raise InterfaceError("TopicBuilder is required for Client")
         self.topic_builder: TopicBuilder = topic_builder
-        self.request_callback = request_callback  # async def callback(response: Any) -> None
+        self.request_callback = request_callback  # async def callback(response: Any) -> Any
         self._transport_handle: Optional[Any] = None
     
     async def initialize(self) -> bool:
@@ -373,7 +383,7 @@ class VyraClient(VyraInterface):
 
 
 @dataclass
-class VyraActionServer(VyraInterface):
+class VyraActionServer(VyraTransport):
     """
     Action Server interface for long-running tasks.
     
@@ -388,9 +398,9 @@ class VyraActionServer(VyraInterface):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        handle_goal_request: Optional[Callable] = None,
-        handle_cancel_request: Optional[Callable] = None,
-        execution_callback: Optional[Callable] = None,
+        handle_goal_request: Optional[Callable[[Any], Coroutine[Any, Any, bool]]] = None,
+        handle_cancel_request: Optional[Callable[[Any], Coroutine[Any, Any, bool]]] = None,
+        execution_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
@@ -429,7 +439,7 @@ class VyraActionServer(VyraInterface):
 
 
 @dataclass
-class VyraActionClient(VyraInterface):
+class VyraActionClient(VyraTransport):
     """
     Action Client interface for long-running tasks.
     
@@ -444,9 +454,9 @@ class VyraActionClient(VyraInterface):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        direct_response_callback: Optional[Callable] = None,
-        feedback_callback: Optional[Callable] = None,
-        goal_callback: Optional[Callable] = None,
+        direct_response_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        feedback_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        goal_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):

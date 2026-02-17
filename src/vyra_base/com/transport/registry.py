@@ -1,15 +1,16 @@
 """
 DataSpace Registry
 
-Central registry for all VYRA communication interfaces (Callables, Speakers, Jobs).
+Central registry for all VYRA communication interfaces (Servers, Publishers, Action Servers).
 Thread-safe singleton pattern for global access.
 """
 import logging
-from typing import Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 from threading import RLock
 
 from vyra_base.com.core.types import (
-    VyraInterface,
+    CallbackType,
+    VyraTransport,
     InterfaceType,
     VyraPublisher,
     VyraSubscriber,
@@ -22,15 +23,15 @@ from vyra_base.com.core.types import (
 logger = logging.getLogger(__name__)
 
 
-class DataSpaceRegistry:
+class InterfaceRegistry:
     """
     Central registry for all communication interfaces.
     
-    This singleton manages all callables, speakers, and jobs across all protocols.
+    This singleton manages all servers, publishers, and action servers across all protocols.
     It provides thread-safe registration, lookup, and lifecycle management.
     """
     
-    _instance: Optional['DataSpaceRegistry'] = None
+    _instance: Optional['InterfaceRegistry'] = None
     _lock = RLock()
     
     def __new__(cls):
@@ -53,10 +54,11 @@ class DataSpaceRegistry:
         self._clients: Dict[str, VyraClient] = {}
         self._action_servers: Dict[str, VyraActionServer] = {}
         self._action_clients: Dict[str, VyraActionClient] = {}
-        self._all_interfaces: Dict[str, VyraInterface] = {}
+        self._all_interfaces: Dict[str, VyraTransport] = {}
+        self._pending_interfaces: Dict[str, Any] = {}
         self._initialized = True
         
-        logger.info("✅ DataSpace Registry initialized")
+        logger.info("✅ Interface Registry initialized")
     
     def register_publisher(self, publisher_obj: VyraPublisher) -> None:
         """
@@ -73,7 +75,7 @@ class DataSpaceRegistry:
                 logger.warning(
                     f"⚠️ Publisher '{publisher_obj.name}' already registered, replacing"
                 )
-            
+
             self._publishers[publisher_obj.name] = publisher_obj
             self._all_interfaces[publisher_obj.name] = publisher_obj
             
@@ -115,7 +117,7 @@ class DataSpaceRegistry:
                 logger.warning(
                     f"⚠️ Server '{server_obj.name}' already registered, replacing"
                 )
-            
+
             self._servers[server_obj.name] = server_obj
             self._all_interfaces[server_obj.name] = server_obj
             
@@ -211,7 +213,7 @@ class DataSpaceRegistry:
         """Get action client by name."""
         return self._action_clients.get(name)
     
-    def get_interface(self, name: str) -> Optional[VyraInterface]:
+    def get_interface(self, name: str) -> Optional[VyraTransport]:
         """Get any interface by name."""
         return self._all_interfaces.get(name)
     
@@ -245,7 +247,7 @@ class DataSpaceRegistry:
         with self._lock:
             return list(self._action_clients.values())
     
-    def list_all(self) -> List[VyraInterface]:
+    def list_all(self) -> List[VyraTransport]:
         """Get all registered interfaces."""
         with self._lock:
             return list(self._all_interfaces.values())
@@ -337,30 +339,29 @@ class DataSpaceRegistry:
 
 
 # Global singleton instance
-DataSpace = DataSpaceRegistry()
+interface_registry = InterfaceRegistry()
 
 # Legacy compatibility functions (will be deprecated)
 def add_publisher(publisher_obj: VyraPublisher) -> None:
     """Legacy: Register publisher."""
-    DataSpace.register_publisher(publisher_obj)
+    interface_registry.register_publisher(publisher_obj)
 
 def add_subscriber(subscriber_obj: VyraSubscriber) -> None:
     """Legacy: Register subscriber."""
-    DataSpace.register_subscriber(subscriber_obj)
+    interface_registry.register_subscriber(subscriber_obj)
 
 def add_server(server_obj: VyraServer) -> None:
     """Legacy: Register server."""
-    DataSpace.register_server(server_obj)
+    interface_registry.register_server(server_obj)
 
 def add_client(client_obj: VyraClient) -> None:
     """Legacy: Register client."""
-    DataSpace.register_client(client_obj)
+    interface_registry.register_client(client_obj)
 
 def add_action_server(action_server_obj: VyraActionServer) -> None:
     """Legacy: Register action server."""
-    DataSpace.register_action_server(action_server_obj)
+    interface_registry.register_action_server(action_server_obj)
 
 def add_action_client(action_client_obj: VyraActionClient) -> None:
     """Legacy: Register action client."""
-    DataSpace.register_action_client(action_client_obj)
-
+    interface_registry.register_action_client(action_client_obj)

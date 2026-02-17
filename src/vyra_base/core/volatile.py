@@ -2,7 +2,7 @@ import asyncio
 from typing import Any, Type, Optional
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
-from vyra_base.com.core.types import VyraSpeaker
+from vyra_base.com.core.types import VyraPublisher
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
 from vyra_base.com import InterfaceFactory, ProtocolType
@@ -54,7 +54,7 @@ class Volatile:
         }
         
         self.redis: RedisClient = storage_access_transient
-        self._active_shouter: dict[str, VyraSpeaker] = {}
+        self._active_shouter: dict[str, VyraPublisher] = {}
         self._listener: asyncio.Task | None = None
 
 
@@ -80,8 +80,8 @@ class Volatile:
             self._listener.cancel()
             self._listener = None
 
-        for key, speaker in self._active_shouter.items():
-            await speaker.shutdown()
+        for key, publisher in self._active_shouter.items():
+            await publisher.shutdown()
 
         self._active_shouter.clear()
 
@@ -92,7 +92,7 @@ class Volatile:
         
         This method starts listening for changes on registered volatile parameters.
         When a volatile value changes in Redis, the listener will receive a message
-        and trigger the appropriate ROS2 speaker to publish the change.
+        and trigger the appropriate ROS2 publisher to publish the change.
         
         **Workflow:**
         1. Get currently active Redis pub/sub channels
@@ -110,7 +110,7 @@ class Volatile:
         if not isinstance(channel, list):
             channel = [channel]
 
-        # # Find channels in our speaker registry that don't have active listeners yet
+        # # Find channels in our publisher registry that don't have active listeners yet
         # new_listener = [li for li in self._active_shouter.keys() if li not in active_listener]
         new_listener: list[str] = [li for li in channel if li in self._active_shouter and li not in active_listener]
 
@@ -147,13 +147,13 @@ class Volatile:
         
         This method is called automatically by the Redis pub/sub listener whenever
         a volatile parameter changes. It publishes the change to the corresponding
-        ROS2 topic via the registered VyraSpeaker.
+        ROS2 topic via the registered VyraPublisher.
         
         **Message flow:**
         1. Redis detects value change on subscribed key
         2. Redis pub/sub sends message to this callback
         3. Callback extracts channel and message type
-        4. If valid, publishes change to ROS2 topic via VyraSpeaker
+        4. If valid, publishes change to ROS2 topic via VyraPublisher
         
         :param message: Redis pub/sub message containing type, channel, and data.
         :type message: dict
@@ -173,7 +173,7 @@ class Volatile:
         # Only process actual messages (not subscribe/unsubscribe events)
         if message_type == "message" and channel in self._active_shouter:
             # Publish the changed value to the ROS2 topic
-            await self._active_shouter[channel].shout(message["data"])
+            await self._active_shouter[channel].publish(message["data"])
 
     @ErrorTraceback.w_check_error_exist
     async def read_all_volatile_names(self) -> list:
@@ -256,16 +256,16 @@ class Volatile:
         Create a ROS2 publisher for a volatile parameter and subscribe to its changes.
         
         This method sets up automatic ROS2 topic publishing whenever the specified
-        volatile parameter changes in Redis. It creates a ROS2 speaker that will
+        volatile parameter changes in Redis. It creates a ROS2 publisher that will
         publish change events to a topic that other modules can subscribe to.
         
         **Setup workflow:**
         1. Verify that the volatile key exists in Redis
         2. Determine the Redis data type (string, hash, list, set)
-        3. Create appropriate ROS2 speaker for that data type
+        3. Create appropriate ROS2 publisher for that data type
         4. Subscribe to Redis key-space notifications for that key
         5. When key changes, Redis notifies this module
-        6. Notification triggers ROS2 topic publication via speaker
+        6. Notification triggers ROS2 topic publication via publisher
         
         :param volatile_key: The name of the volatile parameter to monitor.
         :type volatile_key: str
@@ -318,15 +318,15 @@ class Volatile:
         # Use custom topic name or default to volatile_key
         topic_name = ros2_topic_name if ros2_topic_name is not None else volatile_key
 
-        # Step 3: Create ROS2 speaker for this volatile type
-        speaker: VyraSpeaker = await InterfaceFactory.create_speaker(
+        # Step 3: Create ROS2 publisher for this volatile type
+        publisher: VyraPublisher = await InterfaceFactory.create_publisher(
             name=topic_name,
             protocols=[ProtocolType.ROS2],
             message_type=self.REDIS_TYPE_MAP[redis_type],
             node=self.communication_node,
             is_publisher=True
         )
-        self._active_shouter[volatile_key] = speaker
+        self._active_shouter[volatile_key] = publisher
         
         # Step 4: Subscribe to Redis key-space notifications
         await self.redis.subscribe_to_key(volatile_key)
@@ -353,7 +353,7 @@ class Volatile:
         """
         if await self.redis.exists(volatile_key):
             await self.redis.unsubscribe_from_key(volatile_key)
-            # Remove speaker from registry if it exists
+            # Remove publisher from registry if it exists
             if volatile_key in self._active_shouter:
                 await self._active_shouter[volatile_key].shutdown()
                 del self._active_shouter[volatile_key]

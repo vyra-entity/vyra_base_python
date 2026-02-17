@@ -23,25 +23,25 @@ async def demo_redis_provider():
     logger.info("=" * 60)
     
     try:
-        from vyra_base.com.transport.t_redis import create_redis_provider
+        from vyra_base.com.transport.t_redis.provider import RedisProvider
         
         # Create provider (communication layer + VYRA models)
-        provider = await create_redis_provider(
+        provider = await RedisProvider.create(
             host="localhost",
             port=6379,
             entity_name="demo_module"
         )
         
-        # Speaker (publish)
-        speaker = provider.create_speaker("demo_events")
-        logger.info("✅ Created Speaker on 'demo_events'")
+        # Publisher (publish)
+        publisher = provider.create_publisher("demo_events")
+        logger.info("✅ Created Publisher on 'demo_events'")
         
         # Listener (subscribe)
         listener = provider.create_listener("demo_events")
         logger.info("✅ Created Listener on 'demo_events'")
         
         # Publish message
-        await speaker.publish({"event": "system_started", "timestamp": 1234567890})
+        await publisher.publish({"event": "system_started", "timestamp": 1234567890})
         logger.info("📤 Published: system_started")
         
         # Receive message (with timeout)

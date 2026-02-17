@@ -91,17 +91,17 @@ class BaseFeeder:
             logger.info(f"✅ {self._feederName} using {self._publisher.protocol.value} protocol")
             
         except Exception as e:
-            # Fallback to legacy create_speaker if create_publisher not available yet
-            logger.warning(f"⚠️ create_publisher failed, trying legacy create_speaker: {e}")
+            # Fallback to legacy create_publisher if create_publisher not available yet
+            logger.warning(f"⚠️ create_publisher failed, trying legacy create_publisher: {e}")
             try:
-                self._publisher = await InterfaceFactory.create_speaker(
+                self._publisher = await InterfaceFactory.create_publisher(
                     name=self._feederName,
                     protocols=[ProtocolType.ROS2, ProtocolType.REDIS] if self._ros2_available else [ProtocolType.REDIS],
                     message_type=self._type,
                     is_publisher=True,
                     **({'node': self._node, 'qos_profile': self._qos} if self._ros2_available and self._node else {})
                 )
-                logger.info(f"✅ {self._feederName} using legacy speaker with {self._publisher.protocol.value}")
+                logger.info(f"✅ {self._feederName} using legacy publisher with {self._publisher.protocol.value}")
             except Exception as e2:
                 logger.error(f"❌ Failed to create feeder publisher: {e2}")
                 raise FeederException(
@@ -125,7 +125,7 @@ class BaseFeeder:
 
                 handler = handler_class(
                     initiator=self._feederName,
-                    speaker=self._publisher,  # Pass publisher as 'speaker' for legacy compatibility
+                    publisher=self._publisher,  # Pass publisher as 'publisher' for legacy compatibility
                     type=self._publisher.publisher_server.publisher_info.type
                 )
                 self.add_handler(handler)
@@ -148,7 +148,7 @@ class BaseFeeder:
         self._feeder.log(self._level, msg)
 
         if self._loggingOn:
-            logger.log(
+            logger.info(
                 f"Feeder {self._feederName} fed with message: {msg}"
             )
         
@@ -156,7 +156,7 @@ class BaseFeeder:
             logger.error(f"❌ No publisher available for feeder {self._feederName}")
             return
         
-        # Use unified Publisher.publish() or legacy Speaker.shout()
+        # Use unified Publisher.publish() or legacy Publisher.shout()
         try:
             loop = asyncio.get_event_loop()
             if hasattr(self._publisher, 'publish'):

@@ -38,15 +38,15 @@ class TestTransportIntegration:
             )
 
             # Create components
-            speaker = provider.create_speaker("test_events")
-            listener = provider.create_listener("test_events")
+            publisher = provider.create_publisher("test_events")
+            subscriber = provider.create_subscriber("test_events")
             
             # Publish and receive
-            await speaker.publish({"event": "test"})
+            await publisher.publish({"event": "test"})
             
             # Receive with timeout
             async def receive_with_timeout():
-                async for message in listener.receive():
+                async for message in subscriber.receive():
                     return message
             
             message = await asyncio.wait_for(receive_with_timeout(), timeout=2.0)

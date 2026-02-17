@@ -46,11 +46,12 @@ class RedisServerImpl(VyraServer):
     async def initialize(self) -> bool:
         """Initialize Redis server."""
         try:
-            service_name = self.topic_builder.build_topic(self.name)
+            service_name = self.topic_builder.build(self.name)
             self._service_name = service_name
-        
-            self._pubsub = self._redis.pubsub()
             
+            self._request_channel = f"srv:{service_name}:requests"
+            await self._redis.subscribe_channel(self._request_channel)
+
             logger.info(f"✅ RedisServer initialized: {service_name}")
             return True
             
@@ -65,16 +66,15 @@ class RedisServerImpl(VyraServer):
         Returns:
             True on success
         """
-        if not self._pubsub:
+        if not self._request_channel:
             logger.error("Server not initialized")
             return False
             
         try:
             # Subscribe to request channel
-            await self._pubsub.subscribe(self._request_channel)
-            
-            # Start listening task
-            self._listen_task = asyncio.create_task(self._listen_loop())
+            await self._redis.create_pubsub_listener(
+                self._request_channel, self._handle_request
+            )
             
             logger.info(f"📡 RedisServer serving on: {self._request_channel}")
             return True
@@ -82,23 +82,6 @@ class RedisServerImpl(VyraServer):
         except Exception as e:
             logger.error(f"❌ Serve failed: {e}")
             return False
-    
-    async def _listen_loop(self):
-        """Background task to handle incoming requests."""
-        try:
-            while True:
-                message = await self._pubsub.get_message(ignore_subscribe_messages=True)
-                
-                if message and message['type'] == 'message':
-                    # Handle request in separate task to avoid blocking
-                    asyncio.create_task(self._handle_request(message['data']))
-                
-                await asyncio.sleep(0.01)
-                
-        except asyncio.CancelledError:
-            logger.debug("Server listen loop canceled")
-        except Exception as e:
-            logger.error(f"❌ Server listen loop failed: {e}")
     
     async def _handle_request(self, raw_data: bytes):
         """Process individual request."""
@@ -113,6 +96,15 @@ class RedisServerImpl(VyraServer):
                 logger.error("Invalid request format")
                 return
             
+            if not self.response_callback:
+                logger.error(f"No response callback defined for incoming data: {request_data}")
+                response_msg = json.dumps({
+                    'request_id': request_id,
+                    'data': {'error': 'No response callback defined'}
+                })
+                await self._redis.publish_message(response_channel, response_msg)
+                return
+
             # TODO: Deserialize request_data to srv_type.Request
             
             # Call user callback
@@ -126,7 +118,7 @@ class RedisServerImpl(VyraServer):
                 'data': response if isinstance(response, dict) else {'result': str(response)}
             })
             
-            await self._redis.publish(response_channel, response_msg)
+            await self._redis.publish_message(response_channel, response_msg)
             
         except Exception as e:
             logger.error(f"❌ Request handling failed: {e}")
@@ -141,10 +133,9 @@ class RedisServerImpl(VyraServer):
                 pass
             self._listen_task = None
             
-        if self._pubsub:
-            await self._pubsub.unsubscribe(self._request_channel)
-            await self._pubsub.close()
-            self._pubsub = None
+        if self._redis and self._request_channel:
+            await self._redis.remove_listener_channels(self._request_channel)
+            self._request_channel = None
             
         logger.info(f"🔄 RedisServer cleaned up: {self.name}")
     

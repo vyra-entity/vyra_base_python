@@ -29,13 +29,8 @@ def reset_singleton_state(request):
     
     # Reset DataSpace between tests if it exists
     try:
-        from vyra_base.com.datalayer.interface_factory import DataSpace
-        DataSpace.speakers = []
-        DataSpace.callables = []
-        DataSpace.jobs = []
-        DataSpace.speakers_listener = []
-        DataSpace.callables_executor = []
-        DataSpace.jobs_runner = []
+        from vyra_base.com.transport.registry import interface_registry
+        interface_registry.clear_all()
     except ImportError:
         pass
     
@@ -43,13 +38,8 @@ def reset_singleton_state(request):
     
     # Cleanup after test
     try:
-        from vyra_base.com.datalayer.interface_factory import DataSpace
-        DataSpace.speakers = []
-        DataSpace.callables = []
-        DataSpace.jobs = []
-        DataSpace.speakers_listener = []
-        DataSpace.callables_executor = []
-        DataSpace.jobs_runner = []
+        from vyra_base.com.transport.registry import interface_registry
+        interface_registry.clear_all()
     except ImportError:
         pass
 

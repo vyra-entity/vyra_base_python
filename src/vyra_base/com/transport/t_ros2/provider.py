@@ -78,18 +78,18 @@ class ROS2Provider(AbstractProtocolProvider):
         ...         "namespace": "/vyra"
         ...     })
         ...     
-        ...     # Create callable (service server)
+        ...     # Create server (service server)
         ...     async def handle_request(req):
         ...         return {"result": req.value * 2}
         ...     
-        ...     callable = await provider.create_callable(
+        ...     server = await provider.create_server(
         ...         "calculate",
         ...         handle_request,
         ...         service_type="example_interfaces/srv/AddTwoInts"
         ...     )
         ...     
-        ...     # Create speaker (topic publisher)
-        ...     speaker = await provider.create_speaker(
+        ...     # Create publisher (topic publisher)
+        ...     publisher = await provider.create_publisher(
         ...         "sensor_data",
         ...         message_type="std_msgs/msg/String"
         ...     )

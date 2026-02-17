@@ -23,7 +23,7 @@ Usage:
         provider = ROS2Provider(node_name="my_node")
         await provider.initialize()
         callable = await provider.create_callable("/service", callback)
-        speaker = await provider.create_speaker("/topic")
+        publisher = await provider.create_publisher("/topic")
 """
 import logging
 
@@ -79,16 +79,22 @@ except ImportError as e:
 # Try importing VYRA models layer
 try:
     from vyra_base.com.transport.t_ros2.vyra_models import (
-        ROS2Callable,
-        ROS2Speaker,
-        ROS2Job,
+        VyraPublisherImpl,
+        VyraSubscriberImpl,
+        VyraServerImpl,
+        VyraClientImpl,
+        VyraActionServerImpl,
+        VyraActionClientImpl,
         ROS2_MODELS_AVAILABLE,
     )
     _models_available = ROS2_MODELS_AVAILABLE
 except ImportError as e:
-    ROS2Callable = None
-    ROS2Speaker = None
-    ROS2Job = None
+    VyraPublisherImpl = None
+    VyraSubscriberImpl = None
+    VyraServerImpl = None
+    VyraClientImpl = None
+    VyraActionServerImpl = None
+    VyraActionClientImpl = None
     _models_available = False
     logger.debug(f"⚠️  ROS2 VYRA models layer unavailable: {e}")
 
@@ -135,8 +141,11 @@ __all__ = [
     "ROS2ActionClient",
     "Ros2TypeConverter",
     # VYRA models layer
-    "ROS2Callable",
-    "ROS2Speaker",
-    "ROS2Job",
+    "VyraPublisherImpl",
+    "VyraSubscriberImpl",
+    "VyraServerImpl",
+    "VyraClientImpl",
+    "VyraActionServerImpl",
+    "VyraActionClientImpl",
 ]
 

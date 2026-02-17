@@ -47,6 +47,12 @@ except ImportError as e:
 # Try importing VYRA models layer
 try:
     from vyra_base.com.transport.t_uds.vyra_models import (
+        VyraPublisherImpl,
+        VyraSubscriberImpl,
+        VyraServerImpl,
+        VyraClientImpl,
+        VyraActionClientImpl,
+        VyraActionServerImpl,
         UDS_MODELS_AVAILABLE,
     )
     _models_available = UDS_MODELS_AVAILABLE
@@ -82,5 +88,12 @@ __all__ = [
     "UnixSocket",
     "UDS_SOCKET_DIR",
     "MESSAGE_HEADER_FORMAT",
-    "MESSAGE_HEADER_SIZE"
+    "MESSAGE_HEADER_SIZE",
+    # VYRA models layer
+    "VyraPublisherImpl",
+    "VyraSubscriberImpl",
+    "VyraServerImpl",
+    "VyraClientImpl",
+    "VyraActionClientImpl",
+    "VyraActionServerImpl"
 ]

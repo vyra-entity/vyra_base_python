@@ -31,8 +31,8 @@ class RedisClientImpl(VyraClient):
         self,
         name: str,
         topic_builder: TopicBuilder,
+        redis_client: RedisClient,
         request_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
-        redis_client: RedisClient = None,
         service_type: type = None,
         **kwargs
     ):
@@ -40,25 +40,23 @@ class RedisClientImpl(VyraClient):
         self._redis = redis_client
         self.service_type = service_type
         self._client_id = str(uuid.uuid4())[:8]
-        self._response_channel = f"srv:{service_name}:response:{self._client_id}"
-        self._pubsub = None
+        self._response_channel = f"srv:{self.name}:response:{self._client_id}"
         self._pending_requests = {}  # request_id -> asyncio.Future
         self._listen_task: Optional[asyncio.Task] = None
         
     async def initialize(self) -> bool:
         """Initialize Redis client."""
         try:
-            service_name = self.topic_builder.build_topic(self.name)
-            self._service_name = service_name
-            self._response_channel = f"srv:{service_name}:response:{self._client_id}"
+            self.service_name = self.topic_builder.build(self.name)
+            self._service_name = self.service_name
+            self._response_channel = f"srv:{self.service_name}:response:{self._client_id}"
             
             # Create pubsub for responses
-            self._pubsub = self._redis.pubsub()
-            await self._pubsub.subscribe(self._response_channel)
-            
-            # Start listening for responses
-            self._listen_task = asyncio.create_task(self._listen_loop())
-            
+            await self._redis.subscribe_channel(self._response_channel)
+            await self._redis.create_pubsub_listener(
+                self._response_channel, self._handle_response
+            )
+
             logger.info(f"✅ RedisClient initialized: {self.service_name}")
             return True
             
@@ -77,9 +75,6 @@ class RedisClientImpl(VyraClient):
         Returns:
             Response object on success, None on failure
         """
-        if not self._pubsub:
-            logger.error("Client not initialized")
-            return None
             
         try:
             # Generate request ID
@@ -106,7 +101,8 @@ class RedisClientImpl(VyraClient):
             })
             
             # Publish request
-            await self._redis.publish(f"srv:{self._service_name}:requests", request_msg)
+            await self._redis.publish_message(
+                f"srv:{self._service_name}:requests", request_msg)
             
             # Wait for response with timeout
             try:
@@ -130,33 +126,21 @@ class RedisClientImpl(VyraClient):
             # Cleanup pending request
             self._pending_requests.pop(request_id, None)
     
-    async def _listen_loop(self):
-        """Background task to receive responses."""
+    async def _handle_response(self, message: Any):
+        """Handle incoming response message."""
         try:
-            while True:
-                message = await self._pubsub.get_message(ignore_subscribe_messages=True)
-                
-                if message and message['type'] == 'message':
-                    try:
-                        response_msg = json.loads(message['data'])
-                        request_id = response_msg.get('request_id')
-                        response_data = response_msg.get('data')
-                        
-                        # Resolve pending request
-                        if request_id in self._pending_requests:
-                            future = self._pending_requests[request_id]
-                            if not future.done():
-                                future.set_result(response_data)
-                                
-                    except Exception as e:
-                        logger.error(f"❌ Response handling failed: {e}")
-                
-                await asyncio.sleep(0.01)
-                
-        except asyncio.CancelledError:
-            logger.debug("Client listen loop canceled")
+            response_msg = json.loads(message['data'])
+            request_id = response_msg.get('request_id')
+            response_data = response_msg.get('data')
+            
+            # Resolve pending request
+            if request_id in self._pending_requests:
+                future = self._pending_requests[request_id]
+                if not future.done():
+                    future.set_result(response_data)
+                    
         except Exception as e:
-            logger.error(f"❌ Client listen loop failed: {e}")
+            logger.error(f"❌ Response handling failed: {e}")
     
     async def cleanup(self):
         """Cleanup Redis resources."""
@@ -174,10 +158,9 @@ class RedisClientImpl(VyraClient):
                 pass
             self._listen_task = None
             
-        if self._pubsub:
-            await self._pubsub.unsubscribe(self._response_channel)
-            await self._pubsub.close()
-            self._pubsub = None
+        if self._redis and self._response_channel:
+            await self._redis.remove_listener_channels(self._response_channel)
+            self._response_channel = None
             
         logger.info(f"🔄 RedisClient cleaned up: {self.name}")
     

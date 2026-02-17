@@ -18,7 +18,7 @@ from vyra_base.com.core.exceptions import InterfaceError
 logger = logging.getLogger(__name__)
 
 
-class UdsServerImpl(VyraServer):
+class VyraServerImpl(VyraServer):
     """
     Unix Domain Socket server implementation using stream sockets.
     
@@ -65,11 +65,11 @@ class UdsServerImpl(VyraServer):
             self._socket.listen(5)
             
             self._initialized = True
-            logger.info(f"✅ UdsServer '{self.name}' initialized: {self._socket_path}")
+            logger.info(f"✅ VyraServer '{self.name}' initialized: {self._socket_path}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize UdsServer '{self.name}': {e}")
+            logger.error(f"❌ Failed to initialize VyraServer '{self.name}': {e}")
             raise InterfaceError(f"Server initialization failed: {e}")
     
     async def serve(self) -> bool:
@@ -87,11 +87,11 @@ class UdsServerImpl(VyraServer):
             # Start server task
             self._server_task = asyncio.create_task(self._accept_loop())
             
-            logger.info(f"📡 UdsServer serving on: {self._socket_path}")
+            logger.info(f"📡 VyraServer '{self.name}' serving on: {self._socket_path}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Serve failed: {e}")
+            logger.error(f"❌ VyraServer '{self.name}' serve failed: {e}")
             return False
     
     async def _accept_loop(self):
@@ -100,7 +100,7 @@ class UdsServerImpl(VyraServer):
             loop = asyncio.get_event_loop()
             
             if not self._socket:
-                logger.error("Server socket not available in accept loop")
+                logger.error("VyraServer socket not available in accept loop")
                 return
 
             while True:
@@ -112,13 +112,13 @@ class UdsServerImpl(VyraServer):
                     asyncio.create_task(self._handle_client(client_socket))
                     
                 except Exception as e:
-                    logger.error(f"❌ Accept failed: {e}")
+                    logger.error(f"❌ VyraServer '{self.name}' accept failed: {e}")
                     await asyncio.sleep(0.1)
                     
         except asyncio.CancelledError:
-            logger.debug("Accept loop canceled")
+            logger.debug("VyraServer accept loop canceled")
         except Exception as e:
-            logger.error(f"❌ Accept loop failed: {e}")
+            logger.error(f"❌ VyraServer '{self.name}' accept loop failed: {e}")
     
     async def _handle_client(self, client_socket: socket.socket):
         """Handle individual client request."""
@@ -184,7 +184,7 @@ class UdsServerImpl(VyraServer):
             await loop.sock_sendall(client_socket, length_prefix + response_bytes)
             
         except Exception as e:
-            logger.error(f"❌ Client handling failed: {e}")
+            logger.error(f"❌ VyraServer '{self.name}' client handling failed: {e}")
         finally:
             client_socket.close()
     
@@ -209,7 +209,7 @@ class UdsServerImpl(VyraServer):
             except Exception as e:
                 logger.warning(f"Failed to remove socket file: {e}")
                 
-        logger.info(f"🔄 UdsServer cleaned up: {self._socket_path}")
+        logger.info(f"🔄 VyraServer '{self.name}' cleaned up: {self._socket_path}")
     
     @property
     def interface_type(self) -> InterfaceType:

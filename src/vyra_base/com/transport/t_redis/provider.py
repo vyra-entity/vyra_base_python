@@ -40,7 +40,7 @@ class RedisProvider(AbstractProtocolProvider):
     Protocol provider for Redis communication.
     
     Features:
-    - Pub/Sub messaging via Speaker interface
+    - Pub/Sub messaging via Publisher interface
     - Key-Value storage via Callable interface (get/set)
     - TLS support with ACL authentication
     - Streaming support (Redis Streams)
@@ -58,17 +58,17 @@ class RedisProvider(AbstractProtocolProvider):
         >>> if await provider.check_availability():
         ...     await provider.initialize()
         ...     
-        ...     # Create speaker (Pub/Sub)
-        ...     speaker = await provider.create_speaker(
+        ...     # Create publisher (Pub/Sub)
+        ...     publisher = await provider.create_publisher(
         ...         "sensor_updates",
         ...         module_name="robot"
         ...     )
-        ...     await speaker.shout({"temperature": 23.5})
+        ...     await publisher.publish({"temperature": 23.5})
         ...     
         ...     # Listen for messages
         ...     async def on_message(data):
         ...         print(f"Received: {data}")
-        ...     await speaker.listen(on_message)
+        ...     await publisher.listen(on_message)
     """
     
     def __init__(

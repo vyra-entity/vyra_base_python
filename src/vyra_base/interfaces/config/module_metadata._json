@@ -70,7 +70,7 @@
     },
     {
         "tags": ["module"],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "module_name",
         "displayname": "Module name",
         "description": "Read the Module-Name",
@@ -79,7 +79,7 @@
     },
     {
         "tags": ["module"],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "module_id",
         "displayname": "Module id",
         "description": "Read the Module-ID",
@@ -88,7 +88,7 @@
     },
     {
         "tags": ["module"],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "module_state",
         "displayname": "Module state",
         "params": [],
@@ -104,7 +104,7 @@
     },
     {
         "tags": ["module"],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "config_links",
         "displayname": "Config links",
         "description": "Read the IP-Address of the Configuration-Software",
@@ -115,7 +115,7 @@
     },
     {
         "tags": ["module"],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "is_continuous_running",
         "displayname": "Is continuous running",
         "description": "Read if the module permanently runs.",
@@ -126,7 +126,7 @@
     },
     {
         "tags": ["module"],
-        "type": "speaker",
+        "type": "publisher",
         "functionname": "module_address",
         "displayname": "Module address",
         "description": "Read the IP-Address and Port of the Shaker-Module",
