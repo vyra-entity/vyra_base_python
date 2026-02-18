@@ -114,6 +114,7 @@ class TestProviderRegistry:
         registry.register_provider(provider)
         
         retrieved = registry.get_provider(ProtocolType.MQTT, require_available=True)
+        
         assert retrieved is provider
         assert retrieved.is_available
     
@@ -250,7 +251,7 @@ class TestInterfaceFactory:
         )
         
         assert result is not None
-        assert result._protocol == ProtocolType.REDIS
+        assert result.metadata.protocol == ProtocolType.REDIS
     
     @pytest.mark.asyncio
     async def test_create_publisher_with_available_protocol(self):

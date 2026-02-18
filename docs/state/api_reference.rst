@@ -88,17 +88,17 @@ For usage, refer to the :class:`~vyra_base.state.unified.UnifiedStateMachine` cl
 Decorators
 ==========
 
-The ``@remote_callable`` decorator is used to mark methods that should be exposed as ROS2 services.
+The ``@remote_service`` decorator is used to mark methods that should be exposed as ROS2 services.
 It automatically handles state transitions and validation.
 
 Usage:
 
 .. code-block:: python
 
-    from vyra_base.com import remote_callable
+    from vyra_base.com import remote_service
     
     class MyComponent(OperationalStateMachine):
-        @remote_callable
+        @remote_service
         def initialize(self, request=None, response=None):
             return True
 

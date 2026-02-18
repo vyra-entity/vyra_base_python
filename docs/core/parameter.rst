@@ -36,7 +36,7 @@ Internal vs. External API
 
 Parameter functions are available in **two variants**:
 
-**1. ROS2 Service Interface** (``@remote_callable``)
+**1. ROS2 Service Interface** (``@remote_service``)
    - For external access via ROS2 services
    - Requires ``request`` and ``response`` objects
    - Used by other modules or external systems

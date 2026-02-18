@@ -20,13 +20,13 @@ def extract_interfaces(target_path: str | Path):
     :rtype: None
 
     This function copies interface files from the installed vyra_base library:
-    - .msg files → target/msg/ (from publisher/ directory)
-    - .srv files → target/srv/ (from server/ directory)
-    - .action files → target/action/ (from actionServer/ directory)
-    - .proto files → target/proto/ (from proto/ directory, for others)
+    - .msg + .proto files → target/msg/ (from publisher/ directory)
+    - .srv + .proto files → target/srv/ (from server/ directory)
+    - .action + .proto files → target/action/ (from actionServer/ directory)
     
-    The source uses VYRA terminology (publisher/server/actionServer/proto) but outputs
-    to ROS2-compatible directories (msg/srv/action) plus proto/ for gRPC.
+    The source uses VYRA terminology (publisher/server/actionServer) but outputs
+    to ROS2-compatible directories (msg/srv/action). .proto files are stored
+    alongside their ROS2 counterparts in the same directory.
     """
     import importlib.resources
     package_path: Path = Path(vyra_base.__file__).parent / 'interfaces'
@@ -48,24 +48,25 @@ def extract_interfaces(target_path: str | Path):
             print(f"Copied {build_file} to {target_path}")
     
     # Map VYRA interface types to file extensions and target directories
-    # source_dir → (file_ext, target_dir)
+    # source_dir → (file_exts, target_dir)
+    # .proto files are stored alongside their ROS2 counterparts (msg/srv/action)
     interface_mapping = {
-        'publisher': ('msg', 'msg'),                # Publisher → .msg files for ROS2
-        'server': ('srv', 'srv'),                   # Server → .srv files for ROS2
-        'actionServer': ('action', 'action'),       # actionServer → .action files for ROS2
-        'proto': ('proto', 'proto')                 # Proto → .proto files for others
+        'msg': (['msg', 'proto'], 'msg'),           # Publisher → .msg + .proto files → msg/
+        'srv': (['srv', 'proto'], 'srv'),              # Server → .srv + .proto files → srv/
+        'action': (['action', 'proto'], 'action'),  # actionServer → .action + .proto files → action/
     }
     
-    for source_type, (file_ext, target_type) in interface_mapping.items():
+    for source_type, (file_exts, target_type) in interface_mapping.items():
         source_dir: Path = source_path / source_type
         target_dir: Path = target_path / target_type
         
         if source_dir.exists():
             target_dir.mkdir(exist_ok=True)
             
-            for file in source_dir.rglob(f'*.{file_ext}'):
-                shutil.copy2(file, target_dir / file.name)
-                print(f"Copied {file.name} ({source_type}) to {target_dir}")
+            for f_ext in file_exts:
+                for file in source_dir.rglob(f'*.{f_ext}'):
+                    shutil.copy2(file, target_dir / file.name)
+                    print(f"Copied {file.name} ({source_type}) to {target_dir}")
 
     config_path: Path = source_path / 'config'
     target_config: Path = target_path / 'config'
@@ -80,16 +81,6 @@ def extract_interfaces(target_path: str | Path):
 
     print(f"VYRA interface extraction to {target_path} successful.")
 
-
-# Alias for backward compatibility
-def extract_ros_interfaces(target_path: str | Path):
-    """
-    Deprecated: Use extract_interfaces() instead.
-    
-    This function is kept for backward compatibility.
-    """
-    print("⚠️  extract_ros_interfaces() is deprecated. Use extract_interfaces() instead.")
-    return extract_interfaces(target_path)
 
 def get_reserved_list() -> dict[str, Any]:
     """

@@ -157,11 +157,11 @@ After defining the service in JSON, implement it in your application:
 
 .. code-block:: python
 
-   from vyra_base.com import remote_callable
+   from vyra_base.com import remote_service
    from vyra_base.security import security_required, SecurityLevel
 
    class Application(OperationalStateMachine):
-       @remote_callable
+       @remote_service
        @security_required(security_level=SecurityLevel.EXTENDED_AUTH)
        def set_parameter(self, request=None, response=None):
            """
@@ -419,7 +419,7 @@ Implementation (Simplified)
    from vyra_base.com.datalayer.interface_factory import create_vyra_job
 
    class Application(OperationalStateMachine):
-       @remote_callable
+       @remote_service
        @security_required(security_level=SecurityLevel.EXTENDED_AUTH)
        async def execute_task(self, request=None, response=None):
            """

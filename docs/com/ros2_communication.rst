@@ -66,24 +66,24 @@ Callable - Service Server
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A **Callable** provides a service for other modules.
-Use the ``@remote_callable`` decorato:
+Use the ``@remote_service`` decorato:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factoy import remote_callable
+   from vyra_base.com.datalayer.interface_factoy import remote_service
    from vyra_base.state import OperationalStateMachine
    
    class Calculato(OperationalStateMachine):
        def __init__(self, unified_state_machine):
            super().__init__(unified_state_machine)
        
-       @remote_callable
+       @remote_service
        async def add_two_ints(self, request, response):
            """Adds two numbers"""
            response.sum = request.a + request.b
            return response
        
-       @remote_callable
+       @remote_service
        async def get_status(self, request, response):
            """Returns the current status"""
            response.status = "operational"
@@ -91,7 +91,7 @@ Use the ``@remote_callable`` decorato:
 
 **Automatic Regisration:**
 
-Methods with ``@remote_callable`` are automatically registered as ROS2 services,
+Methods with ``@remote_service`` are automatically registered as ROS2 services,
 when the JSON metadata is correctly defined (see :doc:`../interfaces`).
 
 **Parameters:**
@@ -174,7 +174,7 @@ Inter-Module Service Call
 .. code-block:: python
 
    class RobotController(OperationalStateMachine):
-       @remote_callable
+       @remote_service
        async def move_to_position(self, request, response):
            """Moves robot to position"""
            x, y = request.target_x, request.target_y
@@ -320,7 +320,7 @@ Best Practices
 
 * Use meaningful service/topic names with namespace
 * Define interfaces in JSON metadata
-* Use ``@remote_callable`` for automatic regisration
+* Use ``@remote_service`` for automatic regisration
 * Implement timeouts for service calls
 * Use QoS profiles appropriate for the use case
 

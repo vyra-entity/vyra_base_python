@@ -156,7 +156,7 @@ If you have code that uses the old API (ROS2-only ``datalayer`` module), migrate
 
    * - Old (removed)
      - New
-   * - ``@remote_callable``
+   * - ``@remote_service``
      - ``@remote_service``
    * - ``@remote_speaker``
      - ``@remote_publisher``

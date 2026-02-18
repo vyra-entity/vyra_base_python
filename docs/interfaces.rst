@@ -230,7 +230,7 @@ Entity loads and registers interfaces automatically:
 
 1. JSON metadata read (``config/*.json``)
 2. mport interface types
-3. Methods with ``@remote_callable`` can be found
+3. Methods with ``@remote_service`` can be found
 4. Register ROS2 services
 5. Update DataSpace
 

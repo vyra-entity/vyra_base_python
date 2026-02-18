@@ -753,8 +753,8 @@ def bind_decorated_callbacks(
 
 # Backward compatibility aliases (OLD NAMES - DEPRECATED)
 # These maintain compatibility with existing code but should be migrated
-remote_callable = remote_service        # DEPRECATED: Use remote_service
-remote_callable_ros2 = remote_service  # DEPRECATED: Use remote_service
+remote_service = remote_service        # DEPRECATED: Use remote_service
+remote_service_ros2 = remote_service  # DEPRECATED: Use remote_service
 remote_speaker = remote_publisher      # DEPRECATED: Use remote_publisher
 remote_listener = remote_subscriber    # DEPRECATED: Use remote_subscriber
 remote_job = remote_actionServer       # DEPRECATED: Use remote_actionServer

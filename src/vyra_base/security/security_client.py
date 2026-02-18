@@ -322,9 +322,9 @@ def security_required(
     The decorator integrates with entity.security_manager to validate
     that the calling module has been granted sufficient access level.
     
-    Usage with @remote_callable::
+    Usage with @remote_service::
     
-        @remote_callable
+        @remote_service
         @security_required(security_level=SecurityLevel.HMAC)
         def my_service_callback(self, request, response):
             # Service implementation

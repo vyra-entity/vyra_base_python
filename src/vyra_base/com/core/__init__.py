@@ -69,8 +69,8 @@ from vyra_base.com.core.decorators import (
     get_decorated_methods,
     bind_decorated_callbacks,
     # Backward compatibility aliases
-    remote_callable,
-    remote_callable_ros2,
+    remote_service,
+    remote_service_ros2,
     remote_speaker,
     remote_listener,
     remote_job,

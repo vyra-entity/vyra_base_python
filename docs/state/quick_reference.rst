@@ -195,24 +195,24 @@ Using OperationalStateMachine
         UnifiedStateMachine, 
         OperationalStateMachine
     )
-    from vyra_base.com import remote_callable
+    from vyra_base.com import remote_service
     
     class MyComponent(OperationalStateMachine):
         def __init__(self, unified_sm: UnifiedStateMachine):
             super().__init__(unified_sm)
         
-        @remote_callable
+        @remote_service
         def initialize(self, request=None, response=None):
             # State transition handled automatically
             # IDLE → READY
             return True
         
-        @remote_callable
+        @remote_service
         def start_task(self, request=None, response=None):
             # READY → RUNNING
             return self.execute_task()
         
-        @remote_callable
+        @remote_service
         def stop_task(self, request=None, response=None):
             # RUNNING → STOPPED
             return True

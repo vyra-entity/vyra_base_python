@@ -302,7 +302,7 @@ class ExternalBridgeComponent:
         Handle VYRA callable and forward to external system.
         
         This would be registered as a VYRA callable:
-            @remote_callable
+            @remote_service
             async def send_external_command(self, request, response=None):
                 return await bridge.handle_vyra_command(request)
         """
@@ -438,7 +438,7 @@ This demonstrates how a VYRA module would:
 3. Receive VYRA commands → Forward to external systems
 
 In a real VYRA module, you would:
-- Use @remote_callable for handling commands
+- Use @remote_service for handling commands
 - Use Speaker.shout() to publish to VYRA network
 - Run polling/listening as background tasks
     """)

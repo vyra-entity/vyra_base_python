@@ -182,7 +182,7 @@ class TestROS2IntegrationWithMultiProtocol:
         from vyra_base.com.providers import ProviderRegistry
         
         try:
-            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2 import ROS2Provider
             
             registry = ProviderRegistry()
             registry._providers.clear()
@@ -201,7 +201,7 @@ class TestROS2IntegrationWithMultiProtocol:
         from vyra_base.com.providers import ProviderRegistry
         
         try:
-            from vyra_base.com.transport.t_ros2.ros2_provider import ROS2Provider
+            from vyra_base.com.transport.t_ros2 import ROS2Provider
             
             registry = ProviderRegistry()
             registry._providers.clear()
@@ -216,7 +216,7 @@ class TestROS2IntegrationWithMultiProtocol:
                 
                 callable = await InterfaceFactory.create_server(
                     name="test",
-                    callback=test_callback,
+                    response_callback=test_callback,
                     protocols=[ProtocolType.ROS2]
                 )
                 
@@ -289,6 +289,6 @@ class TestROS2GracefulDegradation:
             # Should raise error when no provider available
             await InterfaceFactory.create_server(
                 name="test",
-                callback=test_callback,
+                response_callback=test_callback,
                 protocols=[ProtocolType.ROS2]
             )

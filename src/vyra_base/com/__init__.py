@@ -76,6 +76,7 @@ from vyra_base.com.core import (
     remote_actionServer,
     get_decorated_methods,
     bind_decorated_callbacks,
+    # Deprecated aliases (kept for backwards compatibility)
     # Blueprint Infrastructure
     HandlerBlueprint,
     ServiceBlueprint,
