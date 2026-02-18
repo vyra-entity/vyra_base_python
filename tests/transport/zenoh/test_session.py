@@ -5,7 +5,7 @@ import pytest
 import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 
-from vyra_base.com.transport.t_zenoh.session import (
+from vyra_base.com.transport.t_zenoh.communication.session import (
     ZenohSession,
     SessionConfig,
     SessionMode,

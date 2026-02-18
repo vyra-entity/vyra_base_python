@@ -76,13 +76,13 @@ class ProviderRegistry:
             self._providers[protocol] = provider
             
             # Check availability
-            if provider.is_available():
+            if provider.is_available:
                 if protocol not in self._available_protocols:
                     self._available_protocols.append(protocol)
             
             logger.info(
                 f"✅ Provider '{protocol}' registered "
-                f"(available: {provider.is_available()})"
+                f"(available: {provider.is_available})"
             )
     
     def get_provider(
@@ -112,7 +112,7 @@ class ProviderRegistry:
                 )
             return None
         
-        if require_available and not provider.is_available():
+        if require_available and not provider.is_available:
             raise ProviderNotFoundError(
                 f"Provider '{protocol}' is registered but not available"
             )
@@ -207,8 +207,8 @@ class ProviderRegistry:
                 "available": len(self._available_protocols),
                 "protocols": {
                     protocol.value: {
-                        "available": provider.is_available(),
-                        "initialized": provider.is_initialized(),
+                        "available": provider.is_available,
+                        "initialized": provider.is_initialized,
                     }
                     for protocol, provider in self._providers.items()
                 }

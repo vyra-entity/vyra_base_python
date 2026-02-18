@@ -14,7 +14,8 @@ import logging
 from typing import Any, Optional, Dict
 import json
 
-from vyra_base.helper.logger import logger
+import logging
+logger = logging.getLogger(__name__)
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)

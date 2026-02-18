@@ -51,9 +51,8 @@ from vyra_base.helper.crypto_helper import (
     load_private_key,
     create_self_signed_cert,
 )
-from vyra_base.helper.logger import logger
-
-
+import logging
+logger = logging.getLogger(__name__)
 @dataclass
 class SecuritySession:
     """

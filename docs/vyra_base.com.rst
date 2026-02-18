@@ -7,7 +7,6 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   vyra_base.com.datalayer
    vyra_base.com.feeder
 
 Submodules

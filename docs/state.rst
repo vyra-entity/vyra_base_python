@@ -83,9 +83,9 @@ Quick Example
 See Also
 ========
 
-- :doc:`statemachine/overview` - Complete architecture and layer interactions
-- :doc:`statemachine/states` - All state definitions
-- :doc:`statemachine/transitions` - Allowed state transitions
-- :doc:`statemachine/events` - Event system documentation
-- :doc:`statemachine/api_reference` - Complete API reference
-- :doc:`statemachine/quick_reference` - Quick reference guide
+- :doc:`state/overview` - Complete architecture and layer interactions
+- :doc:`state/states` - All state definitions
+- :doc:`state/transitions` - Allowed state transitions
+- :doc:`state/events` - Event system documentation
+- :doc:`state/api_reference` - Complete API reference
+- :doc:`state/quick_reference` - Quick reference guide

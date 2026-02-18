@@ -21,7 +21,10 @@ from vyra_base.com.feeder.state_feeder import StateFeeder
 from vyra_base.com.transport.t_zenoh.provider import ZenohProvider, ZENOH_AVAILABLE
 
 # Check ROS2 availability
-_ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+try:
+    _ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+except (ValueError, AttributeError):
+    _ROS2_AVAILABLE = "rclpy" in __import__("sys").modules
 
 if TYPE_CHECKING or _ROS2_AVAILABLE:
     from vyra_base.com.transport.t_ros2.node import CheckerNode, NodeSettings, VyraNode

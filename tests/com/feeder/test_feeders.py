@@ -271,7 +271,7 @@ class TestFeederIntegration:
         # This is a forward-looking test
         assert InterfaceFactory is not None
         
-        # Future: Feeders should use InterfaceFactory.create_speaker()
+        # Future: Feeders should use InterfaceFactory.create_publisher()
         # instead of direct ROS2 publishers
 
 
@@ -316,4 +316,4 @@ class TestFeederROS2Compatibility:
         # For now, just verify InterfaceFactory can create speakers
         
         # This is a placeholder for future integration
-        assert hasattr(InterfaceFactory, 'create_speaker')
+        assert hasattr(InterfaceFactory, 'create_publisher')

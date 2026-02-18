@@ -9,7 +9,8 @@ import concurrent.futures
 from rclpy.service import Service as rclService
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
-from vyra_base.helper.logger import logger
+import logging
+logger = logging.getLogger(__name__)
 from vyra_base.helper.error_handler import ErrorTraceback
 import asyncio
 

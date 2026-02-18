@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.54] - 2026-02-18
+
+### Build
+
+Adding blueprint and update decorators
+Change interface options from speaker, callable, job to publisher, server and actionServer
+
+
 ## [0.1.8+build.51] - 2026-02-16
 
 ### Build

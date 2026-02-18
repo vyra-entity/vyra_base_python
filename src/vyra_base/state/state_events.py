@@ -92,6 +92,7 @@ EVENT_LAYER_MAP = {
     EventType.INIT_SUCCESS: "lifecycle",
     EventType.INIT_FAILURE: "lifecycle",
     EventType.SET_SUSPENDED: "lifecycle",
+    EventType.RESUME_SUSPENDED: "lifecycle",
     EventType.SHUTDOWN: "lifecycle",
     EventType.FINISHED: "lifecycle",
     EventType.FAULT_DETECTED: "lifecycle",  # Can also affect health

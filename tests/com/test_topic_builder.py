@@ -54,7 +54,7 @@ class TestTopicBuilder:
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
         # Should work and log (we can't test logging easily here)
-        topic = builder.build("get_modules", interface_type=InterfaceType.CALLABLE)
+        topic = builder.build("get_modules", interface_type=InterfaceType.SERVER)
         assert topic == "v2_modulemanager_abc123/get_modules"
     
     def test_build_with_prefix(self):
@@ -277,22 +277,22 @@ class TestInterfaceTypes:
     
     def test_interface_types(self):
         """Test all interface types."""
-        assert InterfaceType.CALLABLE.value == "callable"
-        assert InterfaceType.SPEAKER.value == "speaker"
-        assert InterfaceType.JOB.value == "job"
+        assert InterfaceType.SERVER.value == "server"
+        assert InterfaceType.PUBLISHER.value == "publisher"
+        assert InterfaceType.ACTION_SERVER.value == "action_server"
     
     def test_builder_with_interface_types(self):
         """Test builder with different interface types."""
         builder = TopicBuilder("test_module", "test123")
         
         # All should produce same output (interface_type is just for logging)
-        callable_topic = builder.build("service", interface_type=InterfaceType.CALLABLE)
-        speaker_topic = builder.build("topic", interface_type=InterfaceType.SPEAKER)
-        job_topic = builder.build("action", interface_type=InterfaceType.JOB)
+        server_topic = builder.build("service", interface_type=InterfaceType.SERVER)
+        publisher_topic = builder.build("topic", interface_type=InterfaceType.PUBLISHER)
+        action_topic = builder.build("action", interface_type=InterfaceType.ACTION_SERVER)
         
-        assert callable_topic == "test_module_test123/service"
-        assert speaker_topic == "test_module_test123/topic"
-        assert job_topic == "test_module_test123/action"
+        assert server_topic == "test_module_test123/service"
+        assert publisher_topic == "test_module_test123/topic"
+        assert action_topic == "test_module_test123/action"
 
 
 if __name__ == "__main__":

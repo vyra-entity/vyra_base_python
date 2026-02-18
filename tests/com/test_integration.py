@@ -25,6 +25,7 @@ class MockProvider(AbstractProtocolProvider):
         """Check if available."""
         return self._available
     
+    @property
     def is_available(self) -> bool:
         """Return availability status."""
         return self._available
@@ -44,16 +45,28 @@ class MockProvider(AbstractProtocolProvider):
         """Check if initialized."""
         return self._initialized
     
-    async def create_callable(self, name: str, **kwargs):
+    async def create_server(self, name: str, **kwargs):
         """Create mock callable."""
         return Mock(name=name, _protocol=self.protocol)
     
-    async def create_speaker(self, name: str, **kwargs):
+    async def create_publisher(self, name: str, **kwargs):
         """Create mock speaker."""
         return Mock(name=name, _protocol=self.protocol)
     
-    async def create_job(self, name: str, **kwargs):
+    async def create_action_server(self, name: str, **kwargs):
         """Create mock job."""
+        return Mock(name=name, _protocol=self.protocol)
+    
+    async def create_subscriber(self, name: str, **kwargs):
+        """Create mock subscriber."""
+        return Mock(name=name, _protocol=self.protocol)
+    
+    async def create_client(self, name: str, **kwargs):
+        """Create mock client."""
+        return Mock(name=name, _protocol=self.protocol)
+    
+    async def create_action_client(self, name: str, **kwargs):
+        """Create mock action client."""
         return Mock(name=name, _protocol=self.protocol)
 
 
@@ -102,7 +115,7 @@ class TestProviderRegistry:
         
         retrieved = registry.get_provider(ProtocolType.MQTT, require_available=True)
         assert retrieved is provider
-        assert retrieved.is_available()
+        assert retrieved.is_available
     
     @pytest.mark.asyncio
     async def test_get_unavailable_provider_raises(self):
@@ -178,18 +191,18 @@ class TestInterfaceFactory:
     
     def test_factory_has_fallback_chains(self):
         """Test factory defines fallback chains."""
-        assert hasattr(InterfaceFactory, 'CALLABLE_FALLBACK')
-        assert hasattr(InterfaceFactory, 'SPEAKER_FALLBACK')
-        assert hasattr(InterfaceFactory, 'JOB_FALLBACK')
+        assert hasattr(InterfaceFactory, 'SERVER_FALLBACK')
+        assert hasattr(InterfaceFactory, 'PUBLISHER_FALLBACK')
+        assert hasattr(InterfaceFactory, 'ACTION_SERVER_FALLBACK')
         
         # Verify chains are lists
-        assert isinstance(InterfaceFactory.CALLABLE_FALLBACK, list)
-        assert isinstance(InterfaceFactory.SPEAKER_FALLBACK, list)
-        assert isinstance(InterfaceFactory.JOB_FALLBACK, list)
-        assert len(InterfaceFactory.CALLABLE_FALLBACK) > 0
+        assert isinstance(InterfaceFactory.SERVER_FALLBACK, list)
+        assert isinstance(InterfaceFactory.PUBLISHER_FALLBACK, list)
+        assert isinstance(InterfaceFactory.ACTION_SERVER_FALLBACK, list)
+        assert len(InterfaceFactory.SERVER_FALLBACK) > 0
     
     @pytest.mark.asyncio
-    async def test_create_callable_with_available_protocol(self):
+    async def test_create_server_with_available_protocol(self):
         """Test creating callable with available protocol."""
         registry = ProviderRegistry()
         provider = MockProvider(ProtocolType.REDIS, available=True)
@@ -200,9 +213,9 @@ class TestInterfaceFactory:
         async def test_callback(request):
             return {"result": "ok"}
         
-        result = await InterfaceFactory.create_callable(
+        result = await InterfaceFactory.create_server(
             "test_service",
-            callback=test_callback,
+            response_callback=test_callback,
             protocols=[ProtocolType.REDIS]
         )
         
@@ -210,7 +223,7 @@ class TestInterfaceFactory:
         assert hasattr(result, 'name')
     
     @pytest.mark.asyncio
-    async def test_create_callable_fallback(self):
+    async def test_create_server_fallback(self):
         """Test callable creation with fallback chain."""
         registry = ProviderRegistry()
         
@@ -230,9 +243,9 @@ class TestInterfaceFactory:
             return {"result": "ok"}
         
         # Should fall back to REDIS
-        result = await InterfaceFactory.create_callable(
+        result = await InterfaceFactory.create_server(
             "test_service",
-            callback=test_callback,
+            response_callback=test_callback,
             protocols=[ProtocolType.ROS2, ProtocolType.REDIS]
         )
         
@@ -240,14 +253,14 @@ class TestInterfaceFactory:
         assert result._protocol == ProtocolType.REDIS
     
     @pytest.mark.asyncio
-    async def test_create_speaker_with_available_protocol(self):
+    async def test_create_publisher_with_available_protocol(self):
         """Test creating speaker with available protocol."""
         registry = ProviderRegistry()
         provider = MockProvider(ProtocolType.MQTT, available=True)
         await provider.initialize()
         registry.register_provider(provider)
         
-        result = await InterfaceFactory.create_speaker(
+        result = await InterfaceFactory.create_publisher(
             "test_topic",
             protocols=[ProtocolType.MQTT]
         )
@@ -257,20 +270,28 @@ class TestInterfaceFactory:
         assert hasattr(result, 'name')
     
     @pytest.mark.asyncio
-    async def test_create_job_with_available_protocol(self):
+    async def test_create_action_server_with_available_protocol(self):
         """Test creating job with available protocol."""
         registry = ProviderRegistry()
         provider = MockProvider(ProtocolType.ROS2, available=True)
         await provider.initialize()
         registry.register_provider(provider)
         
-        # Provide callback
-        async def test_callback(goal):
+        # Provide callbacks for all three required action lifecycle phases
+        async def handle_goal(goal):
+            return True  # accept goal
+
+        async def handle_cancel(goal_handle):
+            return True  # accept cancel
+        
+        async def execute_goal(goal_handle):
             return {"status": "completed"}
         
-        result = await InterfaceFactory.create_job(
+        result = await InterfaceFactory.create_action_server(
             "test_job",
-            callback=test_callback,
+            handle_goal_request=handle_goal,
+            handle_cancel_request=handle_cancel,
+            execution_callback=execute_goal,
             protocols=[ProtocolType.ROS2]
         )
         
@@ -285,7 +306,7 @@ class TestInterfaceFactory:
         
         # Should raise error
         with pytest.raises(Exception):  # InterfaceError or ProtocolUnavailableError
-            await InterfaceFactory.create_callable(
+            await InterfaceFactory.create_server(
                 "test_service",
                 protocols=[ProtocolType.GRPC]
             )
@@ -300,19 +321,19 @@ class TestInterfaceFactory:
         await provider.initialize()
         registry.register_provider(provider)
         
-        # Don't specify protocols, should use CALLABLE_FALLBACK
+        # Don't specify protocols, should use SERVER_FALLBACK
         # This might fail if REDIS is not in the fallback chain
         # So we register a provider that IS in the chain
-        if ProtocolType.REDIS not in InterfaceFactory.CALLABLE_FALLBACK:
+        if ProtocolType.REDIS not in InterfaceFactory.SERVER_FALLBACK:
             # Register a protocol that is in the fallback
-            fallback_protocol = InterfaceFactory.CALLABLE_FALLBACK[0]
+            fallback_protocol = InterfaceFactory.SERVER_FALLBACK[0]
             fallback_provider = MockProvider(fallback_protocol, available=True)
             await fallback_provider.initialize()
             registry._providers.clear()
             registry.register_provider(fallback_provider)
         
         try:
-            result = await InterfaceFactory.create_callable("test_service")
+            result = await InterfaceFactory.create_server("test_service")
             assert result is not None
         except:
             # Expected if no default protocols are available
@@ -361,9 +382,9 @@ class TestAbstractProtocolProvider:
         provider = MockProvider(ProtocolType.GRPC, available=True)
         await provider.initialize()
         
-        callable_obj = await provider.create_callable("test_service")
-        speaker = await provider.create_speaker("test_topic")
-        job = await provider.create_job("test_job")
+        callable_obj = await provider.create_server("test_service")
+        speaker = await provider.create_publisher("test_topic")
+        job = await provider.create_action_server("test_job")
         
         assert callable_obj is not None
         assert speaker is not None

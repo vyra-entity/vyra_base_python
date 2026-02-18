@@ -24,7 +24,7 @@ from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     ProviderError,
 )
-from vyra_base.com.transport.t_zenoh.session import ZenohSession, SessionConfig, SessionMode
+from vyra_base.com.transport.t_zenoh.communication.session import ZenohSession, SessionConfig, SessionMode
 from vyra_base.com.transport.t_zenoh.vyra_models import (
     VyraPublisherImpl,
     VyraSubscriberImpl,

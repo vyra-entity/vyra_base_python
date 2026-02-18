@@ -142,6 +142,10 @@ class UDSProvider(AbstractProtocolProvider):
             bool: True if initialization successful
         """
         if not self._available:
+            # Check availability if not yet checked
+            await self.check_availability()
+        
+        if not self._available:
             raise ProtocolUnavailableError(
                 "UDS transport not available. Requires Unix-like OS."
             )

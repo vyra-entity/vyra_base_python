@@ -102,7 +102,7 @@ class TestZenohProvider:
     @pytest.mark.asyncio
     @patch('vyra_base.com.transport.zenoh.provider.ZenohSession')
     @patch('vyra_base.com.transport.zenoh.provider.ZenohCallable')
-    async def test_create_callable(self, mock_callable_class, mock_session_class, provider):
+    async def test_create_server(self, mock_callable_class, mock_session_class, provider):
         """Test creating a callable."""
         # Mock session
         mock_session = AsyncMock()
@@ -119,21 +119,21 @@ class TestZenohProvider:
         async def callback(req):
             return {"result": "ok"}
         
-        callable = await provider.create_callable("/test", callback)
+        callable = await provider.create_server("/test", callback)
         
         assert callable == mock_callable
         mock_callable.initialize.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_create_callable_not_initialized(self, provider):
+    async def test_create_server_not_initialized(self, provider):
         """Test creating callable without initialization."""
         with pytest.raises(ProviderError, match="not initialized"):
-            await provider.create_callable("/test", Mock())
+            await provider.create_server("/test", Mock())
     
     @pytest.mark.asyncio
     @patch('vyra_base.com.transport.zenoh.provider.ZenohSession')
     @patch('vyra_base.com.transport.zenoh.provider.ZenohSpeaker')
-    async def test_create_speaker(self, mock_speaker_class, mock_session_class, provider):
+    async def test_create_publisher(self, mock_speaker_class, mock_session_class, provider):
         """Test creating a speaker."""
         # Mock session
         mock_session = AsyncMock()
@@ -147,7 +147,7 @@ class TestZenohProvider:
         
         await provider.initialize()
         
-        speaker = await provider.create_speaker("/test")
+        speaker = await provider.create_publisher("/test")
         
         assert speaker == mock_speaker
         mock_speaker.initialize.assert_called_once()
@@ -155,7 +155,7 @@ class TestZenohProvider:
     @pytest.mark.asyncio
     @patch('vyra_base.com.transport.zenoh.provider.ZenohSession')
     @patch('vyra_base.com.transport.zenoh.provider.ZenohJob')
-    async def test_create_job(self, mock_job_class, mock_session_class, provider):
+    async def test_create_action_server(self, mock_job_class, mock_session_class, provider):
         """Test creating a job."""
         # Mock session
         mock_session = AsyncMock()
@@ -172,7 +172,7 @@ class TestZenohProvider:
         async def callback(params):
             return {"result": "done"}
         
-        job = await provider.create_job("/test_job", callback)
+        job = await provider.create_action_server("/test_job", callback)
         
         assert job == mock_job
         mock_job.initialize.assert_called_once()

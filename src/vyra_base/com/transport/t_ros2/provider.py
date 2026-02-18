@@ -111,6 +111,7 @@ class ROS2Provider(AbstractProtocolProvider):
         super().__init__(protocol)
         self.node_name = f"{module_name}_{module_id}"
         self._node: Optional[VyraNode] = None
+        self._available = ROS2_AVAILABLE  # Set availability based on rclpy presence
         
         # Default configuration
         self._config = {

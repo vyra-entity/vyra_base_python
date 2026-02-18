@@ -52,14 +52,6 @@ vyra\_base.helper.log\_filter module
    :show-inheritance:
 
 
-vyra\_base.helper.logger module
--------------------------------
-
-.. automodule:: vyra_base.helper.logger
-   :members:
-   :show-inheritance:
-
-
 Module contents
 ---------------
 

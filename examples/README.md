@@ -1,234 +1,133 @@
-# VYRA Base Python Examples
+# VYRA Base Python — Examples
 
-This directory contains practical examples demonstrating VYRA's communication capabilities.
+Practical examples showing how to use `vyra_base` to build VYRA modules.
 
-## Examples
+## Structure
 
-### 1. External Communication
-**File**: `external_communication.py`
-
-Demonstrates integration with external (non-VYRA) systems:
-- REST API communication
-- MQTT broker integration  
-- Bidirectional bridge between VYRA and external systems
-
-```bash
-pip install aiohttp paho-mqtt
-python examples/external_communication.py
 ```
-
-**Key Concepts**:
-- External REST API integration
-- MQTT pub/sub with external brokers
-- Bridging external data to VYRA network
-- Forwarding VYRA commands to external systems
-
----
-
-### 2. Zenoh with Protobuf
-**File**: `zenoh_protobuf_example.py`
-
-Demonstrates using Zenoh transport with Protocol Buffers:
-- Speaker (Pub/Sub) with Protobuf messages
-- Callable (Request/Response) with Protobuf
-- Job (Long-running task) with Protobuf feedback
-- Binary Protobuf serialization
-
-```bash
-pip install eclipse-zenoh protobuf
-python examples/zenoh_protobuf_example.py
-```
-
-**Key Concepts**:
-- Type-safe communication with Protobuf
-- Efficient binary serialization
-- Cross-language message compatibility
-- Schema evolution and versioning
-
----
-
-### 3. Speaker Example (Publisher)
-**File**: `example_speaker.py`
-
-Demonstrates how to publish messages on ROS2 topics using VyraSpeaker.
-
-```bash
-python examples/example_speaker.py
-```
-
-**Key Concepts**:
-- Creating a VyraSpeaker (Publisher)
-- Publishing messages with `shout()`
-- QoS configuration
-
----
-
-### 4. Callable Example (Service Server)
-**File**: `example_callable.py`
-
-Demonstrates how to provide ROS2 services using VyraCallable.
-
-```bash
-# Run the service server
-python examples/example_callable.py
-
-# In another terminal, call the service
-ros2 service call /callable_example_node/callable/add_service example_interfaces/srv/AddTwoInts "{a: 5, b: 3}"
-```
-
-**Key Concepts**:
-- Creating a VyraCallable (Service Server)
-- Service callback functions
-- Using `@remote_callable` decorator
-
----
-
-### 5. Job Example (Action Server & Client)
-**File**: `example_job.py`
-
-Demonstrates long-running operations with feedback using VyraJob and VyraJobRunner.
-
-```bash
-# Terminal 1: Run action server
-python examples/example_job.py server
-
-# Terminal 2: Run action client
-python examples/example_job.py client
-
-# Or test with ROS2 CLI:
-ros2 action send_goal /job_server_node/job/fibonacci_job example_interfaces/action/Fibonacci "{order: 10}"
-```
-
-**Key Concepts**:
-- Creating a VyraJob (Action Server)
-- Creating a VyraJobRunner (Action Client)
-- Handling feedback during execution
-- Processing final results
-- Async goal execution
-
----
-
-### 6. Listener Example (Subscriber)
-**File**: `example_listener.py`
-
-Subscribes to a ROS2 topic using VyraSpeaker with `is_publisher=False`. Pairs with `example_speaker.py`.
-
-```bash
-# Terminal 1: Start listener
-python examples/example_listener.py
-
-# Terminal 2: Publish (speaker or CLI)
-python examples/example_speaker.py
-# or: ros2 topic pub /vyra/example_topic std_msgs/msg/String "{data: 'Hello'}"
-```
-
-**Key Concepts**:
-- VyraSpeaker as subscriber (`is_publisher=False`)
-- `listen(callback)` for incoming messages
-- Same topic name as publisher for pub/sub
-
----
-
-### 7. Unified State Machine
-**File**: `unified_state_machine_example.py`
-
-Shows the 3-layer state machine: Lifecycle, Operational, and Health.
-
-```bash
-python examples/unified_state_machine_example.py
-```
-
-**Key Concepts**:
-- `UnifiedStateMachine`: single API for all layers
-- Lifecycle: start, complete_initialization, shutdown
-- Operational: set_ready, start_task, pause, resume, stop, reset
-- Health: report_warning, clear_warning, report_fault, recover
-
----
-
-### 8. Redis Pub/Sub
-**File**: `redis_pubsub_example.py`
-
-Redis transport: publish and subscribe with `RedisProvider` and `create_speaker`. Requires Redis (e.g. `docker run -p 6379:6379 redis`).
-
-```bash
-# Terminal 1: Subscriber
-python examples/redis_pubsub_example.py subscriber
-
-# Terminal 2: Publisher
-python examples/redis_pubsub_example.py publisher
-```
-
-**Key Concepts**:
-- RedisProvider, create_speaker (channel)
-- shout() to publish, listen(callback) to subscribe
-
----
-
-### 9. Storage (Database)
-**File**: `storage_example.py`
-
-DbAccess (SQLite) and DbManipulator with a custom table (`tb_` prefix required).
-
-```bash
-python examples/storage_example.py
-```
-
-**Key Concepts**:
-- DbAccess with db_config (SQLite)
-- Custom table inheriting from Base (`tb_sensor_log`); table names must use `tb_` prefix
-- DbManipulator: add(), get_all(), get_by_id()
-
-Run from project root so that `vyra_base` and its logger are initialized correctly: `python examples/storage_example.py` or `pip install -e .` then run from any directory.
-
----
-
-### 10. Communication Demo (Multi-Transport)
-**File**: `communication_demo.py`
-
-Runs several transport demos: Redis, UDS, Shared Memory, Modbus, External Registry. Good overview of the communication layer.
-
-```bash
-python examples/communication_demo.py
-```
-
-### 11. Operational State Machine (Lifecycle Methods)
-**File**: `operational_state_machine_example.py`
-
-OperationalStateMachine with lifecycle methods (initialize, start, pause, resume, stop, reset) and state validation.
-
-```bash
-python examples/operational_state_machine_example.py
+examples/
+├── 01_service/                  ← Request/response services
+│   ├── service_server.py        — @remote_service decorator, two-phase init
+│   └── service_client.py        — InterfaceFactory.create_client()
+│
+├── 02_publisher_subscriber/     ← Pub/Sub messaging
+│   ├── publisher.py             — @remote_publisher + shout()
+│   └── subscriber.py            — @remote_subscriber callback
+│
+├── 03_action_server/            ← Long-running actions (goal/feedback/result)
+│   ├── action_server.py         — IActionHandler + multi-callback decorator
+│   └── action_client.py         — send_goal() + feedback callback
+│
+├── 04_protocols/                ← Protocol-specific examples
+│   ├── zenoh_protobuf_example.py  — Zenoh + Protobuf serialization
+│   ├── redis_pubsub_example.py    — Redis pub/sub
+│   ├── transport_examples.py      — ROS2 + UDS provider setup
+│   ├── external_communication.py  — gRPC, MQTT, REST
+│   └── communication_demo.py      — Multi-protocol demo
+│
+├── 05_state_machine/            ← State machine patterns
+│   ├── unified_state_machine_example.py   — UnifiedStateMachine usage
+│   └── operational_state_machine_example.py — OperationalStateMachine metaclass
+│
+├── storage_example.py           ← SQLAlchemy database + Redis storage
+├── DEPRECATED/                  ← Old ROS2-only examples (do not use)
+└── README.md                    ← This file
 ```
 
 ---
 
-## Prerequisites
+## Quick Start
 
-Make sure you have:
-1. ROS2 Kilted installed and sourced
-2. vyra_base_python installed
-3. example_interfaces package available
+### Prerequisites
 
 ```bash
-# Source ROS2
-source /opt/ros/kilted/setup.bash
+pip install vyra_base
 
-# Install vyra_base if needed
-pip install -e .
+# Optional — for Zenoh transport (recommended default):
+pip install eclipse-zenoh
+
+# Optional — for Redis transport:
+pip install redis
 ```
 
-## Understanding the Communication Patterns
+### Run an example
 
-| Component | ROS2 Equivalent | Use Case |
-|-----------|----------------|----------|
-| **VyraSpeaker** (is_publisher=True) | Publisher | One-way broadcast of data |
-| **VyraSpeaker** (is_publisher=False) | Subscriber | Receive messages on a topic |
-| **VyraCallable** | Service Server | Quick request/response |
-| **VyraJob** | Action Server | Long-running tasks with feedback |
+```bash
+cd /path/to/vyra_base_python
 
-## Next Steps
+# Service server (Phase 2 binding demo, no network required)
+python examples/01_service/service_server.py
 
-- Read the full documentation: [docs/com.rst](../docs/com.rst)
-- Explore the API reference: [docs/vyra_base.com.datalayer.rst](../docs/vyra_base.com.datalayer.rst)
-- Check out module examples in the VYRA modules repository
+# Publisher (requires Zenoh or Redis)
+python examples/02_publisher_subscriber/publisher.py
+
+# Subscriber (in a second terminal)
+python examples/02_publisher_subscriber/subscriber.py
+
+# Action server
+python examples/03_action_server/action_server.py
+```
+
+---
+
+## Key Concepts
+
+### Two-Phase Initialization
+
+All communication interfaces follow a **two-phase** pattern:
+
+```python
+# Phase 1 (automatic) — decorator creates a blueprint during class definition
+class MyComponent:
+    @remote_service(name="ping", protocols=[ProtocolType.ZENOH])
+    async def ping(self, request, response=None):
+        return {"pong": True}
+
+# Phase 2 — bind the real callbacks to the blueprint
+component = MyComponent()
+bind_decorated_callbacks(component, namespace="my_module")
+
+# The VYRA entity infrastructure then calls InterfaceFactory automatically.
+# In tests or standalone scripts you can create interfaces manually:
+server = await InterfaceFactory.create_from_blueprint(blueprint)
+```
+
+### Protocol Selection
+
+Set `protocols` in order of preference. The first available protocol wins:
+
+```python
+@remote_service(
+    name="my_service",
+    protocols=[ProtocolType.ZENOH, ProtocolType.REDIS, ProtocolType.UDS],
+    # Tries Zenoh first → Redis if Zenoh unavailable → UDS as last resort
+)
+```
+
+Default fallback chain: `ZENOH → ROS2 → REDIS → UDS`
+
+### Access Levels
+
+Control who can call your service:
+
+```python
+from vyra_base.com import AccessLevel
+
+@remote_service(name="admin_reset", access_level=AccessLevel.PRIVATE)
+```
+
+| Level | Description |
+|---|---|
+| `PUBLIC` | Accessible by all modules |
+| `PROTECTED` | Authorized modules only |
+| `PRIVATE` | Same module only |
+| `INTERNAL` | Framework internal |
+
+---
+
+## DEPRECATED folder
+
+The `DEPRECATED/` folder contains old ROS2-only API examples that use
+`VyraCallable`, `VyraSpeaker`, `VyraJob`, `@remote_callable`, etc.
+These APIs no longer exist in the public surface. Use the patterns
+shown in `01_service/` to `03_action_server/` instead.

@@ -3,24 +3,42 @@ VYRA Base Communication Module (COM)
 
 Multi-protocol communication system with automatic protocol selection and fallback.
 
-Provides:
-- Multi-protocol support (ROS2, Redis, gRPC, MQTT, REST, WebSocket, Modbus, OPC UA)
-- Automatic protocol fallback
-- Protocol-agnostic decorators (@remove_server, @remote_publisher, @remote_job)
-- Backward compatibility with legacy ROS2-only datalayer API
+Architecture
+------------
+Transport Layer  (in-process / low-latency)
+    ROS2  · Zenoh  · Redis  · UDS
 
-New Code (Recommended):
-    from vyra_base.com import remove_server, InterfaceFactory, ProtocolType
-    
-Legacy Code (Still Supported):
-    from vyra_base.com import remove_server
+External Layer   (out-of-process / cross-service)
+    gRPC  · MQTT  · REST  · WebSocket  · Shared Memory
+
+Industrial Layer
+    Modbus  · OPC UA
+
+Public API
+----------
+Decorators (use on component methods):
+    @remote_service       — expose a method as a callable service (request/response)
+    @remote_publisher     — expose a method as a publisher (fire-and-forget)
+    @remote_subscriber    — register a method as a message subscriber
+    @remote_actionServer  — expose a method group as an action server (goal/feedback/result)
+
+Factory:
+    InterfaceFactory      — create server/client/publisher/subscriber/action objects
+
+Example::
+
+    from vyra_base.com import remote_service, remote_publisher, InterfaceFactory, ProtocolType
+
+    class MyComponent:
+        @remote_service(name="ping", protocols=[ProtocolType.ZENOH])
+        async def ping(self, request, response=None):
+            return {"pong": True}
 """
 
 # ============================================================================
-# NEW MULTI-PROTOCOL API (Recommended)
+# Core Components (always available)
 # ============================================================================
 
-# Core components
 from vyra_base.com.core import (
     # Exceptions
     CommunicationError,
@@ -28,6 +46,8 @@ from vyra_base.com.core import (
     ProtocolNotInitializedError,
     TransportError,
     ProviderError,
+    ProviderNotFoundError,
+    ProviderRegistrationError,
     InterfaceError,
     TServerError,
     TSubscriberError,
@@ -35,8 +55,21 @@ from vyra_base.com.core import (
     # Types
     ProtocolType,
     InterfaceType,
-    # Factory & Decorators
+    AccessLevel,
+    ActionStatus,
+    VyraPublisher,
+    VyraSubscriber,
+    VyraServer,
+    VyraClient,
+    VyraActionServer,
+    VyraActionClient,
+    # Abstract Handlers (implement these in your component)
+    IServiceHandler,
+    IActionHandler,
+    IGoalHandle,
+    # Factory
     InterfaceFactory,
+    # Decorators
     remote_service,
     remote_publisher,
     remote_subscriber,
@@ -50,12 +83,6 @@ from vyra_base.com.core import (
     SubscriberBlueprint,
     ActionBlueprint,
     CallbackRegistry,
-    # Backward compatibility aliases
-    remote_callable,
-    remote_callable_ros2,
-    remote_speaker,
-    remote_listener,
-    remote_job,
 )
 
 # Topic Builder for naming conventions
@@ -68,13 +95,23 @@ from vyra_base.com.core.topic_builder import (
     parse_topic,
 )
 
+# Interface path registry & loader
+from vyra_base.com.core import (
+    InterfacePathRegistry,
+    get_interface_registry,
+    InterfaceLoader,
+)
+
 # Provider Registry
 from vyra_base.com.providers import (
     AbstractProtocolProvider,
     ProviderRegistry,
 )
 
-# Feeders - Multi-protocol support (optional)
+# ============================================================================
+# Feeders — automatic publication of state / news / errors (optional)
+# ============================================================================
+
 try:
     from vyra_base.com.feeder.feeder import BaseFeeder
     from vyra_base.com.feeder.state_feeder import StateFeeder
@@ -87,18 +124,10 @@ except ImportError:
     ErrorFeeder = None
 
 # ============================================================================
-# LEGACY COMPATIBILITY (Deprecated - use InterfaceFactory instead)
+# Transport Layer — ROS2, Zenoh, Redis, UDS  (all optional at import time)
 # ============================================================================
-#
-# NOTE: Legacy functions (create_vyra_callable, create_vyra_speaker, etc.) have been removed.
-# External modules using them should migrate to:
-#   from vyra_base.com import InterfaceFactory, remove_server, ProtocolType
-#
-# The @remove_server decorator now supports multi-protocol.
-# Old code using it will continue to work but gets ROS2-only behavior.
-#
 
-# ROS2 infrastructure - Using transport/t_ros2 implementations (optional)
+# ROS2
 try:
     from vyra_base.com.transport.t_ros2.communication.publisher import ROS2Publisher
     from vyra_base.com.transport.t_ros2.communication.subscriber import ROS2Subscriber
@@ -108,6 +137,7 @@ try:
     from vyra_base.com.transport.t_ros2.communication.service_client import ROS2ServiceClient
     from vyra_base.com.transport.t_ros2.communication.service_server import ROS2ServiceServer
 except ImportError:
+    ROS2Publisher = None
     ROS2Subscriber = None
     VyraNode = None
     CheckerNode = None
@@ -117,67 +147,156 @@ except ImportError:
     ROS2ServiceClient = None
     ROS2ServiceServer = None
 
-# IPC - Inter-Process Communication (moved to external/grpc)
+# Zenoh
+try:
+    from vyra_base.com.transport.t_zenoh.provider import ZenohProvider
+    from vyra_base.com.transport.t_zenoh.communication.session import ZenohSession, SessionConfig, SessionMode
+except ImportError:
+    ZenohProvider = None
+    ZenohSession = None
+    SessionConfig = None
+    SessionMode = None
+
+# Redis transport
+try:
+    from vyra_base.com.transport.t_redis.provider import RedisProvider
+    from vyra_base.com.transport.t_redis.communication.redis_client import RedisClient
+except ImportError:
+    RedisProvider = None
+    RedisClient = None
+
+# UDS (Unix Domain Sockets)
+try:
+    from vyra_base.com.transport.t_uds.provider import UDSProvider
+except ImportError:
+    UDSProvider = None
+
+# ============================================================================
+# External Layer — gRPC, MQTT, REST, WebSocket, Shared Memory (all optional)
+# ============================================================================
+
 try:
     from vyra_base.com.external.grpc import GrpcServer, GrpcClient
 except ImportError:
     GrpcServer = None
     GrpcClient = None
 
+try:
+    from vyra_base.com.external.mqtt import MqttClient
+except ImportError:
+    MqttClient = None
+
+try:
+    from vyra_base.com.external.rest import RestClient
+except ImportError:
+    RestClient = None
+
+try:
+    from vyra_base.com.external.websocket import WebSocketClient
+except ImportError:
+    WebSocketClient = None
+
+try:
+    from vyra_base.com.external.shared_memory import (
+        SharedMemorySegment,
+        SharedMemorySerializer,
+        SharedMemoryDiscovery,
+    )
+except ImportError:
+    SharedMemorySegment = None
+    SharedMemorySerializer = None
+    SharedMemoryDiscovery = None
+
+# ============================================================================
+# Public API declaration
+# ============================================================================
+
 __all__ = [
-    # ========================================================================
-    # NEW MULTI-PROTOCOL API (Recommended)
-    # ========================================================================
-    
+    # ------------------------------------------------------------------
     # Exceptions
+    # ------------------------------------------------------------------
     "CommunicationError",
     "ProtocolUnavailableError",
     "ProtocolNotInitializedError",
     "TransportError",
     "ProviderError",
+    "ProviderNotFoundError",
+    "ProviderRegistrationError",
     "InterfaceError",
     "TServerError",
     "TSubscriberError",
     "ActionServerError",
-    
-    # Types
+    # ------------------------------------------------------------------
+    # Types & Enums
+    # ------------------------------------------------------------------
     "ProtocolType",
     "InterfaceType",
-    
+    "AccessLevel",
+    "ActionStatus",
+    "VyraPublisher",
+    "VyraSubscriber",
+    "VyraServer",
+    "VyraClient",
+    "VyraActionServer",
+    "VyraActionClient",
+    # ------------------------------------------------------------------
+    # Abstract Handlers
+    # ------------------------------------------------------------------
+    "IServiceHandler",
+    "IActionHandler",
+    "IGoalHandle",
+    # ------------------------------------------------------------------
     # Factory
+    # ------------------------------------------------------------------
     "InterfaceFactory",
-    
-    # Decorators (Multi-protocol)
+    # ------------------------------------------------------------------
+    # Decorators
+    # ------------------------------------------------------------------
     "remote_service",
     "remote_publisher",
+    "remote_subscriber",
     "remote_actionServer",
-    
-    # Providers
+    "get_decorated_methods",
+    "bind_decorated_callbacks",
+    # ------------------------------------------------------------------
+    # Blueprint Infrastructure
+    # ------------------------------------------------------------------
+    "HandlerBlueprint",
+    "ServiceBlueprint",
+    "PublisherBlueprint",
+    "SubscriberBlueprint",
+    "ActionBlueprint",
+    "CallbackRegistry",
+    # ------------------------------------------------------------------
+    # Provider Registry
+    # ------------------------------------------------------------------
     "AbstractProtocolProvider",
     "ProviderRegistry",
-    
+    # ------------------------------------------------------------------
     # Topic Builder
+    # ------------------------------------------------------------------
     "TopicBuilder",
     "TopicComponents",
     "TopicInterfaceType",
     "create_topic_builder",
     "build_topic",
     "parse_topic",
-    
-    # Feeders (Multi-protocol)
+    # ------------------------------------------------------------------
+    # Interface Loading
+    # ------------------------------------------------------------------
+    "InterfacePathRegistry",
+    "get_interface_registry",
+    "InterfaceLoader",
+    # ------------------------------------------------------------------
+    # Feeders
+    # ------------------------------------------------------------------
     "BaseFeeder",
     "StateFeeder",
     "NewsFeeder",
     "ErrorFeeder",
-    
-    # ========================================================================
-    # LEGACY ROS2 API (Minimal exports - migrate to InterfaceFactory)
-    # ========================================================================
-    
-    # ROS2 Classes
-    "ROS2Job",
-    "ROS2Callable",
-    "ROS2Speaker",
+    # ------------------------------------------------------------------
+    # Transport Layer — ROS2
+    # ------------------------------------------------------------------
     "ROS2Publisher",
     "ROS2Subscriber",
     "VyraNode",
@@ -187,8 +306,31 @@ __all__ = [
     "ROS2ActionServer",
     "ROS2ServiceClient",
     "ROS2ServiceServer",
-    
-    # IPC Classes
+    # ------------------------------------------------------------------
+    # Transport Layer — Zenoh
+    # ------------------------------------------------------------------
+    "ZenohProvider",
+    "ZenohSession",
+    "SessionConfig",
+    "SessionMode",
+    # ------------------------------------------------------------------
+    # Transport Layer — Redis
+    # ------------------------------------------------------------------
+    "RedisProvider",
+    "RedisClient",
+    # ------------------------------------------------------------------
+    # Transport Layer — UDS
+    # ------------------------------------------------------------------
+    "UDSProvider",
+    # ------------------------------------------------------------------
+    # External Layer
+    # ------------------------------------------------------------------
     "GrpcServer",
     "GrpcClient",
+    "MqttClient",
+    "RestClient",
+    "WebSocketClient",
+    "SharedMemorySegment",
+    "SharedMemorySerializer",
+    "SharedMemoryDiscovery",
 ]

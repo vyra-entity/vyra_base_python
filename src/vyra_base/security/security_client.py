@@ -42,9 +42,8 @@ from vyra_base.helper.crypto_helper import (
     sign_message_rsa,
     load_private_key,
 )
-from vyra_base.helper.logger import logger
-
-
+import logging
+logger = logging.getLogger(__name__)
 @dataclass
 class SecurityContext:
     """

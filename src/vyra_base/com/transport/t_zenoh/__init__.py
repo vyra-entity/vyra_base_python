@@ -30,7 +30,8 @@ Usage:
         publisher = await provider.create_publisher("/topic")
 """
 
-from vyra_base.helper.logger import logger
+import logging
+logger = logging.getLogger(__name__)
 
 # Check Eclipse Zenoh library availability
 try:
@@ -42,7 +43,7 @@ except ImportError:
 
 # Try importing session layer (Zenoh-specific)
 try:
-    from vyra_base.com.transport.t_zenoh.session import (
+    from vyra_base.com.transport.t_zenoh.communication.session import (
         ZenohSession,
         SessionConfig,
         SessionMode

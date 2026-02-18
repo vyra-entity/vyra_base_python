@@ -21,7 +21,7 @@ class TestGrpcProvider:
             try:
                 from vyra_base.com.external.grpc_provider import GrpcProvider
                 provider = GrpcProvider()
-                available = provider.is_available()
+                available = provider.is_available
                 assert available is False
             except ImportError:
                 # If provider doesn't exist yet, test passes
@@ -44,7 +44,7 @@ class TestGrpcProvider:
             pytest.skip("GrpcProvider not implemented yet")
     
     @pytest.mark.asyncio
-    async def test_grpc_create_callable(self):
+    async def test_grpc_create_server(self):
         """Test creating gRPC callable."""
         try:
             from vyra_base.com.external.grpc_provider import GrpcProvider
@@ -55,8 +55,8 @@ class TestGrpcProvider:
                 return {"result": "ok"}
             
             # Should create callable even if grpcio not available (graceful degradation)
-            if provider.is_available():
-                callable = await provider.create_callable(
+            if provider.is_available:
+                callable = await provider.create_server(
                     name="test_service",
                     callback=test_callback
                 )
@@ -77,7 +77,7 @@ class TestMqttProvider:
             try:
                 from vyra_base.com.external.mqtt_provider import MqttProvider
                 provider = MqttProvider()
-                available = provider.is_available()
+                available = provider.is_available
                 assert available is False
             except ImportError:
                 pytest.skip("MqttProvider not implemented yet")
@@ -99,15 +99,15 @@ class TestMqttProvider:
             pytest.skip("MqttProvider not implemented yet")
     
     @pytest.mark.asyncio
-    async def test_mqtt_create_speaker(self):
+    async def test_mqtt_create_publisher(self):
         """Test creating MQTT speaker (publisher)."""
         try:
             from vyra_base.com.external.mqtt_provider import MqttProvider
             
             provider = MqttProvider()
             
-            if provider.is_available():
-                speaker = await provider.create_speaker(
+            if provider.is_available:
+                speaker = await provider.create_publisher(
                     name="test_topic",
                     broker_host="localhost",
                     broker_port=1883
@@ -132,9 +132,9 @@ class TestMqttProvider:
                 "password": "pass"
             }
             
-            if provider.is_available():
+            if provider.is_available:
                 await provider.initialize(config)
-                assert provider.is_initialized()
+                assert provider.is_initialized
         except ImportError:
             pytest.skip("MqttProvider not implemented yet")
 
@@ -152,12 +152,12 @@ class TestRestProvider:
             assert provider.protocol == ProtocolType.REST
             
             # REST should always be available (uses FastAPI from requirements)
-            assert provider.is_available() is True
+            assert provider.is_available is True
         except ImportError:
             pytest.skip("RestProvider not implemented yet")
     
     @pytest.mark.asyncio
-    async def test_rest_create_callable(self):
+    async def test_rest_create_server(self):
         """Test creating REST endpoint as callable."""
         try:
             from vyra_base.com.external.rest_provider import RestProvider
@@ -167,7 +167,7 @@ class TestRestProvider:
             async def test_callback(request):
                 return {"result": "ok"}
             
-            callable = await provider.create_callable(
+            callable = await provider.create_server(
                 name="test_endpoint",
                 callback=test_callback,
                 method="POST",
@@ -179,14 +179,14 @@ class TestRestProvider:
             pytest.skip("RestProvider not implemented yet")
     
     @pytest.mark.asyncio
-    async def test_rest_create_speaker(self):
+    async def test_rest_create_publisher(self):
         """Test creating REST webhook as speaker."""
         try:
             from vyra_base.com.external.rest_provider import RestProvider
             
             provider = RestProvider()
             
-            speaker = await provider.create_speaker(
+            speaker = await provider.create_publisher(
                 name="test_webhook",
                 webhook_url="https://example.com/webhook"
             )
@@ -209,12 +209,12 @@ class TestWebSocketProvider:
             assert provider.protocol == ProtocolType.WEBSOCKET
             
             # WebSocket should be available (uses FastAPI WebSockets)
-            assert provider.is_available() is True
+            assert provider.is_available is True
         except ImportError:
             pytest.skip("WebSocketProvider not implemented yet")
     
     @pytest.mark.asyncio
-    async def test_websocket_create_callable(self):
+    async def test_websocket_create_server(self):
         """Test creating WebSocket handler as callable."""
         try:
             from vyra_base.com.external.websocket_provider import WebSocketProvider
@@ -224,7 +224,7 @@ class TestWebSocketProvider:
             async def test_callback(message):
                 return {"echo": message}
             
-            callable = await provider.create_callable(
+            callable = await provider.create_server(
                 name="test_ws_handler",
                 callback=test_callback,
                 path="/ws/test"
@@ -235,14 +235,14 @@ class TestWebSocketProvider:
             pytest.skip("WebSocketProvider not implemented yet")
     
     @pytest.mark.asyncio
-    async def test_websocket_create_speaker(self):
+    async def test_websocket_create_publisher(self):
         """Test creating WebSocket broadcaster as speaker."""
         try:
             from vyra_base.com.external.websocket_provider import WebSocketProvider
             
             provider = WebSocketProvider()
             
-            speaker = await provider.create_speaker(
+            speaker = await provider.create_publisher(
                 name="test_broadcast",
                 room="global"
             )
@@ -327,7 +327,7 @@ class TestExternalProvidersIntegration:
         try:
             # Should raise error if no providers available
             with pytest.raises(Exception):
-                await InterfaceFactory.create_callable(
+                await InterfaceFactory.create_server(
                     name="test",
                     callback=test_callback,
                     protocols=[ProtocolType.GRPC, ProtocolType.REST]

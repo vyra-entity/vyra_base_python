@@ -4,15 +4,6 @@ vyra\_base.com.feeder package
 Submodules
 ----------
 
-vyra\_base.com.feeder.available\_module\_feeder module
-------------------------------------------------------
-
-.. automodule:: vyra_base.com.feeder.available_module_feeder
-   :members:
-   :show-inheritance:
-   :no-index:
-
-
 vyra\_base.com.feeder.error\_feeder module
 ------------------------------------------
 

@@ -1,9 +1,15 @@
-Communication
-=============
+Communication (com)
+====================
 
-The COM-Module represents the multi-protocol communication layer of the VYRA framework.
-It provides unified interfaces for ROS2, Redis, Zenoh, UDS, and other protocols with
-automatic protocol selection and fallback.
+The ``com`` module is the multi-protocol communication layer of the VYRA framework.
+It provides a unified API for **Transport** (Zenoh, ROS2, Redis, UDS),
+**External** (gRPC, MQTT, REST, WebSocket, Shared Memory), and
+**Industrial** (Modbus, OPC UA) protocols with automatic protocol selection and fallback.
+
+.. tip::
+
+   For a step-by-step guide on using communication in your own module see
+   :doc:`quickstart` — especially steps 2 and 7.
 
 .. toctree::
    :maxdepth: 2
@@ -20,31 +26,9 @@ automatic protocol selection and fallback.
    :caption: Transport Layer
 
    com/transport/ros2
+   com/transport/zenoh
    com/transport/redis
    com/transport/uds
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Providers
-
-   com/providers/protocol_provider
-   com/providers/provider_registry
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Features
-
-   com/feeders
-   com/monitoring
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Handlers
-
-   com/handler/ros2
-   com/handler/ipc
-   com/handler/database
-   com/handler/communication
 
 .. toctree::
    :maxdepth: 2
@@ -66,290 +50,131 @@ automatic protocol selection and fallback.
 
 .. toctree::
    :maxdepth: 2
+   :caption: Providers
+
+   com/providers/protocol_provider
+   com/providers/provider_registry
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Features
+
+   com/feeders
+   com/monitoring
+
+.. toctree::
+   :maxdepth: 2
    :caption: Reference
 
    com/overview
-   com/ros2_communication
-   com/ipc_communication
 
-Overview
----------
+Architecture
+------------
 
-The COM-Module provides a unified communication API with three main layers:
+::
 
-1. **Core Layer**: Protocol-agnostic interfaces and factory
-   
-   * **InterfaceFactory**: Creates interfaces with automatic protocol selection
-   * **Server/Client Pattern**: Explicit methods for clarity
-     
-     - ``create_callable()`` / ``create_caller()`` - Service server/client
-     - ``create_speaker()`` / ``create_listener()`` - Publisher/subscriber  
-     - ``create_job()`` / ``create_dispatcher()`` - Action server/client
-   
-   * **Type System**: Base types (VyraCallable, VyraSpeaker, VyraJob)
-   * **Decorators**: @remote_callable, @remote_speaker, @remote_job
+    ┌─────────────────────────────────────────────────────────────┐
+    │                    Your Component                           │
+    │   @remote_service  @remote_publisher  @remote_subscriber   │
+    │   @remote_actionServer    InterfaceFactory                  │
+    └────────────────────────┬────────────────────────────────────┘
+                             │
+    ┌────────────────────────▼────────────────────────────────────┐
+    │                     Core Layer                              │
+    │   Decorators · Blueprints · Factory · Types · Exceptions    │
+    └────┬──────────────────┬─────────────────┬───────────────────┘
+         │                  │                 │
+    ┌────▼────┐     ┌────────▼────┐    ┌──────▼──────────┐
+    │Transport│     │  External   │    │   Industrial    │
+    ├─────────┤     ├─────────────┤    ├─────────────────┤
+    │ Zenoh   │     │ gRPC        │    │ Modbus          │
+    │ ROS2    │     │ MQTT        │    │ OPC UA          │
+    │ Redis   │     │ REST        │    └─────────────────┘
+    │ UDS     │     │ WebSocket   │
+    └─────────┘     │ Shared Mem  │
+                    └─────────────┘
 
-2. **Transport Layer**: Protocol implementations
-   
-   * **ROS2**: Distributed robotics (DDS-based)
-   * **Redis**: Pub/Sub and key-value store
-   * **Zenoh**: High-performance pub/sub
-   * **UDS**: Low-latency local IPC
+**Protocol fallback (automatic):** ``Zenoh → ROS2 → Redis → UDS``
 
-3. **Provider Layer**: Protocol providers and registry
-   
-   * **AbstractProtocolProvider**: Base provider interface
-   * **ProviderRegistry**: Manages available protocols
-   * **Automatic fallback**: Zenoh → ROS2 → Redis → UDS
-Quick Start
------------
+Quick Reference
+---------------
 
-New Unified API (Recommended)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Call Remote Service
-"""""""""""""""""""
+Expose a service (server side):
 
 .. code-block:: python
 
-   from vyra_base.com import InterfaceFactory
-   
-   # Service Client (NEW!)
-   caller = await InterfaceFactory.create_caller(
-       "calculate",
-       service_type=AddTwoInts
-   )
-   
-   # Call service
-   request = AddTwoInts.Request(a=5, b=3)
-   response = await caller.call(request, timeout=5.0)
-   print(f"Result: {response.sum}")
+   from vyra_base.com import remote_service, ProtocolType, bind_decorated_callbacks
 
-Provide Service
-"""""""""""""""
-
-.. code-block:: python
-
-   from vyra_base.com import InterfaceFactory
-   
-   # Service Server callback
-   async def handle_calculate(request, response):
-       response.sum = request.a + request.b
-       return response
-   
-   # Create service server
-   server = await InterfaceFactory.create_callable(
-       "calculate",
-       callback=handle_calculate,
-       service_type=AddTwoInts
-   )
-
-Publish Messages
-""""""""""""""""
-
-.. code-block:: python
-
-   from vyra_base.com import InterfaceFactory
-   
-   # Publisher
-   speaker = await InterfaceFactory.create_speaker(
-       "events",
-       message_type=String
-   )
-   
-   # Publish message
-   await speaker.shout(String(data="Hello World"))
-
-Subscribe to Messages
-"""""""""""""""""""""
-
-.. code-block:: python
-
-   from vyra_base.com import InterfaceFactory
-   
-   # Subscriber callback
-   def on_message(msg):
-       print(f"Received: {msg.data}")
-   
-   # Create subscriber (NEW!)
-   listener = await InterfaceFactory.create_listener(
-       "events",
-       callback=on_message,
-       message_type=String
-   )
-
-Send Action Goals
-"""""""""""""""""
-
-.. code-block:: python
-
-   from vyra_base.com import InterfaceFactory
-   
-   # Feedback callback
-   def on_feedback(feedback):
-       print(f"Progress: {feedback.progress}%")
-   
-   # Action Client (NEW!)
-   dispatcher = await InterfaceFactory.create_dispatcher(
-       "process_data",
-       feedback_callback=on_feedback,
-       action_type=ProcessData
-   )
-   
-   # Send goal
-   goal = ProcessData.Goal(dataset="data.csv")
-   result = await dispatcher.execute(goal)
-
-Execute Actions
-"""""""""""""""
-
-.. code-block:: python
-
-   from vyra_base.com import InterfaceFactory
-   
-   # Action Server callback
-   async def execute_task(goal, feedback_callback=None):
-       for i in range(100):
-           if feedback_callback:
-               await feedback_callback({"progress": i})
-       return {"status": "completed"}
-   
-   # Create action server
-   job = await InterfaceFactory.create_job(
-       "process_data",
-       callback=execute_task,
-       action_type=ProcessData
-   )
-
-Using Decorators
-""""""""""""""""
-
-.. code-block:: python
-
-   from vyra_base.com import remote_callable, remote_speaker
-   
    class MyComponent:
-       @remote_callable
-       async def calculate(self, request, response):
-           """Automatically creates service server"""
-           response.result = request.value * 2
-           return response
-       
-       @remote_speaker
-       async def notify(self, message):
-           """Automatically creates publisher"""
-           pass  # Publishing handled automatically
+       @remote_service(name="ping", protocols=[ProtocolType.ZENOH], namespace="my_module")
+       async def ping(self, request, response=None):
+           return {"pong": True}
 
-Legacy API (ROS2-only)
-^^^^^^^^^^^^^^^^^^^^^^
+   component = MyComponent()
+   bind_decorated_callbacks(component, namespace="my_module")
 
-Call ROS2 Service
-^^^^^^^^^^^^^^^^^
+Call a service (client side):
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factory import create_vyra_job
-   
-   # Job (Service Client) create
-   job = create_vyra_job(
-       node=entity.node,
-       service_name="other_module/get_status",
-       service_type=GetStatus
-   )
-   
-   # Call Service
-   response = await job.call_async(request)
+   from vyra_base.com import InterfaceFactory, ProtocolType
 
-Provide ROS2 Service
-^^^^^^^^^^^^^^^^^^^^
+   client = await InterfaceFactory.create_client("ping", namespace="my_module",
+                                                  protocols=[ProtocolType.ZENOH])
+   response = await client.call({}, timeout=5.0)
+
+Publish messages:
 
 .. code-block:: python
 
-   from vyra_base.com import remote_callable
-   
+   from vyra_base.com import remote_publisher, ProtocolType
+
    class MyComponent:
-       @remote_callable
-       async def my_service(self, request, response):
-           # Service-Logic
-           response.result = "Success"
-           return response
+       @remote_publisher(name="events", protocols=[ProtocolType.ZENOH])
+       async def publish_event(self, data: dict):
+           return data
 
-Topic publish
-^^^^^^^^^^^^^
+Subscribe to messages:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factoy import create_vyra_speaker
-   
-   # Speaker (Publisher) create
-   speaker = create_vyra_speaker(
-       node=entity.node,
-       topic_name="sensor_data",
-       topic_type=SensorData
-   )
-   
-   # Publish message
-   speaker.shout(message)
+   from vyra_base.com import remote_subscriber, ProtocolType
 
-Further Information
--------------------
+   class MyComponent:
+       @remote_subscriber(name="events", protocols=[ProtocolType.ZENOH])
+       async def on_event(self, message: dict):
+           print(message)
 
-Core Components
-^^^^^^^^^^^^^^^
+Migration from Legacy API
+-------------------------
 
-* :doc:`com/core/factory` - **InterfaceFactory** - Unified interface creation
-* :doc:`com/core/types` - Base types and enums (VyraCallable, VyraSpeaker, VyraJob)
-* :doc:`com/core/exceptions` - Communication exceptions
-* :doc:`com/core/decorators` - Protocol-agnostic decorators
-* :doc:`com/core/registry` - Provider registry management
+If you have code that uses the old API (ROS2-only ``datalayer`` module), migrate as follows:
 
-Transport Layer
-^^^^^^^^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
 
-* :doc:`com/transport/ros2` - ROS2 transport implementation
-* :doc:`com/transport/redis` - Redis transport implementation
-* :doc:`com/transport/uds` - Unix Domain Socket transport
-
-Providers
-^^^^^^^^^
-
-* :doc:`com/providers/protocol_provider` - AbstractProtocolProvider interface
-* :doc:`com/providers/provider_registry` - ProviderRegistry singleton
-
-Features
-^^^^^^^^
-
-* :doc:`com/feeders` - Automatic data publication (StateFeeder, NewsFeeder, ErrorFeeder)
-* :doc:`com/monitoring` - Prometheus metrics integration
-
-Legacy Documentation
-^^^^^^^^^^^^^^^^^^^^
-
-* :doc:`com/ros2_communication` - Legacy ROS2 Details (Job, Callable, Speaker)
-* :doc:`com/ipc_communication` - Legacy IPC via gRPC
-* :doc:`com/overview` - Complete API Overview
-* :doc:`vyra_base.com.datalayer` - Datalayer API Reference
-* :doc:`vyra_base.com.feeder` - Feeder API Reference
-
-Migration Guide
-^^^^^^^^^^^^^^^
-
-**From Legacy to New API:**
-
-.. code-block:: python
-
-   # OLD (ROS2-only)
-   from vyra_base.com.datalayer.interface_factory import create_vyra_job
-   job = create_vyra_job(node=node, service_name="service", service_type=Type)
-   
-   # NEW (Multi-protocol)
-   from vyra_base.com import InterfaceFactory
-   caller = await InterfaceFactory.create_caller("service", service_type=Type)
-
-**Key Differences:**
-
-1. **No node required** - Protocols managed by providers
-2. **Async initialization** - ``await`` for create methods
-3. **Explicit server/client** - ``create_callable()`` vs ``create_caller()``
-4. **Automatic protocol fallback** - Tries multiple protocols
-5. **Multi-protocol support** - Works with ROS2, Redis, Zenoh, UDS
+   * - Old (removed)
+     - New
+   * - ``@remote_callable``
+     - ``@remote_service``
+   * - ``@remote_speaker``
+     - ``@remote_publisher``
+   * - ``@remote_listener``
+     - ``@remote_subscriber``
+   * - ``@remote_job``
+     - ``@remote_actionServer``
+   * - ``VyraCallable``
+     - ``VyraServer``
+   * - ``VyraSpeaker``
+     - ``VyraPublisher``
+   * - ``VyraJob``
+     - ``VyraActionServer``
+   * - ``from vyra_base.com.datalayer…``
+     - ``from vyra_base.com…``
+   * - ``InterfaceType.CALLABLE``
+     - ``InterfaceType.SERVER``
+   * - ``InterfaceType.SPEAKER``
+     - ``InterfaceType.PUBLISHER``
+   * - ``InterfaceType.JOB``
+     - ``InterfaceType.ACTION_SERVER``

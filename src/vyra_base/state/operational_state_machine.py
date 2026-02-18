@@ -121,17 +121,25 @@ class OperationalStateMachine(metaclass=MetaOperationalState):
         """
         from .state_events import StateEvent, EventType
         
-        # Map target states to appropriate events
-        event_mapping = {
-            OperationalState.READY: EventType.SET_READY,
-            OperationalState.RUNNING: EventType.TASK_START,
-            OperationalState.PAUSED: EventType.TASK_PAUSE,
-            OperationalState.STOPPED: EventType.TASK_STOP,
-            OperationalState.IDLE: EventType.TASK_RESET,
-            OperationalState.ERROR: EventType.TASK_ERROR,
-        }
+        # Map target states to appropriate events (context-sensitive for READY)
+        current_state = self.get_operational_state()
         
-        event_type = event_mapping.get(target_state)
+        if target_state == OperationalState.READY and current_state == OperationalState.PAUSED:
+            # Resuming from PAUSED uses TASK_RESUME, not SET_READY
+            event_type = EventType.TASK_RESUME
+        elif target_state == OperationalState.READY and current_state == OperationalState.RUNNING:
+            # Completing from RUNNING uses TASK_COMPLETE, not SET_READY
+            event_type = EventType.TASK_COMPLETE
+        else:
+            event_mapping = {
+                OperationalState.READY: EventType.SET_READY,
+                OperationalState.RUNNING: EventType.TASK_START,
+                OperationalState.PAUSED: EventType.TASK_PAUSE,
+                OperationalState.STOPPED: EventType.TASK_STOP,
+                OperationalState.IDLE: EventType.TASK_RESET,
+                OperationalState.ERROR: EventType.TASK_ERROR,
+            }
+            event_type = event_mapping.get(target_state)
         if event_type is None:
             logger.error(f"No event mapping for target state {target_state.value}")
             return

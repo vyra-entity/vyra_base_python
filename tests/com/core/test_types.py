@@ -24,7 +24,7 @@ class TestProtocolType:
     def test_protocol_values(self):
         """Test protocol types have expected string values."""
         assert ProtocolType.ROS2 == "ros2"
-        assert ProtocolType.SHARED_MEMORY == "shared_memory"
+        assert ProtocolType.SHARED_MEMORY == "sharedmemory"
         assert ProtocolType.UDS == "uds"
         assert ProtocolType.REDIS == "redis"
         assert ProtocolType.GRPC == "grpc"
@@ -52,18 +52,18 @@ class TestInterfaceType:
     
     def test_interface_types_exist(self):
         """Test all interface types are defined."""
-        assert hasattr(InterfaceType, 'CALLABLE')
-        assert hasattr(InterfaceType, 'SPEAKER')
-        assert hasattr(InterfaceType, 'JOB')
+        assert hasattr(InterfaceType, 'SERVER')
+        assert hasattr(InterfaceType, 'PUBLISHER')
+        assert hasattr(InterfaceType, 'ACTION_SERVER')
     
     def test_interface_values(self):
         """Test interface types have expected string values."""
-        assert InterfaceType.CALLABLE == "callable"
-        assert InterfaceType.SPEAKER == "speaker"
-        assert InterfaceType.JOB == "job"
+        assert InterfaceType.SERVER == "server"
+        assert InterfaceType.PUBLISHER == "publisher"
+        assert InterfaceType.ACTION_SERVER == "actionServer"
     
     def test_interface_comparison(self):
         """Test interface types can be compared."""
-        assert InterfaceType.CALLABLE == InterfaceType.CALLABLE
-        assert InterfaceType.CALLABLE != InterfaceType.SPEAKER
-        assert InterfaceType.JOB == "job"
+        assert InterfaceType.SERVER == InterfaceType.SERVER
+        assert InterfaceType.SERVER != InterfaceType.PUBLISHER
+        assert InterfaceType.ACTION_SERVER == "actionServer"

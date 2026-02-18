@@ -1,235 +1,333 @@
 COM API Overview
-=================
+================
 
-This page provides a complete overview of all communication APIs in vyra_base.com.
+Complete reference of all public classes, decorators, and helpers in ``vyra_base.com``.
 
-ROS2 Communication (Datalayer)
--------------------------------
+.. contents::
+   :local:
+   :depth: 2
 
-Services
-^^^^^^^^
+---
 
-.. list-table::
-   :header-rows: 1
-   :widths: 20 40 40
+Decorators
+----------
 
-   * - Class
-     - Usage
-     - Reference
-   * - **VyraCallable**
-     - Service Server (provides service)
-     - :class:`~vyra_base.com.datalayer.callable.VyraCallable`
-   * - **VyraJob** (via create_vyra_job)
-     - Service Client (calls service)
-     - :doc:`../vyra_base.com.datalayer`
-   * - **@remote_callable**
-     - Decorato for automatic service regisration
-     - :func:`~vyra_base.com.datalayer.interface_factoy.remote_callable`
-
-Topics
-^^^^^^
+Use these on component methods to expose them over the network.
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 40 40
+   :widths: 30 20 50
 
-   * - Class
-     - Usage
-     - Reference
-   * - **VyraSpeaker**
-     - Publisher (publishes)
-     - :class:`~vyra_base.com.datalayer.speaker.VyraSpeaker`
-   * - **VyraSpeakerListener**
-     - Subscriber (receives)
-     - :class:`~vyra_base.com.datalayer.speaker.VyraSpeakerListener`
-   * - **VyraPublisher**
-     - Low-Level Publisher
-     - :class:`~vyra_base.com.datalayer.publisher.VyraPublisher`
-   * - **VyraSubscriber**
-     - Low-Level Subscriber
-     - :class:`~vyra_base.com.datalayer.subscriber.VyraSubscriber`
+   * - Decorator
+     - Type
+     - Description
+   * - ``@remote_service``
+     - Function
+     - Expose a method as a request/response service server
+   * - ``@remote_publisher``
+     - Function
+     - Expose a method as a message publisher
+   * - ``@remote_subscriber``
+     - Function
+     - Register a method as a message subscriber callback
+   * - ``@remote_actionServer.on_goal``
+     - Method on class
+     - Accept/reject incoming action goals
+   * - ``@remote_actionServer.execute``
+     - Method on class
+     - Execute the action (main loop)
+   * - ``@remote_actionServer.on_cancel``
+     - Method on class
+     - Handle cancellation requests
 
-Actions
-^^^^^^^
+All decorators require your component class to call ``bind_decorated_callbacks()``
+during Phase 2 initialization.
 
-.. list-table::
-   :header-rows: 1
-   :widths: 20 40 40
+.. seealso:: :class:`~vyra_base.com.core.decorators`
 
-   * - Class
-     - Usage
-     - Reference
-   * - **VyraActionServer**
-     - Action Server (executes)
-     - :class:`~vyra_base.com.datalayer.action_server.VyraActionServer`
-   * - **VyraActionClient**
-     - Action Client (starts action)
-     - :class:`~vyra_base.com.datalayer.action_client.VyraActionClient`
+---
 
-Node Management
-^^^^^^^^^^^^^^^
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 40 40
-
-   * - Class
-     - Usage
-     - Reference
-   * - **VyraNode**
-     - Main ROS2 node for modules
-     - :class:`~vyra_base.com.datalayer.node.VyraNode`
-   * - **CheckerNode**
-     - Helper node for node availability checking
-     - :class:`~vyra_base.com.datalayer.node.CheckerNode`
-
-Feeder
-------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 40 40
-
-   * - Class
-     - Usage
-     - Reference
-   * - **BaseFeeder**
-     - Base class for all feeders
-     - :class:`~vyra_base.com.feeder.feeder.BaseFeeder`
-   * - **StateFeeder**
-     - Automatic state publication
-     - :class:`~vyra_base.com.feeder.state_feeder.StateFeeder`
-   * - **NewsFeeder**
-     - Automatic news publication
-     - :class:`~vyra_base.com.feeder.news_feeder.NewsFeeder`
-   * - **ErrorFeeder**
-     - Automatic error publication
-     - :class:`~vyra_base.com.feeder.error_feeder.ErrorFeeder`
-
-IPC (Inter Process Communication)
----------------------------------
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 40 40
-
-   * - Class
-     - Usage
-     - Reference
-   * - **GrpcServer**
-     - gRPC server via Unix Domain Socket
-     - :class:`~vyra_base.com.handler.ipc.GrpcServer`
-   * - **GrpcClient**
-     - gRPC client via Unix Domain Socket
-     - :class:`~vyra_base.com.external.grpc.GrpcClient`
-
-Factoy Functions
+Abstract Handlers
 -----------------
 
-Interface Creation
-^^^^^^^^^^^^^^^^^^
-
-.. code-block:: python
-
-   from vyra_base.com.datalayer.interface_factoy import (
-       create_vyra_job,      # Service Client
-       create_vyra_callable,  # Service Server
-       create_vyra_speaker,   # Publisher
-       DataSpace             # Interface-Registry
-   )
+Implement these interfaces in your component class.
 
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
-   * - Function
+   * - Interface
      - Description
-   * - ``create_vyra_job(node, service_name, service_type)``
-     - Creates service client
-   * - ``create_vyra_callable(node, service_name, service_type, callback)``
-     - Creates service server
-   * - ``create_vyra_speaker(node, topic_name, topic_type, qos_profile)``
-     - Creates publisher
-   * - ``@remote_callable``
-     - Decorato for automatic service regisration
+   * - ``IServiceHandler``
+     - Marker interface for classes that expose ``@remote_service`` methods
+   * - ``IActionHandler``
+     - Required base for classes using ``@remote_actionServer``
+   * - ``IGoalHandle``
+     - Passed to ``execute()`` — use to publish feedback and set result
 
-Usage Examples
+.. code-block:: python
+
+   from vyra_base.com import IActionHandler, IGoalHandle
+
+   class MyComponent(IActionHandler):
+       @remote_actionServer.execute(name="task")
+       async def execute(self, goal_handle: IGoalHandle):
+           await goal_handle.publish_feedback({"progress": 50})
+           goal_handle.succeed()
+           return {"done": True}
+
+---
+
+InterfaceFactory
+----------------
+
+Creates live communication objects (servers, clients, publishers, subscribers, action objects).
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+
+   * - Method
+     - Description
+   * - ``create_server(name, callback, protocols)``
+     - Create a service server
+   * - ``create_client(name, protocols)``
+     - Create a service client
+   * - ``create_publisher(name, protocols)``
+     - Create a publisher
+   * - ``create_subscriber(name, callback, protocols)``
+     - Create a subscriber
+   * - ``create_action_client(name, protocols, feedback_callback)``
+     - Create an action client
+   * - ``create_from_blueprint(blueprint)``
+     - Create interface from a Blueprint object
+   * - ``get_available_protocols()``
+     - Returns list of currently available ``ProtocolType`` values
+
+.. seealso:: :class:`~vyra_base.com.core.factory.InterfaceFactory`
+
+---
+
+Blueprints
+----------
+
+Blueprints describe an interface *before* it is created (Phase 1 of two-phase init).
+Created automatically by decorators; rarely needed manually.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Blueprint
+     - Description
+   * - ``ServiceBlueprint``
+     - Describes a service server
+   * - ``PublisherBlueprint``
+     - Describes a publisher
+   * - ``SubscriberBlueprint``
+     - Describes a subscriber
+   * - ``ActionBlueprint``
+     - Describes an action server (groups goal/execute/cancel blueprints)
+   * - ``CallbackRegistry``
+     - Global registry — stores and retrieves all blueprints by name
+
+---
+
+Transport Layer
+---------------
+
+All four transports are **fully implemented**. Import from ``com.transport.t_*``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 20 30 35
+
+   * - Protocol
+     - Module
+     - Key Classes
+     - Notes
+   * - **Zenoh** (default)
+     - ``transport.t_zenoh``
+     - ``ZenohProvider``, ``ZenohSession``
+     - Requires ``eclipse-zenoh``
+   * - **ROS2**
+     - ``transport.t_ros2``
+     - ``VyraNode``, ``ROS2Publisher``, ``ROS2Subscriber``, ``ROS2ServiceServer``, ``ROS2ServiceClient``, ``ROS2ActionServer``, ``ROS2ActionClient``
+     - Requires ROS2 + ``rclpy``
+   * - **Redis**
+     - ``transport.t_redis``
+     - ``RedisProvider``, ``RedisClient``
+     - Requires ``redis``
+   * - **UDS**
+     - ``transport.t_uds``
+     - ``UDSProvider``
+     - No extra dependencies
+
+Fallback chain: ``Zenoh → ROS2 → Redis → UDS``
+
+---
+
+External Layer
 --------------
 
-Service Call (Job)
-^^^^^^^^^^^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 20 20 30 30
+
+   * - Protocol
+     - Module
+     - Key Classes
+     - Notes
+   * - **gRPC**
+     - ``external.grpc``
+     - ``GrpcServer``, ``GrpcClient``
+     - Requires ``grpcio``
+   * - **MQTT**
+     - ``external.mqtt``
+     - ``MqttClient``
+     - Requires ``paho-mqtt``
+   * - **REST**
+     - ``external.rest``
+     - ``RestClient``
+     - Requires ``aiohttp``
+   * - **WebSocket**
+     - ``external.websocket``
+     - ``WebSocketClient``
+     - Requires ``websockets``
+   * - **Shared Memory**
+     - ``external.shared_memory``
+     - ``SharedMemorySegment``, ``SharedMemorySerializer``, ``SharedMemoryDiscovery``
+     - Linux only; no extra deps
+
+---
+
+Industrial Layer
+----------------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 20 30 30
+
+   * - Protocol
+     - Module
+     - Key Classes
+     - Notes
+   * - **Modbus**
+     - ``industrial.modbus``
+     - TCP + RTU sub-modules
+     - Requires ``pymodbus``
+   * - **OPC UA**
+     - ``industrial.opcua``
+     - ``OpcuaClient``, ``OpcuaServer``
+     - Requires ``asyncua``
+
+---
+
+Feeders
+-------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Class
+     - Description
+   * - ``BaseFeeder``
+     - Abstract base for all feeders
+   * - ``StateFeeder``
+     - Publishes lifecycle + operational state changes
+   * - ``NewsFeeder``
+     - Publishes informational messages
+   * - ``ErrorFeeder``
+     - Publishes error reports
+   * - ``AvailableModuleFeeder``
+     - Publishes module availability (heartbeat/discovery)
+
+Use feeders via the entity:
 
 .. code-block:: python
 
-   from vyra_base.com.datalayer.interface_factoy import create_vyra_job
-   from example_interfaces.srv import AddTwoInts
-   
-   job = create_vyra_job(
-       node=entity.node,
-       service_name="/calculato/add_two_ints",
-       service_type=AddTwoInts
+   entity.publish_news("Ready")
+   entity.publish_error("Storage unavailable")
+
+---
+
+Type System
+-----------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Type / Enum
+     - Description
+   * - ``ProtocolType``
+     - All supported protocols (``ROS2``, ``ZENOH``, ``REDIS``, ``UDS``, ``MQTT``, ``GRPC``, ``REST``, ``WEBSOCKET``, ``SHARED_MEMORY``, ``MODBUS``, ``OPCUA``)
+   * - ``InterfaceType``
+     - Interface kinds: ``SERVER``, ``CLIENT``, ``PUBLISHER``, ``SUBSCRIBER``, ``ACTION_SERVER``, ``ACTION_CLIENT``
+   * - ``AccessLevel``
+     - Security access control: ``PUBLIC``, ``PROTECTED``, ``PRIVATE``, ``INTERNAL``
+   * - ``ActionStatus``
+     - Action result status: ``SUCCEEDED``, ``ABORTED``, ``CANCELED``, ``EXECUTING``
+   * - ``VyraServer``
+     - Type alias for a running service server
+   * - ``VyraClient``
+     - Type alias for a service client
+   * - ``VyraPublisher``
+     - Type alias for a publisher (has ``.shout()`` method)
+   * - ``VyraSubscriber``
+     - Type alias for a subscriber
+   * - ``VyraActionServer``
+     - Type alias for an action server
+   * - ``VyraActionClient``
+     - Type alias for an action client
+
+---
+
+Topic Builder
+-------------
+
+Generates consistent topic / service names following VYRA naming conventions.
+
+.. code-block:: python
+
+   from vyra_base.com import build_topic, parse_topic, InterfaceType
+
+   # Build a topic name
+   name = build_topic(namespace="my_module", name="temperature", interface_type=InterfaceType.PUBLISHER)
+   # → "my_module/temperature"
+
+   # Parse an existing topic back to its components
+   components = parse_topic("my_module/temperature")
+   print(components.namespace, components.name)
+
+---
+
+Exceptions
+----------
+
+All exceptions live in ``vyra_base.com.core.exceptions``.
+
+.. code-block:: python
+
+   from vyra_base.com import (
+       CommunicationError,          # Base
+       ProtocolUnavailableError,    # Protocol not installed / unreachable
+       ProtocolNotInitializedError, # Protocol not set up yet
+       TransportError,              # Low-level transport failure
+       InterfaceError,              # Interface creation failed
+       TServerError,                # Server runtime error
+       TSubscriberError,            # Subscriber error
+       ActionServerError,           # Action server error
    )
-   response = await job.call_async(request)
 
-Provide Service (Callable)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+---
 
-.. code-block:: python
+Further Reading
+---------------
 
-   from vyra_base.com.datalayer.interface_factoy import remote_callable
-   
-   class MyService:
-       @remote_callable
-       async def my_service_method(self, request, response):
-           response.result = "success"
-           return response
-
-Publish Topic (Speaker)
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: python
-
-   from vyra_base.com.datalayer.interface_factoy import create_vyra_speaker
-   from std_msgs.msg import String
-   
-   speaker = create_vyra_speaker(
-       node=entity.node,
-       topic_name="/my_topic",
-       topic_type=String
-   )
-   speaker.shout(message)
-
-Use Feeders
-^^^^^^^^^^^
-
-.. code-block:: python
-
-   # Via Entity (easiest way)
-   entity.publish_state()
-   entity.publish_news("Module started")
-   entity.publish_error("Connection failed")
-
-Use IPC
-^^^^^^^
-
-.. code-block:: python
-
-   from vyra_base.com.handler.ipc import GrpcClient
-   
-   client = GrpcClient(target="/tmp/my_module.sock")
-   await client.connect()
-   response = await client.call_unary("MethodName", request)
-
-Complete API Reference
-----------------------
-
-* :doc:`../vyra_base.com.datalayer` - Datalayer (ROS2) API
-* :doc:`../vyra_base.com.feeder` - Feeder API
-* :doc:`../vyra_base.com` - Complete COM API
-
-Further Documentation
----------------------
-
-* :doc:`ros2_communication` - ROS2 Details
-* :doc:`ipc_communication` - IPC Details
-* :doc:`feeders` - Feeder Details
+* :doc:`../com` — Transport, External, Industrial — full module reference
+* :doc:`core/factory` — InterfaceFactory API
+* :doc:`core/decorators` — Decorator API
+* :doc:`core/types` — Type system
+* :doc:`../quickstart` — Step-by-step module building guide

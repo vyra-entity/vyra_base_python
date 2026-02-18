@@ -18,7 +18,6 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from vyra_base.helper.logger import logger
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)

@@ -34,20 +34,28 @@ class TestAbstractProtocolProvider:
             async def shutdown(self):
                 self._initialized = False
             
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         provider = MockProvider(ProtocolType.REDIS)
         assert isinstance(provider, AbstractProtocolProvider)
         assert provider.protocol == ProtocolType.REDIS
         assert hasattr(provider, 'initialize')
-        assert hasattr(provider, 'create_callable')
+        assert hasattr(provider, 'create_server')
 
 
 class TestProviderRegistry:
@@ -86,13 +94,21 @@ class TestProviderRegistry:
             async def shutdown(self):
                 self._initialized = False
             
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         registry = ProviderRegistry()
@@ -121,13 +137,21 @@ class TestProviderRegistry:
             async def shutdown(self):
                 self._initialized = False
             
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         registry = ProviderRegistry()
@@ -164,13 +188,21 @@ class TestProviderRegistry:
             async def shutdown(self):
                 self._initialized = False
             
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
             
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         registry = ProviderRegistry()
@@ -198,11 +230,19 @@ class TestProviderRegistry:
                 self._initialized = True
             async def shutdown(self):
                 self._initialized = False
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         class MockProvider2(AbstractProtocolProvider):
@@ -217,11 +257,19 @@ class TestProviderRegistry:
                 self._initialized = True
             async def shutdown(self):
                 self._initialized = False
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         registry = ProviderRegistry()
@@ -252,11 +300,19 @@ class TestProviderRegistry:
                 self._initialized = True
             async def shutdown(self):
                 self._initialized = False
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         registry = ProviderRegistry()
@@ -284,11 +340,19 @@ class TestProviderRegistry:
                 self._initialized = True
             async def shutdown(self):
                 self._initialized = False
-            async def create_callable(self, name: str, **kwargs):
+            async def create_server(self, name: str, **kwargs):
                 return Mock()
-            async def create_speaker(self, name: str, **kwargs):
+            async def create_publisher(self, name: str, **kwargs):
                 return Mock()
-            async def create_job(self, name: str, **kwargs):
+            async def create_action_server(self, name: str, **kwargs):
+                return Mock()
+            async def create_subscriber(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_client(self, name: str, **kwargs):
+                return Mock()
+            
+            async def create_action_client(self, name: str, **kwargs):
                 return Mock()
         
         registry = ProviderRegistry()

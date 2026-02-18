@@ -10,8 +10,8 @@ from rclpy.client import Client
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
 from vyra_base.helper.error_handler import ErrorTraceback
-from vyra_base.helper.logger import logger
-
+import logging
+logger = logging.getLogger(__name__)
 def _base_request(*args, **kwargs) -> NoReturn:
     """
     Raises

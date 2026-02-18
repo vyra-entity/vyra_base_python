@@ -61,7 +61,7 @@ class TestTransportIntegration:
     @pytest.mark.asyncio
     async def test_uds_provider_lifecycle(self):
         """Test UDS provider full lifecycle."""
-        from vyra_base.com.transport.t_uds import create_uds_provider
+        from vyra_base.com.transport.t_uds import UDSProvider
         
         # Create temp socket path
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -69,21 +69,19 @@ class TestTransportIntegration:
             
             try:
                 # Server provider
-                server_provider = await create_uds_provider(
-                    socket_path=socket_path,
-                    is_server=True,
-                    entity_name="server"
+                server_provider = UDSProvider(
+                    module_name="server",
+                    module_id="server_id",
                 )
                 
                 # Client provider
-                client_provider = await create_uds_provider(
-                    socket_path=socket_path,
-                    is_server=False,
-                    entity_name="client"
+                client_provider = UDSProvider(
+                    module_name="client",
+                    module_id="client_id",
                 )
                 
                 # Server callable
-                server_callable = server_provider.create_callable("rpc")
+                server_callable = server_provider.create_server("rpc")
                 
                 # Start server
                 async def handle_request(request):
@@ -97,7 +95,7 @@ class TestTransportIntegration:
                 await asyncio.sleep(0.1)
                 
                 # Client call
-                client_callable = client_provider.create_callable("rpc")
+                client_callable = client_provider.create_server("rpc")
                 result = await client_callable.call({"value": 21})
                 
                 assert result["result"] == 42
@@ -152,7 +150,7 @@ class TestIndustrialProtocols:
     @pytest.mark.asyncio
     async def test_opcua_client_connection(self):
         """Test OPC UA client lifecycle."""
-        from vyra_base.com.industrial.opcua.client import OpcuaClient
+        from vyra_base.com.industrial.opcua.opcua_client import OpcuaClient
         
         try:
             client = OpcuaClient(
@@ -240,21 +238,19 @@ class TestLayeredArchitecture:
     @pytest.mark.asyncio
     async def test_communication_to_vyra_models(self):
         """Test communication layer to VYRA models flow."""
-        from vyra_base.com.transport.t_uds import create_uds_provider
+        from vyra_base.com.transport.t_uds import UDSProvider
         
         with tempfile.TemporaryDirectory() as tmpdir:
-            socket_path = os.path.join(tmpdir, "layered_test.sock")
             
             try:
                 # Provider uses communication layer internally
-                provider = await create_uds_provider(
-                    socket_path=socket_path,
-                    is_server=True,
-                    entity_name="test"
+                provider = UDSProvider(
+                    module_name="test",
+                    module_id="test_id",
                 )
                 
                 # VYRA models (Speaker, Listener, Callable) built on communication layer
-                speaker = provider.create_speaker("events")
+                speaker = provider.create_publisher("events")
                 
                 # Should work without knowing underlying communication details
                 await speaker.publish({"event": "test"})
@@ -279,24 +275,22 @@ class TestEndToEnd:
             socket_path = os.path.join(tmpdir, "e2e_test.sock")
             
             try:
-                from vyra_base.com.transport.t_uds import create_uds_provider
+                from vyra_base.com.transport.t_uds import UDSProvider
                 
                 # Server
-                server = await create_uds_provider(
-                    socket_path=socket_path,
-                    is_server=True,
-                    entity_name="server"
+                server = UDSProvider(
+                    module_name="server",
+                    module_id="server_id",
                 )
                 
                 # Client
-                client = await create_uds_provider(
-                    socket_path=socket_path,
-                    is_server=False,
-                    entity_name="client"
+                client = UDSProvider(
+                    module_name="client",
+                    module_id="client_id",
                 )
                 
                 # Server handles requests
-                server_callable = server.create_callable("api")
+                server_callable = server.create_server("api")
                 
                 async def handle_api_request(request):
                     return {"processed": request["data"]}
@@ -308,7 +302,7 @@ class TestEndToEnd:
                 await asyncio.sleep(0.1)
                 
                 # Client sends requests
-                client_callable = client.create_callable("api")
+                client_callable = client.create_server("api")
                 
                 for i in range(5):
                     result = await client_callable.call({"data": f"request_{i}"})

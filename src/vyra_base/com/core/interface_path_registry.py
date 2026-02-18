@@ -36,8 +36,8 @@ class InterfacePathRegistry:
     Examples:
         >>> registry = InterfacePathRegistry.get_instance()
         >>> registry.set_interface_paths([
-        ...     "/workspace/install/v2_modulemanager_interfaces/share/v2_modulemanager_interfaces",
-        ...     "/workspace/install/vyra_module_template_interfaces/share/vyra_module_template_interfaces"
+        ...     "/path/to/interfaces1",
+        ...     "/path/to/interfaces2"
         ... ])
         >>> paths = registry.get_interface_paths()
     """
@@ -102,8 +102,8 @@ class InterfacePathRegistry:
             
         Examples:
             >>> registry.set_interface_paths([
-            ...     "/workspace/install/v2_modulemanager_interfaces/share/v2_modulemanager_interfaces",
-            ...     "/workspace/install/vyra_module_template_interfaces/share/vyra_module_template_interfaces"
+            ...     "/path/to/interfaces1",
+            ...     "/path/to/interfaces2"
             ... ])
         """
         with self._paths_lock:

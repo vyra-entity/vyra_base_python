@@ -58,10 +58,13 @@ autodoc_mock_imports = [
     "unique_identifier_msgs",
     "grpc",
     "grpc.aio",
+    "numpy",
+    "zenoh",
+    "redis",
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'DEPRECATED']
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = 'furo'

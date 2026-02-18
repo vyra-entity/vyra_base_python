@@ -1,5 +1,5 @@
 """
-Unit tests for decorators (@remote_callable, @remote_speaker, @remote_job).
+Unit tests for decorators (@remote_service, @remote_publisher, @remote_actionServer, @remote_subscriber).
 """
 import pytest
 import asyncio
@@ -8,7 +8,7 @@ from vyra_base.com.core.types import ProtocolType
 
 
 class TestRemoteCallableDecorator:
-    """Test @remote_callable decorator."""
+    """Test @remote_service decorator."""
     
     def test_decorator_on_async_function(self):
         """Test decorator works on async functions."""
@@ -16,9 +16,9 @@ class TestRemoteCallableDecorator:
         async def test_func(request):
             return {"result": "success"}
         
-        assert hasattr(test_func, '_vyra_remote_callable')
-        assert test_func._vyra_remote_callable is True
-        assert test_func._vyra_callable_name == "test_callable"
+        assert hasattr(test_func, '_vyra_remote_server')
+        assert test_func._vyra_remote_server is True
+        assert test_func._vyra_server_name == "test_callable"
     
     def test_decorator_on_sync_function(self):
         """Test decorator converts sync to async."""
@@ -28,7 +28,7 @@ class TestRemoteCallableDecorator:
         
         # Should be converted to async
         assert asyncio.iscoroutinefunction(sync_func)
-        assert hasattr(sync_func, '_vyra_remote_callable')
+        assert hasattr(sync_func, '_vyra_remote_server')
     
     def test_decorator_default_name(self):
         """Test decorator uses function name if name not provided."""
@@ -36,7 +36,7 @@ class TestRemoteCallableDecorator:
         async def my_function(request):
             return {}
         
-        assert my_function._vyra_callable_name == "my_function"
+        assert my_function._vyra_server_name == "my_function"
     
     def test_decorator_with_protocols(self):
         """Test decorator stores protocol list."""
@@ -66,7 +66,7 @@ class TestRemoteCallableDecorator:
 
 
 class TestRemoteSpeakerDecorator:
-    """Test @remote_speaker decorator."""
+    """Test @remote_publisher decorator."""
     
     def test_decorator_on_async_function(self):
         """Test decorator works on async functions."""
@@ -74,9 +74,9 @@ class TestRemoteSpeakerDecorator:
         async def test_func(self, message):
             pass
         
-        assert hasattr(test_func, '_vyra_remote_speaker')
-        assert test_func._vyra_remote_speaker is True
-        assert test_func._vyra_speaker_name == "test_speaker"
+        assert hasattr(test_func, '_vyra_remote_publisher')
+        assert test_func._vyra_remote_publisher is True
+        assert test_func._vyra_publisher_name == "test_speaker"
     
     def test_decorator_default_name(self):
         """Test decorator uses function name if name not provided."""
@@ -84,7 +84,7 @@ class TestRemoteSpeakerDecorator:
         async def broadcast_status(self, message):
             pass
         
-        assert broadcast_status._vyra_speaker_name == "broadcast_status"
+        assert broadcast_status._vyra_publisher_name == "broadcast_status"
     
     def test_decorator_with_protocols(self):
         """Test decorator stores protocol list."""
@@ -96,29 +96,29 @@ class TestRemoteSpeakerDecorator:
 
 
 class TestRemoteJobDecorator:
-    """Test @remote_job decorator."""
+    """Test @remote_actionServer decorator."""
     
     def test_decorator_on_async_function(self):
         """Test decorator works on async functions."""
-        @remote_actionServer(name="test_job")
+        @remote_actionServer.on_goal(name="test_job")
         async def test_func(self, goal):
             return {"status": "completed"}
         
-        assert hasattr(test_func, '_vyra_remote_job')
-        assert test_func._vyra_remote_job is True
-        assert test_func._vyra_job_name == "test_job"
+        assert hasattr(test_func, '_vyra_remote_action')
+        assert test_func._vyra_remote_action is True
+        assert test_func._vyra_action_name == "test_job"
     
     def test_decorator_default_name(self):
-        """Test decorator uses function name if name not provided."""
-        @remote_actionServer()
+        """Test decorator uses provided name (name is required for action server)."""
+        @remote_actionServer.on_goal(name="long_running_task")
         async def long_running_task(self, goal):
             return {}
         
-        assert long_running_task._vyra_job_name == "long_running_task"
+        assert long_running_task._vyra_action_name == "long_running_task"
     
     def test_decorator_with_protocols(self):
         """Test decorator stores protocol list."""
-        @remote_actionServer(protocols=[ProtocolType.ROS2])
+        @remote_actionServer.on_goal(name="test_func", protocols=[ProtocolType.ROS2])
         async def test_func(self, goal):
             return {}
         
@@ -127,7 +127,7 @@ class TestRemoteJobDecorator:
     @pytest.mark.asyncio
     async def test_decorated_function_callable(self):
         """Test decorated function can be called."""
-        @remote_actionServer()
+        @remote_actionServer.on_goal(name="process_data")
         async def process_data(self, goal):
             return {"processed": goal['data']}
         

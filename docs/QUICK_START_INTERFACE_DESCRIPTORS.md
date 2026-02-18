@@ -48,7 +48,7 @@ interface = await InterfaceFactory.create_from_descriptor(descriptor, node=node)
 
 | Concept | What It Is | When Created |
 |---------|-----------|--------------|
-| **InterfaceDescriptor** | Definition/Blueprint of interface (metadata, protocols, etc.) | Early (module init, from JSON) |
+| **Blueprint** | Definition/Blueprint of interface (metadata, protocols, etc.) | Early (module init, from JSON) |
 | **VyraServer/Publisher/etc.** | Active running interface (network connection, ROS2 node, etc.) | Late (after callbacks bound) |
 
 **Analogy:** 

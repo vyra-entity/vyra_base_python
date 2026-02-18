@@ -7,8 +7,8 @@ from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
 from vyra_base.com import InterfaceFactory, ProtocolType
 
-from vyra_base.helper.logger import logger
-
+import logging
+logger = logging.getLogger(__name__)
 class Volatile:
     """
     A class to manage volatile parameters. Volatile parameters are

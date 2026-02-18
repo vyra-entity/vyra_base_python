@@ -23,7 +23,12 @@ from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
 logger = logging.getLogger(__name__)
 
 # Check ROS2 availability
-_ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+try:
+    _ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+except (ValueError, AttributeError):
+    # find_spec raises ValueError if module is in sys.modules but __spec__ is None
+    # (e.g. when ROS2 is sourced but running in a venv)
+    _ROS2_AVAILABLE = "rclpy" in __import__("sys").modules
 
 if _ROS2_AVAILABLE:
     try:
@@ -33,6 +38,13 @@ if _ROS2_AVAILABLE:
             "⚠️ rosidl_runtime_py not available. ROS2 dynamic interface loading disabled."
         )
         _ROS2_AVAILABLE = False
+        get_message = None  # type: ignore[assignment]
+        get_service = None  # type: ignore[assignment]
+        get_action = None  # type: ignore[assignment]
+else:
+    get_message = None  # type: ignore[assignment]
+    get_service = None  # type: ignore[assignment]
+    get_action = None  # type: ignore[assignment]
 
 
 class InterfaceLoader:
@@ -53,8 +65,8 @@ class InterfaceLoader:
         >>> loader = InterfaceLoader()
         
         # Load ROS2 service interface
-        >>> srv_type = loader.load_ros2_interface("vyra_module_template_interfaces/srv/VBASEGetInterfaceList")
-        >>> print(srv_type)  # <class 'vyra_module_template_interfaces.srv._v_b_a_s_e_get_interface_list.VBASEGetInterfaceList'>
+        >>> srv_type = loader.load_ros2_interface("your_module_interfaces/srv/VBASEGetInterfaceList")
+        >>> print(srv_type)  # <class 'your_module_interfaces.srv.VBASEGetInterfaceList'>
         
         # Load Protocol Buffer interface
         >>> pb_type = loader.load_protobuf_interface("VBASEGetInterfaceList")
@@ -132,7 +144,7 @@ class InterfaceLoader:
             interface_path: Interface path in format "package/type/Name"
                 Examples:
                 - "std_msgs/msg/String"
-                - "vyra_module_template_interfaces/srv/VBASEGetInterfaceList"
+                - "your_module_interfaces/srv/VBASEGetInterfaceList"
                 - "action_msgs/action/MyAction"
         
         Returns:
@@ -168,6 +180,10 @@ class InterfaceLoader:
             # Load interface based on type
             interface_class = None
             
+            if not _ROS2_AVAILABLE:
+                logger.error("ROS2 not installed")
+                return None
+
             if interface_type == "msg":
                 interface_class = get_message(interface_path)
             elif interface_type == "srv":
@@ -219,23 +235,26 @@ class InterfaceLoader:
             return self._protobuf_interface_cache[interface_name]
         
         # Build module name
-        module_name = f"{interface_name}_pb2"
+        built_proto_name = f"{interface_name}_pb2"
         
         # Try direct import first (if module already in sys.path)
         try:
-            module = importlib.import_module(module_name)
+            module = importlib.import_module(built_proto_name)
             self._protobuf_interface_cache[interface_name] = module
-            logger.info(f"✓ Loaded protobuf interface via import: {module_name}")
+            logger.info(f"✓ Loaded protobuf interface via import: {built_proto_name}")
             return module
         except ImportError:
             pass
         
         # Search in interface paths
-        registry = InterfacePathRegistry.get_instance()
-        proto_paths = registry.get_proto_paths()
+        proto_paths: list[Path] = []
+        for interface_path in self.interface_paths:
+            proto_path = interface_path / "proto"
+            if proto_path.is_dir():
+                proto_paths.append(proto_path)
         
         for proto_path in proto_paths:
-            module_file = proto_path / f"{module_name}.py"
+            module_file = proto_path / f"{built_proto_name}.py"
             
             if not module_file.exists():
                 continue
@@ -243,7 +262,7 @@ class InterfaceLoader:
             try:
                 # Load module from file path
                 spec = importlib.util.spec_from_file_location(
-                    module_name,
+                    built_proto_name,
                     module_file
                 )
                 
@@ -251,7 +270,7 @@ class InterfaceLoader:
                     continue
                 
                 module = importlib.util.module_from_spec(spec)
-                sys.modules[module_name] = module
+                sys.modules[built_proto_name] = module
                 spec.loader.exec_module(module)
                 
                 # Cache successful load
@@ -303,8 +322,12 @@ class InterfaceLoader:
         
         metadata: dict[str, dict] = {}
         
-        registry = InterfacePathRegistry.get_instance()
-        config_paths = registry.get_config_paths()
+        # Derive config paths from self.interface_paths
+        config_paths: list[Path] = []
+        for interface_path in self.interface_paths:
+            config_path = interface_path / "config"
+            if config_path.is_dir():
+                config_paths.append(config_path)
         
         for config_path in config_paths:
             # Find all JSON files

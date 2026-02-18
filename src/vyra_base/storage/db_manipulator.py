@@ -1,6 +1,8 @@
 """Handling database datatables"""
 
 import uuid
+import logging
+logger = logging.getLogger(__name__)
 
 from dataclasses import dataclass
 
@@ -14,8 +16,6 @@ from typing import Union
 from typing import Type
 from typing import Any
 
-from vyra_base.helper.logger import logger
-from vyra_base.helper.logger import LogEntry
 from vyra_base.storage.tb_base import Base
 from vyra_base.storage.db_access import DBSTATUS
 from vyra_base.storage.db_access import DbAccess
@@ -99,10 +99,7 @@ class DbManipulator:
             raise TypeError('db_access must be of type DbAccess.')
         
         if not issubclass(model, Base):
-            logger.log(LogEntry(
-                ('Model is no subclass of Base (SQLAlchemy). '
-                    'This could lead to errors')).warn()
-            )
+            logger.warning('Model is no subclass of Base (SQLAlchemy). This could lead to errors')
 
         self._db = db_access
         self.model = model
@@ -134,10 +131,8 @@ class DbManipulator:
         finally:
             error_details: list = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    ('Could not get tablestructure from '
-                     f'{self.model.__tablename__}.')).error()
-                )
+                logger.error('Could not get tablestructure from '
+                     f'{self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -169,9 +164,7 @@ class DbManipulator:
                             stmt = stmt.where(getattr(
                                 self.model, self._read_pkey()) == id)
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in get_by_id: {e}').error()
-                        )
+                        logger.error(f'Error in get_by_id: {e}')
                         raise e
                     
             result = await session.execute(stmt)
@@ -190,9 +183,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not get data by id from {self.model.__tablename__}.').error()
-                )
+                logger.error(f'Could not get data by id from {self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -231,13 +222,13 @@ class DbManipulator:
                     if limit:
                         stmt = stmt.limit(limit)
 
-                    logger.log("Start executing query")
+                    logger.debug("Start executing query")
                     try:
                         result = await session.execute(stmt)
                     finally:
-                        logger.log("Ran execute on session")
+                        logger.debug("Ran execute on session")
                         ErrorTraceback.check_error_exist()
-                    logger.log(f"Executed query: {stmt}: {result}")
+                    logger.debug(f"Executed query: {stmt}: {result}")
                     value = result.scalars().all()
 
                     if len(value) == 0:
@@ -252,9 +243,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not get all data from {self.model.__tablename__}.').error()
-                )
+                logger.error(f'Could not get all data from {self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -289,9 +278,7 @@ class DbManipulator:
                         exec_ret = await session.execute(stmt)
                         await session.flush()
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in update: {e}').error()
-                        )
+                        logger.error(f'Error in update: {e}')
                         raise e
 
             if exec_ret.rowcount == 0:
@@ -308,9 +295,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not update data to {self.model.__tablename__}.').error()
-                )
+                logger.error(f'Could not update data to {self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -334,7 +319,7 @@ class DbManipulator:
                         await session.flush()
                         await session.refresh(obj)
                     except Exception as e:
-                        logger.log(LogEntry(str(e)).error())
+                        logger.error(str(e))
                         raise e
             
             return DBReturnValue(
@@ -347,9 +332,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not add tabledata to {self.table_name}.').error()
-                )
+                logger.error(f'Could not add tabledata to {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -372,9 +355,7 @@ class DbManipulator:
                         await session.execute(stmt)
                         await session.flush()
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in delete: {e}').error()
-                        )
+                        logger.error(f'Error in delete: {e}')
                         raise e
 
             return DBReturnValue(
@@ -387,9 +368,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not delete tabledata from {self.table_name}.').error()
-                )
+                logger.error(f'Could not delete tabledata from {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -414,9 +393,7 @@ class DbManipulator:
                         for obj in objs:
                             await session.refresh(obj)
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in bulk_add: {e}').error()
-                        )
+                        logger.error(f'Error in bulk_add: {e}')
                         raise e
 
             return DBReturnValue(
@@ -429,9 +406,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not bulk add tabledata to {self.table_name}.').error()
-                )
+                logger.error(f'Could not bulk add tabledata to {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -455,9 +430,7 @@ class DbManipulator:
                         await session.execute(stmt)
                         await session.flush()
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in bulk_delete: {e}').error()
-                        )
+                        logger.error(f'Error in bulk_delete: {e}')
                         raise e
 
             return DBReturnValue(
@@ -467,9 +440,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not bulk delete tabledata from {self.table_name}.').error()
-                )
+                logger.error(f'Could not bulk delete tabledata from {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -498,9 +469,7 @@ class DbManipulator:
 
                         ret_val = result.scalar_one_or_none() is not None
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in exists: {e}').error()
-                        )
+                        logger.error(f'Error in exists: {e}')
                         raise e
 
             return DBReturnValue(
@@ -510,9 +479,7 @@ class DbManipulator:
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not check existance of {self.table_name}.').error()
-                )
+                logger.error(f'Could not check existance of {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 
@@ -540,16 +507,12 @@ class DbManipulator:
                             value=result.scalar_one(),
                             details='').success_return() 
                     except Exception as e:
-                        logger.log(LogEntry(
-                            f'Error in count: {e}').error()
-                        )
+                        logger.error(f'Error in count: {e}')
                         raise e
         finally:
             error_details = []
             if ErrorTraceback.check_error_exist(error_details):
-                logger.log(LogEntry(
-                    f'Could not count tabledata from {self.table_name}.').error()
-                )
+                logger.error(f'Could not count tabledata from {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
 

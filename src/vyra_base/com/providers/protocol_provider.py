@@ -221,10 +221,12 @@ class AbstractProtocolProvider(ABC):
         
         return self._topic_builder
     
+    @property
     def is_available(self) -> bool:
         """Check if protocol is available."""
         return self._available
     
+    @property
     def is_initialized(self) -> bool:
         """Check if provider is initialized."""
         return self._initialized

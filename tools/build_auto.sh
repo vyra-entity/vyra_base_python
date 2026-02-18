@@ -225,10 +225,10 @@ else
     # Create changelog entry with proper formatting
     NEW_ENTRY="\n\n## [$NEW_VERSION] - $CURRENT_DATE\n\n### Build\n\n$CHANGELOG_ENTRY"
     
-    # Insert after [Unreleased] section
-    # Use sed to insert after line containing "## [Unreleased]"
-    sed -i "/## \[Unreleased\]/a\\$NEW_ENTRY" "$CHANGELOG_FILE"
-    
+    # Insert after [Unreleased] section using awk for robust multiline handling
+    TMP_CHANGELOG=$(mktemp)
+    awk -v entry="$NEW_ENTRY" 'BEGIN{inserted=0} {print $0} $0 ~ /^## \[Unreleased\]/ && !inserted {print entry; inserted=1}' "$CHANGELOG_FILE" > "$TMP_CHANGELOG"
+    mv "$TMP_CHANGELOG" "$CHANGELOG_FILE"
     echo "  ✅ Changelog updated"
 fi
 

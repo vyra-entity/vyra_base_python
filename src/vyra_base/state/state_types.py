@@ -55,6 +55,7 @@ LIFECYCLE_TRANSITIONS = {
     (LifecycleState.ACTIVE, LifecycleState.SHUTTING_DOWN),
     (LifecycleState.ACTIVE, LifecycleState.RECOVERING),
     (LifecycleState.ACTIVE, LifecycleState.SUSPENDED),
+    (LifecycleState.SUSPENDED, LifecycleState.ACTIVE),
     (LifecycleState.SUSPENDED, LifecycleState.OFFLINE),
     (LifecycleState.RECOVERING, LifecycleState.ACTIVE),
     (LifecycleState.RECOVERING, LifecycleState.SHUTTING_DOWN),

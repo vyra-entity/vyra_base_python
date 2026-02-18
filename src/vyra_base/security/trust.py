@@ -3,9 +3,8 @@ import uuid
 from enum import Enum
 from pathlib import Path
 
-from vyra_base.helper.logger import logger
-
-
+import logging
+logger = logging.getLogger(__name__)
 class TRUST_LEVEL(int, Enum):
     """
     Enumeration defining trust levels for access control.

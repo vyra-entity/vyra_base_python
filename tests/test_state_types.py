@@ -22,20 +22,20 @@ from vyra_base.state.state_types import (
 
 class TestLifecycleState:
     """Test LifecycleState enum."""
-    
+
     def test_all_states_exist(self):
         """Verify all lifecycle states are defined."""
         expected_states = {
-            "Uninitialized",
+            "Offline",
             "Initializing",
             "Active",
             "Recovering",
             "ShuttingDown",
-            "Deactivated",
+            "Suspended",
         }
         actual_states = {state.value for state in LifecycleState}
         assert actual_states == expected_states
-    
+
     def test_state_values_are_strings(self):
         """Verify state values are properly formatted strings."""
         for state in LifecycleState:
@@ -45,22 +45,20 @@ class TestLifecycleState:
 
 class TestOperationalState:
     """Test OperationalState enum."""
-    
+
     def test_all_states_exist(self):
         """Verify all operational states are defined."""
         expected_states = {
             "Idle",
             "Ready",
             "Running",
-            "Processing",
-            "Delegating",
             "Paused",
-            "Blocked",
-            "Completed",
+            "Stopped",
+            "Error",
         }
         actual_states = {state.value for state in OperationalState}
         assert actual_states == expected_states
-    
+
     def test_state_values_are_strings(self):
         """Verify state values are properly formatted strings."""
         for state in OperationalState:
@@ -70,51 +68,43 @@ class TestOperationalState:
 
 class TestHealthState:
     """Test HealthState enum."""
-    
+
     def test_all_states_exist(self):
         """Verify all health states are defined."""
         expected_states = {
-            "OK",
+            "Healthy",
             "Warning",
-            "Overloaded",
-            "Faulted",
             "Critical",
         }
         actual_states = {state.value for state in HealthState}
         assert actual_states == expected_states
-    
+
     def test_severity_ordering(self):
         """Verify health states can be compared by severity."""
-        # Manual severity mapping for validation
         severity = {
-            HealthState.OK: 0,
+            HealthState.HEALTHY: 0,
             HealthState.WARNING: 1,
-            HealthState.OVERLOADED: 2,
-            HealthState.FAULTED: 3,
-            HealthState.CRITICAL: 4,
+            HealthState.CRITICAL: 2,
         }
-        
-        # Verify increasing severity
-        assert severity[HealthState.OK] < severity[HealthState.WARNING]
-        assert severity[HealthState.WARNING] < severity[HealthState.OVERLOADED]
-        assert severity[HealthState.OVERLOADED] < severity[HealthState.FAULTED]
-        assert severity[HealthState.FAULTED] < severity[HealthState.CRITICAL]
+
+        assert severity[HealthState.HEALTHY] < severity[HealthState.WARNING]
+        assert severity[HealthState.WARNING] < severity[HealthState.CRITICAL]
 
 
 class TestLifecycleTransitions:
     """Test lifecycle state transition validation."""
-    
+
     def test_valid_startup_sequence(self):
         """Test valid startup transitions."""
         assert is_valid_lifecycle_transition(
-            LifecycleState.UNINITIALIZED,
+            LifecycleState.OFFLINE,
             LifecycleState.INITIALIZING
         )
         assert is_valid_lifecycle_transition(
             LifecycleState.INITIALIZING,
             LifecycleState.ACTIVE
         )
-    
+
     def test_valid_shutdown_sequence(self):
         """Test valid shutdown transitions."""
         assert is_valid_lifecycle_transition(
@@ -123,258 +113,161 @@ class TestLifecycleTransitions:
         )
         assert is_valid_lifecycle_transition(
             LifecycleState.SHUTTING_DOWN,
-            LifecycleState.DEACTIVATED
+            LifecycleState.OFFLINE
         )
-    
+
     def test_valid_recovery_sequence(self):
         """Test valid recovery transitions."""
-        # Active -> Recovering
         assert is_valid_lifecycle_transition(
             LifecycleState.ACTIVE,
             LifecycleState.RECOVERING
         )
-        # Recovering -> Active (successful recovery)
         assert is_valid_lifecycle_transition(
             LifecycleState.RECOVERING,
             LifecycleState.ACTIVE
         )
-        # Recovering -> Deactivated (failed recovery)
+        # Failed recovery goes to ShuttingDown
         assert is_valid_lifecycle_transition(
             LifecycleState.RECOVERING,
-            LifecycleState.DEACTIVATED
+            LifecycleState.SHUTTING_DOWN
         )
-    
+
+    def test_valid_suspend_sequence(self):
+        """Test valid suspend transitions."""
+        assert is_valid_lifecycle_transition(
+            LifecycleState.ACTIVE,
+            LifecycleState.SUSPENDED
+        )
+        assert is_valid_lifecycle_transition(
+            LifecycleState.SUSPENDED,
+            LifecycleState.OFFLINE
+        )
+
     def test_invalid_transitions(self):
         """Test that invalid transitions are rejected."""
-        # Cannot go directly from Uninitialized to Active
         assert not is_valid_lifecycle_transition(
-            LifecycleState.UNINITIALIZED,
+            LifecycleState.OFFLINE,
             LifecycleState.ACTIVE
         )
-        # Cannot go back to Uninitialized
         assert not is_valid_lifecycle_transition(
             LifecycleState.ACTIVE,
-            LifecycleState.UNINITIALIZED
+            LifecycleState.OFFLINE
         )
-        # Cannot skip initialization
+        # SUSPENDED -> RECOVERING is invalid (must go through ACTIVE first)
         assert not is_valid_lifecycle_transition(
-            LifecycleState.DEACTIVATED,
-            LifecycleState.ACTIVE
+            LifecycleState.SUSPENDED,
+            LifecycleState.RECOVERING
         )
-    
+
     def test_transition_set_completeness(self):
         """Verify LIFECYCLE_TRANSITIONS covers all valid transitions."""
-        assert len(LIFECYCLE_TRANSITIONS) >= 8  # Minimum expected transitions
+        assert len(LIFECYCLE_TRANSITIONS) >= 8
 
 
 class TestOperationalTransitions:
     """Test operational state transition validation."""
-    
+
     def test_valid_task_lifecycle(self):
         """Test valid task execution transitions."""
-        # Idle -> Ready
-        assert is_valid_operational_transition(
-            OperationalState.IDLE,
-            OperationalState.READY
-        )
-        # Ready -> Running
-        assert is_valid_operational_transition(
-            OperationalState.READY,
-            OperationalState.RUNNING
-        )
-        # Running -> Completed
-        assert is_valid_operational_transition(
-            OperationalState.RUNNING,
-            OperationalState.COMPLETED
-        )
-        # Completed -> Ready (reset)
-        assert is_valid_operational_transition(
-            OperationalState.COMPLETED,
-            OperationalState.READY
-        )
-    
+        assert is_valid_operational_transition(OperationalState.IDLE, OperationalState.READY)
+        assert is_valid_operational_transition(OperationalState.READY, OperationalState.RUNNING)
+        assert is_valid_operational_transition(OperationalState.RUNNING, OperationalState.STOPPED)
+        assert is_valid_operational_transition(OperationalState.STOPPED, OperationalState.IDLE)
+
     def test_valid_pause_resume(self):
         """Test pause and resume transitions."""
-        # Running -> Paused
-        assert is_valid_operational_transition(
-            OperationalState.RUNNING,
-            OperationalState.PAUSED
-        )
-        # Paused -> Running
-        assert is_valid_operational_transition(
-            OperationalState.PAUSED,
-            OperationalState.RUNNING
-        )
-    
-    def test_valid_processing_states(self):
-        """Test background processing and delegation."""
-        # Running -> Processing
-        assert is_valid_operational_transition(
-            OperationalState.RUNNING,
-            OperationalState.PROCESSING
-        )
-        # Processing -> Running
-        assert is_valid_operational_transition(
-            OperationalState.PROCESSING,
-            OperationalState.RUNNING
-        )
-        # Running -> Delegating
-        assert is_valid_operational_transition(
-            OperationalState.RUNNING,
-            OperationalState.DELEGATING
-        )
-        # Delegating -> Running
-        assert is_valid_operational_transition(
-            OperationalState.DELEGATING,
-            OperationalState.RUNNING
-        )
-    
-    def test_valid_blocking(self):
-        """Test blocking and unblocking."""
-        # Running -> Blocked
-        assert is_valid_operational_transition(
-            OperationalState.RUNNING,
-            OperationalState.BLOCKED
-        )
-        # Blocked -> Running
-        assert is_valid_operational_transition(
-            OperationalState.BLOCKED,
-            OperationalState.RUNNING
-        )
-    
+        assert is_valid_operational_transition(OperationalState.RUNNING, OperationalState.PAUSED)
+        # Paused -> Ready (resume)
+        assert is_valid_operational_transition(OperationalState.PAUSED, OperationalState.READY)
+
+    def test_valid_running_complete(self):
+        """Test running to ready (task complete)."""
+        assert is_valid_operational_transition(OperationalState.RUNNING, OperationalState.READY)
+
+    def test_valid_error_transitions(self):
+        """Test error state transitions."""
+        assert is_valid_operational_transition(OperationalState.IDLE, OperationalState.ERROR)
+        assert is_valid_operational_transition(OperationalState.ERROR, OperationalState.IDLE)
+
     def test_invalid_transitions(self):
         """Test that invalid operational transitions are rejected."""
-        # Cannot go from Idle to Running (must go through Ready)
-        assert not is_valid_operational_transition(
-            OperationalState.IDLE,
-            OperationalState.RUNNING
-        )
-        # Cannot go from Completed to Running (must reset to Ready first)
-        assert not is_valid_operational_transition(
-            OperationalState.COMPLETED,
-            OperationalState.RUNNING
-        )
+        assert not is_valid_operational_transition(OperationalState.IDLE, OperationalState.RUNNING)
+        assert not is_valid_operational_transition(OperationalState.STOPPED, OperationalState.RUNNING)
 
 
 class TestHealthTransitions:
     """Test health state transition validation."""
-    
+
     def test_valid_degradation_sequence(self):
         """Test valid health degradation."""
-        # OK -> Warning
-        assert is_valid_health_transition(
-            HealthState.OK,
-            HealthState.WARNING
-        )
-        # Warning -> Overloaded
-        assert is_valid_health_transition(
-            HealthState.WARNING,
-            HealthState.OVERLOADED
-        )
-        # Warning -> Faulted
-        assert is_valid_health_transition(
-            HealthState.WARNING,
-            HealthState.FAULTED
-        )
-        # Faulted -> Critical
-        assert is_valid_health_transition(
-            HealthState.FAULTED,
-            HealthState.CRITICAL
-        )
-    
+        assert is_valid_health_transition(HealthState.HEALTHY, HealthState.WARNING)
+        assert is_valid_health_transition(HealthState.WARNING, HealthState.CRITICAL)
+        assert is_valid_health_transition(HealthState.HEALTHY, HealthState.CRITICAL)
+
     def test_valid_recovery_sequence(self):
         """Test valid health recovery."""
-        # Warning -> OK
-        assert is_valid_health_transition(
-            HealthState.WARNING,
-            HealthState.OK
-        )
-        # Overloaded -> Warning
-        assert is_valid_health_transition(
-            HealthState.OVERLOADED,
-            HealthState.WARNING
-        )
-        # Faulted -> OK
-        assert is_valid_health_transition(
-            HealthState.FAULTED,
-            HealthState.OK
-        )
-        # Critical -> Faulted
-        assert is_valid_health_transition(
-            HealthState.CRITICAL,
-            HealthState.FAULTED
-        )
-    
+        assert is_valid_health_transition(HealthState.WARNING, HealthState.HEALTHY)
+        assert is_valid_health_transition(HealthState.CRITICAL, HealthState.WARNING)
+        assert is_valid_health_transition(HealthState.CRITICAL, HealthState.HEALTHY)
+
     def test_invalid_transitions(self):
-        """Test that invalid health transitions are rejected."""
-        # Cannot go from OK to Critical directly
-        assert not is_valid_health_transition(
-            HealthState.OK,
-            HealthState.CRITICAL
-        )
-        # Cannot go from Critical to OK directly
-        assert not is_valid_health_transition(
-            HealthState.CRITICAL,
-            HealthState.OK
-        )
+        """Test that self-transitions are not defined."""
+        assert not is_valid_health_transition(HealthState.HEALTHY, HealthState.HEALTHY)
 
 
 class TestLayerInteractionRules:
     """Test lifecycle-operational interaction rules."""
-    
-    def test_uninitialized_allows_only_idle(self):
-        """Uninitialized lifecycle only allows Idle operational."""
-        allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.UNINITIALIZED]
-        assert allowed == {OperationalState.IDLE}
-    
+
+    def test_initializing_allows_no_operational(self):
+        """Initializing lifecycle locks operational FSM (empty set)."""
+        allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.INITIALIZING]
+        assert allowed == set()
+
     def test_active_allows_all_operational(self):
         """Active lifecycle allows all operational states."""
         allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.ACTIVE]
         assert OperationalState.READY in allowed
         assert OperationalState.RUNNING in allowed
-        assert OperationalState.PROCESSING in allowed
-        assert len(allowed) >= 7  # Should allow most operational states
-    
+        assert OperationalState.PAUSED in allowed
+        assert len(allowed) == 6
+
     def test_recovering_restricts_operational(self):
         """Recovering lifecycle restricts operational states."""
         allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.RECOVERING]
-        assert OperationalState.PAUSED in allowed or OperationalState.BLOCKED in allowed
-        # Should not allow normal running
-        assert OperationalState.RUNNING not in allowed or OperationalState.READY not in allowed
-    
+        assert OperationalState.PAUSED in allowed
+        assert OperationalState.RUNNING not in allowed
+        assert OperationalState.READY not in allowed
+
     def test_shutting_down_restricts_operational(self):
         """ShuttingDown lifecycle restricts operational states."""
         allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.SHUTTING_DOWN]
-        # Should allow only safe states
         assert OperationalState.RUNNING not in allowed
-    
-    def test_deactivated_allows_only_idle(self):
-        """Deactivated lifecycle only allows Idle operational."""
-        allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.DEACTIVATED]
+        assert OperationalState.IDLE in allowed
+
+    def test_suspended_allows_only_idle(self):
+        """Suspended lifecycle only allows Idle operational."""
+        allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.SUSPENDED]
         assert allowed == {OperationalState.IDLE}
-    
+
+    def test_offline_allows_safe_states(self):
+        """Offline lifecycle allows only IDLE, STOPPED, ERROR."""
+        allowed = LIFECYCLE_OPERATIONAL_RULES[LifecycleState.OFFLINE]
+        assert OperationalState.IDLE in allowed
+        assert OperationalState.STOPPED in allowed
+        assert OperationalState.ERROR in allowed
+        assert OperationalState.RUNNING not in allowed
+        assert OperationalState.READY not in allowed
+
     def test_validation_function_uses_rules(self):
         """Test is_operational_allowed_in_lifecycle uses defined rules."""
-        # Active allows Running
-        assert is_operational_allowed_in_lifecycle(
-            LifecycleState.ACTIVE,
-            OperationalState.RUNNING
-        )
-        # Deactivated does not allow Running
-        assert not is_operational_allowed_in_lifecycle(
-            LifecycleState.DEACTIVATED,
-            OperationalState.RUNNING
-        )
-        # Uninitialized does not allow Ready
-        assert not is_operational_allowed_in_lifecycle(
-            LifecycleState.UNINITIALIZED,
-            OperationalState.READY
-        )
+        assert is_operational_allowed_in_lifecycle(LifecycleState.ACTIVE, OperationalState.RUNNING)
+        assert not is_operational_allowed_in_lifecycle(LifecycleState.SUSPENDED, OperationalState.RUNNING)
+        assert not is_operational_allowed_in_lifecycle(LifecycleState.INITIALIZING, OperationalState.READY)
 
 
 class TestTransitionDataStructures:
     """Test transition rule data structures."""
-    
+
     def test_lifecycle_transitions_structure(self):
         """Verify LIFECYCLE_TRANSITIONS has correct structure."""
         assert isinstance(LIFECYCLE_TRANSITIONS, set)
@@ -383,7 +276,7 @@ class TestTransitionDataStructures:
             assert len(transition) == 2
             assert isinstance(transition[0], LifecycleState)
             assert isinstance(transition[1], LifecycleState)
-    
+
     def test_operational_transitions_structure(self):
         """Verify OPERATIONAL_TRANSITIONS has correct structure."""
         assert isinstance(OPERATIONAL_TRANSITIONS, set)
@@ -392,7 +285,7 @@ class TestTransitionDataStructures:
             assert len(transition) == 2
             assert isinstance(transition[0], OperationalState)
             assert isinstance(transition[1], OperationalState)
-    
+
     def test_health_transitions_structure(self):
         """Verify HEALTH_TRANSITIONS has correct structure."""
         assert isinstance(HEALTH_TRANSITIONS, set)
@@ -401,15 +294,13 @@ class TestTransitionDataStructures:
             assert len(transition) == 2
             assert isinstance(transition[0], HealthState)
             assert isinstance(transition[1], HealthState)
-    
+
     def test_lifecycle_operational_rules_structure(self):
         """Verify LIFECYCLE_OPERATIONAL_RULES has correct structure."""
         assert isinstance(LIFECYCLE_OPERATIONAL_RULES, dict)
-        # All lifecycle states should have rules
         for lifecycle_state in LifecycleState:
             assert lifecycle_state in LIFECYCLE_OPERATIONAL_RULES
             allowed_states = LIFECYCLE_OPERATIONAL_RULES[lifecycle_state]
             assert isinstance(allowed_states, set)
-            # All allowed states must be valid OperationalState
             for op_state in allowed_states:
                 assert isinstance(op_state, OperationalState)

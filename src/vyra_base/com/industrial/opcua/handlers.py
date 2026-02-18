@@ -23,6 +23,13 @@ try:
     ASYNCUA_AVAILABLE = True
 except ImportError:
     ASYNCUA_AVAILABLE = False
+    # Provide fallback base classes so class definitions don't fail at import
+    class SubHandler:  # type: ignore[no-redef]
+        """Fallback SubHandler when asyncua is not available."""
+    class ua:  # type: ignore[no-redef]
+        """Fallback ua namespace when asyncua is not available."""
+    Node = object  # type: ignore[assignment,misc]
+    Subscription = object  # type: ignore[assignment]
 
 
 class OpcuaSecurityMode(Enum):

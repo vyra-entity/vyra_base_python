@@ -37,9 +37,8 @@ from vyra_base.helper.crypto_helper import (
     verify_message_rsa,
     create_hmac_payload,
 )
-from vyra_base.helper.logger import logger
-
-
+import logging
+logger = logging.getLogger(__name__)
 class SecurityValidator:
     """
     Validates SafetyMetadata in incoming messages and service calls.

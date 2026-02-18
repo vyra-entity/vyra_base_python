@@ -31,9 +31,8 @@ from .state_types import (
     is_operational_allowed_in_lifecycle,
 )
 from .state_events import StateEvent, EventType, get_event_target_layer, is_interrupt_event
-from vyra_base.helper.logger import logger
-
-
+import logging
+logger = logging.getLogger(__name__)
 class StateMachineError(Exception):
     """Base exception for state machine errors."""
     pass
@@ -353,7 +352,10 @@ class StateMachine:
         new_state = self._get_lifecycle_target(current, event.event_type)
         
         if new_state is None:
-            logger.debug(f"No lifecycle transition for event {event.event_type} in state {current}")
+            msg = f"No lifecycle transition for event {event.event_type} in state {current}"
+            logger.debug(msg)
+            if self.config.strict_mode:
+                raise InvalidTransitionError(msg)
             return
         
         # Validate transition

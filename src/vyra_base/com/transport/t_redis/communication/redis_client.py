@@ -16,7 +16,8 @@ from enum import Enum
 import redis.asyncio as redis
 from redis.asyncio.client import PubSub
 
-from vyra_base.helper.logger import logger
+import logging
+logger = logging.getLogger(__name__)
 from vyra_base.helper.error_handler import ErrorTraceback
 
 

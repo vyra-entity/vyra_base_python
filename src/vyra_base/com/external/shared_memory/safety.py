@@ -20,7 +20,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Optional, Callable, Dict
 
-from vyra_base.helper.logger import logger
+import logging
+logger = logging.getLogger(__name__)
 from vyra_base.helper.error_handler import ErrorTraceback
 
 logger = logging.getLogger(__name__)

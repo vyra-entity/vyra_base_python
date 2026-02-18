@@ -7,8 +7,8 @@ from rclpy.subscription import Subscription as rclpySubscription
 from rclpy.timer import Timer
 
 from vyra_base.com.transport.t_ros2.node import VyraNode
-from vyra_base.helper.logger import logger
-
+import logging
+logger = logging.getLogger(__name__)
 def _base_callback(*args, **kwargs) -> NoReturn:
     """
     Default callback that raises a NotImplementedError.

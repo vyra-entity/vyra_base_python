@@ -172,7 +172,7 @@ class TestTopicBuilderDynamic:
         
         topic, interface = builder.build_with_interface(
             "get_modules",
-            interface_type=InterfaceType.CALLABLE,
+            interface_type=InterfaceType.SERVER,
             protocol="ros2"
         )
         
