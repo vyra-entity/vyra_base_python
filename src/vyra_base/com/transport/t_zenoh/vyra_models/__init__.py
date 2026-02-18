@@ -3,9 +3,6 @@ Zenoh VYRA Models
 
 VYRA abstractions for Zenoh transport.
 
-Legacy patterns (deprecated):
-- Speaker, Callable, Job
-
 Unified transport layer:
 - Publisher/Subscriber (pub/sub)
 - Server/Client (request/response)
