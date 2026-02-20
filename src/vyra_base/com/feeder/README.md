@@ -40,9 +40,81 @@ Feeders automatically publish data (state, news, errors) to multiple subscribers
 
 - **ROS2-Optional**: Works with or without ROS2 installed
 - **Automatic Fallback**: Redis → ROS2 → MQTT → SharedMemory
+- **Config-based Protocol Selection**: Protocol resolved automatically from interface config JSON
+- **Actionable Error Messages**: Fuzzy-match suggestions when a feeder name is not found
 - **Type Safety**: Native Python types or ROS2 messages
 - **Async Support**: Full async/await integration
 - **Entity Integration**: Seamless VyraEntity integration
+
+---
+
+## Protocol Resolution via Interface Config (FeederConfigResolver)
+
+Jeder Feeder wählt sein Transportprotokoll **automatisch** aus den
+Interface-Config-JSON-Dateien der Module.  Das vermeidet hartcodierte
+Protokoll-Parameter und stellt sicher, dass Feeder immer zum konfigurierten
+Transport des jeweiligen Moduls passen.
+
+### Funktionsweise
+
+1. Der Feeder übergibt seinen `feeder_name` (= `functionname` im JSON) an den
+   `FeederConfigResolver.resolve()`.
+2. Der Resolver durchsucht rekursiv alle JSON-Dateien in den `interface_paths`.
+3. Er filtert Einträge mit `"type": "publisher"` und sucht einen mit passendem
+   `functionname`.
+4. Aus dem `tags`-Feld (`["zenoh"]`, `["ros2"]`, …) wird das Transportprotokoll
+   abgeleitet.
+5. Das Ergebnis enthält Protokoll, Interface-Datei-Typen (`.proto`) und Metadaten.
+
+### Interface-Config-Schema (Beispiel)
+
+```json
+[
+  {
+    "type":         "publisher",
+    "functionname": "StateFeed",
+    "tags":         ["zenoh"],
+    "filetype":     ["VBASEStateFeed.proto"],
+    "displayname":  "State Feed",
+    "description":  "Überträgt Zustandsänderungen."
+  }
+]
+```
+
+### Usage
+
+```python
+from vyra_base.com.feeder.config_resolver import FeederConfigResolver
+
+result = FeederConfigResolver.resolve(
+    feeder_name="StateFeed",
+    interface_paths=["/workspace/install/my_interfaces/share/my_interfaces/config"],
+)
+
+if result is None:
+    # Error wurde bereits geloggt, inkl. Fuzzy-Match-Vorschläge
+    raise RuntimeError("StateFeed nicht in Interface-Config gefunden")
+
+print(result.protocol)    # "zenoh"
+print(result.file_types)  # ["VBASEStateFeed.proto"]
+print(result.tags)        # ["zenoh"]
+```
+
+### Fehlerfall: Feeder-Name nicht gefunden
+
+Wenn der `feeder_name` in keiner Interface-Config-Datei vorhanden ist, wird ein
+detailliertes Fehlermeldung mit Vorschlägen ähnlicher Publisher-Namen geloggt:
+
+```
+❌ Feeder 'StaetFeed' not found as a publisher in any interface config.
+   Searched 2 JSON file(s) across paths: ["/workspace/.../config"]
+   All known publishers: ['ErrorFeed', 'NewsFeed', 'StateFeed']
+   Did you mean one of: ['StateFeed']?
+```
+
+Die Vorschläge werden mit `fuzzy_match()` aus `vyra_base.helper.func` erzeugt.
+
+---
 
 ## BaseFeeder
 

@@ -187,6 +187,9 @@ class VyraTransport(ABC):
         """Check if interface is initialized."""
         return self._initialized
 
+    def is_connected(self) -> bool:
+        """Check if transport layer is connected (override if applicable)."""
+        return self._initialized
 
 # ============================================================================
 # NEW UNIFIED TRANSPORT LAYER CLASSES (Async-first)

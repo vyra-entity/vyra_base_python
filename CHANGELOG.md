@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.65] - 2026-02-20
+
+### Build
+
+Update feeder structure (make abstract, more usable, examples, tests, docs) and add tcp and udp external communication interfaces 
+
+
 ## [0.1.8+build.62] - 2026-02-18
 
 ### Build

@@ -19,6 +19,7 @@ from .feeder import BaseFeeder
 from vyra_base.defaults.entries import ModuleEntry
 from vyra_base.defaults.entries import StateEntry
 from vyra_base.defaults.exceptions import FeederException
+from vyra_base.com.core.interface_path_registry import get_interface_registry
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +70,8 @@ class StateFeeder(BaseFeeder):
         """
         super().__init__()
 
-        self._feederName: str = 'StateFeeder'
+        # _feederName must match the "functionname" in the interface config JSON
+        self._feederName: str = 'StateFeed'
         self._doc: str = 'Collect states from this module.'
         self._level: int = logging.INFO
         self._type: Any = type
@@ -80,11 +82,17 @@ class StateFeeder(BaseFeeder):
 
         if self._ros2_available and ROS2Handler:
             self._handler_classes.append(ROS2Handler)
-    
+
     async def start(self) -> None:
+        """Starts the feeder by initializing handlers.
+
+        Automatically resolves the transport protocol from the module's
+        interface config (reads ``StateFeed`` entry, picks ``tags``).
         """
-        Starts the feeder by initializing handlers.
-        """
+        # Provide interface paths from module entity if available
+        paths = get_interface_registry().get_interface_paths()
+        if paths:
+            self.set_interface_paths(paths)
         await self.create(loggingOn=self._loggingOn)
         
     def feed(self, stateElement: StateEntry) -> None:

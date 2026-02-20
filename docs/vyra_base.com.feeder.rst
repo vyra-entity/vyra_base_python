@@ -4,10 +4,10 @@ vyra\_base.com.feeder package
 Submodules
 ----------
 
-vyra\_base.com.feeder.error\_feeder module
-------------------------------------------
+vyra\_base.com.feeder.interfaces module
+----------------------------------------
 
-.. automodule:: vyra_base.com.feeder.error_feeder
+.. automodule:: vyra_base.com.feeder.interfaces
    :members:
    :show-inheritance:
    :no-index:
@@ -22,10 +22,28 @@ vyra\_base.com.feeder.feeder module
    :no-index:
 
 
-vyra\_base.com.feeder.news\_feeder module
------------------------------------------
+vyra\_base.com.feeder.custom\_feeder module
+-------------------------------------------
 
-.. automodule:: vyra_base.com.feeder.news_feeder
+.. automodule:: vyra_base.com.feeder.custom_feeder
+   :members:
+   :show-inheritance:
+   :no-index:
+
+
+vyra\_base.com.feeder.config\_resolver module
+---------------------------------------------
+
+.. automodule:: vyra_base.com.feeder.config_resolver
+   :members:
+   :show-inheritance:
+   :no-index:
+
+
+vyra\_base.com.feeder.registry module
+--------------------------------------
+
+.. automodule:: vyra_base.com.feeder.registry
    :members:
    :show-inheritance:
    :no-index:
@@ -35,6 +53,24 @@ vyra\_base.com.feeder.state\_feeder module
 ------------------------------------------
 
 .. automodule:: vyra_base.com.feeder.state_feeder
+   :members:
+   :show-inheritance:
+   :no-index:
+
+
+vyra\_base.com.feeder.news\_feeder module
+-----------------------------------------
+
+.. automodule:: vyra_base.com.feeder.news_feeder
+   :members:
+   :show-inheritance:
+   :no-index:
+
+
+vyra\_base.com.feeder.error\_feeder module
+------------------------------------------
+
+.. automodule:: vyra_base.com.feeder.error_feeder
    :members:
    :show-inheritance:
    :no-index:

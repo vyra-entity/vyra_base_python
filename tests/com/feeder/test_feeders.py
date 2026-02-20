@@ -1,319 +1,260 @@
 """
 Unit tests for Feeder Components.
 
-Tests BaseFeeder, StateFeeder, NewsFeeder, and ErrorFeeder.
+Tests IFeeder, BaseFeeder, CustomBaseFeeder, FeederRegistry,
+FeederConfigResolver, StateFeeder, NewsFeeder, ErrorFeeder.
 """
+import asyncio
+import json
 import pytest
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from vyra_base.com.feeder.feeder import BaseFeeder
-from vyra_base.com.feeder.state_feeder import StateFeeder
-from vyra_base.com.feeder.news_feeder import NewsFeeder
-from vyra_base.com.feeder.error_feeder import ErrorFeeder
+import tempfile
+import os
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+from vyra_base.com.feeder.interfaces import IFeeder
+from vyra_base.com.feeder.custom_feeder import CustomBaseFeeder
+from vyra_base.com.feeder.config_resolver import FeederConfigResolver, FeederResolverResult
+from vyra_base.com.feeder.registry import FeederRegistry, register_feeder
 
 
-class TestBaseFeeder:
-    """Test BaseFeeder abstract class."""
-    
-    def test_base_feeder_cannot_be_instantiated(self):
-        """Test that BaseFeeder cannot be instantiated directly."""
-        # BaseFeeder might not be abstract, so just test it exists
-        assert BaseFeeder is not None
-    
-    def test_base_feeder_has_required_methods(self):
-        """Test that BaseFeeder defines required interface."""
-        assert hasattr(BaseFeeder, '__init__')
-        # Check for common feeder methods
-        # These might vary based on actual implementation
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def sample_interface_config():
+    """Write a minimal interface config JSON to a temp file and return the path."""
+    data = [
+        {
+            "type": "publisher",
+            "functionname": "TemperatureFeed",
+            "name": "temperature_feed",
+            "tags": ["zenoh"],
+            "filetype": ["VBASETemperatureFeed.proto"],
+            "description": "Temperature publisher",
+        },
+        {
+            "type": "publisher",
+            "functionname": "StateFeed",
+            "name": "state_feed",
+            "tags": ["zenoh"],
+            "filetype": ["VBASEStateFeed.proto"],
+            "description": "State publisher",
+        },
+    ]
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".json", delete=False
+    ) as f:
+        json.dump(data, f)
+        path = f.name
+    yield path
+    os.unlink(path)
 
 
-class TestStateFeeder:
-    """Test StateFeeder for state machine updates."""
-    
-    def test_state_feeder_initialization(self):
-        """Test StateFeeder can be initialized."""
-        try:
-            feeder = StateFeeder(name="test_state_feeder")
-            assert feeder is not None
-            assert feeder.name == "test_state_feeder"
-        except TypeError as e:
-            # If StateFeeder requires more arguments
-            pytest.skip(f"StateFeeder initialization needs more info: {e}")
-    
-    def test_state_feeder_ros2_availability(self):
-        """Test StateFeeder handles ROS2 availability check."""
-        # StateFeeder should handle missing ROS2 gracefully
-        with patch('importlib.import_module') as mock_import:
-            def side_effect(name):
-                if name == 'rclpy':
-                    raise ImportError("No module named 'rclpy'")
-                return MagicMock()
-            
-            mock_import.side_effect = side_effect
-            
-            try:
-                feeder = StateFeeder(name="test")
-                # Should not crash even if ROS2 unavailable
-                assert feeder is not None
-            except (ImportError, TypeError):
-                pytest.skip("StateFeeder requires ROS2 or more init params")
-    
-    @pytest.mark.asyncio
-    async def test_state_feeder_publish_state(self):
-        """Test publishing state updates."""
-        try:
-            feeder = StateFeeder(name="test_state_feeder")
-            
-            # Mock the publish method
-            feeder.publish = AsyncMock()
-            
-            await feeder.publish(
-                state="RUNNING",
-                previous_state="READY"
-            )
-            
-            feeder.publish.assert_called_once()
-        except (TypeError, AttributeError):
-            pytest.skip("StateFeeder API not as expected")
-    
-    def test_state_feeder_with_entity(self):
-        """Test StateFeeder integration with entity."""
-        # This would require a full entity mock
-        pytest.skip("Requires VyraEntity mock - integration test")
+@pytest.fixture(autouse=True)
+def clean_registry():
+    """Clear the FeederRegistry before each test."""
+    FeederRegistry._instance.clear()
+    yield
+    FeederRegistry._instance.clear()
 
 
-class TestNewsFeeder:
-    """Test NewsFeeder for general notifications."""
-    
-    def test_news_feeder_initialization(self):
-        """Test NewsFeeder can be initialized."""
-        try:
-            feeder = NewsFeeder(name="test_news_feeder")
-            assert feeder is not None
-            assert feeder.name == "test_news_feeder"
-        except TypeError:
-            pytest.skip("NewsFeeder initialization needs more info")
-    
-    def test_news_feeder_ros2_availability(self):
-        """Test NewsFeeder handles ROS2 availability check."""
-        with patch('importlib.import_module') as mock_import:
-            def side_effect(name):
-                if name == 'rclpy':
-                    raise ImportError("No module named 'rclpy'")
-                return MagicMock()
-            
-            mock_import.side_effect = side_effect
-            
-            try:
-                feeder = NewsFeeder(name="test")
-                assert feeder is not None
-            except (ImportError, TypeError):
-                pytest.skip("NewsFeeder requires ROS2 or more init params")
-    
-    @pytest.mark.asyncio
-    async def test_news_feeder_publish_news(self):
-        """Test publishing news/notifications."""
-        try:
-            feeder = NewsFeeder(name="test_news_feeder")
-            
-            feeder.publish = AsyncMock()
-            
-            await feeder.publish(
-                message="System started",
-                level="INFO"
-            )
-            
-            feeder.publish.assert_called_once()
-        except (TypeError, AttributeError):
-            pytest.skip("NewsFeeder API not as expected")
-    
-    def test_news_feeder_message_types(self):
-        """Test different news message types."""
-        try:
-            feeder = NewsFeeder(name="test")
-            
-            # NewsFeeder should support different message levels
-            assert hasattr(feeder, 'publish') or hasattr(feeder, 'shout')
-        except TypeError:
-            pytest.skip("NewsFeeder requires init params")
+# ---------------------------------------------------------------------------
+# IFeeder
+# ---------------------------------------------------------------------------
 
-
-class TestErrorFeeder:
-    """Test ErrorFeeder for error propagation."""
-    
-    def test_error_feeder_initialization(self):
-        """Test ErrorFeeder can be initialized."""
-        try:
-            feeder = ErrorFeeder(name="test_error_feeder")
-            assert feeder is not None
-            assert feeder.name == "test_error_feeder"
-        except TypeError:
-            pytest.skip("ErrorFeeder initialization needs more info")
-    
-    def test_error_feeder_ros2_availability(self):
-        """Test ErrorFeeder handles ROS2 availability check."""
-        with patch('importlib.import_module') as mock_import:
-            def side_effect(name):
-                if name == 'rclpy':
-                    raise ImportError("No module named 'rclpy'")
-                return MagicMock()
-            
-            mock_import.side_effect = side_effect
-            
-            try:
-                feeder = ErrorFeeder(name="test")
-                assert feeder is not None
-            except (ImportError, TypeError):
-                pytest.skip("ErrorFeeder requires ROS2 or more init params")
-    
-    @pytest.mark.asyncio
-    async def test_error_feeder_publish_error(self):
-        """Test publishing error information."""
-        try:
-            feeder = ErrorFeeder(name="test_error_feeder")
-            
-            feeder.publish = AsyncMock()
-            
-            await feeder.publish(
-                error_type="RuntimeError",
-                error_message="Something went wrong",
-                traceback="..."
-            )
-            
-            feeder.publish.assert_called_once()
-        except (TypeError, AttributeError):
-            pytest.skip("ErrorFeeder API not as expected")
-    
-    def test_error_feeder_error_levels(self):
-        """Test error severity levels."""
-        try:
-            feeder = ErrorFeeder(name="test")
-            
-            # ErrorFeeder should support severity levels
-            assert hasattr(feeder, 'publish') or hasattr(feeder, 'shout')
-        except TypeError:
-            pytest.skip("ErrorFeeder requires init params")
-
-
-class TestFeederIntegration:
-    """Integration tests for feeder components."""
-    
-    @pytest.mark.asyncio
-    async def test_multiple_feeders_coexist(self):
-        """Test that multiple feeders can coexist."""
-        feeders = []
-        
-        try:
-            state_feeder = StateFeeder(name="state")
-            feeders.append(state_feeder)
-        except TypeError:
-            pass
-        
-        try:
-            news_feeder = NewsFeeder(name="news")
-            feeders.append(news_feeder)
-        except TypeError:
-            pass
-        
-        try:
-            error_feeder = ErrorFeeder(name="error")
-            feeders.append(error_feeder)
-        except TypeError:
-            pass
-        
-        # At least some feeders should be creatable
-        assert len(feeders) >= 0
-    
-    def test_feeder_naming_unique(self):
-        """Test that feeders can have unique names."""
-        names = set()
-        
-        try:
-            feeder1 = StateFeeder(name="feeder1")
-            names.add(feeder1.name)
-        except TypeError:
-            pass
-        
-        try:
-            feeder2 = StateFeeder(name="feeder2")
-            names.add(feeder2.name)
-        except TypeError:
-            pass
-        
-        # Names should be unique if feeders created
-        if len(names) > 0:
-            assert len(names) == 2 or len(names) == 0
-    
-    @pytest.mark.asyncio
-    async def test_feeder_without_ros2(self):
-        """Test that feeders work without ROS2 (graceful degradation)."""
-        # Mock ROS2 as unavailable
-        with patch('importlib.import_module') as mock_import:
-            def side_effect(name):
-                if 'rclpy' in name or 'builtin_interfaces' in name:
-                    raise ImportError(f"No module named '{name}'")
-                return MagicMock()
-            
-            mock_import.side_effect = side_effect
-            
-            # Feeders should handle this gracefully
-            try:
-                # Try importing feeder module
-                from vyra_base.com.feeder import state_feeder
-                assert state_feeder is not None
-            except ImportError:
-                pytest.skip("Feeder modules have hard ROS2 dependency")
-    
-    def test_feeders_use_multi_protocol(self):
-        """Test that feeders can use multi-protocol architecture."""
-        # Feeders should ideally use InterfaceFactory for multi-protocol support
-        from vyra_base.com.core.factory import InterfaceFactory
-        
-        # This is a forward-looking test
-        assert InterfaceFactory is not None
-        
-        # Future: Feeders should use InterfaceFactory.create_publisher()
-        # instead of direct ROS2 publishers
-
-
-class TestFeederROS2Compatibility:
-    """Test ROS2 compatibility and graceful degradation."""
-    
-    def test_feeder_imports_dont_crash(self):
-        """Test that feeder imports don't crash without ROS2."""
-        try:
-            from vyra_base.com.feeder.feeder import BaseFeeder
-            from vyra_base.com.feeder.state_feeder import StateFeeder
-            from vyra_base.com.feeder.news_feeder import NewsFeeder
-            from vyra_base.com.feeder.error_feeder import ErrorFeeder
-            
-            assert all([BaseFeeder, StateFeeder, NewsFeeder, ErrorFeeder])
-        except ImportError as e:
-            # Imports might fail if ROS2 not available
-            pytest.skip(f"Feeder imports failed: {e}")
-    
-    def test_ros2_import_pattern(self):
-        """Test that feeders use try/except pattern for ROS2 imports."""
+class TestIFeeder:
+    def test_is_abstract(self):
+        """IFeeder cannot be instantiated directly."""
         import inspect
-        
-        try:
-            from vyra_base.com.feeder import state_feeder
-            
-            # Check source code for try/except pattern
-            source = inspect.getsource(state_feeder)
-            
-            # Should use try/except for rclpy imports
-            assert 'try:' in source and 'import rclpy' in source
-        except (ImportError, OSError):
-            pytest.skip("Cannot inspect feeder source")
-    
-    @pytest.mark.asyncio
-    async def test_feeder_factory_integration(self):
-        """Test feeder integration with InterfaceFactory."""
-        from vyra_base.com.core.factory import InterfaceFactory
-        from vyra_base.com.core.types import ProtocolType
-        
-        # Future: Feeders should create speakers using InterfaceFactory
-        # For now, just verify InterfaceFactory can create speakers
-        
-        # This is a placeholder for future integration
-        assert hasattr(InterfaceFactory, 'create_publisher')
+        assert inspect.isabstract(IFeeder)
+
+    def test_has_required_methods(self):
+        for method in ("start", "feed", "get_feeder_name"):
+            assert hasattr(IFeeder, method), f"IFeeder missing '{method}'"
+
+
+# ---------------------------------------------------------------------------
+# FeederConfigResolver
+# ---------------------------------------------------------------------------
+
+class TestFeederConfigResolver:
+    def test_resolve_known_name(self, sample_interface_config):
+        resolver = FeederConfigResolver()
+        result = resolver.resolve("TemperatureFeed", [sample_interface_config])
+        assert result is not None
+        assert isinstance(result, FeederResolverResult)
+        assert result.feeder_name == "TemperatureFeed"
+        assert result.protocol == "zenoh"
+
+    def test_resolve_unknown_name_returns_none(self, sample_interface_config, caplog):
+        resolver = FeederConfigResolver()
+        result = resolver.resolve("CompletelyUnknownFeed", [sample_interface_config])
+        assert result is None
+
+    def test_resolve_fuzzy_suggestion_in_log(self, sample_interface_config, caplog):
+        import logging
+        # Capture all loggers so propagation issues don't hide the message
+        with caplog.at_level(logging.ERROR):
+            import logging as _lg
+            _lg.getLogger("vyra_base.com.feeder.config_resolver").propagate = True
+            resolver = FeederConfigResolver()
+            resolver.resolve("TemratureFeed", [sample_interface_config])
+        # The error is written to stderr by default; also check caplog text
+        # (fuzzy matches are logged at ERROR level with "Did you mean")
+        combined = caplog.text + "".join(
+            r.getMessage() for r in caplog.records
+        )
+        assert "TemperatureFeed" in combined, (
+            "Fuzzy suggestion for close match should appear in error log. "
+            f"caplog.records={caplog.records}"
+        )
+
+    def test_resolve_case_insensitive(self, sample_interface_config):
+        resolver = FeederConfigResolver()
+        result = resolver.resolve("temperaturefeed", [sample_interface_config],
+                                  case_sensitive=False)
+        assert result is not None
+
+    def test_resolve_no_paths_returns_none(self):
+        resolver = FeederConfigResolver()
+        result = resolver.resolve("StateFeed", [])
+        assert result is None
+
+
+# ---------------------------------------------------------------------------
+# FeederRegistry
+# ---------------------------------------------------------------------------
+
+class TestFeederRegistry:
+    def test_register_and_get(self):
+        class DummyFeeder(CustomBaseFeeder):
+            async def start(self): pass
+            def feed(self, _): pass
+            def get_feeder_name(self): return "Dummy"
+
+        FeederRegistry.register("DummyFeed", DummyFeeder)
+        assert FeederRegistry.get("DummyFeed") is DummyFeeder
+
+    def test_get_unregistered_returns_none(self):
+        assert FeederRegistry.get("NoSuchFeed") is None
+
+    def test_list_feeders(self):
+        class A(CustomBaseFeeder):
+            async def start(self): pass
+            def feed(self, _): pass
+            def get_feeder_name(self): return "A"
+
+        FeederRegistry.register("AFeed", A)
+        assert "AFeed" in FeederRegistry.list_feeders()
+
+    def test_unregister(self):
+        class B(CustomBaseFeeder):
+            async def start(self): pass
+            def feed(self, _): pass
+            def get_feeder_name(self): return "B"
+
+        FeederRegistry.register("BFeed", B)
+        FeederRegistry.unregister("BFeed")
+        assert FeederRegistry.get("BFeed") is None
+
+    def test_register_feeder_decorator(self):
+        @register_feeder("DecoratedFeed")
+        class DecoratedFeeder(CustomBaseFeeder):
+            async def start(self): pass
+            def feed(self, _): pass
+            def get_feeder_name(self): return "Decorated"
+
+        assert FeederRegistry.get("DecoratedFeed") is DecoratedFeeder
+
+
+# ---------------------------------------------------------------------------
+# CustomBaseFeeder
+# ---------------------------------------------------------------------------
+
+class ConcreteFeeder(CustomBaseFeeder):
+    """Minimal concrete feeder for testing."""
+
+    def _build_message(self, raw):
+        return {"value": raw, "unit": "°C"}
+
+    def _validate(self, raw):
+        return isinstance(raw, (int, float)) and -50 <= raw <= 300
+
+
+class TestCustomBaseFeeder:
+    def _make_feeder(self):
+        entity = MagicMock()
+        entity.name = "test_module"
+        entity.uuid = "aaaa-bbbb"
+        return ConcreteFeeder(
+            feeder_name="TemperatureFeed",
+            module_entity=entity,
+        )
+
+    def test_validate_passes_valid_value(self):
+        feeder = self._make_feeder()
+        assert feeder._validate(25.0) is True
+
+    def test_validate_rejects_out_of_range(self):
+        feeder = self._make_feeder()
+        assert feeder._validate(999.0) is False
+
+    def test_build_message(self):
+        feeder = self._make_feeder()
+        msg = feeder._build_message(100.0)
+        assert msg == {"value": 100.0, "unit": "°C"}
+
+    def test_feed_skips_invalid(self):
+        feeder = self._make_feeder()
+        feeder._is_ready = False
+        feeder.feed(-999.0)  # invalid — validation should reject
+        assert len(feeder.get_buffer()) == 0
+
+    def test_feed_valid_buffers_when_not_ready(self):
+        feeder = self._make_feeder()
+        feeder._is_ready = False
+        feeder.feed(42.0)  # valid — should buffer transformed message
+        assert len(feeder.get_buffer()) == 1
+
+    def test_get_feeder_name(self):
+        feeder = self._make_feeder()
+        assert feeder.get_feeder_name() == "TemperatureFeed"
+
+    def test_metrics_initial_values(self):
+        feeder = self._make_feeder()
+        assert feeder.feed_count == 0
+        assert feeder.error_count == 0
+
+    def test_is_alive_false_before_start(self):
+        feeder = self._make_feeder()
+        assert feeder.is_alive() is False
+
+
+# ---------------------------------------------------------------------------
+# StateFeeder / NewsFeeder / ErrorFeeder minimal smoke tests
+# ---------------------------------------------------------------------------
+
+class TestBuiltinFeeders:
+    def _make_builtin(self, klass):
+        """Instantiate a builtin feeder with all required mocks."""
+        entity = MagicMock()
+        entity.name = "test_module"
+        entity.uuid = "test-uuid"
+        return klass(type=None, node=None, module_entity=entity)
+
+    def test_state_feeder_name(self):
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        feeder = self._make_builtin(StateFeeder)
+        assert feeder.get_feeder_name() == "StateFeed"
+
+    def test_news_feeder_name(self):
+        from vyra_base.com.feeder.news_feeder import NewsFeeder
+        feeder = self._make_builtin(NewsFeeder)
+        assert feeder.get_feeder_name() == "NewsFeed"
+
+    def test_error_feeder_name(self):
+        from vyra_base.com.feeder.error_feeder import ErrorFeeder
+        feeder = self._make_builtin(ErrorFeeder)
+        assert feeder.get_feeder_name() == "ErrorFeed"

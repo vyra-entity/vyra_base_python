@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import datetime
 import logging
 from collections import deque
-from typing import Any, Type, Optional
+from typing import Any, Type, Optional, Sequence
+from pathlib import Path
 
 # Check ROS2 availability
 try:
@@ -21,18 +23,35 @@ if _ROS2_AVAILABLE:
     )
     from vyra_base.com import InterfaceFactory, ProtocolType
 
+from vyra_base.com.feeder.interfaces import IFeeder
 from vyra_base.com.handler.communication import CommunicationHandler
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.helper.logging_config import VyraLoggingConfig
+from vyra_base.com.feeder.config_resolver import FeederConfigResolver
+from vyra_base.com.core.types import ProtocolType as PT
+from vyra_base.com.core.types import VyraPublisher
 
 logger = logging.getLogger(__name__)
 
 
-class BaseFeeder:
+class BaseFeeder(IFeeder):
     """
-    Abstract class.
+    Concrete base class for all VYRA feeders.
 
-    Provides the required interface for the ``deque`` method all inheriting deque objects require to work.
+    Implements :class:`~vyra_base.com.feeder.interfaces.IFeeder` and provides:
+
+    * **Protocol auto-resolution** via
+      :class:`~vyra_base.com.feeder.config_resolver.FeederConfigResolver` —
+      the transport protocol is read from the module's interface config JSON
+      (``functionname`` matched against ``feeder_name``).
+    * **Pre-start buffer** — messages fed before :meth:`start` are queued and
+      flushed automatically.
+    * **Metrics** — ``feed_count``, ``error_count``, ``last_feed_at``.
+    * **Health check** — :meth:`is_alive` probes the backing publisher.
+    * **Retry policy** — configurable ``max_retries`` and ``retry_delay``.
+
+    Abstract class — subclasses set ``_feederName``, ``_type``, optionally
+    ``_interface_paths``.
     """
 
     def __init__(self) -> None:
@@ -56,59 +75,180 @@ class BaseFeeder:
         self._level: int = logging.INFO
         self._ros2_available: bool = _ROS2_AVAILABLE
 
-        self._handler_classes: list[Type[CommunicationHandler]] = []  # Store handler classes
-        self._handler: list[Type[CommunicationHandler] | CommunicationHandler] = []  # Store handler instances
+        # Interface paths for protocol resolution (set by subclasses or entity)
+        self._interface_paths: list[str] = []
+
+        self._handler_classes: list[Type[CommunicationHandler]] = []
+        self._handler: list[Type[CommunicationHandler] | CommunicationHandler] = []
         self._feeder: logging.Logger
-        self._loggingOn: bool  # If true, the feeder will log messages in the base logger
-        self._node: Optional[Any] = None  # VyraNode or None
-        self._type: Any
-        self._publisher: Optional[Any] = None  # VyraPublisher or legacy VyraSpeaker
-        self._feedbuffer = deque(maxlen=20)  
+        self._loggingOn: bool = False
+        self._node: Optional[Any] = None
+        self._type: Any = None
+        self._publisher: Optional[VyraPublisher] = None
+        self._feedbuffer: deque = deque(maxlen=20)
+
+        # Resolved protocol (set after start())
+        self._resolved_protocol: Optional[str] = None
+        self._is_ready: bool = False
+
+        # Metrics
+        self._feed_count: int = 0
+        self._error_count: int = 0
+        self._last_feed_at: Optional[datetime.datetime] = None
+
+        # Retry policy
+        self._max_retries: int = 3
+        self._retry_delay: float = 1.0
+
+    # ------------------------------------------------------------------
+    # IFeeder implementation
+    # ------------------------------------------------------------------
+
+    def get_feeder_name(self) -> str:
+        """Return the feeder name (= ``functionname`` in interface config)."""
+        return self._feederName
+
+    def get_protocol(self) -> Optional[str]:
+        """Return the resolved transport protocol, or ``None`` before start."""
+        return self._resolved_protocol
+
+    def is_alive(self) -> bool:
+        """Return ``True`` if the publisher is set and available."""
+        if not self._publisher:
+            return False
+        if hasattr(self._publisher, 'is_connected'):
+            return bool(self._publisher.is_connected())
+        return True
+
+    def is_ready(self) -> bool:
+        """Return ``True`` after :meth:`start` has completed successfully."""
+        return self._is_ready
+
+    def get_buffer(self) -> deque:
+        """Return the pre-start message buffer."""
+        return self._feedbuffer
+
+    @property
+    def feed_count(self) -> int:
+        """Number of successfully published messages."""
+        return self._feed_count
+
+    @property
+    def error_count(self) -> int:
+        """Number of publish errors."""
+        return self._error_count
+
+    @property
+    def last_feed_at(self) -> Optional[datetime.datetime]:
+        """Timestamp of the last successful :meth:`feed` call."""
+        return self._last_feed_at
+
+    # ------------------------------------------------------------------
+    # Initialisation helpers
+    # ------------------------------------------------------------------
+
+    def set_interface_paths(self, paths: Sequence[str]|list[Path]) -> None:
+        """Override the interface paths used for protocol resolution.
+
+        Called by a :class:`~vyra_base.core.entity.VyraEntity` after
+        constructing the feeder to provide module-specific config paths.
+
+        :param paths: List of directory or JSON file paths.
+        :type paths: Sequence[str] | list[Path]
+        """
+        if isinstance(paths, Sequence):
+            self._interface_paths = [str(p) for p in paths]
+        else:             
+            self._interface_paths = [str(paths)]
 
     async def create(self, loggingOn: bool = False) -> None:
-        """
-        Create the feeder and its communication handlers.
-        Uses new unified transport layer (Publisher) with protocol fallback.
-        
-        :raises FeederException: If the publisher could not be created.
-        :raises TypeError: If a handler class is not a subclass of CommunicationHandler.
-        :param loggingOn: If True, enables logging in the base logger.
+        """Create the publisher using protocol resolved from interface config.
+
+        Resolution order:
+
+        1. ``FeederConfigResolver.resolve(feeder_name, interface_paths)`` —
+           reads the module's JSON config, maps ``tags`` to a protocol.
+        2. If no config found (or ``interface_paths`` empty): fall back to
+           ``InterfaceFactory.create_publisher`` with the default chain
+           ``[ZENOH, ROS2, REDIS, UDS]``.
+
+        :raises FeederException: If no protocol is available at all.
+        :param loggingOn: Emit feeder messages also to the base logger.
         :type loggingOn: bool
         """
-        self._loggingOn: bool = loggingOn
-        
-        # Use new unified create_publisher (with ROS2 fallback to legacy if needed)
-        try:
-            # New unified API: create_publisher with protocol fallback
-            self._publisher = await InterfaceFactory.create_publisher(
-                name=self._feederName,
-                protocols=[ProtocolType.ROS2, ProtocolType.ZENOH, ProtocolType.REDIS] if self._ros2_available else [ProtocolType.ZENOH, ProtocolType.REDIS],
-                message_type=self._type,
-                topic_builder=getattr(self, '_topic_builder', None),  # Optional TopicBuilder
-                **({'node': self._node, 'qos_profile': self._qos} if self._ros2_available and self._node else {})
-            )
-            
-            logger.info(f"✅ {self._feederName} using {self._publisher.protocol.value} protocol")
-            
-        except Exception as e:
-            # Fallback to legacy create_publisher if create_publisher not available yet
-            logger.warning(f"⚠️ create_publisher failed, trying legacy create_publisher: {e}")
+        self._loggingOn = loggingOn
+
+        # ── Protocol resolution via interface config ──────────────────
+        resolved_protocols = None
+        if self._interface_paths:
             try:
+                result = FeederConfigResolver.resolve(
+                    feeder_name=self._feederName,
+                    interface_paths=self._interface_paths,
+                )
+                if result is not None:
+                    self._resolved_protocol = result.protocol
+                    try:
+                        resolved_protocols = [PT(result.protocol)]
+                    except ValueError:
+                        logger.warning(
+                            "⚠️ Protocol '%s' from config not a valid ProtocolType, "
+                            "using fallback chain.", result.protocol
+                        )
+            except Exception as exc:
+                logger.warning("⚠️ FeederConfigResolver error for '%s': %s — using fallback.",
+                               self._feederName, exc)
+
+        # ── Publisher creation ────────────────────────────────────────
+        try:
+            pub_kwargs: dict[str, Any] = {
+                "name": self._feederName,
+                "message_type": self._type,
+            }
+            if resolved_protocols:
+                pub_kwargs["protocols"] = resolved_protocols
+            else:
+                # Default fallback chain
+                if self._ros2_available:
+                    pub_kwargs["protocols"] = [PT.ROS2, PT.ZENOH, PT.REDIS, PT.UDS]
+                else:
+                    pub_kwargs["protocols"] = [PT.ZENOH, PT.REDIS, PT.UDS]
+
+            if self._ros2_available and self._node:
+                pub_kwargs["node"] = self._node
+                if self._qos:
+                    pub_kwargs["qos_profile"] = self._qos
+
+            self._publisher = await InterfaceFactory.create_publisher(**pub_kwargs)
+
+            if self._resolved_protocol is None and hasattr(self._publisher, 'protocol'):
+                self._resolved_protocol = getattr(self._publisher.protocol, 'value',
+                                                   str(self._publisher.protocol))
+
+            logger.info("✅ %s using protocol '%s'", self._feederName, self._resolved_protocol)
+
+        except Exception as exc_primary:
+            # Last-resort legacy retry
+            logger.warning("⚠️ create_publisher failed (%s), retrying with legacy kwargs.",
+                           exc_primary)
+            try:
+                fallback = [PT.ROS2, PT.REDIS] if self._ros2_available else [PT.REDIS]
                 self._publisher = await InterfaceFactory.create_publisher(
                     name=self._feederName,
-                    protocols=[ProtocolType.ROS2, ProtocolType.REDIS] if self._ros2_available else [ProtocolType.REDIS],
+                    protocols=fallback,
                     message_type=self._type,
                     is_publisher=True,
-                    **({'node': self._node, 'qos_profile': self._qos} if self._ros2_available and self._node else {})
+                    **({'node': self._node, 'qos_profile': self._qos}
+                       if self._ros2_available and self._node else {})
                 )
-                logger.info(f"✅ {self._feederName} using legacy publisher with {self._publisher.protocol.value}")
-            except Exception as e2:
-                logger.error(f"❌ Failed to create feeder publisher: {e2}")
+            except Exception as exc_fallback:
+                logger.error("❌ Failed to create feeder publisher for '%s': %s",
+                             self._feederName, exc_fallback)
                 raise FeederException(
                     f"Could not create publisher for {self._feederName}. "
                     f"Install ROS2 or configure Zenoh/Redis."
-                )
-        
+                ) from exc_fallback
+
         if self._publisher is None:
             raise FeederException(
                 f"No communication protocol available for {self._feederName}. "
@@ -117,105 +257,154 @@ class BaseFeeder:
 
         self.create_feeder()
 
-        # Create handlers only for ROS2 publishers (legacy support)
+        # Attach ROS2 handlers only for ROS2-backed publishers (legacy support)
         if self._ros2_available and hasattr(self._publisher, 'publisher_server'):
             for handler_class in self._handler_classes:
-                if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
+                if not isinstance(handler_class, type) or not issubclass(
+                        handler_class, CommunicationHandler):
                     raise TypeError("Handler class must be a subclass of CommunicationHandler")
-
                 handler = handler_class(
                     initiator=self._feederName,
-                    publisher=self._publisher,  # Pass publisher as 'publisher' for legacy compatibility
+                    publisher=self._publisher,
                     type=self._publisher.publisher_server.publisher_info.type
                 )
                 self.add_handler(handler)
         else:
-            logger.debug(f"⚠️ Skipping ROS2 handlers for {self._feederName} (non-ROS2 protocol or unified Publisher)")
+            logger.debug("⚠️ Skipping ROS2 handlers for %s (non-ROS2 publisher)",
+                         self._feederName)
+
+        # Flush buffered messages
+        self._is_ready = True
+        await self._flush_buffer()
+
+    async def _flush_buffer(self) -> None:
+        """Publish all messages that arrived before :meth:`start`."""
+        flushed = 0
+        while self._feedbuffer:
+            msg = self._feedbuffer.popleft()
+            try:
+                await self._publish(msg)
+                flushed += 1
+            except Exception as exc:
+                logger.warning("⚠️ Buffer flush failed for message in %s: %s",
+                               self._feederName, exc)
+        if flushed:
+            logger.debug("🔁 %s flushed %d buffered message(s).", self._feederName, flushed)
+
+    async def start(self) -> None:
+        """Start the feeder (implements :class:`IFeeder`).
+
+        Subclasses may override to add extra initialisation before calling
+        ``await super().start()``.
+        """
+        await self.create(loggingOn=self._loggingOn)
+
+    # ------------------------------------------------------------------
+    # Feed / publish path
+    # ------------------------------------------------------------------
 
     def feed(self, msg: Any) -> None:
-        """
-        Feed a message to the feeder.
-        Uses Publisher.publish() for new unified transport layer.
+        """Enqueue *msg* for publishing (implements :class:`IFeeder`).
 
-        :param msg: The message to feed.
+        If the feeder is not yet ready the message is buffered.  Otherwise
+        the publish path is executed synchronously (event-loop aware).
+
+        :param msg: Message to publish.
         :type msg: Any
         """
-        if not hasattr(self, '_feeder'):
+        if not self._is_ready:
             self._feedbuffer.append(msg)
-            logger.info(f"⏳ Feeder {self._feederName} not yet created. Buffering message: {msg}")
+            logger.debug("⏳ %s buffering message (not started yet).", self._feederName)
             return
-        
-        self._feeder.log(self._level, msg)
+
+        if hasattr(self, '_feeder'):
+            self._feeder.log(self._level, msg)
 
         if self._loggingOn:
-            logger.info(
-                f"Feeder {self._feederName} fed with message: {msg}"
-            )
-        
+            logger.info("🗞 Feeder %s fed: %s", self._feederName, msg)
+
         if not self._publisher:
-            logger.error(f"❌ No publisher available for feeder {self._feederName}")
+            logger.error("❌ No publisher for feeder %s", self._feederName)
+            self._error_count += 1
             return
-        
-        # Use unified Publisher.publish() or legacy Publisher.shout()
+
         try:
             loop = asyncio.get_event_loop()
-            if hasattr(self._publisher, 'publish'):
-                loop.run_until_complete(self._publisher.publish(msg))
-            elif hasattr(self._publisher, 'shout'):  # Legacy fallback
-                loop.run_until_complete(self._publisher.shout(msg))
+            if loop.is_running():
+                loop.create_task(self._publish(msg))
             else:
-                logger.error(f"❌ Publisher has no publish() or shout() method: {type(self._publisher)}")
-        except Exception as e:
-            logger.error(f"❌ Failed to feed message via {self._publisher.protocol}: {e}")
+                loop.run_until_complete(self._publish(msg))
+        except Exception as exc:
+            logger.error("❌ Feed failed in %s: %s", self._feederName, exc)
+            self._error_count += 1
 
-    def create_feeder(self):
-        """
-        Set the logger for the feeder.
-        """
-        feed_logger_name: str = f"{self._feedBaseName}.{self._feederName}"
+    async def _publish(self, msg: Any) -> None:
+        """Internal coroutine — publish with retry and metrics tracking."""
+        last_exc: Optional[Exception] = None
+        
+        if not self._publisher:
+            raise FeederException(f"No publisher available for {self._feederName}")
+        
+        for attempt in range(1, self._max_retries + 1):
+            try:
+                if hasattr(self._publisher, 'publish'):
+                    await self._publisher.publish(msg)
+                else:
+                    raise FeederException(
+                        f"Publisher has no publish() method: {type(self._publisher)}"
+                    )
+                self._feed_count += 1
+                self._last_feed_at = datetime.datetime.utcnow()
+                return
+            except Exception as exc:
+                last_exc = exc
+                if attempt < self._max_retries:
+                    await asyncio.sleep(self._retry_delay)
+
+        self._error_count += 1
+        logger.error("❌ %s publish failed after %d attempt(s): %s",
+                     self._feederName, self._max_retries, last_exc)
+
+    # ------------------------------------------------------------------
+    # Feeder logger setup
+    # ------------------------------------------------------------------
+
+    def create_feeder(self) -> None:
+        """Set up the Python logger for this feeder."""
+        feed_logger_name = f"{self._feedBaseName}.{self._feederName}"
         self._feeder = logging.getLogger(feed_logger_name)
         self._feeder.setLevel(self._level)
-        # self._feeder.propagate = False
 
         if self._loggingOn:
-            # Add handlers from vyra_base logger to the feeder logger
             vyra_logger = logging.getLogger("vyra_base")
             for handler in vyra_logger.handlers:
                 if handler not in self._feeder.handlers:
                     self._feeder.addHandler(handler)
 
     def add_handler(self, handler: CommunicationHandler) -> bool:
-        """
-        Add a communication handler to the feeder.
+        """Attach a :class:`~vyra_base.com.handler.communication.CommunicationHandler`.
 
-        :param handler: The communication handler to add.
+        :param handler: Handler instance to attach.
         :type handler: CommunicationHandler
-        :raises TypeError: If the handler is not a CommunicationHandler.
-        :return: True if the handler was added, False if it was already present.
+        :return: ``True`` if added, ``False`` if already present.
         :rtype: bool
         """
         if not isinstance(handler, CommunicationHandler):
-            raise TypeError(
-                f"Expected a CommunicationHandler, got {type(handler)}"
-            )
-        
+            raise TypeError(f"Expected CommunicationHandler, got {type(handler)}")
         if handler in self._handler:
             return False
-        
         self._feeder.addHandler(handler)
-        self._handler.append(handler)  # Store the instance
-
+        self._handler.append(handler)
         return True
 
     def add_handler_class(self, handler_class: Type[CommunicationHandler]) -> None:
-        """
-        Add a handler class to the feeder.
+        """Register a handler class to be instantiated during :meth:`create`.
 
-        :param handler_class: The handler class to add.
+        :param handler_class: Handler class (must subclass CommunicationHandler).
         :type handler_class: Type[CommunicationHandler]
-        :raises TypeError: If handler_class is not a subclass of CommunicationHandler.
         """
-        if not isinstance(handler_class, type) or not issubclass(handler_class, CommunicationHandler):
+        if not isinstance(handler_class, type) or not issubclass(
+                handler_class, CommunicationHandler):
             raise TypeError("Handler class must be a subclass of CommunicationHandler")
         if handler_class not in self._handler_classes:
             self._handler_classes.append(handler_class)

@@ -17,6 +17,7 @@ if _ROS2_AVAILABLE:
 
 from vyra_base.defaults.entries import ErrorEntry, ModuleEntry
 from vyra_base.defaults.exceptions import FeederException
+from vyra_base.com.core.interface_path_registry import get_interface_registry
 
 from .feeder import BaseFeeder
 
@@ -44,7 +45,8 @@ class ErrorFeeder(BaseFeeder):
         ):
         super().__init__()
 
-        self._feederName: str = f'ErrorFeeder'
+        # _feederName must match the "functionname" in the interface config JSON
+        self._feederName: str = 'ErrorFeed'
         self._doc: str = 'Collect error messages of this module.'
         self._level: int = logging.ERROR
         self._type: Any = type
@@ -52,14 +54,20 @@ class ErrorFeeder(BaseFeeder):
         self._module_entity: ModuleEntry = module_entity
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
         self._loggingOn: bool = loggingOn
-        
+
         if self._ros2_available and ROS2Handler is not None:
             self._handler_classes.append(ROS2Handler)
 
     async def start(self) -> None:
+        """Starts the feeder by initializing handlers.
+
+        Automatically resolves the transport protocol from the module's
+        interface config (reads ``ErrorFeed`` entry, picks ``tags``).
         """
-        Starts the feeder by initializing handlers.
-        """
+        paths = get_interface_registry().get_interface_paths()
+
+        if paths:
+            self.set_interface_paths(paths)
         await self.create(loggingOn=self._loggingOn)
         
     def feed(self, errorElement: Union[ErrorEntry, dict]) -> None:

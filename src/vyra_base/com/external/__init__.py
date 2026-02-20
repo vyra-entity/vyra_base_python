@@ -41,29 +41,95 @@ except ImportError as e:
 
 # Optional protocol imports
 try:
-    from vyra_base.com.external.shared_memory import SharedMemoryProvider
+    from vyra_base.com.external.shared_memory import (
+        SharedMemorySegment,
+        SegmentInfo,
+        POSIX_IPC_AVAILABLE,
+        SharedMemorySerializer,
+        SerializationFormat,
+        MessageType,
+        calculate_segment_size,
+        SharedMemoryDiscovery,
+        SegmentDiscoveryInfo,
+        get_discovery,
+        DISCOVERY_DIR,
+    )
 except ImportError:
-    SharedMemoryProvider = None
+    SharedMemorySegment = None
+    SegmentInfo = None
+    POSIX_IPC_AVAILABLE = False
+    SharedMemorySerializer = None
+    SerializationFormat = None
+    MessageType = None
+    calculate_segment_size = None
+    SharedMemoryDiscovery = None
+    SegmentDiscoveryInfo = None
+    get_discovery = None
+    DISCOVERY_DIR = None
+    logger.debug("⚠️  Shared Memory protocol unavailable")
 
 try:
-    from vyra_base.com.external.grpc import GrpcProvider
+    from vyra_base.com.external.grpc import (
+        GrpcClient,
+        GrpcServer,
+        GRPC_CLIENT_AVAILABLE,
+        GRPC_SERVER_AVAILABLE,
+    )
 except ImportError:
-    GrpcProvider = None
+    GrpcClient = None
+    GrpcServer = None
+    GRPC_CLIENT_AVAILABLE = False
+    GRPC_SERVER_AVAILABLE = False
+    logger.debug("⚠️  gRPC protocol unavailable")
 
 try:
-    from vyra_base.com.external.mqtt import MqttProvider
+    from vyra_base.com.external.mqtt import (
+        MqttClient,
+        MQTT_AVAILABLE,
+    )
 except ImportError:
-    MqttProvider = None
+    MqttClient = None
+    MQTT_AVAILABLE = False
+    logger.debug("⚠️  MQTT protocol unavailable")
 
 try:
-    from vyra_base.com.external.rest import RestProvider
+    from vyra_base.com.external.rest import (
+        RestClient,
+        REST_AVAILABLE,
+    )
 except ImportError:
-    RestProvider = None
+    RestClient = None
+    REST_AVAILABLE = False
+    logger.debug("⚠️  REST protocol unavailable")
 
 try:
-    from vyra_base.com.external.websocket import WebSocketProvider
+    from vyra_base.com.external.websocket import (
+        WebSocketClient,
+        WEBSOCKET_AVAILABLE,
+    )
 except ImportError:
-    WebSocketProvider = None
+    WebSocketClient = None
+    WEBSOCKET_AVAILABLE = False
+    logger.debug("⚠️  WebSocket protocol unavailable")
+
+# TCP and UDP (asyncio stdlib — always available)
+try:
+    from vyra_base.com.external.tcp import AsyncTcpClient, AsyncTcpServer
+    TCP_AVAILABLE = True
+except ImportError as e:
+    AsyncTcpClient = None
+    AsyncTcpServer = None
+    TCP_AVAILABLE = False
+    logger.debug(f"⚠️  TCP unavailable: {e}")
+
+try:
+    from vyra_base.com.external.udp import AsyncUdpClient, AsyncUdpServer
+    UDP_AVAILABLE = True
+except ImportError as e:
+    AsyncUdpClient = None
+    AsyncUdpServer = None
+    UDP_AVAILABLE = False
+    logger.debug(f"⚠️  UDP unavailable: {e}")
 
 __all__ = [
     # Core exceptions
@@ -76,10 +142,39 @@ __all__ = [
     "ProtocolStatus",
     "get_global_registry",
     "REGISTRY_AVAILABLE",
-    # Protocol providers
-    "SharedMemoryProvider",
-    "GrpcProvider",
-    "MqttProvider",
-    "RestProvider",
-    "WebSocketProvider",
+    # External interfaces
+    # Shared Memory
+    "SharedMemorySegment",
+    "SegmentInfo",
+    "POSIX_IPC_AVAILABLE",
+    "SharedMemorySerializer",
+    "SerializationFormat",
+    "MessageType",
+    "calculate_segment_size",
+    "SharedMemoryDiscovery",
+    "SegmentDiscoveryInfo",
+    "get_discovery",
+    "DISCOVERY_DIR",
+    # gRPC
+    "GrpcClient",
+    "GrpcServer",
+    "GRPC_CLIENT_AVAILABLE",
+    "GRPC_SERVER_AVAILABLE",
+    # MQTT
+    "MqttClient",
+    "MQTT_AVAILABLE",
+    # REST
+    "RestClient",
+    "REST_AVAILABLE",
+    # WebSocket
+    "WebSocketClient",
+    "WEBSOCKET_AVAILABLE",
+    # TCP
+    "AsyncTcpClient",
+    "AsyncTcpServer",
+    "TCP_AVAILABLE",
+    # UDP
+    "AsyncUdpClient",
+    "AsyncUdpServer",
+    "UDP_AVAILABLE",
 ]

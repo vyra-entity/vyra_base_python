@@ -14,6 +14,7 @@ from vyra_base.helper.ros2_env_helper import (
     get_current_paths_info,
 )
 from vyra_base.helper.logging_config import VyraLoggingConfig, get_logger
+from vyra_base.helper.func import deep_merge, fuzzy_match
 
 __all__ = [
     # ROS2 Environment Helper
@@ -27,4 +28,7 @@ __all__ = [
     # Logging
     "VyraLoggingConfig",
     "get_logger",
+    # Utility functions
+    "deep_merge",
+    "fuzzy_match",
 ]
