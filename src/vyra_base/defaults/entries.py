@@ -199,8 +199,8 @@ class FunctionConfigEntry(DCBase):
     :type returns: list[FunctionConfigBaseReturn]
     :param qosprofile: Quality of Service profile (default: 10)
     :type qosprofile: Union[int, QoSProfile]
-    :param callback: Function to be called when the function is invoked (only for callable)
-    :type callback: Callable, Optional
+    :param callbacks: Functions to be called when the function is invoked (only for callable)
+    :type callbacks: list[Callable], Optional
     :param periodic: Function to be called periodically (only for publisher)
     :type periodic: FunctionConfigPeriodicPublisher, Optional
     """
@@ -214,7 +214,7 @@ class FunctionConfigEntry(DCBase):
     params: list[FunctionConfigBaseParams] = field(default_factory=list)
     returns: list[FunctionConfigBaseReturn] = field(default_factory=list)
     qosprofile: Union[int, QoSProfile] = 10
-    callback: Union[Callable, None] = None
+    callbacks: Union[dict[str, Callable], None] = None
     periodic: Union[FunctionConfigPeriodicPublisher, None] = None
 
     def asdict(self):
@@ -229,8 +229,8 @@ class FunctionConfigEntry(DCBase):
         """
         result = {}
         for f in fields(self):
-            if f.name == "callback":
-                result[f.name] = getattr(self.callback, "__name__", None)
+            if f.name == "callbacks":
+                result[f.name] = {name: getattr(cb, "__name__", None) for name, cb in self.callbacks.items()} if self.callbacks else None
                 continue
             if f.name == "interfacetypes":
                 result[f.name] = getattr(self.interfacetypes, "__name__", None)

@@ -7,13 +7,16 @@ import logging
 
 from datetime import datetime
 from pathlib import Path
+import re
 from typing import Any, Optional, Union, TYPE_CHECKING
 
 # NEW: Import from new multi-protocol architecture
 from vyra_base.com import InterfaceFactory, remote_service, ProtocolType
 from vyra_base.com.core.decorators import get_decorated_methods
-from vyra_base.com.core.blueprints import ActionBlueprint
+from vyra_base.com.core.blueprints import ActionBlueprint, ServiceBlueprint
+from vyra_base.com.core.callback_registry import CallbackRegistry
 from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
+from vyra_base.com.providers.provider_registry import ProviderRegistry
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
@@ -239,6 +242,10 @@ class VyraEntity:
                         module_id=self.module_entry.uuid
                     )
                     
+                    # check_availability() must be called before initialize()
+                    # to set the internal _available flag correctly.
+                    await zenoh_provider.check_availability()
+                    
                     zenoh_config = self.module_config.get("zenoh", {
                         "mode": "client",
                         "connect": ["tcp/zenoh-router:7447"]
@@ -259,8 +266,19 @@ class VyraEntity:
                 module_id=self.module_entry.uuid
             )
             
-            providers.append(redis_provider)
-            logger.info("✅ Registered Redis protocol provider")
+            try:
+                await redis_provider.check_availability()
+                redis_config = self.module_config.get("redis", {})
+                await redis_provider.initialize(redis_config if redis_config else None)
+                providers.append(redis_provider)
+                logger.info("✅ Registered Redis protocol provider")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to initialize Redis provider: {e}")
+                # Still register provider even if initialization fails — availability
+                # check already set _available on the provider object
+                await redis_provider.check_availability()
+                providers.append(redis_provider)
+                logger.info("✅ Registered Redis protocol provider (limited mode)")
 
         if ProtocolType.UDS in register_types:
             from vyra_base.com.transport.t_uds.provider import UDSProvider
@@ -662,11 +680,25 @@ class VyraEntity:
             logger.info(f"Starting entity '{self.module_entry.name}' startup sequence")
             
             # Step 1: Begin initialization
-            self.state_machine.start(metadata={
-                "entity": self.module_entry.name,
-                "uuid": self.module_entry.uuid,
-                "timestamp": "startup_initiated"
-            })
+            # Skip start() if already in INITIALIZING state (entity is created with
+            # initial_lifecycle=LifecycleState.INITIALIZING, so calling start() which
+            # expects Offline→Initializing transition would raise InvalidTransitionError).
+            try:
+                current_lifecycle = self.state_machine.get_lifecycle_state()
+                _already_initializing = (current_lifecycle == LifecycleState.INITIALIZING)
+            except Exception:
+                _already_initializing = False
+
+            if not _already_initializing:
+                self.state_machine.start(metadata={
+                    "entity": self.module_entry.name,
+                    "uuid": self.module_entry.uuid,
+                    "timestamp": "startup_initiated"
+                })
+            else:
+                logger.info(
+                    f"Entity '{self.module_entry.name}' already in INITIALIZING state — skipping start()"
+                )
             
             # Step 2: Initialize transport providers
             await self._register_transport_provider(self.registered_protocols)
@@ -899,13 +931,51 @@ class VyraEntity:
         """
 
         for setting in settings:
-            if setting.functionname in [i.functionname for i in self._interface_list]:
-                logger.warning(
-                    f"Interface {setting.functionname} already "
-                    "exists. Skipping creation.")
+            existing = next((i for i in self._interface_list if i.functionname == setting.functionname), None)
+            if existing is not None:
+                # If the new setting has a callback but the existing one does not,
+                # upgrade: bind callback and create the server now (late-binding pattern)
+                new_callbacks = setting.callbacks if isinstance(setting.callbacks, dict) else None
+                existing_callbacks = existing.callbacks if isinstance(existing.callbacks, dict) else None
+                if new_callbacks and not existing_callbacks:
+                    logger.info(
+                        f"📋 Upgrading pending interface '{setting.functionname}' with callback"
+                    )
+                    existing.callbacks = new_callbacks
+                    # Create the Zenoh server now that we have a callback
+                    try:
+                        if ProviderRegistry().is_available(ProtocolType.ZENOH):
+                            zenoh_server = await InterfaceFactory.create_server(
+                                name=setting.functionname,
+                                response_callback=new_callbacks.get('response'),
+                                protocols=[ProtocolType.ZENOH],
+                                service_type=setting.interfacetypes,
+                            )
+                            if zenoh_server is not None:
+                                logger.info(f"✅ Zenoh server upgraded: {setting.functionname}")
+                            else:
+                                logger.warning(f"⚠️ Zenoh server upgrade returned None for '{setting.functionname}'")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Failed to upgrade Zenoh server for '{setting.functionname}': {e}")
+                else:
+                    logger.warning(
+                        f"Interface {setting.functionname} already "
+                        "exists. Skipping creation.")
                 continue
             
             self._interface_list.append(setting)
+
+            callbacks = setting.callbacks if isinstance(setting.callbacks, dict) else None
+
+            # Blueprint strategy fallback: if no callbacks set on FunctionConfigEntry,
+            # check CallbackRegistry for a bound blueprint (two-phase init pattern)
+            if not callbacks:
+                blueprint = CallbackRegistry.get_blueprint(setting.functionname)
+                if blueprint and blueprint.is_bound():
+                    callbacks = {'response': blueprint.callback}
+                    logger.debug(
+                        f"📋 Using CallbackRegistry blueprint callback for '{setting.functionname}'"
+                    )
 
             # Use ROS2 if available, otherwise skip ROS2-specific creation
             # (InterfaceFactory will handle protocol selection in future versions)
@@ -914,23 +984,90 @@ class VyraEntity:
                     f"⚠️ ROS2 not available, skipping ROS2 interface creation for {setting.functionname}. "
                     "Use InterfaceFactory for multi-protocol support."
                 )
+                
+                # Still create Zenoh servers when ROS2 unavailable
+                if setting.type == FunctionConfigBaseTypes.service.value:
+                    try:
+                        if ProviderRegistry().is_available(ProtocolType.ZENOH):
+                            zenoh_server = await InterfaceFactory.create_server(
+                                name=setting.functionname,
+                                response_callback=callbacks['response'] if callbacks and 'response' in callbacks else None,
+                                protocols=[ProtocolType.ZENOH],
+                                service_type=setting.interfacetypes,
+                            )
+                            if zenoh_server is not None:
+                                logger.info(f"✅ Registered Zenoh queryable (no ROS2): {setting.functionname}")
+                            else:
+                                logger.debug(
+                                    f"⏳ Zenoh queryable '{setting.functionname}' pending "
+                                    f"— no callback bound yet (blueprint strategy: bind callback first)"
+                                )
+                    except Exception as e:
+                        logger.warning(f"⚠️ Zenoh queryable for {setting.functionname} failed: {e}")
                 continue
 
             if setting.type == FunctionConfigBaseTypes.service.value:
                 logger.info(f"Creating callable: {setting.functionname}")
-                await InterfaceFactory.create_server(
-                    name=setting.functionname,
-                    response_callback=setting.callback,
-                    protocols=[ProtocolType.ROS2],
-                    service_type=setting.interfacetypes,
-                    node=self._node
-                )
+                
+                # Determine if ROS2 service creation is appropriate:
+                # Skip ROS2 if service_type is proto strings (not ROS2 class types)
+                # or if tags explicitly list only non-ros2 protocols
+                tags = getattr(setting, 'tags', None) or []
+                service_type = setting.interfacetypes
+                
+                # Check if service_type is a ROS2-compatible type (a class, not a string/list of strings)
+                def _is_ros2_service_type(st) -> bool:
+                    if st is None:
+                        return False
+                    if isinstance(st, list):
+                        # List of strings (proto types) → not ROS2
+                        return any(hasattr(item, '__slots__') for item in st)
+                    if isinstance(st, str):
+                        return False  # plain string → not a ROS2 class
+                    return hasattr(st, '__slots__')  # ROS2 types have __slots__
+                
+                use_ros2 = self._ros2_available and _is_ros2_service_type(service_type)
+                # Also allow ros2 if "ros2" is in tags and ROS2 is available
+                if not use_ros2 and 'ros2' in tags and self._ros2_available and _is_ros2_service_type(service_type):
+                    use_ros2 = True
+                
+                if use_ros2:
+                    await InterfaceFactory.create_server(
+                        name=setting.functionname,
+                        response_callback=callbacks['response'] if callbacks and 'response' in callbacks else None,
+                        protocols=[ProtocolType.ROS2],
+                        service_type=service_type,
+                        node=self._node
+                    )
+                else:
+                    logger.debug(
+                        f"⚠️ Skipping ROS2 server for '{setting.functionname}' "
+                        f"(service_type is not a ROS2 class: {type(service_type).__name__})"
+                    )
+                # Also register service as a Zenoh queryable if Zenoh is available
+                try:
+                    _registry = ProviderRegistry()
+                    if _registry.is_available(ProtocolType.ZENOH):
+                        zenoh_server = await InterfaceFactory.create_server(
+                            name=setting.functionname,
+                            response_callback=callbacks['response'] if callbacks and 'response' in callbacks else None,
+                            protocols=[ProtocolType.ZENOH],
+                            service_type=service_type,
+                        )
+                        if zenoh_server is not None:
+                            logger.info(f"✅ Also registered Zenoh queryable: {setting.functionname}")
+                        else:
+                            logger.debug(
+                                f"⏳ Zenoh queryable '{setting.functionname}' pending "
+                                f"— no callback bound yet (blueprint strategy: bind callback first)"
+                            )
+                except Exception as e:
+                    logger.warning(f"⚠️ Zenoh queryable for {setting.functionname} failed: {e}")
             elif setting.type == FunctionConfigBaseTypes.action.value:
                 logger.info(f"Creating actionServer: {setting.functionname}")
                 
                 # Check if this is a multi-callback ActionServer (new blueprint pattern)
                 # For multi-callback, callbacks are stored in setting metadata
-                callbacks = setting.metadata.get('callbacks', {}) if hasattr(setting, 'metadata') else {}
                 
                 if callbacks:
                     # New multi-callback pattern
@@ -942,24 +1079,9 @@ class VyraEntity:
                     )
                     await InterfaceFactory.create_action_server(
                         name=setting.functionname,
-                        handle_goal_request=callbacks.get('on_goal'),
-                        handle_cancel_request=callbacks.get('on_cancel'),
-                        execution_callback=callbacks.get('execute'),
-                        protocols=[ProtocolType.ROS2],
-                        action_type=setting.interfacetypes,
-                        node=self._node
-                    )
-                elif setting.callback:
-                    # Legacy single callback (backward compatibility)
-                    logger.warning(
-                        f"⚠️  ActionServer '{setting.functionname}' using deprecated single-callback pattern. "
-                        "Please migrate to multi-callback pattern with @remote_actionServer.on_goal/on_cancel/execute"
-                    )
-                    await InterfaceFactory.create_action_server(
-                        name=setting.functionname,
-                        handle_goal_request=None,  # Will use default: accept all
-                        handle_cancel_request=None,  # Will use default: accept all
-                        execution_callback=setting.callback,
+                        handle_goal_request=callbacks.get('on_goal', None),
+                        handle_cancel_request=callbacks.get('on_cancel', None),
+                        execution_callback=callbacks.get('execute', None),
                         protocols=[ProtocolType.ROS2],
                         action_type=setting.interfacetypes,
                         node=self._node
@@ -1089,15 +1211,15 @@ class VyraEntity:
             
             setting = matching_settings[0]
             
-            # Initialize metadata if needed
-            if not hasattr(setting, 'metadata'):
-                setting.metadata = {}
-            if 'callbacks' not in setting.metadata:
-                setting.metadata['callbacks'] = {}
+            if setting.callbacks is None:
+                logger.warning(
+                    f"⚠️  FunctionConfigEntry for '{action_name}' has no callbacks dict. Initializing empty callbacks dict."
+                )
+                setting.callbacks = {}
             
             # Bind each callback
             for callback_type, method in callbacks.items():
-                setting.metadata['callbacks'][callback_type] = method
+                setting.callbacks[callback_type] = method
                 results[f"{action_name}/{callback_type}"] = True
                 logger.debug(
                     f"✅ Bound ActionServer callback: {action_name}/{callback_type}"
@@ -1105,7 +1227,7 @@ class VyraEntity:
             
             # Verify all required callbacks are present
             required = ['on_goal', 'on_cancel', 'execute']
-            missing = [cb for cb in required if cb not in setting.metadata['callbacks']]
+            missing = [cb for cb in required if cb not in setting.callbacks]
             
             if missing:
                 logger.warning(
@@ -1126,9 +1248,19 @@ class VyraEntity:
             
             if matching_settings:
                 setting = matching_settings[0]
-                setting.callback = method
+                if setting.callbacks is None:
+                    setting.callbacks = {}
+                setting.callbacks['response'] = method
                 results[service_name] = True
                 logger.debug(f"✅ Bound service callback: {service_name}")
+                # Blueprint strategy: also bind to CallbackRegistry blueprint
+                blueprint = getattr(method, '_vyra_blueprint', None)
+                if isinstance(blueprint, ServiceBlueprint) and not blueprint.is_bound():
+                    try:
+                        blueprint.bind_callback(method)
+                        logger.debug(f"📋 Blueprint '{service_name}' callback bound in CallbackRegistry")
+                    except RuntimeError:
+                        pass  # Already bound (e.g. duplicate call)
             else:
                 results[service_name] = False
                 logger.warning(

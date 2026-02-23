@@ -29,9 +29,9 @@ class VyraSubscriberImpl(VyraSubscriber):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        subscriber_callback: Callable[[Any], Coroutine[Any, Any, Any]],
         zenoh_session: Any,  # zenoh.Session
-        message_type: type,
+        subscriber_callback: Callable[[Any], Coroutine[Any, Any, Any]] | None = None,
+        message_type: type | None = None,
         **kwargs
     ):
         super().__init__(name, topic_builder, subscriber_callback, ProtocolType.ZENOH, **kwargs)
@@ -42,27 +42,34 @@ class VyraSubscriberImpl(VyraSubscriber):
     async def initialize(self) -> bool:
         """Initialize Zenoh subscriber."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            # If name is already a fully-qualified topic (contains '/'), use it
+            # directly instead of running through topic_builder.build() which
+            # only accepts plain function names without '/'.
+            if '/' in self.name:
+                topic_name = self.name
+            else:
+                topic_name = self.topic_builder.build(self.name)
             
-            # Create async wrapper for callback
+            # Capture the running asyncio event loop for thread-safe callback dispatch
+            loop = asyncio.get_event_loop()
+
+            # Create wrapper for callback — safe to call from Zenoh's background thread
             def _callback_wrapper(sample):
                 if not self.subscriber_callback:
                     logger.warning("No subscriber callback defined")
                     return
-                
-                try:
-                    loop = asyncio.get_event_loop()
-                except RuntimeError:
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
-                
-                # Deserialize and call user callback
+
+                # Deserialize payload
                 serializer = ZenohSerializer()
                 data = serializer.deserialize(sample.payload, format=SerializationFormat.JSON)
-                asyncio.create_task(self.subscriber_callback(data))
-            
-            # Declare Zenoh subscriber directly from session
-            loop = asyncio.get_event_loop()
+
+                cb = self.subscriber_callback
+                if asyncio.iscoroutinefunction(cb):
+                    # Async callback: schedule on the event loop from this thread
+                    asyncio.run_coroutine_threadsafe(cb(data), loop)
+                else:
+                    # Sync callback: use call_soon_threadsafe for thread-safety
+                    loop.call_soon_threadsafe(cb, data)
             
             def _create_subscriber():
                 if not self._zenoh_session:

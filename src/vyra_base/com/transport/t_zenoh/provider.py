@@ -173,7 +173,13 @@ class ZenohProvider(AbstractProtocolProvider):
             
             self._initialized = True
             logger.info("✅ Zenoh provider initialized")
-            logger.info(f"Session ID: {self._session.session.info().zid()}")
+            try:
+                session_info = self._session.session.info()
+                # zenoh 1.x: zid is a property, not callable
+                zid = session_info.zid() if callable(session_info.zid) else session_info.zid
+                logger.info(f"Session ID: {zid}")
+            except Exception:
+                logger.info("✅ Zenoh provider initialized (session ID unavailable)")
             
             return True
             
@@ -208,8 +214,8 @@ class ZenohProvider(AbstractProtocolProvider):
     async def create_publisher(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        message_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        message_type: Optional[type] = None,
         **kwargs
     ) -> VyraPublisher:
         """
@@ -230,9 +236,10 @@ class ZenohProvider(AbstractProtocolProvider):
             if not self._session or not self._session.is_open:
                 raise ProviderError("Zenoh session not open")
             
+            effective_topic_builder = topic_builder or self._topic_builder
             publisher = VyraPublisherImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 zenoh_session=self._session.session,
                 message_type=message_type,
                 **kwargs
@@ -250,9 +257,9 @@ class ZenohProvider(AbstractProtocolProvider):
     async def create_subscriber(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        subscriber_callback: Callable,
-        message_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        subscriber_callback: Optional[Callable] = None,
+        message_type: Optional[type] = None,
         **kwargs
     ) -> VyraSubscriber:
         """
@@ -274,9 +281,10 @@ class ZenohProvider(AbstractProtocolProvider):
             if not self._session or not self._session.is_open:
                 raise ProviderError("Zenoh session not open")
 
+            effective_topic_builder = topic_builder or self._topic_builder
             subscriber = VyraSubscriberImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 subscriber_callback=subscriber_callback,
                 zenoh_session=self._session.session,
                 message_type=message_type,
@@ -296,9 +304,9 @@ class ZenohProvider(AbstractProtocolProvider):
     async def create_server(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        response_callback: Callable,
-        service_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        response_callback: Optional[Callable] = None,
+        service_type: Optional[type] = None,
         **kwargs
     ) -> VyraServer:
         """
@@ -320,9 +328,10 @@ class ZenohProvider(AbstractProtocolProvider):
             if not self._session or not self._session.is_open:
                 raise ProviderError("Zenoh session not open")
             
+            effective_topic_builder = topic_builder or self._topic_builder
             server = VyraServerImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 response_callback=response_callback,
                 zenoh_session=self._session.session,
                 service_type=service_type,
@@ -342,8 +351,8 @@ class ZenohProvider(AbstractProtocolProvider):
     async def create_client(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        service_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        service_type: Optional[type] = None,
         request_callback: Optional[Callable] = None,
         **kwargs
     ) -> VyraClient:
@@ -352,8 +361,8 @@ class ZenohProvider(AbstractProtocolProvider):
         
         Args:
             name: Client name
-            topic_builder: TopicBuilder instance
-            service_type: Service type class
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
+            service_type: Optional service type class (ignored in Zenoh – schema-less)
             request_callback: Optional async callback for responses
             **kwargs: Additional client options
             
@@ -366,9 +375,12 @@ class ZenohProvider(AbstractProtocolProvider):
             if not self._session or not self._session.is_open:
                 raise ProviderError("Zenoh session not open")
             
+            # Use provider's topic_builder if none provided
+            effective_topic_builder = topic_builder or self._topic_builder
+            
             client = VyraClientImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 request_callback=request_callback,
                 zenoh_session=self._session.session,
                 service_type=service_type,

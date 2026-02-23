@@ -29,7 +29,7 @@ class VyraPublisherImpl(VyraPublisher):
         name: str,
         topic_builder: TopicBuilder,
         zenoh_session: Any,  # zenoh.Session
-        message_type: type,
+        message_type: type | None = None,
         **kwargs
     ):
         super().__init__(name, topic_builder, ProtocolType.ZENOH, **kwargs)

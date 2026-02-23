@@ -44,10 +44,15 @@ class VyraClientImpl(VyraClient):
     async def initialize(self) -> bool:
         """Initialize Zenoh client."""
         try:
-            service_name = self.topic_builder.build(self.name)
-            self._service_name = service_name
+            # If name is already a fully-qualified topic (contains '/'), use it
+            # directly instead of running through topic_builder.build() which
+            # only accepts plain function names without '/'.
+            if '/' in self.name:
+                self._service_name = self.name
+            else:
+                self._service_name = self.topic_builder.build(self.name)
             # No persistent resources needed for client
-            logger.info(f"✅ ZenohClient initialized: {service_name}")
+            logger.info(f"✅ ZenohClient initialized: {self._service_name}")
             return True
             
         except Exception as e:
@@ -88,7 +93,7 @@ class VyraClientImpl(VyraClient):
                 replies = self._zenoh_session.get(
                     self._service_name,
                     timeout=timeout,
-                    value=request_bytes
+                    payload=request_bytes
                 )
                 # Get first reply
                 for reply in replies:

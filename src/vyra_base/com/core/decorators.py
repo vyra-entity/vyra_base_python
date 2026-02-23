@@ -78,60 +78,89 @@ def remote_service(
         - Async methods recommended (sync methods wrapped automatically)
         - Blueprint created during decoration, callback bound during initialization
     """
-    def decorator(func: Callable) -> Callable:
-        # Create blueprint (without callback yet)
-        blueprint_name = name or func.__name__
-        blueprint = ServiceBlueprint(
-            name=blueprint_name,
-            protocols=protocols or [],
-            metadata=kwargs,
-            service_type=kwargs.get('service_type')
+    # Handle bare @remote_service usage (no parentheses): name will be the function itself
+    if callable(name):
+        func = name
+        return _remote_service_decorator(
+            func=func,
+            name=None,
+            protocols=None,
+            auto_register=True,
+            namespace=None,
         )
-        
-        # Register blueprint if auto_register is True
-        if auto_register:
-            try:
-                CallbackRegistry.register_blueprint(blueprint, namespace=namespace)
-                logger.debug(f"📝 Registered service blueprint '{blueprint_name}'")
-            except ValueError as e:
-                logger.warning(f"⚠️  Blueprint '{blueprint_name}' already registered: {e}")
-        
-        # Store metadata on function for backward compatibility and discovery
-        func._vyra_remote_server = True
-        func._vyra_server_name = blueprint_name
-        func._vyra_protocols = protocols
-        func._vyra_auto_register = auto_register
-        func._vyra_kwargs = kwargs
-        func._vyra_blueprint = blueprint  # NEW: Reference to blueprint
-        func._vyra_namespace = namespace
-        
-        # Wrap async functions
-        if asyncio.iscoroutinefunction(func):
-            @functools.wraps(func)
-            async def async_wrapper(*args, **wrapper_kwargs):
-                return await func(*args, **wrapper_kwargs)
-            
-            wrapper = async_wrapper
-        else:
-            # Wrap sync functions with async wrapper
-            @functools.wraps(func)
-            async def async_wrapper(*args, **wrapper_kwargs):
-                return func(*args, **wrapper_kwargs)
-            
-            wrapper = async_wrapper
-        
-        # Transfer metadata to wrapper
-        setattr(wrapper, "_vyra_remote_server", True)
-        setattr(wrapper, "_vyra_server_name", blueprint_name)
-        setattr(wrapper, "_vyra_protocols", protocols)
-        setattr(wrapper, "_vyra_auto_register", auto_register)
-        setattr(wrapper, "_vyra_kwargs", kwargs)
-        setattr(wrapper, "_vyra_blueprint", blueprint)
-        setattr(wrapper, "_vyra_namespace", namespace)
-        
-        return wrapper
+    def decorator(func: Callable) -> Callable:
+        return _remote_service_decorator(
+            func=func,
+            name=name,
+            protocols=protocols,
+            auto_register=auto_register,
+            namespace=namespace,
+            **kwargs,
+        )
     
     return decorator
+
+
+def _remote_service_decorator(
+    func: Callable,
+    name: Optional[str] = None,
+    protocols: Optional[List] = None,
+    auto_register: bool = True,
+    namespace: Optional[str] = None,
+    **kwargs
+) -> Callable:
+    """Internal helper that actually applies the remote_service decoration to a function."""
+    # Create blueprint (without callback yet)
+    blueprint_name = name or func.__name__
+    blueprint = ServiceBlueprint(
+        name=blueprint_name,
+        protocols=protocols or [],
+        metadata=kwargs,
+        service_type=kwargs.get('service_type')
+    )
+    
+    # Register blueprint if auto_register is True
+    if auto_register:
+        try:
+            CallbackRegistry.register_blueprint(blueprint, namespace=namespace)
+            logger.debug(f"📝 Registered service blueprint '{blueprint_name}'")
+        except ValueError as e:
+            logger.warning(f"⚠️  Blueprint '{blueprint_name}' already registered: {e}")
+    
+    # Store metadata on function for backward compatibility and discovery
+    func._vyra_remote_server = True
+    func._vyra_server_name = blueprint_name
+    func._vyra_protocols = protocols
+    func._vyra_auto_register = auto_register
+    func._vyra_kwargs = kwargs
+    func._vyra_blueprint = blueprint
+    func._vyra_namespace = namespace
+    
+    # Wrap async functions
+    if asyncio.iscoroutinefunction(func):
+        @functools.wraps(func)
+        async def async_wrapper(*args, **wrapper_kwargs):
+            return await func(*args, **wrapper_kwargs)
+        
+        wrapper = async_wrapper
+    else:
+        # Wrap sync functions with async wrapper
+        @functools.wraps(func)
+        async def async_wrapper(*args, **wrapper_kwargs):
+            return func(*args, **wrapper_kwargs)
+        
+        wrapper = async_wrapper
+    
+    # Transfer metadata to wrapper
+    setattr(wrapper, "_vyra_remote_server", True)
+    setattr(wrapper, "_vyra_server_name", blueprint_name)
+    setattr(wrapper, "_vyra_protocols", protocols)
+    setattr(wrapper, "_vyra_auto_register", auto_register)
+    setattr(wrapper, "_vyra_kwargs", kwargs)
+    setattr(wrapper, "_vyra_blueprint", blueprint)
+    setattr(wrapper, "_vyra_namespace", namespace)
+    
+    return wrapper
 
 
 def remote_publisher(

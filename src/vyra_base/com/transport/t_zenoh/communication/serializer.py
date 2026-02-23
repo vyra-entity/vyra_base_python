@@ -41,7 +41,21 @@ class ZenohSerializer:
         """
         try:
             if format == SerializationFormat.JSON:
-                return json.dumps(data).encode('utf-8')
+                def _default_encoder(obj):
+                    """Fallback JSON encoder for non-serializable objects."""
+                    if hasattr(obj, 'to_dict'):
+                        return obj.to_dict()
+                    if hasattr(obj, '__dict__'):
+                        return {
+                            k: v for k, v in obj.__dict__.items()
+                            if not k.startswith('_')
+                        }
+                    # Enum support
+                    if hasattr(obj, 'value'):
+                        return obj.value
+                    return str(obj)
+
+                return json.dumps(data, default=_default_encoder).encode('utf-8')
             
             elif format == SerializationFormat.MSGPACK:
                 try:
@@ -79,13 +93,17 @@ class ZenohSerializer:
         Deserialize data from bytes.
         
         Args:
-            data: Serialized data
+            data: Serialized data (bytes, bytearray, memoryview, or Zenoh ZBytes)
             format: Serialization format
             
         Returns:
             Deserialized data
         """
         try:
+            # Zenoh 1.x returns ZBytes objects which need explicit conversion to bytes
+            if not isinstance(data, (bytes, bytearray, memoryview)):
+                data = bytes(data)
+
             if format == SerializationFormat.JSON:
                 return json.loads(data.decode('utf-8'))
             

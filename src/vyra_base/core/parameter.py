@@ -11,6 +11,7 @@ from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.storage.db_access import DBSTATUS, DbAccess
 from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
 from vyra_base.storage.tb_params import Parameter as DbParameter
+from vyra_base.storage.tb_params import TypeEnum
 
 logger = logging.getLogger(__name__)
 
@@ -236,6 +237,10 @@ class Parameter:
         all_params: DBReturnValue = await self.persistant_manipulator.get_all(
             filters={"name": key})
 
+        # Treat NOT_FOUND the same as a real DB error for get (parameter doesn't exist)
+        if all_params.status == DBSTATUS.NOT_FOUND:
+            all_params.status = DBSTATUS.ERROR  # map to failure so caller gets proper error
+
         if all_params.status != DBSTATUS.SUCCESS:
             response['success'] = False
             response['message'] = f"Failed to retrieve parameter with key '{key}'." 
@@ -343,10 +348,16 @@ class Parameter:
         param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
             filters={"name": key})
 
+        # DBSTATUS.NOT_FOUND means the query ran fine but no rows matched (empty table/filter).
+        # Treat NOT_FOUND the same as SUCCESS+empty-list: fall through to the upsert path.
+        if param_ret.status == DBSTATUS.NOT_FOUND:
+            param_ret.status = DBSTATUS.SUCCESS
+            param_ret.value = []
+
         if param_ret.status != DBSTATUS.SUCCESS:
             response['success'] = False
-            response['message'] = f"Failed to retrieve parameter with key '{key}'."
-            logger.warn(response['message'])
+            response['message'] = f"Failed to retrieve parameter with key '{key}' (DB error)."
+            logger.warning(response['message'])
             return response
 
         if not isinstance(param_ret.value, list):
@@ -356,10 +367,30 @@ class Parameter:
             return response
             
         if len(param_ret.value) == 0:
-            response['success'] = False
-            response['message'] = f"Parameter with key '{key}' does not exist."
-            logger.warn(response['message'])
-            return response
+            # Parameter does not exist — create it as a string parameter (upsert behavior)
+            try:
+                new_param: dict[str, Any] = {
+                    "name": key,
+                    "value": str(value),
+                    "default_value": str(value),
+                    "type": TypeEnum.string.value,
+                    "displayname": key,
+                }
+                add_ret: DBReturnValue = await self.persistant_manipulator.add(new_param)
+                if add_ret.status != DBSTATUS.SUCCESS:
+                    response['success'] = False
+                    response['message'] = f"Failed to create parameter with key '{key}'."
+                    logger.error(response['message'])
+                    return response
+                response['success'] = True
+                response['message'] = f"Parameter '{key}' created successfully."
+                logger.info(response['message'])
+                return response
+            except Exception as e:
+                response['success'] = False
+                response['message'] = f"Failed to create parameter '{key}': {e}"
+                logger.error(response['message'])
+                return response
             
         if len(param_ret.value) > 1:
             logger.warn(

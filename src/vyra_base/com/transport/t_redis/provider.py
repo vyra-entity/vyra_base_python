@@ -107,6 +107,7 @@ class RedisProvider(AbstractProtocolProvider):
         """
         
         logger.debug("✅ Redis available")
+        self._available = True
         return True
     
     async def initialize(self, config: Optional[Dict[str, Any]] = None) -> bool:

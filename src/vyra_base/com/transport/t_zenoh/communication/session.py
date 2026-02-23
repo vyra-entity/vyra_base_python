@@ -6,6 +6,7 @@ Manages Zenoh session lifecycle, configuration, and connection to Zenoh router.
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 
 from dataclasses import dataclass, field
@@ -144,7 +145,7 @@ class ZenohSession:
                 
                 # Create Zenoh configuration
                 zenoh_config = zenoh.Config.from_json5(
-                    str(self.config.to_zenoh_config())
+                    json.dumps(self.config.to_zenoh_config())
                 )
                 
                 # Open session (blocking call, wrapped in executor)
@@ -159,7 +160,13 @@ class ZenohSession:
         
                 self._opened = True
                 logger.info("✅ Zenoh session opened successfully")
-                logger.info(f"Session ID: {self._session.info().zid()}")
+                try:
+                    info = self._session.info()
+                    # zenoh 1.x: zid is a property, not a callable
+                    zid = info.zid() if callable(info.zid) else info.zid
+                    logger.info(f"Session ID: {zid}")
+                except Exception:
+                    logger.info("✅ Zenoh session opened (session ID unavailable)")
                 
                 return True
                 

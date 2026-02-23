@@ -124,8 +124,18 @@ class InterfaceFactory:
             provider_func = info["provider"]
             kwargs = info["kwargs"]
             
-            # Check if required callbacks are now available
-            if all(kwargs.get(key) for key in ["subscriber_callback", "response_callback", "handle_goal_request", "execution_callback"]):
+            # Check if required callbacks are now available based on interface type
+            # A server needs "response_callback", a subscriber needs "subscriber_callback",
+            # an action server needs "handle_goal_request" and "execution_callback"
+            ready = False
+            if "response_callback" in kwargs and kwargs.get("response_callback"):
+                ready = True  # Server: response_callback now available
+            elif "subscriber_callback" in kwargs and kwargs.get("subscriber_callback"):
+                ready = True  # Subscriber: subscriber_callback now available
+            elif (kwargs.get("handle_goal_request") and kwargs.get("execution_callback")):
+                ready = True  # ActionServer: both callbacks now available
+            
+            if ready:
                 try:
                     # Create the interface using the provider function
                     interface = provider_func(**kwargs)
@@ -447,9 +457,9 @@ class InterfaceFactory:
     @staticmethod
     async def create_action_server(
         name: str,
-        handle_goal_request: Callable,
-        handle_cancel_request: Callable,
-        execution_callback: Callable,
+        handle_goal_request: Callable | None,
+        handle_cancel_request: Callable | None,
+        execution_callback: Callable | None,
         protocols: Optional[List[ProtocolType]] = None,
         **kwargs
     ) -> Optional[VyraActionServer]:

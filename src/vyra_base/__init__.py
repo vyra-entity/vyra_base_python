@@ -8,78 +8,50 @@ import vyra_base
 
 def extract_interfaces(target_path: str | Path):
     """
-    Extract VYRA interface files from the pip-installed library into a module interface package.
+    Copy VYRA interface config files and build files from the pip-installed library.
 
-    Extracts publisher (.msg), server (.srv + .proto), and job (.action) interfaces
-    using VYRA-specific terminology independent of ROS2 naming conventions.
+    Only copies JSON/YAML/XML metadata files from the config/ directory and the
+    ROS2 build scaffolding files (package.xml, CMakeLists.template.txt).
 
-    :param target_path: Path to the target package where interfaces will be extracted.
+    Interface files (.msg, .srv, .action, .proto) are NOT copied — they are
+    generated on demand by InterfaceGenerator (interfaces/tools/generate_interfaces.py)
+    from the config metadata.
+
+    :param target_path: Path to the target interface package directory.
     :type target_path: str or pathlib.Path
 
     :return: None
     :rtype: None
-
-    This function copies interface files from the installed vyra_base library:
-    - .msg + .proto files → target/msg/ (from publisher/ directory)
-    - .srv + .proto files → target/srv/ (from server/ directory)
-    - .action + .proto files → target/action/ (from actionServer/ directory)
-    
-    The source uses VYRA terminology (publisher/server/actionServer) but outputs
-    to ROS2-compatible directories (msg/srv/action). .proto files are stored
-    alongside their ROS2 counterparts in the same directory.
     """
-    import importlib.resources
     package_path: Path = Path(vyra_base.__file__).parent / 'interfaces'
-
     source_path = Path(package_path)
 
     if isinstance(target_path, str):
         target_path = Path(target_path)
-    
-    # Copy interface files from source to target
-    print(f"Extracting VYRA interfaces from {source_path} to {target_path}")
-    
-    # Copy build files first
+
+    print(f"Extracting VYRA interface configs from {source_path} to {target_path}")
+
+    # Copy ROS2 build scaffolding files
     build_files = ['package.xml', 'CMakeLists.template.txt']
     for build_file in build_files:
         source_file = source_path / build_file
         if source_file.exists():
             shutil.copy2(source_file, target_path / build_file)
             print(f"Copied {build_file} to {target_path}")
-    
-    # Map VYRA interface types to file extensions and target directories
-    # source_dir → (file_exts, target_dir)
-    # .proto files are stored alongside their ROS2 counterparts (msg/srv/action)
-    interface_mapping = {
-        'msg': (['msg', 'proto'], 'msg'),           # Publisher → .msg + .proto files → msg/
-        'srv': (['srv', 'proto'], 'srv'),              # Server → .srv + .proto files → srv/
-        'action': (['action', 'proto'], 'action'),  # actionServer → .action + .proto files → action/
-    }
-    
-    for source_type, (file_exts, target_type) in interface_mapping.items():
-        source_dir: Path = source_path / source_type
-        target_dir: Path = target_path / target_type
-        
-        if source_dir.exists():
-            target_dir.mkdir(exist_ok=True)
-            
-            for f_ext in file_exts:
-                for file in source_dir.rglob(f'*.{f_ext}'):
-                    shutil.copy2(file, target_dir / file.name)
-                    print(f"Copied {file.name} ({source_type}) to {target_dir}")
 
+    # Copy config metadata files (JSON / YAML / XML)
     config_path: Path = source_path / 'config'
     target_config: Path = target_path / 'config'
-    
+
     if not target_config.exists():
         target_config.mkdir(parents=True, exist_ok=True)
-    
-    for type in ['json', 'yaml', 'xml']:
-        for file in config_path.glob(f'*.{type}'):
+
+    for ftype in ['json', 'yaml', 'xml']:
+        for file in config_path.glob(f'*.{ftype}'):
             shutil.copy2(file, target_config)
             print(f"Copied {file.name} to {target_config}")
 
-    print(f"VYRA interface extraction to {target_path} successful.")
+    print(f"VYRA interface config extraction to {target_path} successful.")
 
 
 def get_reserved_list() -> dict[str, Any]:
@@ -114,3 +86,18 @@ def get_reserved_list() -> dict[str, Any]:
                 }
     
     return reserved
+
+
+def get_vyra_base_config_files() -> set[str]:
+    """
+    Return the set of config file names shipped with vyra_base.
+
+    Used by setup_interfaces.py to distinguish module-specific config files
+    (which must be validated against the RESERVED list) from files that were
+    copied from vyra_base itself.
+
+    :return: Set of file names (basename only) present in the vyra_base interfaces/config/ directory.
+    :rtype: set[str]
+    """
+    config_path: Path = Path(vyra_base.__file__).parent / "interfaces" / "config"
+    return {f.name for f in config_path.iterdir() if f.is_file()}

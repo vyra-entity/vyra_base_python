@@ -3,7 +3,8 @@ Zenoh Server Implementation
 
 Uses Zenoh Queryable for request/response pattern.
 """
-
+import asyncio
+import concurrent.futures
 import logging
 from typing import Coroutine, Optional, Any, Callable, Awaitable
 
@@ -16,6 +17,40 @@ from vyra_base.com.transport.t_zenoh.communication.serializer import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ZenohProxyRequest(dict):
+    """
+    Dict subclass that also supports attribute access.
+
+    Zenoh deserialises requests as plain Python dicts, but ROS2-style callbacks
+    access fields via ``request.key`` / ``request.value`` etc.  This thin
+    wrapper makes both ``request["key"]`` and ``request.key`` work.
+    """
+
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(f"Request has no attribute '{name}'")
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        self[name] = value
+
+
+class ZenohProxyResponse:
+    """
+    Proxy response object for ROS2-style callbacks (request, response) pattern.
+    
+    Some callbacks (e.g. get_interface_list) follow the ROS2 pattern where they
+    receive a mutable response object, set attributes on it, and return None.
+    This proxy captures those attribute assignments and converts them to a dict
+    so Zenoh can serialize and reply.
+    """
+
+    def to_dict(self) -> dict:
+        """Return all captured response attributes as a plain dict."""
+        return dict(vars(self))
 
 
 class VyraServerImpl(VyraServer):
@@ -31,7 +66,7 @@ class VyraServerImpl(VyraServer):
         name: str,
         topic_builder: TopicBuilder,
         zenoh_session: Any,  # zenoh.Session
-        service_type: type,
+        service_type: type | None = None,
         response_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
         **kwargs
     ):
@@ -72,29 +107,40 @@ class VyraServerImpl(VyraServer):
     
     def _handle_query_sync(self, query: Any):
         """
-        Synchronous query handler (called by Zenoh).
+        Synchronous query handler (called by Zenoh in a background thread).
         
         Args:
             query: Zenoh Query object
         """
-        import asyncio
+        
         try:
-            # Get or create event loop
             try:
                 loop = asyncio.get_event_loop()
             except RuntimeError:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-            
-            # Run async handler
-            loop.run_until_complete(self._handle_query(query))
+                loop = None
+
+            if loop is not None and loop.is_running():
+                # Called from a thread while the main loop is running — schedule safely
+                future = asyncio.run_coroutine_threadsafe(self._handle_query(query), loop)
+                future.result(timeout=10)
+            else:
+                # No running loop — create one or reuse
+                if loop is None or loop.is_closed():
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                loop.run_until_complete(self._handle_query(query))
         except Exception as e:
             logger.error(f"❌ Sync query handler failed: {e}")
     
     async def _handle_query(self, query: Any):
         """
         Internal query handler that wraps user callback.
-        
+
+        Supports two callback conventions:
+        1. ``callback(request) → response_dict``  — returns a value directly
+        2. ``callback(request, response)``  — ROS2-style: mutates a response object,
+           returns ``None``; the proxy response's attributes are used as the reply.
+
         Args:
             query: Zenoh Query object (has .value and .reply())
         """
@@ -102,17 +148,36 @@ class VyraServerImpl(VyraServer):
             if not self.response_callback:
                 logger.error("Response callback not set for query handling")
                 return
-            
-            # Deserialize request from query.value
-            request = self._deserialize_request(query.value.payload)
-            
-            # Call user callback
-            response = await self.response_callback(request)
-            
+
+            # Deserialize request from query.payload (zenoh 1.x API)
+            request = self._deserialize_request(query.payload)
+
+            # Create proxy for ROS2-style callbacks that write to a response object
+            proxy_response = ZenohProxyResponse()
+
+            # Call user callback — support both (request,) and (request, response) signatures
+            try:
+                result = await self.response_callback(request, proxy_response)
+            except TypeError:
+                # Fallback: callback only accepts a single argument
+                result = await self.response_callback(request)
+
+            # Determine what to send back:
+            # • If the callback returned a non-None, non-bool value → use it directly
+            #   (booleans indicate ROS2-style success/failure, not the response payload)
+            # • Otherwise fall back to whatever was written into proxy_response
+            if result is not None and not isinstance(result, bool):
+                response_data = result
+            else:
+                response_data = proxy_response.to_dict()
+                if not response_data:
+                    # Callback returned None/bool and wrote nothing — respond with bool status
+                    response_data = {"success": bool(result)} if result is not None else {}
+
             # Serialize and reply
-            response_bytes = self._serialize_response(response)
+            response_bytes = self._serialize_response(response_data)
             query.reply(self._service_name, response_bytes)
-            
+
         except Exception as e:
             logger.error(f"❌ Query handling failed: {e}")
             # Send error reply
@@ -121,8 +186,15 @@ class VyraServerImpl(VyraServer):
             query.reply(self._service_name, error_bytes)
     
     def _deserialize_request(self, payload: bytes) -> Any:
-        """Deserialize request from bytes using Zenoh serializer."""
-        return self._serializer.deserialize(payload, format=self._format)
+        """Deserialize request from bytes using Zenoh serializer.
+        
+        Returns a ZenohProxyRequest (dict subclass with attribute access) so that
+        ROS2-style callbacks can access fields via ``request.key`` or ``request["key"]``.
+        """
+        raw = self._serializer.deserialize(payload, format=self._format)
+        if isinstance(raw, dict):
+            return ZenohProxyRequest(raw)
+        return raw
     
     def _serialize_response(self, response: Any) -> bytes:
         """Serialize response to bytes using Zenoh serializer."""
