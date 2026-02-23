@@ -3,7 +3,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "initialize",
         "displayname": "Initialize",
         "description": "Executing initial commands and set state IDLE -> READY",
@@ -42,7 +42,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "pause",
         "displayname": "Pause",
         "description": "Pause the current operation and set state READY|RUNNING -> PAUSED",
@@ -81,7 +81,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "stop",
         "displayname": "Stop",
         "description": "Stop the current operation and set state READY|RUNNING|PAUSED -> STOPPED",
@@ -120,7 +120,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "resume",
         "displayname": "Resume",
         "description": "Resume the current operation and set state PAUSED -> RUNNING",
@@ -159,7 +159,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "reset",
         "displayname": "Reset",
         "description": "Reset the current operation and set state STOPPED -> IDLE",

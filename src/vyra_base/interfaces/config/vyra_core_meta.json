@@ -3,7 +3,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "get_interface_list",
         "displayname": "Get Interface List",
         "description": "Retrieve the list of interfaces of the vyra system.",
@@ -29,7 +29,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "set_parameter",
         "displayname": "Set Parameter",
         "description": "Set a parameter in the vyra system.",
@@ -74,7 +74,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "get_parameter",
         "displayname": "Get Parameter",
         "description": "Get a parameter in the vyra system.",
@@ -119,7 +119,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "server",
+        "type": "service",
         "functionname": "param_changed_topic",
         "displayname": "Get Update Parameter Event Topic",
         "description": "Get the topic for update parameter events.",

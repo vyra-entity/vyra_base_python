@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.75] - 2026-02-23
+
+### Build
+
+bugfix interface: "server" -> "service"
+
+
 ## [0.1.8+build.74] - 2026-02-23
 
 ### Build
