@@ -31,6 +31,7 @@ from vyra_base.com.core.blueprints import (
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 from vyra_base.com.providers.provider_registry import ProviderRegistry
+from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.transport.registry import (
     add_publisher as add_publisher_registry,
     add_subscriber as add_subscriber_registry,
@@ -205,24 +206,27 @@ class InterfaceFactory:
     ) -> VyraPublisher:
         """
         Create Publisher with automatic protocol selection.
-        
+
+        Only the own (default) provider is used.
+
         Args:
             name: Topic/channel name
             protocols: Preferred protocols (fallback if not specified)
             **kwargs: Additional parameters (message_type, qos, etc.)
-            
+
         Returns:
             VyraPublisher: Initialized publisher
-            
+
         Raises:
             InterfaceError: If no protocol available
         """
         protocols = protocols or InterfaceFactory.PUBLISHER_FALLBACK
         provider_registry = ProviderRegistry()
-        
+
         for protocol in protocols:
             try:
-                provider = provider_registry.get_provider(protocol)
+                # Publishers always use own provider (module_id=None)
+                provider = provider_registry.get_provider(protocol, module_id=None)
                 
                 if not provider:
                     logger.debug(f"⚠️ No provider for {protocol.value}")
@@ -259,31 +263,46 @@ class InterfaceFactory:
         name: str,
         subscriber_callback: Callable,
         protocols: Optional[List[ProtocolType]] = None,
+        module_id: Optional[str] = None,
+        module_name: Optional[str] = None,
         **kwargs
     ) -> Optional[VyraSubscriber]:
         """
         Create Subscriber with automatic protocol selection.
-        
+
         Args:
             name: Topic/channel name
             subscriber_callback: Async callback for received messages
             protocols: Preferred protocols (fallback if not specified)
+            module_id: Optional target module ID. When provided the registry
+                       looks up (or creates) a provider scoped to that module.
+            module_name: Human-readable name of the target module (required
+                         when module_id is supplied).
             **kwargs: Additional parameters (message_type, qos, etc.)
-            
+
         Returns:
             Optional[VyraSubscriber]: Initialized subscriber or None if pending
-            
+
         Raises:
             InterfaceError: If no protocol available
         """
         protocols = protocols or InterfaceFactory.SUBSCRIBER_FALLBACK
         provider_registry = ProviderRegistry()
-        
+
+        # Inject a remote TopicBuilder when targeting a foreign module
+        if module_id and module_name:
+            kwargs.setdefault("topic_builder", TopicBuilder(module_name, module_id))
+
         PENDING = not subscriber_callback
 
         for protocol in protocols:
             try:
-                provider = provider_registry.get_provider(protocol)
+                if module_id and module_name:
+                    provider = provider_registry.get_or_create_provider_for_module(
+                        protocol, module_name, module_id
+                    )
+                else:
+                    provider = provider_registry.get_provider(protocol, module_id=None)
                 
                 if not provider:
                     logger.debug(f"⚠️ No provider for {protocol.value}")
@@ -340,27 +359,31 @@ class InterfaceFactory:
     ) -> Optional[VyraServer]:
         """
         Create Server with automatic protocol selection.
-        
+
+        Only the own (default) provider is used. module_id / module_name are
+        determined by the provider that was registered without a module_id.
+
         Args:
             name: Service name
             response_callback: Async callback for requests
             protocols: Preferred protocols (fallback if not specified)
             **kwargs: Additional parameters (service_type, qos, etc.)
-            
+
         Returns:
             Optional[VyraServer]: Initialized server or None if pending
-            
+
         Raises:
             InterfaceError: If no protocol available
         """
         protocols = protocols or InterfaceFactory.SERVER_FALLBACK
         provider_registry = ProviderRegistry()
-        
+
         PENDING = not response_callback
 
         for protocol in protocols:
             try:
-                provider = provider_registry.get_provider(protocol)
+                # Servers always use own provider (module_id=None)
+                provider = provider_registry.get_provider(protocol, module_id=None)
                 
                 if not provider:
                     logger.debug(f"⚠️ No provider for {protocol.value}")
@@ -413,28 +436,43 @@ class InterfaceFactory:
     async def create_client(
         name: str,
         protocols: Optional[List[ProtocolType]] = None,
+        module_id: Optional[str] = None,
+        module_name: Optional[str] = None,
         **kwargs
     ) -> VyraClient:
         """
         Create Client with automatic protocol selection.
-        
+
         Args:
             name: Service name
             protocols: Preferred protocols (fallback if not specified)
+            module_id: Optional target module ID. When provided the registry
+                       looks up (or creates) a provider scoped to that module.
+            module_name: Human-readable name of the target module (required
+                         when module_id is supplied).
             **kwargs: Additional parameters (service_type, qos, etc.)
-            
+
         Returns:
             VyraClient: Initialized client
-            
+
         Raises:
             InterfaceError: If no protocol available
         """
         protocols = protocols or InterfaceFactory.CLIENT_FALLBACK
         provider_registry = ProviderRegistry()
-         
+
+        # Inject a remote TopicBuilder when targeting a foreign module
+        if module_id and module_name:
+            kwargs.setdefault("topic_builder", TopicBuilder(module_name, module_id))
+
         for protocol in protocols:
             try:
-                provider = provider_registry.get_provider(protocol)
+                if module_id and module_name:
+                    provider = provider_registry.get_or_create_provider_for_module(
+                        protocol, module_name, module_id
+                    )
+                else:
+                    provider = provider_registry.get_provider(protocol, module_id=None)
                 
                 if not provider:
                     logger.debug(f"⚠️ No provider for {protocol.value}")
@@ -478,7 +516,9 @@ class InterfaceFactory:
     ) -> Optional[VyraActionServer]:
         """
         Create Action Server with automatic protocol selection.
-        
+
+        Only the own (default) provider is used.
+
         Args:
             name: Action name
             handle_goal_request: Async callback to accept/reject goals
@@ -486,25 +526,26 @@ class InterfaceFactory:
             execution_callback: Async callback for goal execution
             protocols: Preferred protocols (fallback if not specified)
             **kwargs: Additional parameters (action_type, qos, etc.)
-            
+
         Returns:
             Optional[VyraActionServer]: Initialized action server or None if pending
-            
+
         Raises:
             InterfaceError: If no protocol available
         """
         protocols = protocols or InterfaceFactory.ACTION_SERVER_FALLBACK
         provider_registry = ProviderRegistry()
-        
+
         PENDING = (
-            not handle_goal_request or 
-            not execution_callback or 
+            not handle_goal_request or
+            not execution_callback or
             not handle_cancel_request
         )
 
         for protocol in protocols:
             try:
-                provider = provider_registry.get_provider(protocol)
+                # Action servers always use own provider (module_id=None)
+                provider = provider_registry.get_provider(protocol, module_id=None)
                 
                 if not provider:
                     logger.debug(f"⚠️ No provider for {protocol.value}")
@@ -566,37 +607,52 @@ class InterfaceFactory:
         feedback_callback: Optional[Callable] = None,
         goal_callback: Optional[Callable] = None,
         protocols: Optional[List[ProtocolType]] = None,
+        module_id: Optional[str] = None,
+        module_name: Optional[str] = None,
         **kwargs
     ) -> Optional[VyraActionClient]:
         """
         Create Action Client with automatic protocol selection.
-        
+
         Args:
             name: Action name
             direct_response_callback: Async callback for goal acceptance
             feedback_callback: Async callback for feedback
             goal_callback: Async callback for final result
             protocols: Preferred protocols (fallback if not specified)
+            module_id: Optional target module ID. When provided the registry
+                       looks up (or creates) a provider scoped to that module.
+            module_name: Human-readable name of the target module (required
+                         when module_id is supplied).
             **kwargs: Additional parameters (action_type, qos, etc.)
-            
+
         Returns:
             Optional[VyraActionClient]: Initialized action client or None if pending
-            
+
         Raises:
             InterfaceError: If no protocol available
         """
         protocols = protocols or InterfaceFactory.ACTION_CLIENT_FALLBACK
         provider_registry = ProviderRegistry()
-        
+
+        # Inject a remote TopicBuilder when targeting a foreign module
+        if module_id and module_name:
+            kwargs.setdefault("topic_builder", TopicBuilder(module_name, module_id))
+
         PENDING = (
-            not direct_response_callback or 
-            not feedback_callback or 
+            not direct_response_callback or
+            not feedback_callback or
             not goal_callback
         )
 
         for protocol in protocols:
             try:
-                provider = provider_registry.get_provider(protocol)
+                if module_id and module_name:
+                    provider = provider_registry.get_or_create_provider_for_module(
+                        protocol, module_name, module_id
+                    )
+                else:
+                    provider = provider_registry.get_provider(protocol, module_id=None)
                 
                 if not provider:
                     logger.debug(f"⚠️ No provider for {protocol.value}")
