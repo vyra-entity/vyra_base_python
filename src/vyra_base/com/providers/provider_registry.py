@@ -64,7 +64,7 @@ class ProviderRegistry:
             ProviderRegistrationError: If provider already registered (unless force=True)
         """
         with self._lock:
-            protocol = provider.protocol
+            protocol = provider._protocol
             
             if protocol in self._providers and not force:
                 raise ProviderRegistrationError(

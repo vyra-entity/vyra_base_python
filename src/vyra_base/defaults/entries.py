@@ -81,13 +81,34 @@ class FunctionConfigBaseTypes(Enum):
 
     Represents the types of a function configuration.
 
-    :cvar publisher: Represents a publisher function (simple publisher)
+    :cvar message: Represents a message function (simple message)
     :cvar service: Represents a service function (request-reply pattern)
     :cvar action: Represents an action function (request-feedback-reply pattern)
     """
-    publisher = 'publisher'
+    message = 'message'
     service = 'service'
     action = 'action'
+
+
+class FunctionConfigTags(str, Enum):
+    """
+    Enum for the function configuration tags.
+
+    Defines which transport protocol(s) a function entry supports.
+    Matches the protocol identifiers used in interface metadata JSON files.
+
+    Using ``str, Enum`` so tag values compare equal to plain strings and
+    serialise cleanly to JSON.
+
+    :cvar ROS2: ROS2 transport (DDS topics, services, actions)
+    :cvar ZENOH: Zenoh transport (pub/sub, queryable)
+    :cvar REDIS: Redis transport (pub/sub, streams)
+    :cvar UDS: Unix Domain Socket transport
+    """
+    ROS2 = "ros2"
+    ZENOH = "zenoh"
+    REDIS = "redis"
+    UDS = "uds"
 
 
 @dataclass(slots=True)
@@ -180,7 +201,7 @@ class FunctionConfigEntry(DCBase):
     Stores the function settings for type safety and DDS communication node configuration.
 
     :param tags: Tags for the function
-    :type tags: list[str]
+    :type tags: list[FunctionConfigTags]
     :param type: Type of the function
     :type type: FunctionConfigBaseTypes
     :param interfacetypes: Interface types of the function
@@ -204,7 +225,7 @@ class FunctionConfigEntry(DCBase):
     :param periodic: Function to be called periodically (only for publisher)
     :type periodic: FunctionConfigPeriodicPublisher, Optional
     """
-    tags: list[str]
+    tags: list[FunctionConfigTags]
     type: FunctionConfigBaseTypes
     interfacetypes: Any
     functionname: str

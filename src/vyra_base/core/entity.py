@@ -39,6 +39,7 @@ from vyra_base.defaults.entries import (
     ErrorEntry,
     FunctionConfigBaseTypes,
     FunctionConfigEntry,
+    FunctionConfigTags,
     ModuleEntry,
     NewsEntry,
     StateEntry,
@@ -56,6 +57,7 @@ from vyra_base.storage.db_access import DbAccess
 from vyra_base.storage.db_access import DBTYPE
 from vyra_base.com.transport.t_redis import RedisClient
 from vyra_base.storage.storage import Storage
+from vyra_base.core.interface_builder import InterfaceBuilder
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
 from vyra_base.helper.error_handler import ErrorTraceback
@@ -903,232 +905,87 @@ class VyraEntity:
         logger.info("Storage access initialized.")
 
     async def set_interfaces(
-            self, 
+            self,
             settings: list[FunctionConfigEntry]) -> None:
         """
         Add communication interfaces to this module.
 
-        Interfaces are used to communicate with other modules or external systems.
-        Interface types can be:
+        Protocol selection is driven by :class:`~vyra_base.defaults.entries.FunctionConfigTags`:
 
-        - ``!vyra-service``: service function that can be invoked remotely.
-        - ``!vyra-actionServer``: actionServer that can be executed in the background.
-        - ``!vyra-publisher``: Publisher that can publish messages periodically.
-        
-        Protocols used depend on availability:
-        - ROS2 (if available)
-        - SharedMemory (always available)
-        - UDS (always available)
-        - Redis (if configured)
-        - gRPC (if configured)
+        - **empty tags** → register on every available / applicable protocol.
+        - **non-empty tags** → register *only* on the explicitly listed protocols.
 
-        :param settings: Settings for the module functions.
-        :type settings: list[FunctionConfigEntry]
-        :param permission_file: Path to the permission file for the interface.
-        :type permission_file: str
-        :returns: None
-        :rtype: None
+        Dispatch is fully delegated to :class:`~vyra_base.core.interface_builder.InterfaceBuilder`
+        so this method stays lean and serves solely as orchestration glue.
+
+        :param settings: List of :class:`~vyra_base.defaults.entries.FunctionConfigEntry`.
         """
 
+        _registry = ProviderRegistry()
+
         for setting in settings:
-            existing = next((i for i in self._interface_list if i.functionname == setting.functionname), None)
+            # ── Dedup / late-bind upgrade ─────────────────────────────────────
+            existing = next(
+                (i for i in self._interface_list if i.functionname == setting.functionname),
+                None,
+            )
             if existing is not None:
-                # If the new setting has a callback but the existing one does not,
-                # upgrade: bind callback and create the server now (late-binding pattern)
-                new_callbacks = setting.callbacks if isinstance(setting.callbacks, dict) else None
-                existing_callbacks = existing.callbacks if isinstance(existing.callbacks, dict) else None
-                if new_callbacks and not existing_callbacks:
+                new_cb = setting.callbacks if isinstance(setting.callbacks, dict) else None
+                old_cb = existing.callbacks if isinstance(existing.callbacks, dict) else None
+                if new_cb and not old_cb:
                     logger.info(
                         f"📋 Upgrading pending interface '{setting.functionname}' with callback"
                     )
-                    existing.callbacks = new_callbacks
-                    # Create the Zenoh server now that we have a callback
-                    try:
-                        if ProviderRegistry().is_available(ProtocolType.ZENOH):
-                            zenoh_server = await InterfaceFactory.create_server(
-                                name=setting.functionname,
-                                response_callback=new_callbacks.get('response'),
-                                protocols=[ProtocolType.ZENOH],
-                                service_type=setting.interfacetypes,
-                            )
-                            if zenoh_server is not None:
-                                logger.info(f"✅ Zenoh server upgraded: {setting.functionname}")
-                            else:
-                                logger.warning(f"⚠️ Zenoh server upgrade returned None for '{setting.functionname}'")
-                    except Exception as e:
-                        logger.warning(f"⚠️ Failed to upgrade Zenoh server for '{setting.functionname}': {e}")
+                    existing.callbacks = new_cb
+                    await InterfaceBuilder.upgrade_service(setting, new_cb, _registry)
                 else:
                     logger.warning(
-                        f"Interface {setting.functionname} already "
-                        "exists. Skipping creation.")
+                        f"Interface '{setting.functionname}' already registered. Skipping."
+                    )
                 continue
-            
+
             self._interface_list.append(setting)
 
-            callbacks = setting.callbacks if isinstance(setting.callbacks, dict) else None
-
-            # Blueprint strategy fallback: if no callbacks set on FunctionConfigEntry,
-            # check CallbackRegistry for a bound blueprint (two-phase init pattern)
+            # ── Resolve callbacks ─────────────────────────────────────────────
+            callbacks: dict | None = (
+                setting.callbacks if isinstance(setting.callbacks, dict) else None
+            )
             if not callbacks:
                 blueprint = CallbackRegistry.get_blueprint(setting.functionname)
                 if blueprint and blueprint.is_bound():
-                    callbacks = {'response': blueprint.callback}
+                    callbacks = {"response": blueprint.callback}
                     logger.debug(
-                        f"📋 Using CallbackRegistry blueprint callback for '{setting.functionname}'"
+                        f"📋 Using CallbackRegistry blueprint for '{setting.functionname}'"
                     )
 
-            # Use ROS2 if available, otherwise skip ROS2-specific creation
-            # (InterfaceFactory will handle protocol selection in future versions)
-            if not self._ros2_available:
-                logger.debug(
-                    f"⚠️ ROS2 not available, skipping ROS2 interface creation for {setting.functionname}. "
-                    "Use InterfaceFactory for multi-protocol support."
+            # ── Dispatch by interface type ────────────────────────────────────
+            t = setting.type
+
+            if t == FunctionConfigBaseTypes.service.value:
+                logger.info(f"Creating service: {setting.functionname}")
+                await InterfaceBuilder.create_service(
+                    setting, callbacks, self._node, self._ros2_available, _registry
                 )
-                
-                # Still create Zenoh servers when ROS2 unavailable
-                if setting.type == FunctionConfigBaseTypes.service.value:
-                    try:
-                        if ProviderRegistry().is_available(ProtocolType.ZENOH):
-                            zenoh_server = await InterfaceFactory.create_server(
-                                name=setting.functionname,
-                                response_callback=callbacks['response'] if callbacks and 'response' in callbacks else None,
-                                protocols=[ProtocolType.ZENOH],
-                                service_type=setting.interfacetypes,
-                            )
-                            if zenoh_server is not None:
-                                logger.info(f"✅ Registered Zenoh queryable (no ROS2): {setting.functionname}")
-                            else:
-                                logger.debug(
-                                    f"⏳ Zenoh queryable '{setting.functionname}' pending "
-                                    f"— no callback bound yet (blueprint strategy: bind callback first)"
-                                )
-                    except Exception as e:
-                        logger.warning(f"⚠️ Zenoh queryable for {setting.functionname} failed: {e}")
-                continue
 
-            if setting.type == FunctionConfigBaseTypes.service.value:
-                logger.info(f"Creating callable: {setting.functionname}")
-                
-                # Determine if ROS2 service creation is appropriate:
-                # Skip ROS2 if service_type is proto strings (not ROS2 class types)
-                # or if tags explicitly list only non-ros2 protocols
-                tags = getattr(setting, 'tags', None) or []
-                service_type = setting.interfacetypes
-                
-                # Check if service_type is a ROS2-compatible type (a class, not a string/list of strings)
-                def _is_ros2_service_type(st) -> bool:
-                    if st is None:
-                        return False
-                    if isinstance(st, list):
-                        # List of strings (proto types) → not ROS2
-                        return any(hasattr(item, '__slots__') for item in st)
-                    if isinstance(st, str):
-                        return False  # plain string → not a ROS2 class
-                    return hasattr(st, '__slots__')  # ROS2 types have __slots__
-                
-                use_ros2 = self._ros2_available and _is_ros2_service_type(service_type)
-                # Also allow ros2 if "ros2" is in tags and ROS2 is available
-                if not use_ros2 and 'ros2' in tags and self._ros2_available and _is_ros2_service_type(service_type):
-                    use_ros2 = True
-                
-                if use_ros2:
-                    await InterfaceFactory.create_server(
-                        name=setting.functionname,
-                        response_callback=callbacks['response'] if callbacks and 'response' in callbacks else None,
-                        protocols=[ProtocolType.ROS2],
-                        service_type=service_type,
-                        node=self._node
-                    )
-                else:
-                    logger.debug(
-                        f"⚠️ Skipping ROS2 server for '{setting.functionname}' "
-                        f"(service_type is not a ROS2 class: {type(service_type).__name__})"
-                    )
-                # Also register service as a Zenoh queryable if Zenoh is available
-                try:
-                    _registry = ProviderRegistry()
-                    if _registry.is_available(ProtocolType.ZENOH):
-                        zenoh_server = await InterfaceFactory.create_server(
-                            name=setting.functionname,
-                            response_callback=callbacks['response'] if callbacks and 'response' in callbacks else None,
-                            protocols=[ProtocolType.ZENOH],
-                            service_type=service_type,
-                        )
-                        if zenoh_server is not None:
-                            logger.info(f"✅ Also registered Zenoh queryable: {setting.functionname}")
-                        else:
-                            logger.debug(
-                                f"⏳ Zenoh queryable '{setting.functionname}' pending "
-                                f"— no callback bound yet (blueprint strategy: bind callback first)"
-                            )
-                except Exception as e:
-                    logger.warning(f"⚠️ Zenoh queryable for {setting.functionname} failed: {e}")
-            elif setting.type == FunctionConfigBaseTypes.action.value:
+            elif t == FunctionConfigBaseTypes.action.value:
                 logger.info(f"Creating actionServer: {setting.functionname}")
-                
-                # Check if this is a multi-callback ActionServer (new blueprint pattern)
-                # For multi-callback, callbacks are stored in setting metadata
-                
-                if callbacks:
-                    # New multi-callback pattern
-                    logger.debug(
-                        f"ActionServer '{setting.functionname}' using multi-callback pattern: "
-                        f"on_goal={bool(callbacks.get('on_goal'))}, "
-                        f"on_cancel={bool(callbacks.get('on_cancel'))}, "
-                        f"execute={bool(callbacks.get('execute'))}"
-                    )
-                    await InterfaceFactory.create_action_server(
-                        name=setting.functionname,
-                        handle_goal_request=callbacks.get('on_goal', None),
-                        handle_cancel_request=callbacks.get('on_cancel', None),
-                        execution_callback=callbacks.get('execute', None),
-                        protocols=[ProtocolType.ROS2],
-                        action_type=setting.interfacetypes,
-                        node=self._node
-                    )
-                else:
-                    logger.error(
-                        f"❌ ActionServer '{setting.functionname}' has no callbacks defined. "
-                        "Use @remote_actionServer.on_goal/on_cancel/execute decorators."
-                    )
-                    raise ValueError(
-                        f"ActionServer '{setting.functionname}' requires callbacks. "
-                        "Use the multi-callback decorator pattern."
-                    )
+                await InterfaceBuilder.create_action(
+                    setting, callbacks, self._node, self._ros2_available
+                )
 
-            elif setting.type == FunctionConfigBaseTypes.publisher.value:
+            elif t == FunctionConfigBaseTypes.message.value:
                 logger.info(f"Creating publisher: {setting.functionname}")
-                
-                # Extract periodic parameters
-                periodic: bool = False
-                periodic_caller: Any = None
-                periodic_interval: Union[float, None] = None
+                await InterfaceBuilder.create_publisher(
+                    setting, self._node, self._ros2_available
+                )
 
-                if setting.periodic != None:
-                    periodic = True
-                    periodic_caller = setting.periodic.caller if periodic else None
-                    periodic_interval = setting.periodic.interval if periodic else None
-                
-                # Publisher creation through InterfaceFactory
-                await InterfaceFactory.create_publisher(
-                    name=setting.functionname,
-                    protocols=[ProtocolType.ROS2],
-                    message_type=setting.interfacetypes,
-                    node=self._node,
-                    is_publisher=True,
-                    qos_profile=setting.qosprofile,
-                    description=setting.description,
-                    periodic=periodic,
-                    interval_time=periodic_interval,
-                    periodic_caller=periodic_caller
-                )
             else:
-                fail_msg = (
-                    f"Unsupported interface type: {setting.type}. "
-                    "Supported types are publisher, service, action."
+                msg = (
+                    f"Unsupported interface type: '{setting.type}'. "
+                    "Supported: service, action, message."
                 )
-                logger.error(fail_msg)
-                raise ValueError(fail_msg) 
+                logger.error(msg)
+                raise ValueError(msg)
 
     def bind_interface_callbacks(
             self, 

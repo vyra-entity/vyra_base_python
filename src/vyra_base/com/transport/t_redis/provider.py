@@ -22,6 +22,7 @@ from vyra_base.com.core.exceptions import (
     ProviderError,
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
+from vyra_base.com.core.callback_registry import CallbackRegistry
 from vyra_base.com.transport.t_redis.communication.redis_client import RedisClient
 from vyra_base.com.transport.t_redis.vyra_models import (
     RedisPublisherImpl,
@@ -31,6 +32,12 @@ from vyra_base.com.transport.t_redis.vyra_models import (
     RedisActionServerImpl,
     RedisActionClientImpl,
 )
+from vyra_base.com.core.blueprints import (
+    ActionBlueprint, 
+    ServiceBlueprint,
+    PublisherBlueprint,
+    SubscriberBlueprint,
+) 
 
 logger = logging.getLogger(__name__)
 
@@ -169,8 +176,8 @@ class RedisProvider(AbstractProtocolProvider):
     async def create_publisher(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        message_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        message_type: type = None,
         **kwargs
     ) -> VyraPublisher:
         """
@@ -178,7 +185,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Publisher name
-            topic_builder: TopicBuilder instance
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
             message_type: Message type class
             **kwargs: Additional publisher options
             
@@ -188,10 +195,21 @@ class RedisProvider(AbstractProtocolProvider):
         if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
+        effective_topic_builder = topic_builder or self._topic_builder
+        
+        if message_type is None:
+            message_type = effective_topic_builder.load_interface_type(
+                name,
+                self.protocol,
+            )
+
+        if message_type is None:
+            raise ProviderError(f"Message type for publisher '{name}' not found in topic builder")
+        
         try:
             publisher = RedisPublisherImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 redis_client=self._client,
                 message_type=message_type,
                 **kwargs
@@ -209,9 +227,9 @@ class RedisProvider(AbstractProtocolProvider):
     async def create_subscriber(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        subscriber_callback: Callable,
-        message_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        subscriber_callback: Callable = None,
+        message_type: type = None,
         **kwargs
     ) -> VyraSubscriber:
         """
@@ -219,7 +237,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Subscriber name
-            topic_builder: TopicBuilder instance
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
             subscriber_callback: Async callback for received messages
             message_type: Message type class
             **kwargs: Additional subscriber options
@@ -230,10 +248,31 @@ class RedisProvider(AbstractProtocolProvider):
         if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
+        effective_topic_builder = topic_builder or self._topic_builder
+        
+        if message_type is None:
+            message_type = effective_topic_builder.load_interface_type(
+                name,
+                self.protocol,
+            )
+            
+        if message_type is None:
+            raise ProviderError(f"Message type for subscriber '{name}' not found in topic builder")
+
+        if subscriber_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                subscriber_callback = _bp.callback
+        
+        if subscriber_callback is None:
+            raise ProviderError(
+                f"No subscriber_callback provided for '{name}' and no bound blueprint found in CallbackRegistry"
+            )
+        
         try:
             subscriber = RedisSubscriberImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 subscriber_callback=subscriber_callback,
                 redis_client=self._client,
                 message_type=message_type,
@@ -253,9 +292,9 @@ class RedisProvider(AbstractProtocolProvider):
     async def create_server(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        response_callback: Callable,
-        service_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        response_callback: Optional[Callable] = None,
+        service_type: Optional[type] = None,
         **kwargs
     ) -> VyraServer:
         """
@@ -263,7 +302,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Server name
-            topic_builder: TopicBuilder instance
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
             response_callback: Async callback for handling requests
             service_type: Service type class
             **kwargs: Additional server options
@@ -274,10 +313,31 @@ class RedisProvider(AbstractProtocolProvider):
         if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
+        effective_topic_builder = topic_builder or self._topic_builder
+        
+        if service_type is None:
+            service_type = effective_topic_builder.load_interface_type(
+                name,
+                self.protocol,
+            )
+            
+        if service_type is None:
+            raise ProviderError(f"Service type for server '{name}' not found in topic builder")
+
+        if response_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                response_callback = _bp.callback
+        
+        if response_callback is None:
+            raise ProviderError(
+                f"No response_callback provided for server '{name}' and no bound blueprint found in CallbackRegistry"
+            )
+        
         try:
             server = RedisServerImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 response_callback=response_callback,
                 redis_client=self._client,
                 service_type=service_type,
@@ -297,8 +357,8 @@ class RedisProvider(AbstractProtocolProvider):
     async def create_client(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        service_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        service_type: type = None,
         request_callback: Optional[Callable] = None,
         **kwargs
     ) -> VyraClient:
@@ -307,7 +367,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Client name
-            topic_builder: TopicBuilder instance
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
             service_type: Service type class
             request_callback: Optional async callback for responses
             **kwargs: Additional client options
@@ -318,10 +378,21 @@ class RedisProvider(AbstractProtocolProvider):
         if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
+        effective_topic_builder = topic_builder or self._topic_builder
+        
+        if service_type is None:
+            service_type = effective_topic_builder.load_interface_type(
+                name,
+                self.protocol,
+            )
+            
+        if service_type is None:
+            raise ProviderError(f"Service type for client '{name}' not found in topic builder")
+        
         try:
             client = RedisClientImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 request_callback=request_callback,
                 redis_client=self._client,
                 service_type=service_type,
@@ -340,11 +411,11 @@ class RedisProvider(AbstractProtocolProvider):
     async def create_action_server(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        handle_goal_request: Callable,
-        handle_cancel_request: Callable,
-        execution_callback: Callable,
-        action_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        handle_goal_request: Callable = None,
+        handle_cancel_request: Callable = None,
+        execution_callback: Callable = None,
+        action_type: type = None,
         **kwargs
     ) -> VyraActionServer:
         """
@@ -352,7 +423,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Action server name
-            topic_builder: TopicBuilder instance
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
             handle_goal_request: Async callback for goal requests
             handle_cancel_request: Async callback for cancel requests
             execution_callback: Async callback for goal execution
@@ -365,10 +436,53 @@ class RedisProvider(AbstractProtocolProvider):
         if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
+        effective_topic_builder = topic_builder or self._topic_builder
+        
+        if action_type is None:
+            action_type = effective_topic_builder.load_interface_type(
+                name,
+                self.protocol,
+            )
+            
+        if action_type is None:
+            raise ProviderError(f"Action type for action server '{name}' not found in topic builder")
+
+        if execution_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                execution_callback = _bp.callback
+            else:
+                raise ProviderError(
+                    f"No execution_callback provided for action server '{name}' and no bound blueprint found in CallbackRegistry"
+                )
+        
+        if not isinstance(_bp, ActionBlueprint):
+            raise ProviderError(
+                f"Blueprint for action server '{name}' must be an ActionBlueprint. Found: {type(_bp).__name__}"
+            )
+            
+        if handle_goal_request is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound('on_goal'):
+                handle_goal_request = _bp.get_callback('on_goal')
+        if handle_cancel_request is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound('on_cancel'):
+                handle_cancel_request = _bp.get_callback('on_cancel')
+        
+        if execution_callback is None or handle_goal_request is None or handle_cancel_request is None:
+            raise ProviderError(
+                f"Missing callbacks for action server '{name}'. "
+                f"Execution callback: {execution_callback is not None}, "
+                f"Goal request callback: {handle_goal_request is not None}, "
+                f"Cancel request callback: {handle_cancel_request is not None}. "
+                f"Ensure they are provided or bound in CallbackRegistry."
+            )
+        
         try:
             action_server = RedisActionServerImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 handle_goal_request=handle_goal_request,
                 handle_cancel_request=handle_cancel_request,
                 execution_callback=execution_callback,
@@ -389,8 +503,8 @@ class RedisProvider(AbstractProtocolProvider):
     async def create_action_client(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        action_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        action_type: type = None,
         direct_response: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
         goal_response_callback: Optional[Callable] = None,
@@ -401,7 +515,7 @@ class RedisProvider(AbstractProtocolProvider):
         
         Args:
             name: Action client name
-            topic_builder: TopicBuilder instance
+            topic_builder: TopicBuilder instance (uses provider's default if omitted)
             action_type: Action type class
             direct_response: Optional async callback for results
             feedback_callback: Optional async callback for feedback
@@ -414,10 +528,21 @@ class RedisProvider(AbstractProtocolProvider):
         if not self._initialized or not self._client:
             raise ProviderError("Provider not initialized")
         
+        effective_topic_builder = topic_builder or self._topic_builder
+        
+        if action_type is None:
+            action_type = effective_topic_builder.load_interface_type(
+                name,
+                self.protocol,
+            )
+            
+        if action_type is None:
+            raise ProviderError(f"Action type for action client '{name}' not found in topic builder")
+        
         try:
             action_client = RedisActionClientImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 direct_response=direct_response,
                 feedback_callback=feedback_callback,
                 goal_response_callback=goal_response_callback,

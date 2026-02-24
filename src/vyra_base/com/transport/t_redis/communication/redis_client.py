@@ -79,6 +79,7 @@ class RedisClient():
         self._active_channels: set[str] = set()  # Track all subscribed channels/patterns
         self._listener_task: Optional[asyncio.Task] = None  # Single background task
         self._listener_running = False
+        self._channel_callbacks: dict = {}  # Per-channel callback routing: channel -> (handler, context)
 
     def _load_legacy_config(self, redis_config_path: Optional[str], redis_config: Optional[dict]):
         """Load configuration from legacy format (INI file or dict)."""
@@ -678,6 +679,11 @@ class RedisClient():
             if new_channels:
                 logger.info(f"🎧 PubSub listener added channels: {new_channels}")
             
+            # Register per-channel callbacks for routing
+            if callback_handler:
+                for channel in channels:
+                    self._channel_callbacks[channel] = (callback_handler, callback_context)
+            
             # Start listening loop if not already running and start_loop is True
             if start_loop and callback_handler and not self._listener_running:
                 self._listener_running = True
@@ -716,13 +722,24 @@ class RedisClient():
                 
                 if message["type"] in ["message", "pmessage"]:
                     try:
-                        # Process message through callback
-                        if asyncio.iscoroutinefunction(callback_handler):
-                            await callback_handler(message, callback_context)
+                        # Route to per-channel callback if registered, else use default
+                        channel = message.get('channel', b'')
+                        if isinstance(channel, bytes):
+                            channel = channel.decode('utf-8')
+                        
+                        if channel in self._channel_callbacks:
+                            ch_handler, ch_context = self._channel_callbacks[channel]
                         else:
-                            callback_handler(message, callback_context)
+                            ch_handler = callback_handler
+                            ch_context = callback_context
+
+                        # Process message through callback
+                        if asyncio.iscoroutinefunction(ch_handler):
+                            await ch_handler(message, ch_context)
+                        else:
+                            ch_handler(message, ch_context)
                             
-                        logger.debug(f"📨 Processed message from {message.get('channel', 'unknown')}")
+                        logger.debug(f"📨 Processed message from {channel}")
                         
                     except Exception as e:
                         logger.error(f"❌ Error processing message: {e}")

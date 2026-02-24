@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.78] - 2026-02-24
+
+### Build
+
+bugfix entity (FunctionConfigBaseTypes publisher->message)
+
+
+## [0.1.8+build.77] - 2026-02-24
+
+### Build
+
+Bugfix interfacestypes
+
+
+## [0.1.8+build.76] - 2026-02-24
+
+### Build
+
+Update bugs containing interface_type (publisher,server,actionServer) -> (message,service, action)
+
+
 ## [0.1.8+build.75] - 2026-02-23
 
 ### Build

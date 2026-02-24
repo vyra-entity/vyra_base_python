@@ -5,7 +5,7 @@ Implements AbstractProtocolProvider for Unix Domain Socket transport.
 Provides low-latency local IPC via stream sockets.
 """
 import logging
-from typing import Any, Callable, Optional, Dict
+from typing import Any, Awaitable, Callable, Coroutine, Optional, Dict
 
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
@@ -22,6 +22,7 @@ from vyra_base.com.core.exceptions import (
     ProviderError,
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
+from vyra_base.com.core.callback_registry import CallbackRegistry
 from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 from vyra_base.com.transport.t_uds.vyra_models import (
     VyraPublisherImpl,
@@ -196,8 +197,8 @@ class UDSProvider(AbstractProtocolProvider):
     async def create_publisher(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        message_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        message_type: Optional[type] = None,
         **kwargs
     ) -> VyraPublisher:
         """
@@ -214,13 +215,21 @@ class UDSProvider(AbstractProtocolProvider):
         """
         if not self._initialized:
             raise ProviderError("Provider not initialized")
-        
+
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        if message_type is None:
+            message_type = effective_topic_builder.load_interface_type(name, self.protocol)
+
+        if message_type is None:
+            raise ProviderError(f"Message type for publisher '{name}' not found in topic builder")
+
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
             publisher = VyraPublisherImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 message_type=message_type,
                 module_name=module_name,
                 **kwargs
@@ -238,9 +247,9 @@ class UDSProvider(AbstractProtocolProvider):
     async def create_subscriber(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        subscriber_callback: Callable,
-        message_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        subscriber_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
+        message_type: Optional[type] = None,
         **kwargs
     ) -> VyraSubscriber:
         """
@@ -258,13 +267,31 @@ class UDSProvider(AbstractProtocolProvider):
         """
         if not self._initialized:
             raise ProviderError("Provider not initialized")
+
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        if message_type is None:
+            message_type = effective_topic_builder.load_interface_type(name, self.protocol)
+
+        if message_type is None:
+            raise ProviderError(f"Message type for subscriber '{name}' not found in topic builder")
+
+        if subscriber_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                subscriber_callback = _bp.callback
         
+        if subscriber_callback is None:
+            raise ProviderError(
+                f"No subscriber_callback provided for subscriber '{name}' and no bound blueprint found in CallbackRegistry"
+            )
+
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
             subscriber = VyraSubscriberImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 subscriber_callback=subscriber_callback,
                 message_type=message_type,
                 module_name=module_name,
@@ -284,9 +311,9 @@ class UDSProvider(AbstractProtocolProvider):
     async def create_server(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        response_callback: Callable,
-        service_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        response_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
+        service_type: Optional[type] = None,
         **kwargs
     ) -> VyraServer:
         """
@@ -304,13 +331,31 @@ class UDSProvider(AbstractProtocolProvider):
         """
         if not self._initialized:
             raise ProviderError("Provider not initialized")
+
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        if service_type is None:
+            service_type = effective_topic_builder.load_interface_type(name, self.protocol)
+
+        if service_type is None:
+            raise ProviderError(f"Service type for server '{name}' not found in topic builder")
+
+        if response_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                response_callback = _bp.callback
         
+        if response_callback is None:
+            raise ProviderError(
+                f"No response_callback provided for server '{name}' and no bound blueprint found in CallbackRegistry"
+            )
+
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
             server = VyraServerImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 response_callback=response_callback,
                 service_type=service_type,
                 module_name=module_name,
@@ -330,9 +375,9 @@ class UDSProvider(AbstractProtocolProvider):
     async def create_client(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        service_type: type,
-        request_callback: Optional[Callable] = None,
+        topic_builder: Optional[TopicBuilder] = None,
+        service_type: Optional[type] = None,
+        request_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
         **kwargs
     ) -> VyraClient:
         """
@@ -350,13 +395,21 @@ class UDSProvider(AbstractProtocolProvider):
         """
         if not self._initialized:
             raise ProviderError("Provider not initialized")
-        
+
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        if service_type is None:
+            service_type = effective_topic_builder.load_interface_type(name, self.protocol)
+
+        if service_type is None:
+            raise ProviderError(f"Service type for client '{name}' not found in topic builder")
+
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
             client = VyraClientImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 request_callback=request_callback,
                 service_type=service_type,
                 module_name=module_name,
@@ -375,11 +428,11 @@ class UDSProvider(AbstractProtocolProvider):
     async def create_action_server(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        handle_goal_request: Callable,
-        handle_cancel_request: Callable,
-        execution_callback: Callable,
-        action_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        handle_goal_request: Optional[Callable[[Any], Awaitable[bool]]] = None,
+        handle_cancel_request: Optional[Callable[[Any], Awaitable[bool]]] = None,
+        execution_callback: Optional[Callable[[Any], Awaitable[bool]]] = None,
+        action_type: Optional[type] = None,
         **kwargs
     ) -> VyraActionServer:
         """
@@ -399,13 +452,47 @@ class UDSProvider(AbstractProtocolProvider):
         """
         if not self._initialized:
             raise ProviderError("Provider not initialized")
-        
+
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        if action_type is None:
+            action_type = effective_topic_builder.load_interface_type(name, self.protocol)
+
+        if action_type is None:
+            raise ProviderError(f"Action type for action server '{name}' not found in topic builder")
+
+        if execution_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                execution_callback = _bp.callback
+            else:
+                raise ProviderError(
+                    f"No execution_callback provided for action server '{name}' and no bound blueprint found in CallbackRegistry"
+                )
+        if handle_goal_request is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp is not None:
+                handle_goal_request = getattr(_bp, 'get_callback', lambda x: None)('on_goal')
+        if handle_cancel_request is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp is not None:
+                handle_cancel_request = getattr(_bp, 'get_callback', lambda x: None)('on_cancel')
+
         module_name = kwargs.pop('module_name', self.module_name)
+        
+        if execution_callback is None or handle_goal_request is None or handle_cancel_request is None:
+            raise ProviderError(
+                f"Missing callbacks for action server '{name}'. "
+                f"Execution callback: {execution_callback is not None}, "
+                f"Goal request callback: {handle_goal_request is not None}, "
+                f"Cancel request callback: {handle_cancel_request is not None}. "
+                f"Ensure they are provided or bound in CallbackRegistry."
+            )
         
         try:
             action_server = VyraActionServerImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 handle_goal_request=handle_goal_request,
                 handle_cancel_request=handle_cancel_request,
                 execution_callback=execution_callback,
@@ -426,11 +513,11 @@ class UDSProvider(AbstractProtocolProvider):
     async def create_action_client(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        action_type: type,
-        direct_response: Optional[Callable] = None,
-        feedback_callback: Optional[Callable] = None,
-        goal_response_callback: Optional[Callable] = None,
+        topic_builder: Optional[TopicBuilder] = None,
+        action_type: Optional[type] = None,
+        direct_response: Optional[Callable[[Any], Awaitable[None]]] = None,
+        feedback_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
+        goal_response_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
         **kwargs
     ) -> VyraActionClient:
         """
@@ -450,13 +537,21 @@ class UDSProvider(AbstractProtocolProvider):
         """
         if not self._initialized:
             raise ProviderError("Provider not initialized")
-        
+
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        if action_type is None:
+            action_type = effective_topic_builder.load_interface_type(name, self.protocol)
+
+        if action_type is None:
+            raise ProviderError(f"Action type for action server '{name}' not found in topic builder")
+
         module_name = kwargs.pop('module_name', self.module_name)
         
         try:
             action_client = VyraActionClientImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 direct_response=direct_response,
                 feedback_callback=feedback_callback,
                 goal_response_callback=goal_response_callback,

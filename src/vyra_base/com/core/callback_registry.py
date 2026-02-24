@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Callable
 
 from vyra_base.com.core.blueprints import (
     AnyBlueprint,
@@ -170,7 +170,7 @@ class CallbackRegistry:
     def bind_callback(
         cls,
         name: str,
-        callback: callable,
+        callback: Callable,
         callback_type: str = 'default',
         namespace: Optional[str] = None
     ) -> bool:

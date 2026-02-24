@@ -3,7 +3,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "publisher",
+        "type": "message",
         "functionname": "ErrorFeed",
         "displayname": "Error Feed",
         "description": "Communicate error information in the system between different components or modules.",
@@ -50,7 +50,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "publisher",
+        "type": "message",
         "functionname": "StateFeed",
         "displayname": "State Feed",
         "description": "Communicate state information in the system between different components or modules.",
@@ -84,7 +84,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "publisher",
+        "type": "message",
         "functionname": "NewsFeed",
         "displayname": "News Feed",
         "description": "Communicate news in the system between different components or modules.",

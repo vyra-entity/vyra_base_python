@@ -51,7 +51,7 @@ class TestRedisProvider:
             module_name="test_module",
             module_id="test_redis_proto_001"
         )
-        assert provider.protocol == ProtocolType.REDIS
+        assert provider._protocol == ProtocolType.REDIS
 
     async def test_create_server(self):
         """Test creating server through provider."""
@@ -100,7 +100,7 @@ class TestRedisProvider:
             port=6379
         )
         assert provider is not None
-        assert provider.protocol == ProtocolType.REDIS
+        assert provider._protocol == ProtocolType.REDIS
 
     async def test_ssl_connection(self):
         """Test provider accepts SSL parameters."""

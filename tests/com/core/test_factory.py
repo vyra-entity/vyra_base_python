@@ -43,22 +43,22 @@ class TestInterfaceFactory:
                 self._initialized = False
             
             async def create_server(self, name: str, **kwargs):
-                return Mock(name=name, _protocol=self.protocol)
+                return Mock(name=name, _protocol=self._protocol)
 
             async def create_subscriber(self, name: str, **kwargs):
-                return Mock(name=name, _protocol=self.protocol)
+                return Mock(name=name, _protocol=self._protocol)
 
             async def create_client(self, name: str, **kwargs):
-                return Mock(name=name, _protocol=self.protocol)
+                return Mock(name=name, _protocol=self._protocol)
 
             async def create_action_server(self, name: str, **kwargs):
-                return Mock(name=name, _protocol=self.protocol)
+                return Mock(name=name, _protocol=self._protocol)
 
             async def create_action_client(self, name: str, **kwargs):
-                return Mock(name=name, _protocol=self.protocol)
+                return Mock(name=name, _protocol=self._protocol)
             
             async def create_publisher(self, name: str, **kwargs):
-                return Mock(name=name, _protocol=self.protocol)
+                return Mock(name=name, _protocol=self._protocol)
         
         return MockProvider
     

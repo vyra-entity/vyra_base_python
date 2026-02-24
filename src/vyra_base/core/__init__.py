@@ -7,11 +7,13 @@ Provides:
 """
 
 from vyra_base.core.entity import VyraEntity
+from vyra_base.core.interface_builder import InterfaceBuilder
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
 
 __all__ = [
     "VyraEntity",
+    "InterfaceBuilder",
     "Parameter",
     "Volatile",
 ]

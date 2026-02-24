@@ -213,11 +213,11 @@ class InterfaceGenerator:
             logger.warning("Metadata missing functionname")
             return None
             
-        # For publisher (formerly publisher), only 'returns' are used as message fields
+        # For message (formerly message), only 'returns' are used as message fields
         returns = metadata.get("returns", [])
         
         if not returns:
-            logger.warning(f"Publisher '{functionname}' has no returns fields")
+            logger.warning(f"Message '{functionname}' has no returns fields")
             return None
             
         lines = [
@@ -247,7 +247,7 @@ class InterfaceGenerator:
             
         returns = metadata.get("returns", [])
         if not returns:
-            logger.warning(f"Publisher '{functionname}' has no returns fields")
+            logger.warning(f"Message '{functionname}' has no returns fields")
             return None
             
         message_name = to_ros2_class_name(functionname)
@@ -673,7 +673,7 @@ class InterfaceGenerator:
                 # Check if proto files should be generated
                 generate_proto = bool(proto_filetypes)
 
-                if interface_type == "publisher":
+                if interface_type == "message":
                     content = self.generate_msg(metadata)
                     if content:
                         filename = f"{interface_name}.msg"
@@ -705,7 +705,7 @@ class InterfaceGenerator:
 
                             self.generated_messages.add(proto_filename)
 
-                elif interface_type == "server":
+                elif interface_type == "service":
                     content = self.generate_srv(metadata)
                     if content:
                         filename = f"{interface_name}.srv"
@@ -737,7 +737,7 @@ class InterfaceGenerator:
 
                             self.generated_messages.add(proto_filename)
 
-                elif interface_type == "actionServer":
+                elif interface_type == "action":
                     content = self.generate_action(metadata)
                     if content:
                         filename = f"{interface_name}.action"

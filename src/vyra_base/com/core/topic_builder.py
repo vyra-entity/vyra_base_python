@@ -127,7 +127,8 @@ class TopicBuilder:
                 self._interface_loader = InterfaceLoader(interface_paths=path_objs)
             else:
                 # Use registry defaults
-                self._interface_loader = InterfaceLoader()
+                ifp = InterfacePathRegistry.get_instance()
+                self._interface_loader = InterfaceLoader(ifp.get_interface_paths())
         
         logger.debug(
             f"TopicBuilder initialized: {self._module_prefix} "

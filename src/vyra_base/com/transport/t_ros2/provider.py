@@ -37,6 +37,7 @@ from vyra_base.com.transport.t_ros2.vyra_models import (
     VyraActionClientImpl
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
+from vyra_base.com.core.callback_registry import CallbackRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -239,6 +240,8 @@ class ROS2Provider(AbstractProtocolProvider):
         
         message_type = kwargs.pop("message_type", None)
         if not message_type:
+            message_type = self._topic_builder.load_interface_type(name, self.protocol)
+        if not message_type:
             raise ArgumentError("message_type is required for ROS2 publisher")
         
         node = kwargs.pop("node", None)
@@ -270,7 +273,18 @@ class ROS2Provider(AbstractProtocolProvider):
         
         message_type = kwargs.pop("message_type", None)
         if not message_type:
+            message_type = self._topic_builder.load_interface_type(name, self.protocol)
+        if not message_type:
             raise ArgumentError("message_type is required for ROS2 subscriber")
+        
+        if subscriber_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                subscriber_callback = _bp.callback
+            else:
+                raise ProviderError(
+                    f"No subscriber_callback provided for '{name}' and no bound blueprint found in CallbackRegistry"
+                )
         
         node = kwargs.pop("node", None)
         qos_profile = kwargs.pop("qos_profile", None)
@@ -302,7 +316,18 @@ class ROS2Provider(AbstractProtocolProvider):
         
         service_type = kwargs.pop("service_type", None)
         if not service_type:
+            service_type = self._topic_builder.load_interface_type(name, self.protocol)
+        if not service_type:
             raise ArgumentError("service_type is required for ROS2 server")
+        
+        if response_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                response_callback = _bp.callback
+            else:
+                raise ProviderError(
+                    f"No response_callback provided for server '{name}' and no bound blueprint found in CallbackRegistry"
+                )
         
         node = kwargs.pop("node", None)
         qos_profile = kwargs.pop("qos_profile", None)
@@ -332,6 +357,8 @@ class ROS2Provider(AbstractProtocolProvider):
         self.require_initialization()
         
         service_type = kwargs.pop("service_type", None)
+        if not service_type:
+            service_type = self._topic_builder.load_interface_type(name, self.protocol)
         if not service_type:
             raise ArgumentError("service_type is required for ROS2 client")
         
@@ -368,7 +395,26 @@ class ROS2Provider(AbstractProtocolProvider):
         
         action_type = kwargs.pop("action_type", None)
         if not action_type:
+            action_type = self._topic_builder.load_interface_type(name, self.protocol)
+        if not action_type:
             raise ArgumentError("action_type is required for ROS2 action server")
+        
+        if execution_callback is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp and _bp.is_bound():
+                execution_callback = _bp.callback
+            else:
+                raise ProviderError(
+                    f"No execution_callback provided for action server '{name}' and no bound blueprint found in CallbackRegistry"
+                )
+        if handle_goal_request is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp is not None:
+                handle_goal_request = getattr(_bp, 'get_callback', lambda x: None)('on_goal')
+        if handle_cancel_request is None:
+            _bp = CallbackRegistry.get_blueprint(name)
+            if _bp is not None:
+                handle_cancel_request = getattr(_bp, 'get_callback', lambda x: None)('on_cancel')
         
         node = kwargs.pop("node", None)
         
@@ -401,6 +447,8 @@ class ROS2Provider(AbstractProtocolProvider):
         self.require_initialization()
         
         action_type = kwargs.pop("action_type", None)
+        if not action_type:
+            action_type = self._topic_builder.load_interface_type(name, self.protocol)
         if not action_type:
             raise ArgumentError("action_type is required for ROS2 action client")
         

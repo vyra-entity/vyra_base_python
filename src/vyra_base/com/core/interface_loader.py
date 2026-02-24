@@ -244,14 +244,23 @@ class InterfaceLoader:
             logger.info(f"✓ Loaded protobuf interface via import: {built_proto_name}")
             return module
         except ImportError:
+            logger.warning(
+                f"⚠️ Protobuf module '{built_proto_name}' not found via import, "
+                f"searching interface paths..."
+            )
             pass
         
         # Search in interface paths
         proto_paths: list[Path] = []
         for interface_path in self.interface_paths:
-            proto_path = interface_path / "proto"
-            if proto_path.is_dir():
-                proto_paths.append(proto_path)
+            proto_subpaths = [
+                interface_path / "msg" / "_gen",
+                interface_path / "srv" / "_gen",
+                interface_path / "action" / "_gen"
+            ]
+            for proto_subpath in proto_subpaths:
+                if proto_subpath.is_dir():
+                    proto_paths.append(proto_subpath)
         
         for proto_path in proto_paths:
             module_file = proto_path / f"{built_proto_name}.py"

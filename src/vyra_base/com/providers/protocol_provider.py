@@ -37,7 +37,7 @@ class AbstractProtocolProvider(ABC):
     """
     
     def __init__(self, protocol: ProtocolType):
-        self.protocol = protocol
+        self._protocol = protocol
         self._available = False
         self._initialized = False
         self._config: Dict[str, Any] = {}
@@ -45,9 +45,9 @@ class AbstractProtocolProvider(ABC):
         self._topic_builder: TopicBuilder
     
     @property
-    def name(self) -> str:
+    def protocol(self) -> str:
         """Get protocol name."""
-        return self.protocol.value
+        return self._protocol.value
     
     @abstractmethod
     async def check_availability(self) -> bool:
@@ -243,7 +243,7 @@ class AbstractProtocolProvider(ABC):
         """Raise exception if protocol is not available."""
         if not self._available:
             raise ProtocolUnavailableError(
-                f"Protocol '{self.protocol}' is not available. "
+                f"Protocol '{self._protocol}' is not available. "
                 f"Check installation and dependencies."
             )
     
@@ -251,6 +251,6 @@ class AbstractProtocolProvider(ABC):
         """Raise exception if provider is not initialized."""
         if not self._initialized:
             raise ProviderError(
-                f"Provider '{self.protocol}' is not initialized. "
+                f"Provider '{self._protocol}' is not initialized. "
                 f"Call initialize() first."
             )

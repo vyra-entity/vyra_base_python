@@ -47,14 +47,22 @@ except ImportError as e:
 # Try importing VYRA models layer
 try:
     from vyra_base.com.transport.t_redis.vyra_models import (
-        RedisCallable,
-        RedisSpeaker,
+        RedisActionClientImpl,
+        RedisActionServerImpl,
+        RedisServerImpl,
+        RedisClientImpl,
+        RedisPublisherImpl,
+        RedisSubscriberImpl,
         REDIS_MODELS_AVAILABLE,
     )
     _models_available = REDIS_MODELS_AVAILABLE
 except ImportError as e:
-    RedisCallable = None
-    RedisSpeaker = None
+    RedisActionClientImpl = None
+    RedisActionServerImpl = None
+    RedisServerImpl = None
+    RedisClientImpl = None
+    RedisPublisherImpl = None
+    RedisSubscriberImpl = None
     _models_available = False
     logger.debug(f"⚠️  Redis VYRA models layer unavailable: {e}")
 
@@ -84,8 +92,12 @@ __all__ = [
     "RedisClient",
     "REDIS_TYPE",
     # VYRA models layer
-    "RedisCallable",
-    "RedisSpeaker",
+    "RedisActionClientImpl",
+    "RedisActionServerImpl",
+    "RedisServerImpl",
+    "RedisClientImpl",
+    "RedisPublisherImpl",
+    "RedisSubscriberImpl",
     # Availability flags
     "REDIS_AVAILABLE",
 ]

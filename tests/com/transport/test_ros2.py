@@ -44,7 +44,7 @@ class TestROS2Provider:
             from vyra_base.com.transport.t_ros2 import ROS2Provider
             
             provider = ROS2Provider(module_name="test_module", module_id="test_ros2_id")
-            assert provider.protocol == ProtocolType.ROS2
+            assert provider._protocol == ProtocolType.ROS2
             
             # Should be available when rclpy present
             assert provider.is_available is True

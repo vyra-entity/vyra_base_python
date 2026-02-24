@@ -11,7 +11,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-from typing import Any, Callable, Coroutine, Optional, Dict, List
+from typing import Any, Callable, Optional, Dict, List, Awaitable
 from datetime import datetime
 
 from vyra_base.com.core.topic_builder import TopicBuilder
@@ -312,7 +312,7 @@ class VyraServer(VyraTransport):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        response_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        response_callback: Optional[Callable[[Any], Awaitable[Any]]] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
@@ -361,7 +361,7 @@ class VyraClient(VyraTransport):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        request_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,  # Optional for async pattern
+        request_callback: Optional[Callable[[Any], Awaitable[Any]]] = None,  # Optional for async pattern
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
@@ -416,9 +416,9 @@ class VyraActionServer(VyraTransport):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        handle_goal_request: Optional[Callable[[Any], Coroutine[Any, Any, bool]]] = None,
-        handle_cancel_request: Optional[Callable[[Any], Coroutine[Any, Any, bool]]] = None,
-        execution_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        handle_goal_request: Optional[Callable[[Any], Awaitable[bool]]] = None,
+        handle_cancel_request: Optional[Callable[[Any], Awaitable[bool]]] = None,
+        execution_callback: Optional[Callable[[Any], Awaitable[Any]]] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):
@@ -472,9 +472,9 @@ class VyraActionClient(VyraTransport):
         self,
         name: str,
         topic_builder: TopicBuilder,
-        direct_response_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
-        feedback_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
-        goal_callback: Optional[Callable[[Any], Coroutine[Any, Any, Any]]] = None,
+        direct_response_callback: Optional[Callable[[Any], Awaitable[Any]]] = None,
+        feedback_callback: Optional[Callable[[Any], Awaitable[Any]]] = None,
+        goal_callback: Optional[Callable[[Any], Awaitable[Any]]] = None,
         protocol: ProtocolType = ProtocolType.ROS2,
         **kwargs
     ):

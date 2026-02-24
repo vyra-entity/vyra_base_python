@@ -47,27 +47,27 @@ class MockProvider(AbstractProtocolProvider):
     
     async def create_server(self, name: str, **kwargs):
         """Create mock callable."""
-        return Mock(name=name, _protocol=self.protocol)
+        return Mock(name=name, _protocol=self._protocol)
     
     async def create_publisher(self, name: str, **kwargs):
         """Create mock speaker."""
-        return Mock(name=name, _protocol=self.protocol)
+        return Mock(name=name, _protocol=self._protocol)
     
     async def create_action_server(self, name: str, **kwargs):
         """Create mock job."""
-        return Mock(name=name, _protocol=self.protocol)
+        return Mock(name=name, _protocol=self._protocol)
     
     async def create_subscriber(self, name: str, **kwargs):
         """Create mock subscriber."""
-        return Mock(name=name, _protocol=self.protocol)
+        return Mock(name=name, _protocol=self._protocol)
     
     async def create_client(self, name: str, **kwargs):
         """Create mock client."""
-        return Mock(name=name, _protocol=self.protocol)
+        return Mock(name=name, _protocol=self._protocol)
     
     async def create_action_client(self, name: str, **kwargs):
         """Create mock action client."""
-        return Mock(name=name, _protocol=self.protocol)
+        return Mock(name=name, _protocol=self._protocol)
 
 
 # ============================================================================
@@ -359,7 +359,7 @@ class TestAbstractProtocolProvider:
         provider = MockProvider(ProtocolType.REDIS, available=True)
         
         assert isinstance(provider, AbstractProtocolProvider)
-        assert provider.protocol == ProtocolType.REDIS
+        assert provider._protocol == ProtocolType.REDIS
         assert await provider.check_availability() is True
     
     @pytest.mark.asyncio

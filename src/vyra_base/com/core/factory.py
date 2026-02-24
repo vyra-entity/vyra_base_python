@@ -6,6 +6,7 @@ Unified interface creation with automatic protocol selection and fallback.
 import logging
 
 from typing import Any, Callable, Dict, Optional, List, Union
+
 from vyra_base.com.core.types import (
     ProtocolType,
     # New unified types
@@ -19,6 +20,14 @@ from vyra_base.com.core.types import (
 from vyra_base.com.core.exceptions import (
     ProtocolUnavailableError,
     InterfaceError,
+)
+from vyra_base.com.core.blueprints import (
+    HandlerBlueprint,
+    ServiceBlueprint,
+    PublisherBlueprint,
+    SubscriberBlueprint,
+    ActionBlueprint,
+    InterfaceType as BlueprintInterfaceType
 )
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
 from vyra_base.com.providers.provider_registry import ProviderRegistry
@@ -126,14 +135,18 @@ class InterfaceFactory:
             
             # Check if required callbacks are now available based on interface type
             # A server needs "response_callback", a subscriber needs "subscriber_callback",
-            # an action server needs "handle_goal_request" and "execution_callback"
+            # an action server needs all three: handle_goal_request, handle_cancel_request, execution_callback
             ready = False
             if "response_callback" in kwargs and kwargs.get("response_callback"):
                 ready = True  # Server: response_callback now available
             elif "subscriber_callback" in kwargs and kwargs.get("subscriber_callback"):
                 ready = True  # Subscriber: subscriber_callback now available
-            elif (kwargs.get("handle_goal_request") and kwargs.get("execution_callback")):
-                ready = True  # ActionServer: both callbacks now available
+            elif (
+                kwargs.get("handle_goal_request") and
+                kwargs.get("handle_cancel_request") and
+                kwargs.get("execution_callback")
+            ):
+                ready = True  # ActionServer: all three callbacks now available
             
             if ready:
                 try:
@@ -679,7 +692,7 @@ class InterfaceFactory:
     
     @staticmethod
     async def create_from_blueprint(
-        blueprint: 'HandlerBlueprint',  # type: ignore
+        blueprint: HandlerBlueprint,
         **override_kwargs
     ) -> Optional[Union[VyraServer, VyraPublisher, VyraSubscriber, VyraActionServer]]:
         """
@@ -703,13 +716,7 @@ class InterfaceFactory:
             >>> blueprint.bind_callback(my_callback)
             >>> server = await InterfaceFactory.create_from_blueprint(blueprint)
         """
-        from vyra_base.com.core.blueprints import (
-            ServiceBlueprint,
-            PublisherBlueprint,
-            SubscriberBlueprint,
-            ActionBlueprint,
-            InterfaceType as BlueprintInterfaceType
-        )
+        
         
         # Merge blueprint metadata with overrides
         kwargs = {**blueprint.metadata, **override_kwargs}
@@ -734,6 +741,17 @@ class InterfaceFactory:
             )
         
         elif isinstance(blueprint, SubscriberBlueprint):
+            if not blueprint.callback:
+                logger.warning(
+                    f"⚠️ Subscriber blueprint '{blueprint.name}' missing callback, "
+                    f"registering as pending"
+                )
+                InterfaceFactory._pending_interface[blueprint.name] = {
+                    "provider": InterfaceFactory.create_subscriber,
+                    "kwargs": {**kwargs, "subscriber_callback": blueprint.callback}
+                }
+                return None  # Return None for pending interface
+            
             return await InterfaceFactory.create_subscriber(
                 name=blueprint.name,
                 subscriber_callback=blueprint.callback,
@@ -760,14 +778,26 @@ class InterfaceFactory:
     @staticmethod
     async def bind_pending_callback(
         name: str,
-        callback: Callable
+        callback: Optional[Callable] = None,
+        handle_goal_request: Optional[Callable] = None,
+        handle_cancel_request: Optional[Callable] = None,
+        execution_callback: Optional[Callable] = None,
     ) -> Optional[Union[VyraServer, VyraSubscriber, VyraActionServer]]:
         """
-        Bind a callback to a pending interface and initialize it.
+        Bind one or more callbacks to a pending interface and initialize it.
+        
+        For servers/subscribers, use the ``callback`` parameter.
+        For action servers, use the dedicated ``handle_goal_request``,
+        ``handle_cancel_request`` and ``execution_callback`` parameters.
+        If a parameter is ``None``, the previously stored value is kept.
         
         Args:
             name: Interface name (must match pending registration)
-            callback: Implementation callback
+            callback: Callback for server (response_callback) or
+                      subscriber (subscriber_callback)
+            handle_goal_request: Action server goal-accept callback
+            handle_cancel_request: Action server cancel callback
+            execution_callback: Action server execution callback
             
         Returns:
             Initialized interface or None if not found in pending
@@ -777,7 +807,15 @@ class InterfaceFactory:
             >>> await InterfaceFactory.create_server("my_service", response_callback=None)
             >>> # Phase 2: Bind callback later
             >>> server = await InterfaceFactory.bind_pending_callback(
-            ...  "my_service", my_callback_function
+            ...     "my_service", callback=my_callback_function
+            ... )
+            >>>
+            >>> # Action server – bind all three callbacks
+            >>> action_srv = await InterfaceFactory.bind_pending_callback(
+            ...     "my_action",
+            ...     handle_goal_request=on_goal,
+            ...     handle_cancel_request=on_cancel,
+            ...     execution_callback=execute,
             ... )
         """
         if name not in InterfaceFactory._pending_interface:
@@ -788,14 +826,20 @@ class InterfaceFactory:
         provider_func = info["provider"]
         kwargs = info["kwargs"]
         
-        # Update kwargs with callback
-        # Determine callback key based on provider function name
+        # Update kwargs with the provided callbacks (only override non-None values)
         if "subscriber" in provider_func.__name__:
-            kwargs["subscriber_callback"] = callback
-        elif "server" in provider_func.__name__:
-            kwargs["response_callback"] = callback
+            if callback is not None:
+                kwargs["subscriber_callback"] = callback
         elif "action" in provider_func.__name__:
-            kwargs["execution_callback"] = callback
+            if handle_goal_request is not None:
+                kwargs["handle_goal_request"] = handle_goal_request
+            if handle_cancel_request is not None:
+                kwargs["handle_cancel_request"] = handle_cancel_request
+            if execution_callback is not None:
+                kwargs["execution_callback"] = execution_callback
+        elif "server" in provider_func.__name__:
+            if callback is not None:
+                kwargs["response_callback"] = callback
         else:
             logger.error(f"❌ Unknown provider type for pending interface '{name}'")
             return None
@@ -845,15 +889,29 @@ class InterfaceFactory:
             info = InterfaceFactory._pending_interface[name]
             kwargs = info["kwargs"]
             
-            # Check if callback is now available
-            has_callback = (
-                kwargs.get("subscriber_callback") or
-                kwargs.get("response_callback") or
-                kwargs.get("execution_callback")
+            # Check if all required callbacks are now available.
+            # Action servers require all three callbacks; servers/subscribers one each.
+            is_action = (
+                "handle_goal_request" in kwargs or
+                "handle_cancel_request" in kwargs or
+                "execution_callback" in kwargs
             )
+            if is_action:
+                has_callback = (
+                    kwargs.get("handle_goal_request") and
+                    kwargs.get("handle_cancel_request") and
+                    kwargs.get("execution_callback")
+                )
+            else:
+                has_callback = (
+                    kwargs.get("subscriber_callback") or
+                    kwargs.get("response_callback")
+                )
             
             if has_callback:
-                interface = await InterfaceFactory.bind_pending_callback(name, None)
+                # All required callbacks are already stored in kwargs –
+                # call bind_pending_callback without overriding anything.
+                interface = await InterfaceFactory.bind_pending_callback(name)
                 results[name] = interface is not None
         
         if results:

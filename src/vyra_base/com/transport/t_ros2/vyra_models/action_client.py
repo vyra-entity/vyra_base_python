@@ -5,7 +5,7 @@ Async-first action client for ROS2 with response/feedback/goal callbacks.
 """
 import asyncio
 import logging
-from typing import _T, Any, Callable, Optional
+from typing import Any, Callable, Optional
 
 from grpc import Future
 

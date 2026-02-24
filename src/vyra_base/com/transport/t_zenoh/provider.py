@@ -35,6 +35,7 @@ from vyra_base.com.transport.t_zenoh.vyra_models import (
 )
 from vyra_base.com.transport.t_zenoh.communication.serializer import SerializationFormat
 from vyra_base.com.providers.protocol_provider import AbstractProtocolProvider
+from vyra_base.com.core.callback_registry import CallbackRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +238,15 @@ class ZenohProvider(AbstractProtocolProvider):
                 raise ProviderError("Zenoh session not open")
             
             effective_topic_builder = topic_builder or self._topic_builder
+
+            if message_type is None:
+                message_type = effective_topic_builder.load_interface_type(
+                    name, self.protocol
+                )
+
+            if message_type is None:
+                raise ProviderError(f"Message type for publisher '{name}' not found in topic builder")
+
             publisher = VyraPublisherImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
@@ -282,6 +292,24 @@ class ZenohProvider(AbstractProtocolProvider):
                 raise ProviderError("Zenoh session not open")
 
             effective_topic_builder = topic_builder or self._topic_builder
+
+            if message_type is None:
+                message_type = effective_topic_builder.load_interface_type(
+                    name, self.protocol
+                )
+
+            if message_type is None:
+                raise ProviderError(f"Message type for subscriber '{name}' not found in topic builder")
+
+            if subscriber_callback is None:
+                _bp = CallbackRegistry.get_blueprint(name)
+                if _bp and _bp.is_bound():
+                    subscriber_callback = _bp.callback
+                else:
+                    raise ProviderError(
+                        f"No subscriber_callback provided for '{name}' and no bound blueprint found in CallbackRegistry"
+                    )
+
             subscriber = VyraSubscriberImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
@@ -329,6 +357,24 @@ class ZenohProvider(AbstractProtocolProvider):
                 raise ProviderError("Zenoh session not open")
             
             effective_topic_builder = topic_builder or self._topic_builder
+
+            if service_type is None:
+                service_type = effective_topic_builder.load_interface_type(
+                    name, self.protocol
+                )
+
+            if service_type is None:
+                raise ProviderError(f"Service type for server '{name}' not found in topic builder")
+
+            if response_callback is None:
+                _bp = CallbackRegistry.get_blueprint(name)
+                if _bp and _bp.is_bound():
+                    response_callback = _bp.callback
+                else:
+                    raise ProviderError(
+                        f"No response_callback provided for server '{name}' and no bound blueprint found in CallbackRegistry"
+                    )
+
             server = VyraServerImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
@@ -377,7 +423,12 @@ class ZenohProvider(AbstractProtocolProvider):
             
             # Use provider's topic_builder if none provided
             effective_topic_builder = topic_builder or self._topic_builder
-            
+
+            if service_type is None:
+                service_type = effective_topic_builder.load_interface_type(
+                    name, self.protocol
+                )
+
             client = VyraClientImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
@@ -399,11 +450,11 @@ class ZenohProvider(AbstractProtocolProvider):
     async def create_action_server(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        handle_goal_request: Callable,
-        handle_cancel_request: Callable,
-        execution_callback: Callable,
-        action_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        handle_goal_request: Optional[Callable] = None,
+        handle_cancel_request: Optional[Callable] = None,
+        execution_callback: Optional[Callable] = None,
+        action_type: Optional[type] = None,
         **kwargs
     ) -> VyraActionServer:
         """
@@ -427,9 +478,36 @@ class ZenohProvider(AbstractProtocolProvider):
             if not self._session or not self._session.is_open:
                 raise ProviderError("Zenoh session not open")
             
+            effective_topic_builder = topic_builder or self._topic_builder
+
+            if action_type is None:
+                action_type = effective_topic_builder.load_interface_type(
+                    name, self.protocol
+                )
+
+            if action_type is None:
+                raise ProviderError(f"Action type for action server '{name}' not found in topic builder")
+
+            if execution_callback is None:
+                _bp = CallbackRegistry.get_blueprint(name)
+                if _bp and _bp.is_bound():
+                    execution_callback = _bp.callback
+                else:
+                    raise ProviderError(
+                        f"No execution_callback provided for action server '{name}' and no bound blueprint found in CallbackRegistry"
+                    )
+            if handle_goal_request is None:
+                _bp = CallbackRegistry.get_blueprint(name)
+                if _bp is not None:
+                    handle_goal_request = getattr(_bp, 'get_callback', lambda x: None)('on_goal')
+            if handle_cancel_request is None:
+                _bp = CallbackRegistry.get_blueprint(name)
+                if _bp is not None:
+                    handle_cancel_request = getattr(_bp, 'get_callback', lambda x: None)('on_cancel')
+
             action_server = VyraActionServerImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 handle_goal_request=handle_goal_request,
                 handle_cancel_request=handle_cancel_request,
                 execution_callback=execution_callback,
@@ -450,8 +528,8 @@ class ZenohProvider(AbstractProtocolProvider):
     async def create_action_client(
         self,
         name: str,
-        topic_builder: TopicBuilder,
-        action_type: type,
+        topic_builder: Optional[TopicBuilder] = None,
+        action_type: Optional[type] = None,
         direct_response: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
         goal_response_callback: Optional[Callable] = None,
@@ -478,9 +556,16 @@ class ZenohProvider(AbstractProtocolProvider):
             if not self._session or not self._session.is_open:
                 raise ProviderError("Zenoh session not open")
             
+            effective_topic_builder = topic_builder or self._topic_builder
+
+            if action_type is None:
+                action_type = effective_topic_builder.load_interface_type(
+                    name, self.protocol
+                )
+
             action_client = VyraActionClientImpl(
                 name=name,
-                topic_builder=topic_builder,
+                topic_builder=effective_topic_builder,
                 direct_response=direct_response,
                 feedback_callback=feedback_callback,
                 goal_response_callback=goal_response_callback,

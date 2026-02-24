@@ -53,7 +53,7 @@ class TestAbstractProtocolProvider:
         
         provider = MockProvider(ProtocolType.REDIS)
         assert isinstance(provider, AbstractProtocolProvider)
-        assert provider.protocol == ProtocolType.REDIS
+        assert provider._protocol == ProtocolType.REDIS
         assert hasattr(provider, 'initialize')
         assert hasattr(provider, 'create_server')
 

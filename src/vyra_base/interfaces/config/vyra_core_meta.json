@@ -145,7 +145,7 @@
         "tags": [
             "zenoh"
         ],
-        "type": "publisher",
+        "type": "message",
         "functionname": "updateParamEvent",
         "displayname": "Update Parameter Event",
         "description": "Communicate parameter updates in the system between different components or modules.",

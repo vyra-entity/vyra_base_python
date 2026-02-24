@@ -83,17 +83,33 @@ class RedisServerImpl(VyraServer):
             logger.error(f"❌ Serve failed: {e}")
             return False
     
-    async def _handle_request(self, raw_data: bytes):
+    async def _handle_request(self, raw_data, context=None):
         """Process individual request."""
         try:
-            # Parse request
-            request_msg = json.loads(raw_data)
+            # raw_data is the full Redis PubSub message dict: {type, channel, data, ...}
+            # Extract actual payload from 'data' field
+            if isinstance(raw_data, dict) and 'data' in raw_data:
+                payload = raw_data['data']
+            else:
+                payload = raw_data
+
+            # Parse request - handle both raw bytes/str and already-parsed dict
+            if isinstance(payload, dict):
+                request_msg = payload
+            elif isinstance(payload, (bytes, str)):
+                request_msg = json.loads(payload)
+            else:
+                request_msg = json.loads(str(payload))
             request_id = request_msg.get('request_id')
             request_data = request_msg.get('data')
             response_channel = request_msg.get('response_channel')
             
             if not all([request_id, response_channel]):
                 logger.error("Invalid request format")
+                return
+
+            if not isinstance(response_channel, str):
+                logger.error(f"Invalid response channel format: {type(response_channel)}")
                 return
             
             if not self.response_callback:
@@ -107,16 +123,44 @@ class RedisServerImpl(VyraServer):
 
             # TODO: Deserialize request_data to srv_type.Request
             
-            # Call user callback
-            response = await self.response_callback(request_data)
+            # Call user callback - support both (request, response) ROS2-style
+            # and plain (request) callbacks. Use a dynamic response holder.
+            class _ResponseHolder:
+                """Dynamic attribute container for ROS2-style response objects."""
+                def __getattr__(self, name):
+                    return None
+                def __setattr__(self, name, value):
+                    object.__setattr__(self, name, value)
+                def to_dict(self):
+                    return {k: v for k, v in self.__dict__.items()
+                            if not k.startswith('_')}
+
+            import inspect
+            sig = inspect.signature(self.response_callback)
+            num_params = len(sig.parameters)
+
+            if num_params >= 2:
+                # ROS2-style: callback(request, response)
+                response_holder = _ResponseHolder()
+                await self.response_callback(request_data, response_holder)
+                response_data = response_holder.to_dict()
+            else:
+                # Plain callback: callback(request)
+                result = await self.response_callback(request_data)
+                if isinstance(result, dict):
+                    response_data = result
+                elif result is not None:
+                    response_data = {'result': str(result)}
+                else:
+                    response_data = {}
             
             # TODO: Serialize response from srv_type.Response
             
             # Publish response
             response_msg = json.dumps({
                 'request_id': request_id,
-                'data': response if isinstance(response, dict) else {'result': str(response)}
-            })
+                'data': response_data
+            }, default=str)
             
             await self._redis.publish_message(response_channel, response_msg)
             
