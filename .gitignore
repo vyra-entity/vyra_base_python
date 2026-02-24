@@ -15,7 +15,9 @@
 *.env
 *.pyc
 
+# Wheel files
 dist/*
+*.whl
 
 /.pytest_cache/
 .coverage
