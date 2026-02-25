@@ -27,7 +27,7 @@ Quick start::
         module_entity=my_module_entity,
     )
     await feeder.start()
-    feeder.feed(87.3)     # publishes {"value": 87.3, "unit": "°C", "sensor": "PT-01"}
+    await feeder.feed(87.3)     # publishes {"value": 87.3, "unit": "°C", "sensor": "PT-01"}
 
 The protocol is resolved automatically from the interface config JSON — add
 a ``"type": "publisher", "functionname": "TemperatureFeed"`` entry with the
@@ -122,7 +122,7 @@ class CustomBaseFeeder(BaseFeeder):
     # IFeeder.feed override — applies hooks before publishing
     # ------------------------------------------------------------------
 
-    def feed(self, raw: Any) -> None:  # type: ignore[override]
+    async def feed(self, raw: Any) -> None:  # type: ignore[override]
         """Validate, transform, and publish *raw*.
 
         1. Call :meth:`_validate` — skip on ``False``.
@@ -148,7 +148,7 @@ class CustomBaseFeeder(BaseFeeder):
             self._error_count += 1
             return
 
-        super().feed(message)
+        await super().feed(message)
 
     # ------------------------------------------------------------------
     # start() — resolve interface paths from registry

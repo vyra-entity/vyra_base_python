@@ -250,7 +250,7 @@ Sensor Data with ROS2 Publishing
            
            # React to critical values
            if current_temp > 30:
-               entity.news_feeder.feed("⚠️ Temperature critical!")
+               await entity.news_feeder.feed("⚠️ Temperature critical!")
            
            await asyncio.slvia ROS2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

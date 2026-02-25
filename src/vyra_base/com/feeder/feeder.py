@@ -379,7 +379,7 @@ class BaseFeeder(IFeeder):
     # Feed / publish path
     # ------------------------------------------------------------------
 
-    def feed(self, msg: Any) -> None:
+    async def feed(self, msg: Any) -> None:
         """Enqueue *msg* for publishing (implements :class:`IFeeder`).
 
         If the feeder is not yet ready the message is buffered.  Otherwise
@@ -405,14 +405,35 @@ class BaseFeeder(IFeeder):
             return
 
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                loop.create_task(self._publish(msg))
-            else:
-                loop.run_until_complete(self._publish(msg))
+            await self._publish(msg)
+
         except Exception as exc:
             logger.error("❌ Feed failed in %s: %s", self._feederName, exc)
             self._error_count += 1
+
+    def feed_sync(self, msg: Any) -> None:
+        """Sync version of :meth:`feed` for use in sync contexts."""
+        if not self._is_ready:
+            self._feedbuffer.append(msg)
+            logger.debug("⏳ %s buffering message (not started yet).", self._feederName)
+            return
+
+        if hasattr(self, '_feeder'):
+            self._feeder.log(self._level, msg)
+
+        if self._loggingOn:
+            logger.info("🗞 Feeder %s fed: %s", self._feederName, msg)
+
+        if not self._publisher:
+            logger.error("❌ No publisher for feeder %s", self._feederName)
+            self._error_count += 1
+            return
+
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            loop.create_task(self._publish(msg))
+        else:
+            loop.run_until_complete(self._publish(msg))
 
     async def _publish(self, msg: Any) -> None:
         """

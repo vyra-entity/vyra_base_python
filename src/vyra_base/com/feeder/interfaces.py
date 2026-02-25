@@ -28,7 +28,7 @@ class IFeeder(abc.ABC):
 
         feeder = MyFeeder(...)
         await feeder.start()          # resolve protocol + create publisher
-        feeder.feed(my_data)          # async-safe publish
+        await feeder.feed(my_data)          # async-safe publish
         alive = feeder.is_alive()     # health check
         feeder.feed_count             # read metrics
 
@@ -47,7 +47,7 @@ class IFeeder(abc.ABC):
         """
 
     @abc.abstractmethod
-    def feed(self, message: Any) -> None:
+    async def feed(self, message: Any) -> None:
         """Publish *message* immediately.
 
         If called before :meth:`start` the message is buffered and flushed
@@ -55,6 +55,15 @@ class IFeeder(abc.ABC):
 
         :param message: Domain object to publish.
         :type message: Any
+        """
+    
+    @abc.abstractmethod
+    def feed_sync(self, message: Any) -> None:
+        """Synchronous version of :meth:`feed`.  Not all feeders support this.
+
+        :param message: Domain object to publish.
+        :type message: Any
+        :raises NotImplementedError: If the feeder does not support synchronous feeding.
         """
 
     @abc.abstractmethod

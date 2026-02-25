@@ -5,4 +5,8 @@
 string key
 string value
 
-# Key-Value pair message (used in various interfaces to represent a mapping of keys to values)
+# This message represents a single key-value pair in the VYRA system.
+# It is used as an element in VBASEVolatileHash (entries field).
+# Example usage:
+# - key: "field1"
+# - value: "value1"

@@ -16,7 +16,7 @@ Architecture:
 - Factory pattern for easy converter creation
 
 Usage:
-    from vyra_base.com.converters import ConverterFactory, ProtobufConverter
+    from vyra_base.com.converter import ConverterFactory, ProtobufConverter
     
     # Get protobuf converter
     converter = ConverterFactory.get_converter("protobuf")
@@ -25,10 +25,10 @@ Usage:
     proto_msg = converter.dict_to_proto(data_dict, MessageType)
     data_dict = converter.proto_to_dict(proto_msg)
 """
-from vyra_base.com.converters.interface import ConverterInterface
-from vyra_base.com.converters.registry import ConverterRegistry
-from vyra_base.com.converters.factory import ConverterFactory
-from vyra_base.com.converters.protobuf_converter import ProtobufConverter
+from vyra_base.com.converter.interface import ConverterInterface
+from vyra_base.com.converter.registry import ConverterRegistry
+from vyra_base.com.converter.factory import ConverterFactory
+from vyra_base.com.converter.protobuf_converter import ProtobufConverter
 
 __all__ = [
     "ConverterInterface",

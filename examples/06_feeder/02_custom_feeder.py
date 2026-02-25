@@ -86,7 +86,7 @@ async def main():
     # Feed values before start() — they get buffered
     test_values = [120.5, -10.0, 380.0, "invalid", 200.0, 450.0]
     for v in test_values:
-        feeder.feed(v)
+        await feeder.feed(v)
 
     logger.info(
         "After feeding %d raw values: buffer_size=%d  error_count=%d",

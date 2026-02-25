@@ -41,7 +41,7 @@ class ErrorFeeder(BaseFeeder):
             type: Any,
             node: Optional[Any],
             module_entity: ModuleEntry,
-            loggingOn: bool = False
+            loggingOn: bool = True
         ):
         super().__init__()
 
@@ -70,7 +70,7 @@ class ErrorFeeder(BaseFeeder):
             self.set_interface_paths(paths)
         await self.create(loggingOn=self._loggingOn)
         
-    def feed(self, errorElement: Union[ErrorEntry, dict]) -> None:
+    async def feed(self, errorElement: Union[ErrorEntry, dict]) -> None:
         """
         Feed an error entry to the feeder.
 
@@ -99,7 +99,7 @@ class ErrorFeeder(BaseFeeder):
         if errorfeed_entry.uuid is None:
             errorfeed_entry.uuid = uuid.uuid4()
 
-        super().feed(errorfeed_entry)
+        await super().feed(errorfeed_entry)
 
     def _prepare_entry_for_publish(self, entry: ErrorEntry) -> dict:  # type: ignore[override]
         """

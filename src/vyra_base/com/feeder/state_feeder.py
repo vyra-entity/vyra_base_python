@@ -95,7 +95,7 @@ class StateFeeder(BaseFeeder):
             self.set_interface_paths(paths)
         await self.create(loggingOn=self._loggingOn)
         
-    def feed(self, stateElement: StateEntry) -> None:
+    async def feed(self, stateElement: StateEntry) -> None:
         """
         Feed a state entry to the feeder.
 
@@ -110,7 +110,10 @@ class StateFeeder(BaseFeeder):
         """
         if not isinstance(stateElement, StateEntry):
             raise FeederException(f"Wrong Type. Expect: StateEntry, got {type(stateElement)}")
-        super().feed(stateElement)
+        await super().feed(stateElement)
+
+    def feed_sync(self, msg: Any) -> None:
+        return super().feed_sync(msg)
 
     def _prepare_entry_for_publish(self, entry: StateEntry) -> dict:  # type: ignore[override]
         """

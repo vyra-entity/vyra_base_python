@@ -110,9 +110,9 @@ async def demo_custom_feeder():
     # Before start() the feeder buffers messages
     logger.info("Feeder ready: %s", feeder.is_alive())
 
-    feeder.feed(87.3)     # valid — gets buffered
-    feeder.feed(999.9)    # invalid — dropped with warning
-    feeder.feed(22.0)     # valid — gets buffered
+    await feeder.feed(87.3)     # valid — gets buffered
+    await feeder.feed(999.9)    # invalid — dropped with warning
+    await feeder.feed(22.0)     # valid — gets buffered
 
     logger.info(
         "Buffered %d message(s) before start()  error_count=%d",

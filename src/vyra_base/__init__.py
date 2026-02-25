@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import vyra_base
+from vyra_base.com.converter import interface
 
 
 def extract_interfaces(target_path: str | Path):
@@ -50,6 +51,20 @@ def extract_interfaces(target_path: str | Path):
         for file in config_path.glob(f'*.{ftype}'):
             shutil.copy2(file, target_config)
             print(f"Copied {file.name} to {target_config}")
+    
+    # Copy all base interface files that are not described in config files
+    # These will be used as complex types in other interface files
+    interface_subs = ['msg', 'srv', 'action']
+    for i_type in interface_subs:
+        iface_path: Path = source_path / i_type
+        t_subs_path: Path = target_path / i_type
+        for file in iface_path.glob(f'*.{i_type}'):
+            shutil.copy2(file, t_subs_path)
+            print(f"Copied {file.name} to {t_subs_path}")
+        
+        for p_file in iface_path.glob(f'*.proto'):
+            shutil.copy2(p_file, t_subs_path)
+            print(f"Copied {p_file.name} to {t_subs_path}")
 
     print(f"VYRA interface config extraction to {target_path} successful.")
 

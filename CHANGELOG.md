@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.84] - 2026-02-25
+
+### Build
+
+bugfixing com/converter
+
+
+## [0.1.8+build.83] - 2026-02-25
+
+### Build
+
+Update extract_interfaces to copy base interface files to be used in othnterface files for complex structures
+
+
 ## [0.1.8+build.82] - 2026-02-25
 
 ### Build

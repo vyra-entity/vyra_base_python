@@ -6,7 +6,7 @@ Manages registration and lookup of converters.
 import logging
 from typing import Dict, Optional
 
-from vyra_base.com.converters.interface import ConverterInterface
+from vyra_base.com.converter.interface import ConverterInterface
 
 logger = logging.getLogger(__name__)
 

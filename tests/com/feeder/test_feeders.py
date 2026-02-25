@@ -209,13 +209,13 @@ class TestCustomBaseFeeder:
     def test_feed_skips_invalid(self):
         feeder = self._make_feeder()
         feeder._is_ready = False
-        feeder.feed(-999.0)  # invalid — validation should reject
+        feeder.feed_sync(-999.0)  # invalid — validation should reject
         assert len(feeder.get_buffer()) == 0
 
     def test_feed_valid_buffers_when_not_ready(self):
         feeder = self._make_feeder()
         feeder._is_ready = False
-        feeder.feed(42.0)  # valid — should buffer transformed message
+        feeder.feed_sync(42.0)  # valid — should buffer transformed message
         assert len(feeder.get_buffer()) == 1
 
     def test_get_feeder_name(self):

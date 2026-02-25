@@ -4,7 +4,7 @@ Unit tests for Zenoh communication converters.
 import pytest
 from unittest.mock import Mock
 
-from vyra_base.com.converters import (
+from vyra_base.com.converter import (
     ConverterFactory,
     ConverterRegistry,
     ProtobufConverter

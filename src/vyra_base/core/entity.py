@@ -183,7 +183,7 @@ class VyraEntity:
 
         VyraEntity.register_service_callbacks(self)
 
-        self.news_feeder.feed("...V.Y.R.A. entity initialized")
+        self.news_feeder.feed_sync("...V.Y.R.A. entity initialized")
 
     @property
     def node(self) -> Optional['VyraNode']:
@@ -592,15 +592,15 @@ class VyraEntity:
                 timestamp=datetime.now(),
                 _type="lifecycle"
             )
-            self.state_feeder.feed(state_data)
+            self.state_feeder.feed_sync(state_data)
             
             # Log important lifecycle transitions
             if new_state == "Active":
-                self.news_feeder.feed(f"Module '{self.module_entry.name}' is now active")
+                self.news_feeder.feed_sync(f"Module '{self.module_entry.name}' is now active")
             elif new_state == "Recovering":
-                self.news_feeder.feed(f"Module '{self.module_entry.name}' entered recovery mode")
+                self.news_feeder.feed_sync(f"Module '{self.module_entry.name}' entered recovery mode")
             elif new_state == "Deactivated":
-                self.news_feeder.feed(f"Module '{self.module_entry.name}' has been deactivated")
+                self.news_feeder.feed_sync(f"Module '{self.module_entry.name}' has been deactivated")
         
         def on_operational_change(layer: str, old_state: str, new_state: str):
             """Callback for operational state changes."""
@@ -616,7 +616,7 @@ class VyraEntity:
                 timestamp=datetime.now(),
                 _type="operational"
             )
-            self.state_feeder.feed(state_data)
+            self.state_feeder.feed_sync(state_data)
         
         def on_health_change(layer: str, old_state: str, new_state: str):
             """Callback for health state changes."""
@@ -632,11 +632,11 @@ class VyraEntity:
                 timestamp=datetime.now(),
                 _type="health"
             )
-            self.state_feeder.feed(state_data)
+            self.state_feeder.feed_sync(state_data)
             
             # Report health issues
             if new_state == "Warning":
-                self.news_feeder.feed(f"Module '{self.module_entry.name}' health warning")
+                self.news_feeder.feed_sync(f"Module '{self.module_entry.name}' health warning")
             elif new_state == "Faulted":
                 error_entry = ErrorEntry(
                     _type=self._error_entry_type,
@@ -646,7 +646,7 @@ class VyraEntity:
                     module_name=self.module_entry.name,
                     timestamp=datetime.now()
                 )
-                self.error_feeder.feed(error_entry)
+                self.error_feeder.feed_sync(error_entry)
             elif new_state == "Critical":
                 error_entry = ErrorEntry(
                     _type=self._error_entry_type,
@@ -656,7 +656,7 @@ class VyraEntity:
                     module_name=self.module_entry.name,
                     timestamp=datetime.now()
                 )
-                self.error_feeder.feed(error_entry)
+                self.error_feeder.feed_sync(error_entry)
         
         # Register callbacks with priorities (lifecycle highest, then health, then operational)
         state_machine.on_lifecycle_change(on_lifecycle_change, priority=10)
@@ -725,7 +725,7 @@ class VyraEntity:
             })
             
             logger.info(f"Entity '{self.module_entry.name}' startup completed successfully")
-            self.news_feeder.feed(f"Entity '{self.module_entry.name}' is ready for operation")
+            await self.news_feeder.feed(f"Entity '{self.module_entry.name}' is ready for operation")
             
             return True
             
@@ -744,7 +744,7 @@ class VyraEntity:
                     module_name=self.module_entry.name,
                     timestamp=datetime.now()
                 )
-                self.error_feeder.feed(error_entry)
+                await self.error_feeder.feed(error_entry)
             except:
                 pass  # State machine might already be in invalid state
             
@@ -776,7 +776,7 @@ class VyraEntity:
             self.state_machine.complete_shutdown()
             
             logger.info(f"Entity '{self.module_entry.name}' shutdown completed")
-            self.news_feeder.feed(f"Entity '{self.module_entry.name}' has been shut down")
+            await self.news_feeder.feed(f"Entity '{self.module_entry.name}' has been shut down")
             
             return True
             
@@ -791,7 +791,7 @@ class VyraEntity:
                 module_name=self.module_entry.name,
                 timestamp=datetime.now()
             )
-            self.error_feeder.feed(error_entry)
+            await self.error_feeder.feed(error_entry)
             return False
 
     def _init_security_manager(self, module_config: dict[str, Any]):

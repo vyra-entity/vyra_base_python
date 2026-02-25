@@ -6,8 +6,8 @@ Factory for creating and accessing converters.
 import logging
 from typing import Optional
 
-from vyra_base.com.converters.interface import ConverterInterface
-from vyra_base.com.converters.registry import ConverterRegistry
+from vyra_base.com.converter.interface import ConverterInterface
+from vyra_base.com.converter.registry import ConverterRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class ConverterFactory:
         
         # Register Protobuf converter
         try:
-            from vyra_base.com.converters.protobuf_converter import ProtobufConverter
+            from vyra_base.com.converter.protobuf_converter import ProtobufConverter
             converter = ProtobufConverter()
             if converter.is_available():
                 ConverterRegistry.register(converter)

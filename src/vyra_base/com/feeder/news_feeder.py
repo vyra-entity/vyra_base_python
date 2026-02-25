@@ -46,7 +46,7 @@ class NewsFeeder(BaseFeeder):
             type: Any,
             node: Optional[Any],
             module_entity: ModuleEntry,
-            loggingOn: bool = True
+            loggingOn: bool = False
         ):
         super().__init__()
 
@@ -74,7 +74,7 @@ class NewsFeeder(BaseFeeder):
             self.set_interface_paths(paths)
         await self.create(loggingOn=self._loggingOn)
         
-    def feed(self, newsElement: Union[NewsEntry, str, list]) -> None:
+    async def feed(self, newsElement: Union[NewsEntry, str, list]) -> None:
         """
         Feed a news entry to the feeder.
 
@@ -96,7 +96,10 @@ class NewsFeeder(BaseFeeder):
         else:
             raise FeederException(f"Wrong Type. Expect: NewsEntry, got {type(newsElement)}")
 
-        super().feed(newsfeed_entry)
+        await super().feed(newsfeed_entry)
+
+    def feed_sync(self, msg: Any) -> None:
+        return super().feed_sync(msg)
 
     def _prepare_entry_for_publish(self, entry: NewsEntry) -> dict:  # type: ignore[override]
         """

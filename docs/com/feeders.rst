@@ -113,7 +113,7 @@ Publish Messages
        message="Operation successful",
        timestamp=datetime.now()
    )
-   news_feeder.feed(news_msg)
+   await news_feeder.feed(news_msg)
 
 **Use Cases:**
 
@@ -166,7 +166,7 @@ Publish Errors
        severity="ERROR",  # INFO, WARNING, ERROR, CRITICAL
        timestamp=datetime.now()
    )
-   error_feeder.feed(error_msg)
+   await error_feeder.feed(error_msg)
 
 **Use Cases:**
 
@@ -290,7 +290,7 @@ You can also create your own feeders:
    async def publish_metrics_loop():
        while True:
            metrics = get_system_metrics()
-           metrics_feeder.feed(metrics)
+           await metrics_feeder.feed(metrics)
            await asyncio.sleep(5.0)
 
 Best Practices
