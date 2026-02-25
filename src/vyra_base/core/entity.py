@@ -423,14 +423,15 @@ class VyraEntity:
         state_feeder = StateFeeder(
             type=state_entry._type, 
             node=self._node, 
-            module_entity=self.module_entry
+            module_entity=self.module_entry,
+            loggingOn=False
         )
 
         news_feeder = NewsFeeder(
             type=news_entry._type, 
             node=self._node,
             module_entity=self.module_entry,
-            loggingOn=True
+            loggingOn=False
         )
         
         error_feeder = ErrorFeeder(

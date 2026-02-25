@@ -82,7 +82,7 @@ class BaseFeeder(IFeeder):
 
         self._handler_classes: list[Type[CommunicationHandler]] = []
         self._handler: list[Type[CommunicationHandler] | CommunicationHandler] = []
-        self._feeder: logging.Logger
+        # self._feeder: logging.Logger
         self._loggingOn: bool = False
         self._node: Optional[Any] = None
         self._type: Any = None
@@ -262,7 +262,8 @@ class BaseFeeder(IFeeder):
         # Auto-load interface type via InterfaceLoader (after protocol is known)
         self._msg_type = await self._load_msg_type()
 
-        self.create_feeder()
+        # DEPRECATED
+        # self.create_feeder()
 
         # Attach ROS2 handlers only for ROS2-backed publishers (legacy support)
         if self._ros2_available and hasattr(self._publisher, 'publisher_server'):
@@ -275,6 +276,7 @@ class BaseFeeder(IFeeder):
                     publisher=self._publisher,
                     type=self._publisher.message_type
                 )
+                
                 self.add_handler(handler)
         else:
             logger.debug("⚠️ Skipping ROS2 handlers for %s (non-ROS2 publisher)",
@@ -393,8 +395,8 @@ class BaseFeeder(IFeeder):
             logger.debug("⏳ %s buffering message (not started yet).", self._feederName)
             return
 
-        if hasattr(self, '_feeder'):
-            self._feeder.log(self._level, msg)
+        # if hasattr(self, '_feeder'):
+        #     self._feeder.log(self._level, msg)
 
         if self._loggingOn:
             logger.info("🗞 Feeder %s fed: %s", self._feederName, msg)
@@ -418,8 +420,8 @@ class BaseFeeder(IFeeder):
             logger.debug("⏳ %s buffering message (not started yet).", self._feederName)
             return
 
-        if hasattr(self, '_feeder'):
-            self._feeder.log(self._level, msg)
+        # if hasattr(self, '_feeder'):
+        #     self._feeder.log(self._level, msg)
 
         if self._loggingOn:
             logger.info("🗞 Feeder %s fed: %s", self._feederName, msg)
@@ -489,17 +491,17 @@ class BaseFeeder(IFeeder):
     # Feeder logger setup
     # ------------------------------------------------------------------
 
-    def create_feeder(self) -> None:
-        """Set up the Python logger for this feeder."""
-        feed_logger_name = f"{self._feedBaseName}.{self._feederName}"
-        self._feeder = logging.getLogger(feed_logger_name)
-        self._feeder.setLevel(self._level)
+    # def create_feeder(self) -> None:
+    #     """Set up the Python logger for this feeder."""
+    #     feed_logger_name = f"{self._feedBaseName}.{self._feederName}"
+    #     self._feeder = logging.getLogger(feed_logger_name)
+    #     self._feeder.setLevel(self._level)
 
-        if self._loggingOn:
-            vyra_logger = logging.getLogger("vyra_base")
-            for handler in vyra_logger.handlers:
-                if handler not in self._feeder.handlers:
-                    self._feeder.addHandler(handler)
+    #     if self._loggingOn:
+    #         vyra_logger = logging.getLogger("vyra_base")
+    #         for handler in vyra_logger.handlers:
+    #             if handler not in self._feeder.handlers:
+    #                 self._feeder.addHandler(handler)
 
     def add_handler(self, handler: CommunicationHandler) -> bool:
         """Attach a :class:`~vyra_base.com.handler.communication.CommunicationHandler`.
@@ -513,7 +515,9 @@ class BaseFeeder(IFeeder):
             raise TypeError(f"Expected CommunicationHandler, got {type(handler)}")
         if handler in self._handler:
             return False
-        self._feeder.addHandler(handler)
+
+        # DEPRECATED
+        # self._feeder.addHandler(handler)
         self._handler.append(handler)
         return True
 
