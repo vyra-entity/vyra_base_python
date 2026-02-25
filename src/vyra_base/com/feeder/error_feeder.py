@@ -74,13 +74,17 @@ class ErrorFeeder(BaseFeeder):
         """
         Feed an error entry to the feeder.
 
-        The content can either be a dictionary which will be processed into an
-        :class:`vyra_base.defaults.entries.ErrorEntry`, or an :class:`vyra_base.defaults.entries.ErrorEntry` object itself. Use the method
-        :meth:`build_errorfeed` to create an :class:`vyra_base.defaults.entries.ErrorEntry` from a dict.
+        Normalises the input to an :class:`~vyra_base.defaults.entries.ErrorEntry`,
+        then delegates to :meth:`~BaseFeeder.feed` which calls
+        :meth:`_prepare_entry_for_publish` followed by
+        :class:`~vyra_base.com.feeder.message_mapper.MessageMapper` for
+        protocol-aware conversion.
 
-        :param errorElement: The error entry to be fed. Can be a dictionary with error details or an :class:`vyra_base.defaults.entries.ErrorEntry` object.
+        :param errorElement: The error entry to be fed. Can be a dictionary with error
+            details or an :class:`~vyra_base.defaults.entries.ErrorEntry` object.
         :type errorElement: Union[ErrorEntry, dict]
-        :raises FeederException: If the type of errorElement is neither a dict nor an :class:`vyra_base.defaults.entries.ErrorEntry`.
+        :raises FeederException: If the type of errorElement is neither a dict nor an
+            :class:`~vyra_base.defaults.entries.ErrorEntry`.
         """
         if isinstance(errorElement, dict):
             errorfeed_entry = self.build_errorfeed(errorElement)
@@ -89,23 +93,28 @@ class ErrorFeeder(BaseFeeder):
         else:
             raise FeederException(f"Wrong Type. Expect: ErrorEntry, got {type(errorElement)}")
 
-        # Convert to ROS2 types only if ROS2 available
-        if self._ros2_available and Ros2TypeConverter is not None:
-            errorfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
-                    errorfeed_entry.timestamp if errorfeed_entry.timestamp else datetime.now()
-            )
-            
-            errorfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
-                errorfeed_entry.uuid if errorfeed_entry.uuid else uuid.uuid4()
-            )
-        else:
-            # For non-ROS2 protocols, keep native Python types
-            if errorfeed_entry.timestamp is None:
-                errorfeed_entry.timestamp = datetime.now()
-            if errorfeed_entry.uuid is None:
-                errorfeed_entry.uuid = uuid.uuid4()
+        # Ensure timestamp and uuid are set
+        if errorfeed_entry.timestamp is None:
+            errorfeed_entry.timestamp = datetime.now()
+        if errorfeed_entry.uuid is None:
+            errorfeed_entry.uuid = uuid.uuid4()
 
         super().feed(errorfeed_entry)
+
+    def _prepare_entry_for_publish(self, entry: ErrorEntry) -> dict:  # type: ignore[override]
+        """
+        Convert an :class:`~vyra_base.defaults.entries.ErrorEntry` to a
+        wire-ready dict whose keys match the transport interface field names
+        (``VBASEErrorFeed``).
+        """
+        return {
+            'error_code': int(entry.code or 0),
+            'module_id': str(entry.module_id) if entry.module_id else '',
+            'description': str(entry.description or ''),
+            'solution': str(entry.solution or ''),
+            'miscellaneous': str(entry.miscellaneous or ''),
+            'timestamp': entry.timestamp or datetime.now(),
+        }
 
     def build_errorfeed(self, errorDict: dict) -> ErrorEntry:
         """

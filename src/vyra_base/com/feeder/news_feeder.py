@@ -78,16 +78,17 @@ class NewsFeeder(BaseFeeder):
         """
         Feed a news entry to the feeder.
 
-        The content can either be a string which will be processed into a NewsEntry,
-        or a NewsEntry object itself. Use the method ``build_newsfeed`` to create a
-        NewsEntry from a string or list.
+        Normalises the input to a :class:`~vyra_base.defaults.entries.NewsEntry`,
+        then delegates to :meth:`~BaseFeeder.feed` which calls
+        :meth:`_prepare_entry_for_publish` followed by
+        :class:`~vyra_base.com.feeder.message_mapper.MessageMapper` for
+        protocol-aware conversion.
 
         :param newsElement: The news entry to be fed. Can be a string or list of strings
             to be processed into a NewsEntry, or a NewsEntry object.
         :type newsElement: Union[NewsEntry, str, list]
         :raises FeederException: If the type of newsElement is not supported.
         """
-
         if isinstance(newsElement, str) or isinstance(newsElement, list):
             newsfeed_entry = self.build_newsfeed(newsElement)
         elif isinstance(newsElement, NewsEntry):
@@ -95,23 +96,30 @@ class NewsFeeder(BaseFeeder):
         else:
             raise FeederException(f"Wrong Type. Expect: NewsEntry, got {type(newsElement)}")
 
-        # Convert to ROS2 types only if ROS2 available
-        if self._ros2_available and Ros2TypeConverter:
-            newsfeed_entry.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
-                    newsfeed_entry.timestamp if newsfeed_entry.timestamp else datetime.now()
-            )
-            
-            newsfeed_entry.uuid = Ros2TypeConverter.uuid_to_ros2uuid(
-                newsfeed_entry.uuid if newsfeed_entry.uuid else uuid.uuid4()
-            )
-        else:
-            # For non-ROS2 protocols, keep native Python types
-            if newsfeed_entry.timestamp is None:
-                newsfeed_entry.timestamp = datetime.now()
-            if newsfeed_entry.uuid is None:
-                newsfeed_entry.uuid = uuid.uuid4()
-
         super().feed(newsfeed_entry)
+
+    def _prepare_entry_for_publish(self, entry: NewsEntry) -> dict:  # type: ignore[override]
+        """
+        Convert a :class:`~vyra_base.defaults.entries.NewsEntry` to a
+        wire-ready dict whose keys match the transport interface field names
+        (``VBASENewsFeed``).
+        """
+        try:
+            level_name = (
+                NewsEntry.MESSAGE_LEVEL(entry.level).name
+                if isinstance(entry.level, int)
+                else str(entry.level)
+            )
+        except (ValueError, KeyError):
+            level_name = str(entry.level)
+
+        return {
+            'type': level_name,
+            'message': str(entry.message) if entry.message else '',
+            'timestamp': entry.timestamp if entry.timestamp else datetime.now(),
+            'module_id': str(entry.module_id) if entry.module_id else '',
+            'module_name': str(entry.module_name) if entry.module_name else '',
+        }
 
     def build_newsfeed(self, *args: Any) -> NewsEntry:
         """

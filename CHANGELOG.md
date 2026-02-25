@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.82] - 2026-02-25
+
+### Build
+
+update feeder structure to use interface files
+
+
 ## [0.1.8+build.80] - 2026-02-24
 
 ### Build

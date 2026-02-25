@@ -132,7 +132,7 @@ class VyraTransport(ABC):
         **kwargs
     ):
         # Extract known InterfaceMetadata parameters
-        metadata_params: Dict[str, str | ProtocolType | InterfaceType | Any] = {
+        metadata_params: Dict[str, Any] = {
             'name': name,
             'protocol': protocol,
             'interface_type': interface_type
@@ -206,6 +206,7 @@ class VyraPublisher(VyraTransport):
     - Redis: Pub/Sub Publisher
     - UDS: Datagram Socket Sender
     """
+    message_type: type
     
     def __init__(
         self,

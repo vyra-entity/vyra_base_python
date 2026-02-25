@@ -12,7 +12,7 @@ Interface config file schema (array of entries)::
 
     [
         {
-            "type":         "publisher",        # only these are relevant
+            "type":         "message",          # only "message" is relevant for feeders
             "functionname": "StateFeed",        # matched against feeder_name
             "tags":         ["zenoh"],          # → ProtocolType.ZENOH
             "filetype":     ["VBASEStateFeed.proto"],
@@ -144,7 +144,7 @@ class FeederConfigResolver:
             for entry in entries:
                 if not isinstance(entry, dict):
                     continue
-                if entry.get("type", "").lower() != "publisher":
+                if entry.get("type", "").lower() not in ("message"):
                     continue
 
                 func_name: str = entry.get("functionname", "")

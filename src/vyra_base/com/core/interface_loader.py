@@ -184,11 +184,11 @@ class InterfaceLoader:
                 logger.error("ROS2 not installed")
                 return None
 
-            if interface_type == "msg":
+            if interface_type == "msg" and get_message is not None:
                 interface_class = get_message(interface_path)
-            elif interface_type == "srv":
+            elif interface_type == "srv" and get_service is not None:
                 interface_class = get_service(interface_path)
-            elif interface_type == "action":
+            elif interface_type == "action" and get_action is not None:
                 interface_class = get_action(interface_path)
             else:
                 logger.error(
@@ -488,13 +488,7 @@ class InterfaceLoader:
         if 'package' in metadata:
             return metadata['package']
         
-        # Check interface name prefix for module-specific interfaces
-        # E.g., "V2MMGetModules" → v2_modulemanager_interfaces
-        # For now, default to vyra_module_template_interfaces for all VBASE* interfaces
-        if interface_name.startswith("VBASE"):
-            return "vyra_module_template_interfaces"
-        
-        # Try to infer from interface paths
+        # Try to infer from interface paths first (most reliable)
         for interface_path in self.interface_paths:
             # Path typically: .../share/<package_name>
             if "share" in interface_path.parts:

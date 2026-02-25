@@ -53,7 +53,13 @@ class VyraPublisherImpl(VyraPublisher):
                 node=self.node,
                 publisherInfo=publisher_info
             )
-            
+
+            # Registers the rclpy publisher on the ROS2 node.
+            # Without this call publisher_info.publisher remains None and every
+            # subsequent publish() raises "Publisher must be created before
+            # publishing messages."
+            self._ros2_publisher.create_publisher()
+
             self._transport_handle = self._ros2_publisher
             self._initialized = True
             

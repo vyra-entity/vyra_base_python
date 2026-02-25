@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from vyra_base.com.handler.interfaces import IFeederHandler
-
+from vyra_base.com.core.types import VyraPublisher
 
 class CommunicationHandler(IFeederHandler):
     """
@@ -26,16 +26,20 @@ class CommunicationHandler(IFeederHandler):
 
     FILL_AT_LOADING: bool = True
 
-    def __init__(self, initiator: str = '', publisher=None, type=None):
+    def __init__(
+        self, 
+        initiator: str = '', 
+        publisher: VyraPublisher = None, 
+        type: type = None):
         """
         Initialise the CommunicationHandler.
 
         :param initiator: Optional initiator string (used in log messages).
         :type initiator: str
         :param publisher: Optional pre-created publisher object.
-        :type publisher: object, optional
+        :type publisher: VyraPublisher, optional
         :param type: Optional message-type information.
-        :type type: object, optional
+        :type type: type, optional
         """
         super().__init__()
 

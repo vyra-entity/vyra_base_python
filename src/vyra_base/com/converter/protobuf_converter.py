@@ -7,7 +7,7 @@ import logging
 from typing import Any, Optional, Type, Dict
 import json
 
-from vyra_base.com.converters.interface import ConverterInterface
+from vyra_base.com.converter.interface import ConverterInterface
 
 logger = logging.getLogger(__name__)
 

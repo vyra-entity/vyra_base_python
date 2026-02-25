@@ -8,7 +8,10 @@ from re import DEBUG
 from typing import Any, Callable, Union
 from uuid import UUID
 
-from rclpy.qos import QoSProfile
+try:
+    from rclpy.qos import QoSProfile
+except ImportError:  # ROS2 not installed (e.g. dashboard-only containers)
+    QoSProfile = int  # type: ignore[assignment,misc]  # placeholder for type hints
 from vyra_base.helper.error_handler import ErrorTraceback
 
 

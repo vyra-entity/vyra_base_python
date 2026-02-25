@@ -97,19 +97,30 @@ class StateFeeder(BaseFeeder):
         
     def feed(self, stateElement: StateEntry) -> None:
         """
-        Adds value to the logger and the remote handler.
+        Feed a state entry to the feeder.
+
+        Validates the input type, then delegates to :meth:`~BaseFeeder.feed`
+        which calls :meth:`_prepare_entry_for_publish` followed by
+        :class:`~vyra_base.com.feeder.message_mapper.MessageMapper` for
+        protocol-aware conversion.
 
         :param stateElement: The state entry to feed.
         :type stateElement: StateEntry
-
         :raises FeederException: If the provided element is not of type StateEntry.
         """
-        if isinstance(stateElement, StateEntry):
-            # Convert to ROS2 types only if ROS2 available
-            if self._ros2_available and Ros2TypeConverter:
-                stateElement.timestamp = Ros2TypeConverter.time_to_ros2buildintime(
-                    stateElement.timestamp)
-            # For non-ROS2, timestamp stays as datetime
-            super().feed(stateElement)
-        else:
+        if not isinstance(stateElement, StateEntry):
             raise FeederException(f"Wrong Type. Expect: StateEntry, got {type(stateElement)}")
+        super().feed(stateElement)
+
+    def _prepare_entry_for_publish(self, entry: StateEntry) -> dict:  # type: ignore[override]
+        """
+        Convert a :class:`~vyra_base.defaults.entries.StateEntry` to a
+        wire-ready dict whose keys match the transport interface field names
+        (``VBASEStateFeed``).
+        """
+        from datetime import datetime as _dt
+        return {
+            'previous': str(entry.previous) if entry.previous else '',
+            'current': str(entry.current) if entry.current else '',
+            'timestamp': entry.timestamp if entry.timestamp else _dt.now(),
+        }

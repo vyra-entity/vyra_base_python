@@ -30,6 +30,8 @@ from vyra_base.helper.logging_config import VyraLoggingConfig
 from vyra_base.com.feeder.config_resolver import FeederConfigResolver
 from vyra_base.com.core.types import ProtocolType as PT
 from vyra_base.com.core.types import VyraPublisher
+from vyra_base.com.core.interface_loader import InterfaceLoader
+from vyra_base.com.feeder.message_mapper import MessageMapper
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +86,8 @@ class BaseFeeder(IFeeder):
         self._loggingOn: bool = False
         self._node: Optional[Any] = None
         self._type: Any = None
+        # Resolved message/interface type (loaded from InterfaceLoader or set from self._type)
+        self._msg_type: Optional[Any] = None
         self._publisher: Optional[VyraPublisher] = None
         self._feedbuffer: deque = deque(maxlen=20)
 
@@ -255,6 +259,9 @@ class BaseFeeder(IFeeder):
                 f"Install ROS2, Zenoh, or Redis."
             )
 
+        # Auto-load interface type via InterfaceLoader (after protocol is known)
+        self._msg_type = await self._load_msg_type()
+
         self.create_feeder()
 
         # Attach ROS2 handlers only for ROS2-backed publishers (legacy support)
@@ -266,7 +273,7 @@ class BaseFeeder(IFeeder):
                 handler = handler_class(
                     initiator=self._feederName,
                     publisher=self._publisher,
-                    type=self._publisher.publisher_server.publisher_info.type
+                    type=self._publisher.message_type
                 )
                 self.add_handler(handler)
         else:
@@ -276,6 +283,75 @@ class BaseFeeder(IFeeder):
         # Flush buffered messages
         self._is_ready = True
         await self._flush_buffer()
+
+    # ------------------------------------------------------------------
+    # Interface type loading
+    # ------------------------------------------------------------------
+
+    async def _load_msg_type(self) -> Optional[Any]:
+        """
+        Resolve the transport message type for this feeder.
+
+        Priority:
+        1. Use :class:`~vyra_base.com.core.interface_loader.InterfaceLoader`
+           to look up the interface for ``self._feederName`` with the
+           resolved protocol.
+        2. Fall back to ``self._type`` (explicit type passed in ``__init__``).
+
+        Returns:
+            ROS2 message class, proto ``*_pb2`` module, or ``None``.
+        """
+        protocol = self._resolved_protocol or ""
+
+        # Try InterfaceLoader first
+        if self._interface_paths or self._feederName:
+            try:
+                
+                loader = InterfaceLoader(
+                    interface_paths=[Path(p) for p in self._interface_paths]
+                    if self._interface_paths else None
+                )
+                loaded = loader.get_interface_for_function(
+                    self._feederName, protocol=protocol
+                )
+                if loaded is not None:
+                    logger.info(
+                        f"✅ InterfaceLoader resolved msg type for '{self._feederName}' "
+                        f"via protocol '{protocol}': {loaded}"
+                    )
+                    return loaded
+            except Exception as exc:
+                logger.debug(
+                    f"⚠️ InterfaceLoader failed for '{self._feederName}': {exc}"
+                )
+
+        # Fallback: use explicit type from __init__
+        if self._type is not None:
+            logger.debug(
+                f"Using explicit _type for '{self._feederName}': {self._type}"
+            )
+        return self._type
+
+    # ------------------------------------------------------------------
+    # Conversion hook (overridden by concrete feeders)
+    # ------------------------------------------------------------------
+
+    def _prepare_entry_for_publish(self, entry: Any) -> Any:
+        """
+        Convert a Python entry object to a wire-ready dict (or pass through).
+
+        Concrete feeders override this to apply feeder-specific field
+        name mappings and value transformations.  The returned value is
+        then further converted by :class:`~vyra_base.com.feeder.message_mapper.MessageMapper`
+        into the protocol-native message type inside :meth:`_publish`.
+
+        The default implementation returns *entry* unchanged.
+        """
+        return entry
+
+    # ------------------------------------------------------------------
+    # Buffer flush
+    # ------------------------------------------------------------------
 
     async def _flush_buffer(self) -> None:
         """Publish all messages that arrived before :meth:`start`."""
@@ -339,16 +415,39 @@ class BaseFeeder(IFeeder):
             self._error_count += 1
 
     async def _publish(self, msg: Any) -> None:
-        """Internal coroutine — publish with retry and metrics tracking."""
+        """
+        Internal coroutine — convert entry, then publish with retry.
+
+        Conversion order:
+        1. ``_prepare_entry_for_publish(msg)``  — feeder-specific field mapping
+        2. :meth:`~vyra_base.com.feeder.message_mapper.MessageMapper.to_transport_msg`
+           — route to ROS2 / Protobuf / passthrough based on resolved protocol
+        """
         last_exc: Optional[Exception] = None
-        
+
         if not self._publisher:
             raise FeederException(f"No publisher available for {self._feederName}")
-        
+
+        # Step 1: feeder-specific pre-processing
+        wire_data = self._prepare_entry_for_publish(msg)
+
+        # Step 2: convert to transport-native message
+        try:
+            transport_msg = MessageMapper.to_transport_msg(
+                wire_data if isinstance(wire_data, dict) else wire_data,
+                protocol=self._resolved_protocol or "",
+                msg_type=self._msg_type,
+            )
+        except Exception as exc:
+            logger.debug(
+                f"⚠️ MessageMapper conversion skipped for '{self._feederName}': {exc}"
+            )
+            transport_msg = wire_data
+
         for attempt in range(1, self._max_retries + 1):
             try:
                 if hasattr(self._publisher, 'publish'):
-                    await self._publisher.publish(msg)
+                    await self._publisher.publish(transport_msg)
                 else:
                     raise FeederException(
                         f"Publisher has no publish() method: {type(self._publisher)}"
