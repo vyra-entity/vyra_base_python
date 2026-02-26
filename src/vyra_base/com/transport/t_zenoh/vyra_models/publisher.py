@@ -40,7 +40,7 @@ class VyraPublisherImpl(VyraPublisher):
     async def initialize(self) -> bool:
         """Initialize Zenoh publisher."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             # Declare Zenoh publisher directly from session
             

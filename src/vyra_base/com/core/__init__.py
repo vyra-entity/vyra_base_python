@@ -38,7 +38,8 @@ from vyra_base.com.core.types import (
     VyraServer,
     VyraClient,
     VyraActionServer,
-    VyraActionClient
+    VyraActionClient,
+    GoalHandle,
 )
 
 from vyra_base.com.core.factory import InterfaceFactory
@@ -134,6 +135,7 @@ __all__ = [
     "VyraClient",
     "VyraActionServer",
     "VyraActionClient",
+    "GoalHandle",
     # Blueprints
     "HandlerBlueprint",
     "ServiceBlueprint",

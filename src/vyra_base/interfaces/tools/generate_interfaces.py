@@ -23,45 +23,92 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Type mapping: Python/JSON types → ROS2 types
-TYPE_MAP = {
-    # Basic types
-    "bool": "bool",
-    "boolean": "bool",
-    "int": "int32",
-    "int8": "int8",
-    "int16": "int16",
-    "int32": "int32",
-    "int64": "int64",
-    "uint": "uint32",
-    "uint8": "uint8",
-    "uint16": "uint16",
-    "uint32": "uint32",
-    "uint64": "uint64",
-    "float": "float32",
-    "float32": "float32",
-    "float64": "float64",
-    "double": "float64",
-    "str": "string",
-    "string": "string",
-    "datetime": "builtin_interfaces/Time",
-    "time": "builtin_interfaces/Time",
-    "duration": "builtin_interfaces/Duration",
-    # Array indicators (will be processed separately)
-    "string[]": "string",
-    "int[]": "int32",
-    "int32[]": "int32",
-    "float[]": "float32",
-    "bool[]": "bool",
+def _load_type_definitions() -> dict:
+    """
+    Load the VYRA type definitions from ``assets/schemas/type_definitions.json``.
+
+    This file is the *single source of truth* for all type mappings used across
+    the codebase.  The function resolves the path relative to this file so it
+    works both in the source tree and after ``pip install``.
+
+    Returns a fallback hardcoded dict when the JSON file cannot be found or
+    parsed, ensuring the generator remains functional in minimal environments.
+    """
+    _schema_dir = Path(__file__).parent.parent.parent / "assets" / "schemas"
+    _path = _schema_dir / "type_definitions.json"
+    if _path.exists():
+        try:
+            with open(_path, "r", encoding="utf-8") as _fh:
+                return json.load(_fh)
+        except Exception as _exc:  # pragma: no cover
+            logger.warning(
+                "Could not load type_definitions.json from %s: %s "
+                "– falling back to hardcoded defaults.",
+                _path,
+                _exc,
+            )
+    else:
+        logger.warning(
+            "type_definitions.json not found at %s "
+            "– falling back to hardcoded defaults.",
+            _path,
+        )
+    # ── Fallback ─────────────────────────────────────────────────────────────
+    return {
+        "ros2_map": {
+            "bool": "bool", "boolean": "bool", "int": "int32",
+            "int8": "int8", "int16": "int16", "int32": "int32", "int64": "int64",
+            "uint": "uint32", "uint8": "uint8", "uint16": "uint16",
+            "uint32": "uint32", "uint64": "uint64",
+            "float": "float32", "float32": "float32", "float64": "float64",
+            "double": "float64", "str": "string", "string": "string",
+            "datetime": "builtin_interfaces/Time", "time": "builtin_interfaces/Time",
+            "duration": "builtin_interfaces/Duration",
+            "string[]": "string", "int[]": "int32", "int32[]": "int32",
+            "float[]": "float32", "bool[]": "bool",
+        },
+        "proto_map": {
+            "bool": "bool", "boolean": "bool",
+            "int8": "int32", "uint8": "uint32", "int16": "int32", "uint16": "uint32",
+            "int32": "int32", "int64": "int64", "uint32": "uint32", "uint64": "uint64",
+            "float": "float", "float32": "float", "float64": "double",
+            "double": "double", "str": "string", "string": "string",
+            "datetime": "int64", "time": "int64", "duration": "int64",
+        },
+        "valid_ros2_native_types": {
+            "types": [
+                "bool", "byte", "char",
+                "int8", "uint8", "int16", "uint16", "int32", "uint32",
+                "int64", "uint64", "float32", "float64", "string",
+            ]
+        },
+    }
+
+
+_TYPE_DEFS: Dict[str, Any] = _load_type_definitions()
+
+# Type mapping: JSON/Python type name → ROS2 IDL type.
+# Source of truth: assets/schemas/type_definitions.json (ros2_map).
+# Keys beginning with '_' are metadata comments and are excluded.
+TYPE_MAP: Dict[str, str] = {
+    k: v
+    for k, v in _TYPE_DEFS.get("ros2_map", {}).items()
+    if not k.startswith("_")
 }
 
-# Valid ROS2 base types
-VALID_ROS2_TYPES = {
-    "bool", "byte", "char",
-    "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64",
-    "float32", "float64",
-    "string",
+# Proto type map: JSON/Python type name → Protobuf scalar type.
+# Source of truth: assets/schemas/type_definitions.json (proto_map).
+_PROTO_MAP: Dict[str, str] = {
+    k: v
+    for k, v in _TYPE_DEFS.get("proto_map", {}).items()
+    if not k.startswith("_")
 }
+
+# Valid ROS2 IDL primitive types accepted verbatim (no mapping needed).
+# Source of truth: assets/schemas/type_definitions.json (valid_ros2_native_types.types).
+VALID_ROS2_TYPES: Set[str] = set(
+    _TYPE_DEFS.get("valid_ros2_native_types", {}).get("types", []) or []
+)
 
 
 def to_ros2_class_name(functionname: str) -> str:
@@ -472,40 +519,22 @@ class InterfaceGenerator:
         return "\n".join(lines)
         
     def _map_to_proto_type(self, datatype: str) -> str:
-        """Map Python/ROS2 type to Protobuf type."""
-        # Remove array suffix for mapping
+        """
+        Map a JSON/Python type name to its Protobuf scalar type.
+
+        Uses the ``proto_map`` from ``assets/schemas/type_definitions.json``
+        (loaded at module level as :data:`_PROTO_MAP`) so the mapping stays in
+        sync with the rest of the type system without duplicating it here.
+        """
         base_type = datatype.rstrip("[]")
-        
-        proto_map = {
-            "bool": "bool",
-            "boolean": "bool",
-            "int8": "int32",
-            "uint8": "uint32",
-            "int16": "int32",
-            "uint16": "uint32",
-            "int32": "int32",
-            "uint32": "uint32",
-            "int64": "int64",
-            "uint64": "uint64",
-            "float": "float",
-            "float32": "float",
-            "float64": "double",
-            "double": "double",
-            "str": "string",
-            "string": "string",
-            "datetime": "int64",  # Unix timestamp in nanoseconds
-            "time": "int64",
-            "duration": "int64",
-        }
-        
-        if base_type in proto_map:
-            return proto_map[base_type]
-        
-        # For complex types like builtin_interfaces/Time, use int64 as fallback
+
+        if base_type in _PROTO_MAP:
+            return _PROTO_MAP[base_type]
+
+        # Complex types like builtin_interfaces/Time → int64 (Unix ns)
         if "/" in base_type:
             return "int64"  # Simplified for cross-transport compatibility
-            
-        # Default to string
+
         return "string"
         
     def generate_srv(self, metadata: Dict[str, Any]) -> Optional[str]:

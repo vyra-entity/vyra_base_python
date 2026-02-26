@@ -23,9 +23,12 @@ class RedisActionClientImpl(VyraActionClient):
     Redis-based action client with state tracking.
     
     Architecture:
-    - Publishes goals to action:{name}:goal channel
-    - Subscribes to action:{name}:{goal_id}:updates for feedback/result
-    - Reads action:{name}:{goal_id}:feedback and :result keys
+    - Publishes goals to ``{fn}/goal`` channel
+    - Subscribes to ``{fn}/{goal_id}/updates`` for feedback/result
+    - Reads ``{fn}/{goal_id}/feedback`` and ``{fn}/{goal_id}/result`` keys
+    
+    All keys are built via :py:meth:`_action_channel` following VYRA naming
+    conventions.
     """
     
     def __init__(
@@ -56,8 +59,10 @@ class RedisActionClientImpl(VyraActionClient):
     async def initialize(self) -> bool:
         """Initialize Redis action client."""
         try:
-            action_name = self.topic_builder.build(self.name)
+            action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._action_name = action_name
+            self._key_goal = self._action_channel("goal")
+            self._key_cancel = self._action_channel("cancel")
             logger.info(f"✅ RedisActionClient initialized: {action_name}")
             return True
             
@@ -82,7 +87,7 @@ class RedisActionClientImpl(VyraActionClient):
             
             # Create response future
             self._goal_response_future = asyncio.Future()
-            response_channel = f"action:{self._action_name}:response:{self._client_id}"
+            response_channel = self._action_channel(f"response/{self._client_id}")
             
             # Subscribe to this specific response (for goal acceptance)
             if not self._redis:
@@ -129,7 +134,7 @@ class RedisActionClientImpl(VyraActionClient):
                 'goal': goal_data,
                 'response_channel': response_channel
             })
-            await self._redis.publish_message(f"action:{self._action_name}:goal", goal_msg)
+            await self._redis.publish_message(self._key_goal, goal_msg)
             
             # Wait for acceptance
             try:
@@ -166,10 +171,10 @@ class RedisActionClientImpl(VyraActionClient):
         
         try:
             # Use RedisClient's subscribe_channel method
-            await self._redis.subscribe_channel(f"action:{self._action_name}:{goal_id}:updates")
+            await self._redis.subscribe_channel(self._action_channel(f"{goal_id}/updates"))
             
             await self._redis.create_pubsub_listener(
-                f"action:{self._action_name}:{goal_id}:updates",
+                self._action_channel(f"{goal_id}/updates"),
                 self._listen_updates,
                 callback_context={'goal_id': goal_id}
             )
@@ -222,7 +227,7 @@ class RedisActionClientImpl(VyraActionClient):
         try:
             # Create response future
             response_future = asyncio.Future()
-            response_channel = f"action:{self._action_name}:cancel_response:{self._client_id}"
+            response_channel = self._action_channel(f"cancel_response/{self._client_id}")
             
             if not self._redis:
                 raise InterfaceError("Redis client not initialized")
@@ -248,7 +253,7 @@ class RedisActionClientImpl(VyraActionClient):
             })
 
             await self._redis.create_pubsub_listener(
-                f"action:{self._action_name}:cancel", 
+                self._key_cancel,
                 wait_cancel_response,
                 cancel_msg
             )

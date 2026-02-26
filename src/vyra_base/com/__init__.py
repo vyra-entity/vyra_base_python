@@ -67,6 +67,7 @@ from vyra_base.com.core import (
     IServiceHandler,
     IActionHandler,
     IGoalHandle,
+    GoalHandle,
     # Factory
     InterfaceFactory,
     # Decorators
@@ -246,6 +247,7 @@ __all__ = [
     "IServiceHandler",
     "IActionHandler",
     "IGoalHandle",
+    "GoalHandle",
     # ------------------------------------------------------------------
     # Factory
     # ------------------------------------------------------------------

@@ -8,12 +8,14 @@ Supports dynamic interface loading for ROS2 (.srv/.msg/.action) and
 Protocol Buffer (*_pb2.py) interfaces.
 
 Naming Convention:
-    <module_name>_<module_id>/<function_name>{/<optional_subaction>}
+    <module_name>_<module_id>[/<namespace>]/<function_name>[/<subsection>]
 
 Examples:
     - v2_modulemanager_abc123/get_modules
+    - v2_modulemanager_abc123/feeder/NewsFeed
+    - v2_modulemanager_abc123/{your_domain}/run_task
+    - v2_modulemanager_abc123/{your_domain}/run_task/cancel
     - v2_dashboard_xyz789/set_config/theme
-    - sensor_node_def456/data/temperature
 """
 from __future__ import annotations
 
@@ -41,16 +43,26 @@ class InterfaceType(Enum):
 
 @dataclass
 class TopicComponents:
-    """Components of a topic name."""
+    """Components of a parsed topic name.
+
+    Represents the structured parts of a VYRA topic path:
+    ``{module_name}_{module_id}[/{namespace}]/{function_name}[/{subsection}]``
+    """
     module_name: str
     module_id: str
     function_name: str
-    subaction: Optional[str] = None
-    
+    namespace: Optional[str] = None
+    subsection: Optional[str] = None
+
     def __str__(self) -> str:
-        """String representation of topic components."""
-        return f"{self.module_name}_{self.module_id}/{self.function_name}" + \
-               (f"/{self.subaction}" if self.subaction else "")
+        """Reconstruct the full topic path string from components."""
+        path = f"{self.module_name}_{self.module_id}"
+        if self.namespace:
+            path += f"/{self.namespace}"
+        path += f"/{self.function_name}"
+        if self.subsection:
+            path += f"/{self.subsection}"
+        return path
 
 
 class TopicBuilder:
@@ -60,31 +72,41 @@ class TopicBuilder:
     Features:
         - Validates module names and IDs
         - Ensures naming consistency
-        - Supports optional subactions
+        - Supports optional namespace and subsection path levels
         - Protocol-agnostic design
     
+    Topic path structure::
+
+        {module_name}_{module_id}[/{namespace}]/{function_name}[/{subsection}]
+
     Examples:
         >>> builder = TopicBuilder("v2_modulemanager", "abc123")
         >>> builder.build("get_modules")
         'v2_modulemanager_abc123/get_modules'
+
+        >>> builder.build("NewsFeed", namespace="feeder")
+        'v2_modulemanager_abc123/feeder/NewsFeed'
         
-        >>> builder.build("set_config", subaction="theme")
-        'v2_modulemanager_abc123/set_config/theme'
-        
-        >>> builder.build_with_prefix("state", function_name="update")
-        'v2_modulemanager_abc123/state/update'
+        >>> builder.build("run_task", namespace="action", subsection="cancel")
+        'v2_modulemanager_abc123/action/run_task/cancel'
+
+        >>> # Instance-level default namespace (applied to every build() call)
+        >>> feeder_builder = TopicBuilder("v2_modulemanager", "abc123", namespace="feeder")
+        >>> feeder_builder.build("NewsFeed")
+        'v2_modulemanager_abc123/feeder/NewsFeed'
     """
     
     # Validation patterns
     MODULE_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
     MODULE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
     FUNCTION_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9_]+$")
-    SUBACTION_PATTERN = re.compile(r"^[a-zA-Z0-9_/]+$")
+    SUBSECTION_PATTERN = re.compile(r"^[a-zA-Z0-9_/\-]+$")
     
     def __init__(
         self, 
         module_name: str, 
         module_id: str,
+        namespace: Optional[str] = None,
         interface_paths: Optional[list[str | Path]] = None,
         enable_interface_loading: bool = True
     ):
@@ -94,6 +116,11 @@ class TopicBuilder:
         Args:
             module_name: Name of the module (e.g., "v2_modulemanager")
             module_id: Unique module instance ID (e.g., "abc123" or full hash)
+            namespace: Optional default namespace segment applied to every
+                ``build()`` call that does not supply an explicit ``namespace``
+                argument.  For example, pass ``namespace="feeder"`` when
+                creating a ``TopicBuilder`` for a feeder publisher so that all
+                feeder topics are automatically scoped under ``feeder/``.
             interface_paths: Optional list of interface base paths.
                 If None, uses InterfacePathRegistry defaults.
             enable_interface_loading: Enable dynamic interface loading.
@@ -117,6 +144,7 @@ class TopicBuilder:
         self.module_name = module_name
         self.module_id = module_id
         self._module_prefix = f"{module_name}_{module_id}"
+        self._default_namespace: Optional[str] = namespace
         
         # Initialize interface loader if enabled
         self._interface_loader: Optional[InterfaceLoader] = None
@@ -133,6 +161,7 @@ class TopicBuilder:
         logger.debug(
             f"TopicBuilder initialized: {self._module_prefix} "
             f"(interface_loading={'enabled' if self._interface_loader else 'disabled'})"
+            + (f", default_namespace='{namespace}'" if namespace else "")
         )
     
     @property
@@ -143,15 +172,25 @@ class TopicBuilder:
     def build(
         self,
         function_name: str,
-        subaction: Optional[str] = None,
+        namespace: Optional[str] = None,
+        subsection: Optional[str] = None,
         interface_type: Optional[InterfaceType] = None
     ) -> str:
         """
         Build a topic/service name.
+
+        Path: ``{module_name}_{module_id}[/{namespace}]/{function_name}[/{subsection}]``
+
+        If *namespace* is ``None`` the instance-level default namespace (set via
+        the constructor) is used.  Pass ``namespace=""`` to explicitly suppress
+        the instance default for a single call.
         
         Args:
             function_name: Name of the function/interface
-            subaction: Optional subaction or subcategory
+            namespace: Optional namespace segment (overrides instance default).
+                Omit or pass ``None`` to inherit the instance default.
+                Pass ``""`` to suppress the instance default for this call.
+            subsection: Optional trailing subsection segment
             interface_type: Type of interface (for logging/validation)
             
         Returns:
@@ -161,18 +200,32 @@ class TopicBuilder:
             >>> builder.build("get_modules")
             'v2_modulemanager_abc123/get_modules'
             
-            >>> builder.build("set_config", subaction="theme")
-            'v2_modulemanager_abc123/set_config/theme'
+            >>> builder.build("NewsFeed", namespace="feeder")
+            'v2_modulemanager_abc123/feeder/NewsFeed'
+
+            >>> builder.build("run_task", namespace="action", subsection="cancel")
+            'v2_modulemanager_abc123/action/run_task/cancel'
         """
         if not self.FUNCTION_NAME_PATTERN.match(function_name):
             raise ValueError(
                 f"Invalid function_name '{function_name}'. "
                 f"Must contain only alphanumeric characters and underscores."
             )
-        
-        if subaction and not self.SUBACTION_PATTERN.match(subaction):
+
+        # Resolve namespace: explicit arg > instance default; empty string suppresses default
+        resolved_ns: Optional[str] = namespace if namespace is not None else self._default_namespace
+        if resolved_ns == "":
+            resolved_ns = None
+
+        if resolved_ns and not self.FUNCTION_NAME_PATTERN.match(resolved_ns):
             raise ValueError(
-                f"Invalid subaction '{subaction}'. "
+                f"Invalid namespace '{resolved_ns}'. "
+                f"Must contain only alphanumeric characters and underscores."
+            )
+
+        if subsection and not self.SUBSECTION_PATTERN.match(subsection):
+            raise ValueError(
+                f"Invalid subsection '{subsection}'. "
                 f"Must contain only alphanumeric characters, underscores, and slashes."
             )
         
@@ -180,7 +233,8 @@ class TopicBuilder:
             module_name=self.module_name,
             module_id=self.module_id,
             function_name=function_name,
-            subaction=subaction
+            namespace=resolved_ns,
+            subsection=subsection,
         )
         
         topic_name = str(components)
@@ -193,67 +247,60 @@ class TopicBuilder:
         
         return topic_name
     
-    def build_with_prefix(
-        self,
-        prefix: str,
-        function_name: str,
-        subaction: Optional[str] = None,
-        interface_type: Optional[InterfaceType] = None
-    ) -> str:
-        """
-        Build a topic name with an additional prefix level.
+    # DEPRECATED
+    # def build_with_prefix(
+    #     self,
+    #     prefix: str,
+    #     function_name: str,
+    #     subsection: Optional[str] = None,
+    #     interface_type: Optional[InterfaceType] = None
+    # ) -> str:
+    #     """
+    #     Build a topic name with a namespace prefix level.
+
+    #     Deprecated convenience wrapper — prefer calling ``build()`` with the
+    #     explicit ``namespace=prefix`` keyword argument.  Kept for backward
+    #     compatibility.
         
-        Useful for categorizing interfaces (e.g., state/, data/, control/).
-        
-        Args:
-            prefix: Category prefix (becomes part of the path)
-            function_name: Name of the function/interface
-            subaction: Optional subaction
-            interface_type: Type of interface (for logging/validation)
+    #     Args:
+    #         prefix: Namespace / category prefix (e.g. ``"state"``, ``"data"``)
+    #         function_name: Name of the function/interface
+    #         subaction: Deprecated alias for *subsection*. Ignored when
+    #             *subsection* is also provided.
+    #         subsection: Optional trailing subsection segment
+    #         interface_type: Type of interface (for logging/validation)
             
-        Returns:
-            Complete topic name with prefix
+    #     Returns:
+    #         Complete topic name with prefix as namespace
             
-        Examples:
-            >>> builder.build_with_prefix("state", "update")
-            'v2_modulemanager_abc123/state/update'
-            
-            >>> builder.build_with_prefix("data", "temperature", subaction="celsius")
-            'v2_modulemanager_abc123/data/temperature/celsius'
-        """
-        if not self.FUNCTION_NAME_PATTERN.match(prefix):
-            raise ValueError(
-                f"Invalid prefix '{prefix}'. "
-                f"Must contain only alphanumeric characters and underscores."
-            )
-        
-        if not self.FUNCTION_NAME_PATTERN.match(function_name):
-            raise ValueError(
-                f"Invalid function_name '{function_name}'. "
-                f"Must contain only alphanumeric characters and underscores."
-            )
-        
-        # Build the complete path directly
-        topic = f"{self._module_prefix}/{prefix}/{function_name}"
-        if subaction:
-            if not self.SUBACTION_PATTERN.match(subaction):
-                raise ValueError(
-                    f"Invalid subaction '{subaction}'. "
-                    f"Must contain only alphanumeric characters, underscores, and slashes."
-                )
-            topic = f"{topic}/{subaction}"
-        
-        if interface_type:
-            logger.debug(
-                f"Built {interface_type.value} topic with prefix: {topic} "
-                f"(module: {self.module_prefix})"
-            )
-        
-        return topic
+    #     Examples:
+    #         >>> builder.build_with_prefix("state", "update")
+    #         'v2_modulemanager_abc123/state/update'
+    #     """
+    #     _subsection = subsection if subsection is not None else subaction
+    #     return self.build(
+    #         function_name=function_name,
+    #         namespace=prefix,
+    #         subsection=_subsection,
+    #         interface_type=interface_type,
+    #     )
     
     def parse(self, topic_name: str) -> TopicComponents:
         """
         Parse a topic name back into components.
+        
+        Understands both the 2-level path (``module/function``) and the
+        3-level path (``module/namespace/function`` or
+        ``module/function/subsection``) and the 4-level path
+        (``module/namespace/function/subsection``).
+
+        **Disambiguation rule for 2 remaining segments**:
+        the second segment is treated as ``subsection`` (not ``namespace``),
+        preserving backward compatibility with the previous ``subaction`` field.
+        To get a ``namespace``-only path (without subsection), use 3 segments:
+        build the topic with only ``namespace`` set.
+
+        Path: ``{module_name}_{module_id}[/{namespace}]/{function_name}[/{subsection}]``
         
         Args:
             topic_name: Complete topic name to parse
@@ -266,19 +313,26 @@ class TopicBuilder:
             
         Examples:
             >>> builder.parse("v2_modulemanager_abc123/get_modules")
-            TopicComponents(module_name='v2_modulemanager', module_id='abc123', 
-                          function_name='get_modules', subaction=None)
+            TopicComponents(module_name='v2_modulemanager', module_id='abc123',
+                            function_name='get_modules', namespace=None, subsection=None)
+
+            >>> builder.parse("v2_modulemanager_abc123/feeder/NewsFeed")
+            TopicComponents(module_name='v2_modulemanager', module_id='abc123',
+                            function_name='NewsFeed', namespace='feeder', subsection=None)
+
+            >>> builder.parse("v2_modulemanager_abc123/action/run_task/cancel")
+            TopicComponents(module_name='v2_modulemanager', module_id='abc123',
+                            function_name='run_task', namespace='action', subsection='cancel')
         """
-        # Expected format: <module_name>_<module_id>/<function_name>{/<subaction>}
-        parts = topic_name.split("/", 1)
-        
+        parts = topic_name.split("/")
+
         if len(parts) < 2:
             raise ValueError(
                 f"Invalid topic format '{topic_name}'. "
-                f"Expected format: <module_name>_<module_id>/<function_name>"
+                f"Expected at least: <module_name>_<module_id>/<function_name>"
             )
         
-        # Parse module prefix
+        # Parse module prefix (first segment)
         module_prefix = parts[0]
         if "_" not in module_prefix:
             raise ValueError(
@@ -286,7 +340,6 @@ class TopicBuilder:
                 f"Expected format: <module_name>_<module_id>"
             )
         
-        # Split module_name and module_id (last underscore is separator)
         module_parts = module_prefix.rsplit("_", 1)
         if len(module_parts) != 2:
             raise ValueError(
@@ -294,18 +347,39 @@ class TopicBuilder:
             )
         
         module_name, module_id = module_parts
-        
-        # Parse function and optional subaction
-        function_parts = parts[1].split("/", 1)
-        function_name = function_parts[0]
-        subaction = function_parts[1] if len(function_parts) > 1 else None
-        
-        return TopicComponents(
-            module_name=module_name,
-            module_id=module_id,
-            function_name=function_name,
-            subaction=subaction
-        )
+        remaining = parts[1:]  # everything after the module prefix
+
+        if len(remaining) == 1:
+            # module/function
+            return TopicComponents(
+                module_name=module_name, module_id=module_id,
+                function_name=remaining[0],
+            )
+        elif len(remaining) == 2:
+            # Backward-compatible: treat as module/function/subsection
+            # (same as the old subaction behaviour)
+            return TopicComponents(
+                module_name=module_name, module_id=module_id,
+                function_name=remaining[0],
+                subsection=remaining[1],
+            )
+        elif len(remaining) == 3:
+            # module/namespace/function/subsection would be 4 total,
+            # 3 remaining → namespace/function/subsection
+            return TopicComponents(
+                module_name=module_name, module_id=module_id,
+                namespace=remaining[0],
+                function_name=remaining[1],
+                subsection=remaining[2],
+            )
+        else:
+            # 4+ remaining: namespace/function/subsection[/…] — join excess into subsection
+            return TopicComponents(
+                module_name=module_name, module_id=module_id,
+                namespace=remaining[0],
+                function_name=remaining[1],
+                subsection="/".join(remaining[2:]),
+            )
     
     def validate(self, topic_name: str) -> bool:
         """
@@ -331,7 +405,8 @@ class TopicBuilder:
     def build_topic_name(
         self,
         function_name: str,
-        subaction: Optional[str] = None,
+        namespace: Optional[str] = None,
+        subsection: Optional[str] = None,
         interface_type: Optional[InterfaceType] = None
     ) -> str:
         """
@@ -342,7 +417,8 @@ class TopicBuilder:
         
         Args:
             function_name: Name of the function/interface
-            subaction: Optional subaction or subcategory
+            namespace: Optional namespace segment (overrides instance default)
+            subsection: Optional trailing subsection segment
             interface_type: Type of interface (for logging only)
             
         Returns:
@@ -352,7 +428,8 @@ class TopicBuilder:
             >>> builder.build_topic_name("get_modules")
             'v2_modulemanager_abc123/get_modules'
         """
-        return self.build(function_name, subaction, interface_type)
+        return self.build(function_name, namespace=namespace, subsection=subsection,
+                         interface_type=interface_type)
     
     def load_interface_type(
         self,
@@ -415,7 +492,8 @@ class TopicBuilder:
     def build_with_interface(
         self,
         function_name: str,
-        subaction: Optional[str] = None,
+        namespace: Optional[str] = None,
+        subsection: Optional[str] = None,
         interface_type: Optional[InterfaceType] = None,
         protocol: str = "ros2"
     ) -> tuple[str, Optional[Union[type, Any]]]:
@@ -454,7 +532,8 @@ class TopicBuilder:
         """
         # Build topic name
         topic_name = self.build_topic_name(
-            function_name, subaction, interface_type
+            function_name, namespace=namespace, subsection=subsection,
+            interface_type=interface_type
         )
         
         # Load interface type
@@ -496,18 +575,24 @@ class TopicBuilder:
         return {}
 
 
-def create_topic_builder(module_name: str, module_id: str) -> TopicBuilder:
+def create_topic_builder(
+    module_name: str,
+    module_id: str,
+    namespace: Optional[str] = None,
+) -> TopicBuilder:
     """
     Factory function to create a TopicBuilder instance.
     
     Args:
         module_name: Name of the module
         module_id: Unique module instance ID
+        namespace: Optional default namespace applied to every ``build()`` call
+            (e.g. ``"feeder"`` for feeder publishers).
         
     Returns:
         Configured TopicBuilder instance
     """
-    return TopicBuilder(module_name, module_id)
+    return TopicBuilder(module_name, module_id, namespace=namespace)
 
 
 # Convenience functions for quick topic building without creating a builder instance
@@ -515,7 +600,8 @@ def build_topic(
     module_name: str,
     module_id: str,
     function_name: str,
-    subaction: Optional[str] = None
+    namespace: Optional[str] = None,
+    subsection: Optional[str] = None,
 ) -> str:
     """
     Build a topic name without creating a builder instance.
@@ -526,13 +612,14 @@ def build_topic(
         module_name: Name of the module
         module_id: Unique module instance ID
         function_name: Name of the function/interface
-        subaction: Optional subaction
+        namespace: Optional namespace segment
+        subsection: Optional trailing subsection segment
         
     Returns:
         Complete topic name
     """
     builder = TopicBuilder(module_name, module_id)
-    return builder.build(function_name, subaction)
+    return builder.build(function_name, namespace=namespace, subsection=subsection)
 
 
 def parse_topic(topic_name: str) -> TopicComponents:

@@ -41,7 +41,7 @@ class VyraPublisherImpl(VyraPublisher):
     async def initialize(self) -> bool:
         """Initialize ROS2 publisher."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             publisher_info = PublisherInfo(
                 name=topic_name,

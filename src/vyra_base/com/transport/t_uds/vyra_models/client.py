@@ -14,6 +14,7 @@ from pathlib import Path
 from vyra_base.com.core.types import VyraClient, ProtocolType
 from vyra_base.com.core.topic_builder import InterfaceType, TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
+from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +39,13 @@ class VyraClientImpl(VyraClient):
         super().__init__(name, topic_builder, request_callback, ProtocolType.UDS, **kwargs)
         self.service_type = service_type
         self._module_name = module_name
-        self._socket_dir = Path("/tmp/vyra_sockets")
+        self._socket_dir = UDS_SOCKET_DIR
         self._server_socket_path = None  # Set in initialize()
         
     async def initialize(self) -> bool:
         """Initialize UDS client."""
         try:
-            service_name = self.topic_builder.build(self.name)
+            service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._server_socket_path = self._socket_dir / f"srv_{self._module_name}_{service_name}.sock"
             
             # Check if server socket exists

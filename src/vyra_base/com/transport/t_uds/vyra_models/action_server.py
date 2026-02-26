@@ -13,9 +13,10 @@ from typing import Optional, Any, Callable, Awaitable, Dict
 from pathlib import Path
 from enum import Enum
 
-from vyra_base.com.core.types import VyraActionServer, ProtocolType
+from vyra_base.com.core.types import VyraActionServer, ProtocolType, GoalHandle
 from vyra_base.com.core.topic_builder import InterfaceType, TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
+from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +36,9 @@ class VyraActionServerImpl(VyraActionServer):
     Unix Domain Socket action server using stream sockets.
     
     Pattern:
-    - Main socket: /tmp/vyra_sockets/act_{action}.sock
+    - Main socket: {VYRA_SOCKET_DIR}/{action}.sock
     - Receives: goal_request | cancel_request | feedback_subscribe
-    - Per Goal: Creates dedicated feedback socket at act_{action}_{goal_id}_feedback.sock
+    - Per Goal: Creates dedicated feedback socket at {module}_{action}_{goal_id}_feedback.sock
     """
     
     def __init__(
@@ -59,17 +60,20 @@ class VyraActionServerImpl(VyraActionServer):
         self._action_type = action_type
         self._module_name = module_name
         self._socket: Optional[socket.socket] = None
-        self._socket_dir = Path("/tmp/vyra_sockets")
+        self._socket_dir = UDS_SOCKET_DIR
         self._socket_path = None  # Set in initialize()
         self._server_task: Optional[asyncio.Task] = None
         self._active_goals: Dict[str, asyncio.Task] = {}  # goal_id -> execution_task
+        self._goal_handles: Dict[str, GoalHandle] = {}   # goal_id -> GoalHandle
         self._goal_states: Dict[str, GoalStatus] = {}  # goal_id -> status
         
     async def initialize(self) -> bool:
         """Initialize UDS action server."""
         try:
-            self.action_name = self.topic_builder.build(self.name)
-            self._socket_path = self._socket_dir / f"act_{self.action_name}.sock"
+            self.action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
+            # Sanitize for filesystem use (topic names may contain '/')
+            self._safe_name = self.action_name.replace("/", "_")
+            self._socket_path = self._socket_dir / f"{self._safe_name}.sock"
             
             # Create socket directory
             self._socket_dir.mkdir(parents=True, exist_ok=True)
@@ -190,7 +194,7 @@ class VyraActionServerImpl(VyraActionServer):
                 response = {
                     'goal_id': goal_id,
                     'accepted': True,
-                    'feedback_socket': str(self._socket_dir / f"act_{self._module_name}_{self.action_name}_{goal_id}_feedback.sock")
+                    'feedback_socket': str(self._socket_dir / f"{self._module_name}_{self._safe_name}_{goal_id}_feedback.sock")
                 }
             else:
                 response = {'goal_id': goal_id, 'accepted': False}
@@ -211,9 +215,14 @@ class VyraActionServerImpl(VyraActionServer):
             goal_id = message.get('goal_id')
             
             if goal_id in self._active_goals:
+                goal_handle = self._goal_handles.get(goal_id)
+                # Signal the executing coroutine that cancel was requested
+                if goal_handle:
+                    goal_handle.request_cancel()
                 # TODO: Call handle_cancel callback
                 if self.handle_cancel_request:
-                    canceled = await self.handle_cancel_request(goal_id)
+                    arg = goal_handle if goal_handle else goal_id
+                    canceled = await self.handle_cancel_request(arg)
                 else:
                     canceled = True
                 
@@ -271,9 +280,14 @@ class VyraActionServerImpl(VyraActionServer):
                 self._goal_states[goal_id] = GoalStatus.SUCCEEDED
                 return
             
-            # TODO: Create goal_handle with feedback method
-            # For now, just call execution_callback
-            result = await self.execution_callback(goal)
+            # Create GoalHandle so the execution_callback can publish feedback
+            goal_handle = GoalHandle(
+                goal_id=goal_id,
+                goal=goal,
+                feedback_fn=self.publish_feedback
+            )
+            self._goal_handles[goal_id] = goal_handle
+            result = await self.execution_callback(goal_handle)
             
             self._goal_states[goal_id] = GoalStatus.SUCCEEDED
             
@@ -287,6 +301,7 @@ class VyraActionServerImpl(VyraActionServer):
             self._goal_states[goal_id] = GoalStatus.ABORTED
         finally:
             self._active_goals.pop(goal_id, None)
+            self._goal_handles.pop(goal_id, None)
     
     async def publish_feedback(self, goal_id: str, feedback: Any):
         """
@@ -302,6 +317,7 @@ class VyraActionServerImpl(VyraActionServer):
         for task in self._active_goals.values():
             task.cancel()
         self._active_goals.clear()
+        self._goal_handles.clear()
         
         if self._server_task:
             self._server_task.cancel()

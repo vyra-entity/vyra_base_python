@@ -14,6 +14,7 @@ from pathlib import Path
 from vyra_base.com.core.types import VyraPublisher, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
+from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +42,14 @@ class VyraPublisherImpl(VyraPublisher):
         self.message_type = message_type
         self._module_name = module_name
         self._socket: Optional[socket.socket] = None
-        self._socket_dir = Path("/tmp/vyra_sockets")
+        self._socket_dir = UDS_SOCKET_DIR
         self._socket_path = None  # Set in initialize()
         self._subscribers = []  # List of subscriber socket paths
         
     async def initialize(self) -> bool:
         """Initialize UDS publisher."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._socket_path = self._socket_dir / f"pub_{self._module_name}_{topic_name}.sock"
             
             # TODO: Initialize UDS publisher socket

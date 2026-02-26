@@ -29,17 +29,20 @@ class ActionServerInfo:
         Name of the action server.
     type : Any
         Type of the action.
-    result_callback : Callable
-        Result callback function for the action.
-    feedback_callback : Callable
-        Feedback callback function for the action.
+    goal_callback : Callable
+        Called when a new goal arrives; returns GoalResponse.ACCEPT / REJECT.
+    cancel_callback : Callable
+        Called when a cancel request arrives; returns CancelResponse.ACCEPT / REJECT.
+    execute_callback : Callable
+        Called when a goal is executing; receives goal_handle.
     server : Union[ActionServer, None]
         The ActionServer instance or None.
     """
     name: str = 'vyra_action_server'
     type: Any = None
-    result_callback: Optional[Callable] = _base_callback
-    feedback_callback: Optional[Callable] = _base_callback
+    goal_callback: Optional[Callable] = _base_callback
+    cancel_callback: Optional[Callable] = None
+    execute_callback: Optional[Callable] = _base_callback
     server: Union[ActionServer, None] = None
 
 
@@ -75,12 +78,12 @@ class ROS2ActionServer:
             self._node,
             self._action.type,
             self._action.name,
-            execute_callback=self.feedback_callback,
-            goal_callback=self.goal_callback
-
+            execute_callback=self.execute_callback,
+            goal_callback=self.goal_callback,
+            cancel_callback=self.cancel_callback,
         )
 
-    def feedback_callback(self, goal_handle) -> None:
+    def execute_callback(self, goal_handle) -> None:
         """
         Execute the action callback.
 
@@ -93,8 +96,8 @@ class ROS2ActionServer:
         """
         self._node.get_logger().info(f"Executing action: {self._action.name}")
 
-        if self._action.feedback_callback:
-            self._action.feedback_callback(goal_handle)
+        if self._action.execute_callback:
+            self._action.execute_callback(goal_handle)
 
     def goal_callback(self, goal_handle) -> GoalResponse:
         """
@@ -110,9 +113,23 @@ class ROS2ActionServer:
         self._node.get_logger().info(f"Handling goal for action: {self._action.name}")
 
 
-        if self._action.result_callback:
-            return self._action.result_callback(goal_handle)
+        if self._action.goal_callback:
+            return self._action.goal_callback(goal_handle)
         return GoalResponse.REJECT
+
+    def cancel_callback(self, goal_handle) -> Any:
+        """Handle the cancel callback.
+
+        Returns CancelResponse.ACCEPT if the cancel request is accepted,
+        CancelResponse.REJECT otherwise.
+        """
+        from rclpy.action.server import CancelResponse
+        self._node.get_logger().info(f"Cancel request for action: {self._action.name}")
+
+        if self._action.cancel_callback:
+            return self._action.cancel_callback(goal_handle)
+        # Accept cancel by default if no custom handler is set
+        return CancelResponse.ACCEPT
     
     def destroy(self) -> None:
         """

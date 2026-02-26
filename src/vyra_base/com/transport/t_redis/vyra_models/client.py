@@ -47,7 +47,7 @@ class RedisClientImpl(VyraClient):
     async def initialize(self) -> bool:
         """Initialize Redis client."""
         try:
-            self.service_name = self.topic_builder.build(self.name)
+            self.service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._service_name = self.service_name
             self._response_channel = f"srv:{self.service_name}:response:{self._client_id}"
             

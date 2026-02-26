@@ -46,7 +46,7 @@ class RedisServerImpl(VyraServer):
     async def initialize(self) -> bool:
         """Initialize Redis server."""
         try:
-            service_name = self.topic_builder.build(self.name)
+            service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._service_name = service_name
             
             self._request_channel = f"srv:{service_name}:requests"

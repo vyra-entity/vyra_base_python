@@ -13,20 +13,8 @@ These interfaces define the contract for different communication patterns:
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
-
-class ActionStatus:
-    """
-    Action goal status values (imported from types for convenience).
-    Re-exported here for handler implementations.
-    """
-    UNKNOWN = 0
-    ACCEPTED = 1
-    EXECUTING = 2
-    CANCELING = 3
-    SUCCEEDED = 4
-    CANCELED = 5
-    ABORTED = 6
-
+# ActionStatus lives in vyra_base.com.core.types — import it from there:
+#   from vyra_base.com.core.types import ActionStatus
 
 class IGoalHandle(ABC):
     """
@@ -39,35 +27,24 @@ class IGoalHandle(ABC):
     """
     
     @abstractmethod
-    def publish_feedback(self, feedback: Dict[str, Any]) -> None:
-        """
-        Publish feedback about goal progress.
+    async def publish_feedback(self, feedback: Dict[str, Any]) -> None:
+        """Publish feedback about goal progress.
         
         Args:
             feedback: Dictionary with progress information
         
-        Example:
-            goal_handle.publish_feedback({
+        Example::
+        
+            await goal_handle.publish_feedback({
                 "progress": 50,
-                "total": 100,
-                "message": "Processing items..."
+                "message": "Processing..."
             })
         """
         pass
     
     @abstractmethod
     def is_cancel_requested(self) -> bool:
-        """
-        Check if cancellation has been requested.
-        
-        Returns:
-            bool: True if goal should be canceled
-        
-        Example:
-            if goal_handle.is_cancel_requested():
-                goal_handle.canceled()
-                return {"status": "canceled"}
-        """
+        """Check if cancellation has been requested."""
         pass
     
     @abstractmethod
@@ -219,14 +196,14 @@ class IActionHandler(ABC):
                         handle.canceled()
                         return {
                             "processed": i,
-                            "status": ActionStatus.CANCELED
+                            "status": "CANCELED"  # ActionStatus.CANCELED from vyra_base.com.core.types
                         }
                     
                     # Do work
                     await self.process_item(i)
                     
                     # Publish feedback
-                    handle.publish_feedback({
+                    await handle.publish_feedback({
                         "progress": i + 1,
                         "total": total,
                         "percent": (i + 1) / total * 100
@@ -236,7 +213,7 @@ class IActionHandler(ABC):
                 handle.succeed()
                 return {
                     "processed": total,
-                    "status": ActionStatus.SUCCEEDED
+                    "status": "SUCCEEDED"  # ActionStatus.SUCCEEDED from vyra_base.com.core.types
                 }
         """
         pass
@@ -270,5 +247,4 @@ __all__ = [
     'IServiceHandler',
     'IActionHandler',
     'IGoalHandle',
-    'ActionStatus',
 ]

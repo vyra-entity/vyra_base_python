@@ -25,12 +25,13 @@ class VyraActionClientImpl(VyraActionClient):
     Vyra-based action client implementation.
     
     Architecture:
-    - Query to "action/{name}/goal" for sending goals
-    - Subscriber to "action/{name}/{goal_id}/feedback" for feedback
-    - Subscriber to "action/{name}/{goal_id}/result" for result
-    - Query to "action/{name}/cancel" for canceling
+    - Query to ``{namespace}/{fn}/goal`` for sending goals
+    - Subscriber to ``{namespace}/{fn}/{goal_id}/feedback`` for feedback
+    - Subscriber to ``{namespace}/{fn}/{goal_id}/result`` for result
+    - Query to ``{namespace}/{fn}/cancel`` for canceling
     
-    TODO: Implement using session.get() + ZenohSubscriber combo.
+    Channel keys are built by :py:meth:`_action_channel` following the VYRA
+    topic naming convention.
     """
     
     def __init__(
@@ -56,12 +57,17 @@ class VyraActionClientImpl(VyraActionClient):
         self._result_subscriber = None
         self._serializer = ZenohSerializer()
         self._format = SerializationFormat.JSON
+        self._loop: Optional[asyncio.AbstractEventLoop] = None  # captured in initialize()
         
     async def initialize(self) -> bool:
         """Initialize Zenoh action client."""
         try:
-            action_name = self.topic_builder.build(self.name)
+            action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._action_name = action_name
+            self._key_goal = self._action_channel("goal")
+            self._key_cancel = self._action_channel("cancel")
+            # Capture running event loop so sync Zenoh callbacks can schedule coroutines
+            self._loop = asyncio.get_running_loop()
             # No persistent resources until goal is sent
             logger.info(f"✅ ZenohActionClient initialized: {action_name}")
             return True
@@ -82,7 +88,7 @@ class VyraActionClientImpl(VyraActionClient):
             
         TODO:
         1. Serialize goal
-        2. Query to "action/{name}/goal"
+        2. Query to ``self._key_goal`` (built via _action_channel)
         3. Parse response for goal_id
         4. Subscribe to feedback and result topics
         5. Call goal_response_callback if set
@@ -101,7 +107,7 @@ class VyraActionClientImpl(VyraActionClient):
                 if not self._zenoh_session:
                     raise InterfaceError("Zenoh session not initialized")
                 replies = self._zenoh_session.get(  # type: ignore[union-attr]
-                    f"action/{self._action_name}/goal",
+                    self._key_goal,
                     value=goal_bytes
                 )
                 for reply in replies:
@@ -154,7 +160,7 @@ class VyraActionClientImpl(VyraActionClient):
                     raise InterfaceError("Zenoh session not initialized")
                 
                 info = SubscriberInfo(
-                    key_expr=f"action/{self._action_name}/{goal_id}/feedback",
+                    key_expr=self._action_channel(f"{goal_id}/feedback"),
                     format=self._format
                 )
                 sub = self._zenoh_session.declare_subscriber(  # type: ignore[union-attr]
@@ -171,7 +177,7 @@ class VyraActionClientImpl(VyraActionClient):
                     raise InterfaceError("Zenoh session not initialized")
                 
                 info = SubscriberInfo(
-                    key_expr=f"action/{self._action_name}/{goal_id}/result",
+                    key_expr=self._action_channel(f"{goal_id}/result"),
                     format=self._format
                 )
                 sub = self._zenoh_session.declare_subscriber(  # type: ignore[union-attr]
@@ -186,20 +192,25 @@ class VyraActionClientImpl(VyraActionClient):
             logger.error(f"❌ Failed to subscribe to goal updates: {e}")
     
     def _handle_feedback_sync(self, sample: Any):
-        """Handle feedback (sync callback for Zenoh)."""
+        """Handle feedback (sync callback for Zenoh, runs in a Zenoh background thread)."""
         try:
             feedback = self._serializer.deserialize(sample.payload, format=self._format)
-            if self.feedback_callback:
-                asyncio.create_task(self.feedback_callback(feedback))
+            if self.feedback_callback and self._loop:
+                # run_coroutine_threadsafe is safe to call from any thread
+                asyncio.run_coroutine_threadsafe(
+                    self.feedback_callback(feedback), self._loop
+                )
         except Exception as e:
             logger.error(f"❌ Feedback handling failed: {e}")
     
     def _handle_result_sync(self, sample: Any):
-        """Handle result (sync callback for Zenoh)."""
+        """Handle result (sync callback for Zenoh, runs in a Zenoh background thread)."""
         try:
             result = self._serializer.deserialize(sample.payload, format=self._format)
-            if self.direct_response_callback:
-                asyncio.create_task(self.direct_response_callback(result))
+            if self.direct_response_callback and self._loop:
+                asyncio.run_coroutine_threadsafe(
+                    self.direct_response_callback(result), self._loop
+                )
         except Exception as e:
             logger.error(f"❌ Result handling failed: {e}")
     
@@ -217,7 +228,7 @@ class VyraActionClientImpl(VyraActionClient):
                 if not self._zenoh_session:
                     raise InterfaceError("Zenoh session not initialized")
                 replies = self._zenoh_session.get(  # type: ignore[union-attr]
-                    f"action/{self._action_name}/cancel",
+                    self._key_cancel,
                     value=cancel_bytes
                 )
                 for reply in replies:

@@ -16,8 +16,8 @@ from vyra_base.com.core.exceptions import TransportError, ConnectionError
 
 logger = logging.getLogger(__name__)
 
-# UDS socket directory
-UDS_SOCKET_DIR = Path("/tmp/vyra_sockets")
+# UDS socket directory — read from VYRA_SOCKET_DIR env var, fallback to /vyra/sockets
+UDS_SOCKET_DIR = Path(os.environ.get("VYRA_SOCKET_DIR", "/vyra/sockets"))
 
 # Message format: | Length (4B) | Data (variable) |
 MESSAGE_HEADER_FORMAT = '!I'

@@ -175,23 +175,60 @@ Configuration files are JSON arrays containing interface metadata objects.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `tags` | string[] | Transport protocols: `["ros2"]`, `["redis"]`, or `["ros2", "redis"]` |
-| `type` | string | Interface type: `"speaker"`, `"callable"`, or `"job"` |
-| `functionname` | string | Internal identifier (snake_case) |
-| `displayname` | string | Human-readable name |
+| `tags` | string[] | Transport protocols: `["ros2"]`, `["zenoh"]`, `["redis"]`, `["uds"]` or any combination |
+| `type` | string | Interface type: `"service"`, `"message"`, or `"action"` |
+| `functionname` | string | Unique machine-readable identifier, used as the function/topic name component. Pattern: `^[a-zA-Z][a-zA-Z0-9_]*$` |
+| `displayname` | string | Human-readable name for UI/documentation |
 | `description` | string | Purpose and behavior description |
-| `filetype` | string[] | List of interface files (e.g., `["File.srv", "File.proto"]`) |
 
 #### Optional Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `params` | object[] | Input parameters (for callables/jobs) |
+| `namespace` | string | Namespace segment inserted between module identifier and function name in the topic path: `{module}_{id}/{namespace}/{functionname}`. Pattern: `^[a-zA-Z][a-zA-Z0-9_]*$`. Feeder publishers automatically use `namespace: "feeder"`. |
+| `subsection` | string | Subsection appended after the function name: `{module}_{id}[/{namespace}]/{functionname}/{subsection}`. Pattern: `^[a-zA-Z][a-zA-Z0-9_]*$`. |
+| `filetype` | string[] | List of interface type file references generated from this config (e.g., `["MyService.srv", "MyMessage.proto"]`). Required for `type: "service"`. |
+| `params` | object[] | Input parameters (for services/actions) |
 | `returns` | object[] | Output/result fields |
-| `feedback` | object[] | Progress feedback fields (for jobs) |
-| `displaystyle` | object | UI presentation configuration |
-| `timeout` | number | Default timeout in seconds |
-| `security` | object | Access control settings |
+| `access_level` | integer | Minimum security level (1 = public, higher = restricted, default: 1) |
+| `displaystyle` | object | UI presentation configuration: `{ "visible": bool, "published": bool }` |
+| `qosprofile` | integer | Message queue depth for ROS2/Zenoh (default: 10) |
+
+#### Topic Path Structure
+
+The full topic path for an interface is assembled by `TopicBuilder`:
+
+```
+{module_name}_{module_id}[/{namespace}]/{functionname}[/{subsection}]
+```
+
+Examples:
+- `v2_modulemanager_abc123/get_interface_list` (no namespace/subsection)
+- `v2_modulemanager_abc123/feeder/NewsFeed` (namespace = `feeder`, used by all feeder publishers)
+- `v2_modulemanager_abc123/action/run_task/cancel` (namespace = `action`, subsection = `cancel`)
+
+#### Schema Validation
+
+All `*_meta.json` files are automatically validated against the JSON Schema at
+`assets/schemas/interface_config.json` during `setup_interfaces.py` execution
+(Step 2.5 in the build pipeline). Files that fail validation are:
+1. Excluded from interface generation with a `WARNING` log entry
+2. Temporarily renamed to `*.json.invalid` during generation
+3. Restored to their original name after generation completes
+
+This means schema-invalid files are never silently ignored at runtime — they
+are caught at build time with a clear warning message.
+
+To validate manually:
+```python
+import vyra_base
+
+valid, invalid = vyra_base.validate_config_schema(
+    list(Path("config").glob("*_meta.json"))
+)
+for bad_file, reason in invalid:
+    print(f"INVALID: {bad_file.name}\n  {reason}")
+```
 
 #### Parameter/Return Schema
 
@@ -327,6 +364,18 @@ python3 tools/setup_interfaces.py --ros2-only
 # Build only Proto interfaces
 python3 tools/setup_interfaces.py --proto-only
 ```
+
+### Build Pipeline
+
+`setup_interfaces.py` executes a sequential pipeline:
+
+1. **Copy** config + build files from the installed `vyra_base` library into the interface package.
+2. **Validate** module-specific config JSONs against the `RESERVED` function name list — exits with error on violation.
+3. **Schema validation** (`Step 2.5`) — validates every `*_meta.json` against `assets/schemas/interface_config.json`.
+   Invalid files are excluded from generation with a `WARNING` log (non-fatal).
+4. **Generate** `.msg` / `.srv` / `.action` / `.proto` files via `InterfaceGenerator`.
+5. **Update** `CMakeLists.txt` and `package.xml` with the generated file list.
+6. **Compile** Protobuf stubs (Python + optional C++) via `protoc`.
 
 ## NFS Deployment
 

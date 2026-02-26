@@ -74,7 +74,7 @@ class VyraSubscriberImpl(VyraSubscriber):
     async def initialize(self) -> bool:
         """Initialize ROS2 subscriber."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             # Wrap async callback for ROS2 sync context
             if self.subscriber_callback:

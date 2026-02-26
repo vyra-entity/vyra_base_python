@@ -208,6 +208,7 @@ class BaseFeeder(IFeeder):
             pub_kwargs: dict[str, Any] = {
                 "name": self._feederName,
                 "message_type": self._type,
+                "namespace": "feeder",
             }
             if resolved_protocols:
                 pub_kwargs["protocols"] = resolved_protocols
@@ -241,6 +242,7 @@ class BaseFeeder(IFeeder):
                     name=self._feederName,
                     protocols=fallback,
                     message_type=self._type,
+                    namespace="feeder",
                     is_publisher=True,
                     **({'node': self._node, 'qos_profile': self._qos}
                        if self._ros2_available and self._node else {})

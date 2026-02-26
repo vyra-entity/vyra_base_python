@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vyra_base"
-version = "0.1.8+build.89"
+version = "0.1.8+build.90"
 description = "Base library for V.Y.R.A. modules written in Python"
 authors = ["Holger Schernewski"]
 license = "LICENSE"
@@ -21,7 +21,8 @@ include = [
     "vyra_base/interfaces/action/*.action",
     "vyra_base/interfaces/config/*.json",
     "vyra_base/interfaces/config/*.xml",
-    "vyra_base/interfaces/config/*.yaml"
+    "vyra_base/interfaces/config/*.yaml",
+    "vyra_base/assets/schemas/*.json"
 ]
 
 [tool.poetry.dependencies]
@@ -37,6 +38,7 @@ PyYAML = "^6.0.0"
 grpcio = "^1.60.0"
 grpcio-tools = "^1.60.0"
 eclipse-zenoh = "^1.0.0"
+jsonschema = "^4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.0"

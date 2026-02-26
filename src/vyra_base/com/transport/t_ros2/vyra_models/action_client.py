@@ -50,7 +50,7 @@ class VyraActionClientImpl(VyraActionClient):
     async def initialize(self) -> bool:
         """Initialize ROS2 action client."""
         try:
-            action_name = self.topic_builder.build(self.name)
+            action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             # Wrap async callbacks
             def feedback_cb(feedback_msg):

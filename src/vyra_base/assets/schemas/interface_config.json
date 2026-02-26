@@ -1,0 +1,236 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://variobotic.com/vyra/schemas/interface_config.schema.json",
+    "title": "VYRA Interface Config",
+    "description": "Schema for VYRA interface configuration files (*_meta.json). Each file is a JSON array of interface definitions that describe services, messages, or actions available in the VYRA framework.",
+    "type": "array",
+    "minItems": 1,
+    "items": {
+        "$ref": "#/$defs/InterfaceEntry"
+    },
+    "$defs": {
+        "InterfaceEntry": {
+            "type": "object",
+            "required": [
+                "tags",
+                "type",
+                "functionname",
+                "displayname",
+                "description"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "tags": {
+                    "description": "One or more transport protocols on which this interface is registered. At least one tag is required.",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "ros2",
+                            "zenoh",
+                            "redis",
+                            "uds"
+                        ]
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "type": {
+                    "description": "Communication pattern for this interface.",
+                    "type": "string",
+                    "enum": [
+                        "service",
+                        "message",
+                        "action"
+                    ]
+                },
+                "functionname": {
+                    "description": "Unique machine-readable identifier used as the function/topic name component in the VYRA topic path: {module_name}_{module_id}[/{namespace}]/{functionname}[/{subsection}]. Must start with a letter and contain only letters, digits and underscores.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                    "minLength": 1,
+                    "maxLength": 128
+                },
+                "displayname": {
+                    "description": "Human-readable name shown in dashboards and generated documentation.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "description": {
+                    "description": "Short documentation string explaining what this interface does.",
+                    "type": "string"
+                },
+                "namespace": {
+                    "description": "Optional namespace segment inserted between the module identifier and the function name in the topic path: {module_name}_{module_id}/{namespace}/{functionname}. Omit or leave empty to skip this level. Must start with a letter and contain only letters, digits and underscores.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                    "minLength": 1
+                },
+                "subsection": {
+                    "description": "Optional subsection appended after the function name in the topic path: {module_name}_{module_id}[/{namespace}]/{functionname}/{subsection}. Omit or leave empty to skip this level. Must start with a letter and contain only letters, digits and underscores.",
+                    "type": "string",
+                    "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                    "minLength": 1
+                },
+                "filetype": {
+                    "description": "List of interface type file references generated from this config entry (e.g. 'MyMessage.msg', 'MyService.srv', 'MyAction.action', 'MyMessage.proto').",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_]+\\.(msg|srv|action|proto)$"
+                    },
+                    "minItems": 1
+                },
+                "params": {
+                    "description": "Input parameters for service and action call requests. Empty list is valid for services that require no input.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/FieldDefinition"
+                    }
+                },
+                "returns": {
+                    "description": "Return fields included in the interface response.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/FieldDefinition"
+                    }
+                },
+                "feedback": {
+                    "description": "Feedback fields published periodically during goal execution. Required for action interfaces, not applicable for service or message interfaces.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/FieldDefinition"
+                    }
+                },
+                "access_level": {
+                    "description": "Minimum security level required to call this interface (1 = public, higher = more restricted).",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10,
+                    "default": 1
+                },
+                "displaystyle": {
+                    "description": "Rendering hints for dashboards and UI components.",
+                    "$ref": "#/$defs/DisplayStyle"
+                },
+                "qosprofile": {
+                    "description": "Quality-of-service message queue depth used when registering this interface on ROS2 or Zenoh. Defaults to 10.",
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 10
+                }
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "message"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "filetype"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "service"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "filetype"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "action"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "feedback"
+                        ]
+                    }
+                }
+            ]
+        },
+        "FieldDefinition": {
+            "type": "object",
+            "description": "Describes a single field in a params or returns list.",
+            "required": [
+                "datatype",
+                "displayname",
+                "description"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "name": {
+                    "description": "Machine-readable field identifier (snake_case recommended).",
+                    "type": "string"
+                },
+                "datatype": {
+                    "$comment": "The enum inside anyOf[0] is injected at validation time by validate_config_schema() from assets/schemas/type_definitions.json. The second anyOf branch allows complex ROS2 message types (e.g. 'unique_identifier_msgs/UUID') that are passed through verbatim by map_type().",
+                    "description": "Data type of the field. Either a known VYRA primitive type (e.g. 'string', 'bool', 'int32', 'float64', 'datetime', 'string[]') or a fully-qualified ROS2 message type in the form 'package/TypeName' (e.g. 'unique_identifier_msgs/UUID').",
+                    "anyOf": [
+                        {
+                            "$comment": "Primitive types and their array variants. Enum is dynamically injected from type_definitions.json at validation time.",
+                            "type": "string"
+                        },
+                        {
+                            "$comment": "Complex ROS2 message types (passed through verbatim by map_type()).",
+                            "type": "string",
+                            "pattern": "^[A-Za-z_][A-Za-z0-9_]*/[A-Za-z][A-Za-z0-9]+$"
+                        }
+                    ],
+                    "minLength": 1
+                },
+                "displayname": {
+                    "description": "Human-readable label for this field.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "description": {
+                    "description": "Documentation string explaining the purpose or semantics of this field.",
+                    "type": "string"
+                }
+            }
+        },
+        "DisplayStyle": {
+            "type": "object",
+            "description": "UI rendering settings for dashboard integration.",
+            "additionalProperties": false,
+            "properties": {
+                "visible": {
+                    "description": "Whether this interface is shown in the VYRA dashboard UI.",
+                    "type": "boolean",
+                    "default": false
+                },
+                "published": {
+                    "description": "Whether this interface is exposed in external/public API listings.",
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        }
+    }
+}

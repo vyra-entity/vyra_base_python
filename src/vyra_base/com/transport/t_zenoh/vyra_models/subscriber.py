@@ -48,7 +48,7 @@ class VyraSubscriberImpl(VyraSubscriber):
             if '/' in self.name:
                 topic_name = self.name
             else:
-                topic_name = self.topic_builder.build(self.name)
+                topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             # Capture the running asyncio event loop for thread-safe callback dispatch
             loop = asyncio.get_event_loop()

@@ -44,7 +44,7 @@ class VyraClientImpl(VyraClient):
     async def initialize(self) -> bool:
         """Initialize ROS2 service client."""
         try:
-            service_name = self.topic_builder.build(self.name)
+            service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             # Create service client via VyraServiceClient
             service_info = ServiceClientInfo(

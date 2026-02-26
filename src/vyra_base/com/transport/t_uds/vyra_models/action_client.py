@@ -15,6 +15,7 @@ from pathlib import Path
 from vyra_base.com.core.types import VyraActionClient, ProtocolType, InterfaceType
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
+from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class VyraActionClientImpl(VyraActionClient):
     Unix Domain Socket action client using stream sockets.
     
     Pattern:
-    - Connects to server at /tmp/vyra_sockets/act_{module}_{action}.sock
+    - Connects to server at {VYRA_SOCKET_DIR}/{module}_{action}.sock
     - Sends goal_request, receives goal_id and feedback_socket_path
     - Optionally connects to feedback_socket for streaming updates
     """
@@ -47,7 +48,7 @@ class VyraActionClientImpl(VyraActionClient):
         )
         self.action_type = action_type
         self._module_name = module_name
-        self._socket_dir = Path("/tmp/vyra_sockets")
+        self._socket_dir = UDS_SOCKET_DIR
         self._server_socket_path = None  # Set in initialize()
         self._active_goal_id: Optional[str] = None
         self._feedback_listen_task: Optional[asyncio.Task] = None
@@ -55,8 +56,10 @@ class VyraActionClientImpl(VyraActionClient):
     async def initialize(self) -> bool:
         """Initialize UDS action client."""
         try:
-            action_name = self.topic_builder.build(self.name)
-            self._server_socket_path = self._socket_dir / f"act_{self._module_name}_{action_name}.sock"
+            action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
+            # Sanitize for filesystem use (topic names may contain '/')
+            safe_name = action_name.replace("/", "_")
+            self._server_socket_path = self._socket_dir / f"{self._module_name}_{safe_name}.sock"
             
             if not self._server_socket_path.exists():
                 logger.warning(f"Server socket not found: {self._server_socket_path}")

@@ -48,7 +48,7 @@ class VyraActionServerImpl(VyraActionServer):
     async def initialize(self) -> bool:
         """Initialize ROS2 action server."""
         try:
-            action_name = self.topic_builder.build(self.name)
+            action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             # Wrap async callbacks for ROS2 sync context
             def goal_callback(goal_request):
@@ -104,8 +104,9 @@ class VyraActionServerImpl(VyraActionServer):
             action_info = ActionServerInfo(
                 name=action_name,
                 type=self.action_type,
-                result_callback=goal_callback,
-                feedback_callback=execute_callback
+                goal_callback=goal_callback,
+                cancel_callback=cancel_callback,
+                execute_callback=execute_callback
             )
             
             self._ros2_action_server = ROS2ActionServer(

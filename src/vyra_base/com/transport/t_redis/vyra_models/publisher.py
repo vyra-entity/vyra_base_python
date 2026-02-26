@@ -36,7 +36,7 @@ class RedisPublisherImpl(VyraPublisher):
     async def initialize(self) -> bool:
         """Initialize Redis publisher (no setup needed for pub)."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._topic_name = topic_name
             
             # Test Redis connection

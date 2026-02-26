@@ -7,10 +7,9 @@ Hybrid pattern: Queryable for goal/cancel requests + Publisher for feedback.
 import logging
 import zenoh
 
-from typing import Coroutine, Optional, Any, Callable, Awaitable, Dict, TypedDict
-from enum import Enum
+from typing import Coroutine, Optional, Any, Callable, Awaitable, Dict
 
-from vyra_base.com.core.types import VyraActionServer, ProtocolType
+from vyra_base.com.core.types import VyraActionServer, ProtocolType, GoalHandle
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
 from vyra_base.com.transport.t_zenoh.communication.serializer import (
@@ -22,36 +21,19 @@ import asyncio
 
 logger = logging.getLogger(__name__)
 
-
-class GoalStatus(Enum):
-    """Action goal execution status."""
-    UNKNOWN = 0
-    ACCEPTED = 1
-    EXECUTING = 2
-    SUCCEEDED = 3
-    ABORTED = 4
-    CANCELED = 5
-
-
-class GoalHandle(TypedDict, total=False):
-    """Type definition for goal handle dictionary."""
-    goal_id: str
-    goal: Any
-    status: GoalStatus
-    feedback_publisher: Any  # zenoh.Publisher
-
-
 class VyraActionServerImpl(VyraActionServer):
     """
     Vyra-based action server implementation.
     
     Architecture:
-    - Queryable at "action/{name}/goal" for goal requests
-    - Queryable at "action/{name}/cancel" for cancel requests  
-    - Publisher at "action/{name}/{goal_id}/feedback" for feedback
-    - Publisher at "action/{name}/{goal_id}/result" for results
+    - Queryable at ``{namespace}/{fn}/goal`` for goal requests
+    - Queryable at ``{namespace}/{fn}/cancel`` for cancel requests
+    - Publisher at ``{namespace}/{fn}/{goal_id}/feedback`` for feedback
+    - Publisher at ``{namespace}/{fn}/{goal_id}/result`` for results
     
-    TODO: Implement using ZenohQueryable + ZenohPublisher combo.
+    Channel keys are built by :py:meth:`_action_channel` which stacks the
+    protocol-level sub-channel on top of the config-level ``namespace`` /
+    ``subsection`` following the VYRA topic convention.
     """
     
     def __init__(
@@ -75,14 +57,16 @@ class VyraActionServerImpl(VyraActionServer):
         self._goal_queryable = None
         self._cancel_queryable = None
         self._active_goals: Dict[str, GoalHandle] = {}  # goal_id -> GoalHandle
+        self._fb_publishers: Dict[str, Any] = {}       # goal_id -> zenoh.Publisher
         self._serializer = ZenohSerializer()
         self._format = SerializationFormat.JSON
         
     async def initialize(self) -> bool:
         """Initialize Zenoh action server."""
         try:
-            action_name = self.topic_builder.build(self.name)
-            self._action_name = action_name
+            self._action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
+            self._key_goal = self._action_channel("goal")
+            self._key_cancel = self._action_channel("cancel")
             
             if not self._zenoh_session:
                 raise InterfaceError("Zenoh session not initialized")
@@ -95,7 +79,7 @@ class VyraActionServerImpl(VyraActionServer):
                     raise InterfaceError("Zenoh session not initialized")
             
                 return self._zenoh_session.declare_queryable(
-                    f"action/{action_name}/goal",
+                    self._key_goal,
                     lambda query: self._handle_goal_request_sync(query)
                 )
             
@@ -107,13 +91,13 @@ class VyraActionServerImpl(VyraActionServer):
                     raise InterfaceError("Zenoh session not initialized")
             
                 return self._zenoh_session.declare_queryable(
-                    f"action/{action_name}/cancel",
+                    self._key_cancel,
                     lambda query: self._handle_cancel_request_sync(query)
                 )
             
             self._cancel_queryable = await loop.run_in_executor(None, _create_cancel_queryable)
             
-            logger.info(f"✅ ZenohActionServer initialized: {action_name}")
+            logger.info(f"✅ ZenohActionServer initialized: {self._action_name}")
             return True
             
         except Exception as e:
@@ -142,7 +126,7 @@ class VyraActionServerImpl(VyraActionServer):
                 logger.warning("No goal handler defined, rejecting goal")
                 response = {"accepted": False, "error": "No goal handler defined"}
                 response_bytes = self._serializer.serialize(response, format=self._format)
-                query.reply(f"action/{self._action_name}/goal", response_bytes)
+                query.reply(self._key_goal, response_bytes)
                 return
 
             # Call handle_goal callback
@@ -158,17 +142,17 @@ class VyraActionServerImpl(VyraActionServer):
                 # Reply with acceptance
                 response = {"goal_id": goal_id, "accepted": True}
                 response_bytes = self._serializer.serialize(response, format=self._format)
-                query.reply(f"action/{self._action_name}/goal", response_bytes)
+                query.reply(self._key_goal, response_bytes)
             else:
                 # Reply with rejection
                 response = {"accepted": False}
                 response_bytes = self._serializer.serialize(response, format=self._format)
-                query.reply(f"action/{self._action_name}/goal", response_bytes)
+                query.reply(self._key_goal, response_bytes)
         except Exception as e:
             logger.error(f"❌ Goal handling failed: {e}")
             error_response = {"accepted": False, "error": str(e)}
             error_bytes = self._serializer.serialize(error_response, format=self._format)
-            query.reply(f"action/{self._action_name}/goal", error_bytes)
+            query.reply(self._key_goal, error_bytes)
     
     def _handle_cancel_request_sync(self, query: Any):
         """Sync wrapper for async cancel handler."""
@@ -193,17 +177,21 @@ class VyraActionServerImpl(VyraActionServer):
                 # Call cancel callback
                 goal_handle = self._active_goals[goal_id]
 
+                # Signal the executing coroutine that cancel was requested
+                goal_handle.request_cancel()
+
                 if self.handle_cancel_request is None:
-                    logger.warning("No cancel handler defined, rejecting cancel request")
-                    response = {'canceled': False, 'error': "No cancel handler defined"}
+                    logger.warning("No cancel handler defined, accepting cancel by default")
+                    goal_handle.canceled()
+                    response = {'canceled': True}
                     response_bytes = self._serializer.serialize(response, format=self._format)
-                    query.reply(f"action/{self._action_name}/cancel", response_bytes)
+                    query.reply(self._key_cancel, response_bytes)
                     return
                 
                 canceled = await self.handle_cancel_request(goal_handle)
                 
                 if canceled:
-                    goal_handle['status'] = GoalStatus.CANCELED
+                    goal_handle.canceled()
                     response = {'canceled': True}
                 else:
                     response = {'canceled': False}
@@ -212,29 +200,28 @@ class VyraActionServerImpl(VyraActionServer):
             
             # Reply
             response_bytes = self._serializer.serialize(response, format=self._format)
-            query.reply(f"action/{self._action_name}/cancel", response_bytes)
+            query.reply(self._key_cancel, response_bytes)
             
         except Exception as e:
             logger.error(f"❌ Cancel handling failed: {e}")
             error_response = {'canceled': False, 'error': str(e)}
             error_bytes = self._serializer.serialize(error_response, format=self._format)
-            query.reply(f"action/{self._action_name}/cancel", error_bytes)
+            query.reply(self._key_cancel, error_bytes)
     
     async def _execute_goal(self, goal_id: str, goal: Any):
         """
         Execute goal in background task.
         """
         try:
-            # Create goal handle
-            goal_handle: GoalHandle = {
-                'goal_id': goal_id,
-                'goal': goal,
-                'status': GoalStatus.EXECUTING,
-                'feedback_publisher': None
-            }
+            # Create shared GoalHandle with feedback wired to this server
+            goal_handle = GoalHandle(
+                goal_id=goal_id,
+                goal=goal,
+                feedback_fn=self.publish_feedback
+            )
             self._active_goals[goal_id] = goal_handle
             
-            # Create publisher for feedback
+            # Create zenoh publisher for feedback
             loop = asyncio.get_event_loop()
             
             def _create_feedback_pub():
@@ -242,10 +229,10 @@ class VyraActionServerImpl(VyraActionServer):
                     raise InterfaceError("Zenoh session not initialized")
                 
                 return self._zenoh_session.declare_publisher(
-                    f"action/{self._action_name}/{goal_id}/feedback"
+                    self._action_channel(f"{goal_id}/feedback")
                 )
             
-            goal_handle['feedback_publisher'] = await loop.run_in_executor(None, _create_feedback_pub)
+            self._fb_publishers[goal_id] = await loop.run_in_executor(None, _create_feedback_pub)
             
             if not self.execution_callback:
                 raise InterfaceError("No execution callback defined for action server")
@@ -254,7 +241,7 @@ class VyraActionServerImpl(VyraActionServer):
             result = await self.execution_callback(goal_handle)
             
             # Publish result
-            goal_handle['status'] = GoalStatus.SUCCEEDED
+            goal_handle.set_succeeded(result)
             result_bytes = self._serializer.serialize(result, format=self._format)
             
             
@@ -264,16 +251,16 @@ class VyraActionServerImpl(VyraActionServer):
                     raise InterfaceError("Zenoh session not initialized")
             
                 pub = self._zenoh_session.declare_publisher(  # type: ignore[union-attr]  # type: ignore[union-attr]
-                    f"action/{self._action_name}/{goal_id}/result"
+                    self._action_channel(f"{goal_id}/result")
                 )
                 pub.put(result_bytes)
                 pub.undeclare()
             
             await loop.run_in_executor(None, _create_result_pub)
             
-            # Cleanup
-            if goal_handle['feedback_publisher']:  # type: ignore[misc]
-                fb_publisher = goal_handle['feedback_publisher']  # pyright: ignore[reportGeneralTypeIssues]
+            # Cleanup feedback publisher
+            if goal_id in self._fb_publishers:
+                fb_publisher = self._fb_publishers.pop(goal_id)
                 await loop.run_in_executor(None, fb_publisher.undeclare)  # pyright: ignore[reportGeneralTypeIssues]
             
             del self._active_goals[goal_id]
@@ -281,7 +268,7 @@ class VyraActionServerImpl(VyraActionServer):
         except Exception as e:
             logger.error(f"❌ Goal execution failed: {e}")
             if goal_id in self._active_goals:
-                self._active_goals[goal_id]['status'] = GoalStatus.ABORTED
+                self._active_goals[goal_id].set_aborted(str(e))
     
     async def publish_feedback(self, goal_id: str, feedback: Any):
         """
@@ -292,8 +279,7 @@ class VyraActionServerImpl(VyraActionServer):
                 logger.warning(f"Goal {goal_id} not active")
                 return
             
-            goal_handle = self._active_goals[goal_id]
-            publisher = goal_handle.get('feedback_publisher')
+            publisher = self._fb_publishers.get(goal_id)
             
             if publisher:
                 feedback_bytes = self._serializer.serialize(feedback, format=self._format)
@@ -309,8 +295,8 @@ class VyraActionServerImpl(VyraActionServer):
         
         # Cancel all active goals
         for goal_id, goal_handle in list(self._active_goals.items()):
-            goal_handle['status'] = GoalStatus.CANCELED  # type: ignore[misc]
-            fb_pub = goal_handle.get('feedback_publisher')  # pyright: ignore[reportGeneralTypeIssues]
+            goal_handle.set_canceled()
+            fb_pub = self._fb_publishers.pop(goal_id, None)
             if fb_pub:
                 await loop.run_in_executor(None, fb_pub.undeclare)  # pyright: ignore[reportGeneralTypeIssues]
         

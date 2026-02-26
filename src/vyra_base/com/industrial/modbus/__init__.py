@@ -71,24 +71,6 @@ except ImportError as e:
     _rtu_available = False
     logger.debug(f"⚠️  Modbus RTU unavailable: {e}")
 
-# Try importing callable (VYRA abstraction)
-try:
-    from vyra_base.com.industrial.modbus.callable import ModbusCallable
-    _callable_available = True
-except ImportError as e:
-    ModbusCallable = None
-    _callable_available = False
-    logger.debug(f"⚠️  Modbus callable unavailable: {e}")
-
-# Try importing provider
-try:
-    from vyra_base.com.industrial.modbus.provider import ModbusProvider
-    _provider_available = True
-except ImportError as e:
-    ModbusProvider = None
-    _provider_available = False
-    logger.debug(f"⚠️  Modbus provider unavailable: {e}")
-
 # Modbus is available if at least one transport (TCP or RTU) is available
 MODBUS_AVAILABLE = _base_available and (_tcp_available or _rtu_available)
 
@@ -115,9 +97,6 @@ __all__ = [
     # Transport implementations
     "ModbusTCPClient",
     "ModbusRTUClient",
-    # VYRA abstractions
-    "ModbusCallable",
-    "ModbusProvider",
     # Backward compatibility
     "ModbusClient",  # Alias for ModbusTCPClient
 ]

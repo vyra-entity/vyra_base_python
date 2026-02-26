@@ -15,6 +15,7 @@ from pathlib import Path
 from vyra_base.com.core.types import InterfaceType, VyraSubscriber, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
+from vyra_base.com.transport.t_uds.communication import UDS_SOCKET_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +42,14 @@ class VyraSubscriberImpl(VyraSubscriber):
         self._module_name = module_name
         self._instance_id = str(uuid.uuid4())[:8]
         self._socket: Optional[socket.socket] = None
-        self._socket_dir = Path("/tmp/vyra_sockets")
+        self._socket_dir = UDS_SOCKET_DIR
         self._socket_path = None  # Set in initialize()
         self._listen_task: Optional[asyncio.Task] = None
         
     async def initialize(self) -> bool:
         """Initialize UDS subscriber."""
         try:
-            topic_name = self.topic_builder.build(self.name)
+            topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._socket_path = self._socket_dir / f"sub_{self._module_name}_{topic_name}_{self._instance_id}.sock"
             
             # Create socket directory

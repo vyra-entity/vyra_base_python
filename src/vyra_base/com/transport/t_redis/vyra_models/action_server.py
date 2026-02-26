@@ -11,7 +11,7 @@ import uuid
 from typing import Optional, Any, Callable, Awaitable, Dict
 from enum import Enum
 
-from vyra_base.com.core.types import VyraActionServer, ProtocolType
+from vyra_base.com.core.types import VyraActionServer, ProtocolType, GoalHandle
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError
 from vyra_base.com.transport.t_redis.communication import RedisClient
@@ -35,14 +35,17 @@ class RedisActionServerImpl(VyraActionServer):
     
     Architecture:
     Keys:
-    - action:{name}:{goal_id}:state → JSON: {status, timestamp}
-    - action:{name}:{goal_id}:feedback → JSON: Latest feedback
-    - action:{name}:{goal_id}:result → JSON: Final result
+    - ``{fn}/{goal_id}/state`` → JSON: {status, timestamp}
+    - ``{fn}/{goal_id}/feedback`` → JSON: Latest feedback
+    - ``{fn}/{goal_id}/result`` → JSON: Final result
     
     Channels:
-    - action:{name}:goal → Goal requests
-    - action:{name}:cancel → Cancel requests
-    - action:{name}:{goal_id}:updates → Feedback/result notifications
+    - ``{fn}/goal`` → Goal requests
+    - ``{fn}/cancel`` → Cancel requests
+    - ``{fn}/{goal_id}/updates`` → Feedback/result notifications
+    
+    All keys are built via :py:meth:`_action_channel` so that ``namespace``
+    and ``subsection`` from the config are respected automatically.
     """
     
     def __init__(
@@ -64,6 +67,7 @@ class RedisActionServerImpl(VyraActionServer):
         self.action_type = action_type
         self._redis: RedisClient | None = redis_client
         self._active_goals: Dict[str, asyncio.Task] = {}  # goal_id -> execution_task
+        self._goal_handles: Dict[str, GoalHandle] = {}   # goal_id -> GoalHandle
         
     async def initialize(self) -> bool:
         """Initialize Redis action server."""
@@ -72,22 +76,24 @@ class RedisActionServerImpl(VyraActionServer):
             return False
         
         try:
-            action_name = self.topic_builder.build(self.name)
+            action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             self._action_name = action_name
+            self._key_goal = self._action_channel("goal")
+            self._key_cancel = self._action_channel("cancel")
                         
             # Subscribe to goal and cancel channels
             await self._redis.subscribe_channel(
-                f"action:{action_name}:goal",
-                f"action:{action_name}:cancel"
+                self._key_goal,
+                self._key_cancel
             )
             
             await self._redis.create_pubsub_listener(
-                f"action:{action_name}:goal",
+                self._key_goal,
                 self._handle_goal_request
             )
 
             await self._redis.create_pubsub_listener(
-                f"action:{action_name}:cancel",
+                self._key_cancel,
                 self._handle_cancel_request
             )
             
@@ -154,9 +160,13 @@ class RedisActionServerImpl(VyraActionServer):
             response_channel = cancel_msg.get('response_channel')
             
             if goal_id in self._active_goals:
-                # TODO: Create goal_handle object for callback
+                goal_handle = self._goal_handles.get(goal_id)
+                # Signal the executing coroutine that cancel was requested
+                if goal_handle:
+                    goal_handle.request_cancel()
                 if self.handle_cancel_request:
-                    canceled = await self.handle_cancel_request(goal_id)
+                    arg = goal_handle if goal_handle else goal_id
+                    canceled = await self.handle_cancel_request(arg)
                 else:
                     canceled = True
                 
@@ -192,17 +202,22 @@ class RedisActionServerImpl(VyraActionServer):
             # Update state to executing
             await self._set_goal_state(goal_id, GoalStatus.EXECUTING)
             
-            # TODO: Create goal_handle with feedback publisher
-            # goal_handle = GoalHandle(goal_id, self.publish_feedback)
+            # Create a GoalHandle so the execution_callback can publish feedback
+            goal_handle = GoalHandle(
+                goal_id=goal_id,
+                goal=goal,
+                feedback_fn=self.publish_feedback
+            )
+            self._goal_handles[goal_id] = goal_handle
             
             # Call execution callback
             if not self.execution_callback:
                 raise InterfaceError("No execution callback defined")
-            result = await self.execution_callback(goal)
+            result = await self.execution_callback(goal_handle)
             
             # Store result
             await self._redis.set(
-                f"action:{self._action_name}:{goal_id}:result",
+                self._action_channel(f"{goal_id}/result"),
                 json.dumps(result if isinstance(result, dict) else {'result': str(result)}),
                 ex=3600  # Expire after 1 hour
             )
@@ -212,7 +227,7 @@ class RedisActionServerImpl(VyraActionServer):
             
             # Notify via updates channel
             await self._redis.publish_message(
-                f"action:{self._action_name}:{goal_id}:updates",
+                self._action_channel(f"{goal_id}/updates"),
                 json.dumps({'type': 'result', 'goal_id': goal_id})
             )
             
@@ -224,13 +239,14 @@ class RedisActionServerImpl(VyraActionServer):
             await self._set_goal_state(goal_id, GoalStatus.ABORTED)
         finally:
             self._active_goals.pop(goal_id, None)
+            self._goal_handles.pop(goal_id, None)
     
     async def _set_goal_state(self, goal_id: str, status: GoalStatus):
         """Update goal state in Redis."""
         assert self._redis is not None, "Redis client not initialized"
         import time
         await self._redis.set(
-            f"action:{self._action_name}:{goal_id}:state",
+            self._action_channel(f"{goal_id}/state"),
             json.dumps({'status': status.name, 'timestamp': time.time()}),
             ex=3600
         )
@@ -241,14 +257,14 @@ class RedisActionServerImpl(VyraActionServer):
             assert self._redis is not None, "Redis client not initialized"
             # Store latest feedback
             await self._redis.set(
-                f"action:{self._action_name}:{goal_id}:feedback",
+                self._action_channel(f"{goal_id}/feedback"),
                 json.dumps(feedback if isinstance(feedback, dict) else {'feedback': str(feedback)}),
                 ex=3600
             )
             
             # Notify via updates channel
             await self._redis.publish_message(
-                f"action:{self._action_name}:{goal_id}:updates",
+                self._action_channel(f"{goal_id}/updates"),
                 json.dumps({'type': 'feedback', 'goal_id': goal_id})
             )
             
@@ -261,6 +277,7 @@ class RedisActionServerImpl(VyraActionServer):
         for task in self._active_goals.values():
             task.cancel()
         self._active_goals.clear()
+        self._goal_handles.clear()
     
     async def shutdown(self) -> None:
         """Shutdown interface."""

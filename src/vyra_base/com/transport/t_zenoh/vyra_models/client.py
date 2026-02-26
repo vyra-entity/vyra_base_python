@@ -50,7 +50,7 @@ class VyraClientImpl(VyraClient):
             if '/' in self.name:
                 self._service_name = self.name
             else:
-                self._service_name = self.topic_builder.build(self.name)
+                self._service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             # No persistent resources needed for client
             logger.info(f"✅ ZenohClient initialized: {self._service_name}")
             return True

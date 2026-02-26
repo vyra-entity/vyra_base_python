@@ -9,12 +9,13 @@ VYRA uses three communication paradigms:
 """
 import json
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict, field
 from enum import Enum
 from typing import Any, Callable, Optional, Dict, List, Awaitable
 from datetime import datetime
 
 from vyra_base.com.core.topic_builder import TopicBuilder
+from vyra_base.com.core.abstract_handlers import IGoalHandle
 
 class ProtocolType(str, Enum):
     """Supported communication protocols."""
@@ -131,6 +132,10 @@ class VyraTransport(ABC):
         interface_type: InterfaceType,
         **kwargs
     ):
+        # Extract namespace/subsection before metadata processing
+        self.namespace: Optional[str] = kwargs.pop('namespace', None)
+        self.subsection: Optional[str] = kwargs.pop('subsection', None)
+
         # Extract known InterfaceMetadata parameters
         metadata_params: Dict[str, Any] = {
             'name': name,
@@ -401,7 +406,96 @@ class VyraClient(VyraTransport):
         raise NotImplementedError
 
 
-@dataclass
+class GoalHandle(IGoalHandle):
+    """Transport-agnostic goal handle passed to execution callbacks.
+
+    This is the main communication object between the transport layer and the
+    application.  All action servers create a ``GoalHandle`` for each accepted
+    goal and pass it to the user's ``execution_callback``.
+
+    Implements the :class:`IGoalHandle` interface so user code typed against
+    the abstract interface works seamlessly with the concrete implementation.
+
+    Example usage inside an execution_callback::
+
+        async def my_execute(goal_handle: GoalHandle):
+            for i in range(10):
+                await goal_handle.publish_feedback({'progress': i * 10})
+                if goal_handle.is_cancel_requested():
+                    goal_handle.canceled()
+                    return {'status': 'canceled'}
+            goal_handle.succeed()
+            return {'done': True}
+    """
+
+    def __init__(self, goal_id: str, goal: Any, feedback_fn: Callable) -> None:
+        """
+        Args:
+            goal_id:     Unique identifier for this goal execution (UUID string).
+            goal:        The goal payload received from the client.
+            feedback_fn: Async callable ``(goal_id: str, feedback: Any) -> None``
+                         provided by the transport layer to publish feedback.
+        """
+        self.goal_id: str = goal_id
+        self._goal: Any = goal
+        self._feedback_fn: Callable = feedback_fn
+        self.status: str = "executing"
+        self._cancel_requested: bool = False
+
+    # ------------------------------------------------------------------
+    # IGoalHandle interface implementation
+    # ------------------------------------------------------------------
+
+    @property
+    def goal(self) -> Any:
+        """The original goal payload sent by the client."""
+        return self._goal
+
+    async def publish_feedback(self, feedback: Any) -> None:  # type: ignore[override]
+        """Send feedback to all connected clients."""
+        await self._feedback_fn(self.goal_id, feedback)
+
+    def is_cancel_requested(self) -> bool:
+        """Return ``True`` if the client requested cancellation."""
+        return self._cancel_requested
+
+    def succeed(self) -> None:
+        """Mark goal as succeeded."""
+        self.status = "succeeded"
+
+    def abort(self) -> None:
+        """Mark goal as aborted due to an error."""
+        self.status = "aborted"
+
+    def canceled(self) -> None:
+        """Mark goal as canceled by client request."""
+        self.status = "canceled"
+
+    # ------------------------------------------------------------------
+    # Transport-layer helpers
+    # ------------------------------------------------------------------
+
+    def request_cancel(self) -> None:
+        """Called by the transport layer when a cancel request arrives."""
+        self._cancel_requested = True
+
+    # ------------------------------------------------------------------
+    # Backwards-compatibility aliases (older transport code)
+    # ------------------------------------------------------------------
+
+    def set_succeeded(self, result: Any = None) -> None:  # noqa: D401
+        """Alias for :meth:`succeed`."""
+        self.succeed()
+
+    def set_aborted(self, reason: str = "") -> None:  # noqa: D401
+        """Alias for :meth:`abort`."""
+        self.abort()
+
+    def set_canceled(self) -> None:  # noqa: D401
+        """Alias for :meth:`canceled`."""
+        self.canceled()
+
+
 class VyraActionServer(VyraTransport):
     """
     Action Server interface for long-running tasks.
@@ -434,7 +528,25 @@ class VyraActionServer(VyraTransport):
         self.execution_callback = execution_callback            # async def(goal_handle: Any) -> Any
         
         self._transport_handle: Optional[Any] = None
-    
+
+    def _action_channel(self, channel: str) -> str:
+        """Compute a protocol-level sub-channel key via the topic builder.
+
+        Stacks *channel* on top of any config-level subsection so goal,
+        cancel, feedback and result keys follow the same VYRA naming convention.
+
+        Examples::
+
+            # subsection=None  →  module_id/fn/goal
+            self._action_channel("goal")
+            # subsection="tasks"  →  module_id/fn/tasks/goal
+            self._action_channel("goal")
+            # runtime feedback  →  module_id/fn/{goal_id}/feedback
+            self._action_channel(f"{goal_id}/feedback")
+        """
+        sub = f"{self.subsection}/{channel}" if self.subsection else channel
+        return self.topic_builder.build(self.name, namespace=self.namespace, subsection=sub)
+
     async def initialize(self) -> bool:
         """Initialize action server with transport layer."""
         self._initialized = True
@@ -488,9 +600,18 @@ class VyraActionClient(VyraTransport):
         self.direct_response_callback = direct_response_callback  # async def(accepted: bool) -> None
         self.feedback_callback = feedback_callback                # async def(feedback: Any) -> None
         self.goal_callback = goal_callback                        # async def(result: Any) -> None
-        
+
         self._transport_handle: Optional[Any] = None
-    
+
+    def _action_channel(self, channel: str) -> str:
+        """Compute a protocol-level sub-channel key via the topic builder.
+
+        Stacks *channel* on top of any config-level subsection so goal,
+        cancel, feedback and result keys follow VYRA naming conventions.
+        """
+        sub = f"{self.subsection}/{channel}" if self.subsection else channel
+        return self.topic_builder.build(self.name, namespace=self.namespace, subsection=sub)
+
     async def initialize(self) -> bool:
         """Initialize action client with transport layer."""
         self._initialized = True

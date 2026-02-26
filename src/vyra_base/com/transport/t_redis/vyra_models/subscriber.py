@@ -40,7 +40,7 @@ class RedisSubscriberImpl(VyraSubscriber):
     async def initialize(self) -> bool:
         """Initialize Redis subscriber."""
         try:
-            self._topic_name = self.topic_builder.build(self.name)
+            self._topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
             return True
             

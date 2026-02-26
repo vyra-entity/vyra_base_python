@@ -227,6 +227,10 @@ class FunctionConfigEntry(DCBase):
     :type callbacks: list[Callable], Optional
     :param periodic: Function to be called periodically (only for publisher)
     :type periodic: FunctionConfigPeriodicPublisher, Optional
+    :param namespace: Optional topic namespace segment inserted between module id and function name
+    :type namespace: str, Optional
+    :param subsection: Optional sub-topic segment appended after the function name
+    :type subsection: str, Optional
     """
     tags: list[FunctionConfigTags]
     type: FunctionConfigBaseTypes
@@ -240,6 +244,8 @@ class FunctionConfigEntry(DCBase):
     qosprofile: Union[int, QoSProfile] = 10
     callbacks: Union[dict[str, Callable], None] = None
     periodic: Union[FunctionConfigPeriodicPublisher, None] = None
+    namespace: Union[str, None] = None
+    subsection: Union[str, None] = None
 
     def asdict(self):
         """
