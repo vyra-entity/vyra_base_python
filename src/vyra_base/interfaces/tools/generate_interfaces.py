@@ -181,9 +181,12 @@ class InterfaceGenerator:
         
     def ensure_directories(self):
         """Create output directories if they don't exist."""
-        self.msg_path.mkdir(exist_ok=True)
-        self.srv_path.mkdir(exist_ok=True)
-        self.action_path.mkdir(exist_ok=True)
+        for path in [self.config_path, self.msg_path, self.srv_path, self.action_path]:
+            # Guard against stale non-directory entries (e.g. empty placeholder
+            # files or broken symlinks that cause FileExistsError with exist_ok=True)
+            if path.exists() and not path.is_dir():
+                path.unlink()
+            path.mkdir(parents=True, exist_ok=True)
         
     def map_type(self, datatype: str) -> Tuple[str, bool]:
         """

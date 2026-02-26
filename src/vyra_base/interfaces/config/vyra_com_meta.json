@@ -4,6 +4,7 @@
             "zenoh"
         ],
         "type": "message",
+        "namespace": "feeder",
         "functionname": "ErrorFeed",
         "displayname": "Error Feed",
         "description": "Communicate error information in the system between different components or modules.",
@@ -51,6 +52,7 @@
             "zenoh"
         ],
         "type": "message",
+        "namespace": "feeder",
         "functionname": "StateFeed",
         "displayname": "State Feed",
         "description": "Communicate state information in the system between different components or modules.",
@@ -85,6 +87,7 @@
             "zenoh"
         ],
         "type": "message",
+        "namespace": "feeder",
         "functionname": "NewsFeed",
         "displayname": "News Feed",
         "description": "Communicate news in the system between different components or modules.",

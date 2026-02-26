@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.91] - 2026-02-26
+
+### Build
+
+Bugfix: Error in generate_interfacess.py regarding interface folders that throw an error if they already exists
+
+
 ## [0.1.8+build.90] - 2026-02-26
 
 ### Build
