@@ -108,12 +108,31 @@ echo ""
 # ========================================
 echo "Step 5: Installing new wheel..."
 
+echo "  ✅ Wheel installed: $(basename $WHEEL_FILE)"
+echo ""
+
 $PYTHON_PATH -m pip install "$WHEEL_FILE" --break-system-packages || {
     echo "❌ Installation failed"
     exit 1
 }
-
 echo "  ✅ Wheel installed: $(basename $WHEEL_FILE)"
+echo ""
+
+# ========================================
+# 5b. Install Wheel in .venv (falls vorhanden)
+# ========================================
+VENV_DIR="$PROJECT_ROOT/.venv"
+VENV_PYTHON="$VENV_DIR/bin/python"
+if [ -d "$VENV_DIR" ] && [ -x "$VENV_PYTHON" ]; then
+    echo "Step 5b: Installing wheel in .venv..."
+    "$VENV_PYTHON" -m pip install "$WHEEL_FILE" || {
+        echo "❌ Installation in .venv failed"
+        exit 1
+    }
+    echo "  ✅ Wheel installed in .venv"
+else
+    echo "  ℹ️  No .venv found in vyra_base_python"
+fi
 echo ""
 
 # ========================================

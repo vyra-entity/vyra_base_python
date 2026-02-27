@@ -234,11 +234,11 @@ class VyraLoggingConfig:
         # Standard formatters
         formatters = {
             "standard": {
-                "format": "%(asctime)s - %(name)s - %(levelname)-8s - %(message)s",
+                "format": "%(asctime)s - %(levelname)-8s - %(name)s - %(message)s",
                 "datefmt": "%Y-%m-%d %H:%M:%S"
             },
             "detailed": {
-                "format": "%(asctime)s - %(name)s - %(levelname)-8s - [%(filename)s:%(lineno)d] - %(message)s",
+                "format": "%(asctime)s - %(levelname)-8s - %(name)s - [%(filename)s:%(lineno)d] - %(message)s",
                 "datefmt": "%Y-%m-%d %H:%M:%S"
             },
             "simple": {
@@ -246,7 +246,7 @@ class VyraLoggingConfig:
             },
             "colored": {
                 "()": "vyra_base.helper.logging_config.ColoredFormatter",
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                "format": "%(asctime)s - %(levelname)-8s - %(name)s - %(message)s",
                 "datefmt": "%Y-%m-%d %H:%M:%S"
             },
             "json": {
