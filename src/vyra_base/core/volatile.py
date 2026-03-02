@@ -5,7 +5,7 @@ from vyra_base.com.transport.t_ros2.node import VyraNode
 from vyra_base.com.core.types import VyraPublisher
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
-from vyra_base.com import InterfaceFactory, ProtocolType
+from vyra_base.com import InterfaceFactory, ProtocolType, remote_service
 
 import logging
 logger = logging.getLogger(__name__)
@@ -360,3 +360,90 @@ class Volatile:
         else:
             raise KeyError(
                 f"Volatile key '{volatile_key}' does not exist in Redis.")
+
+    async def has_volatile(self, key: str) -> bool:
+        """
+        Check if a volatile parameter with the given key exists in Redis.
+
+        :param key: The key of the volatile parameter to check.
+        :type key: str
+        :return: True if the volatile exists, False otherwise.
+        :rtype: bool
+
+        **Example:**
+
+        .. code-block:: python
+
+            if await volatile.has_volatile("temperature"):
+                value = await volatile.get_volatile_value("temperature")
+        """
+        return await self.redis.exists(key)
+
+    @remote_service()
+    async def get_volatile(self, request: Any, response: Any) -> None:
+        """
+        Get the current value of a volatile parameter (remote service interface).
+
+        :param request: Request object with ``key`` attribute.
+        :param response: Response object updated with ``success``, ``message``, ``value``.
+        """
+        key = request.key
+        if not await self.redis.exists(key):
+            response.success = False
+            response.message = f"Volatile key '{key}' does not exist."
+            response.value = ""
+            return None
+
+        value = await self.get_volatile_value(key)
+        import json as _json
+        response.success = True
+        response.message = f"Volatile '{key}' retrieved successfully."
+        response.value = _json.dumps(value) if not isinstance(value, str) else value
+        return None
+
+    @remote_service()
+    async def set_volatile(self, request: Any, response: Any) -> None:
+        """
+        Set the value of a volatile parameter (remote service interface).
+
+        :param request: Request object with ``key`` and ``value`` attributes.
+        :param response: Response object updated with ``success`` and ``message``.
+        """
+        key = request.key
+        value = request.value
+        try:
+            await self.set_volatile_value(key, value)
+            response.success = True
+            response.message = f"Volatile '{key}' set successfully."
+        except Exception as e:
+            response.success = False
+            response.message = f"Failed to set volatile '{key}': {e}"
+        return None
+
+    @remote_service()
+    async def read_all_volatiles(self, request: Any, response: Any) -> None:
+        """
+        Read all volatile parameters with their current values (remote service interface).
+
+        Returns a JSON-encoded list of objects with ``key`` and ``value`` fields.
+
+        :param request: Request object (unused).
+        :param response: Response object updated with ``all_volatiles_json``.
+        """
+        import json as _json
+        try:
+            keys = await self.read_all_volatile_names()
+            result = []
+            for key in keys:
+                value = await self.get_volatile_value(key)
+                redis_type = await self.redis.get_type(key)
+                result.append({
+                    "key": key,
+                    "value": value,
+                    "type": redis_type.value if redis_type is not None else "unknown",
+                })
+            response.all_volatiles_json = _json.dumps(result)
+        except Exception as e:
+            logger.error(f"Failed to read all volatiles: {e}")
+            response.all_volatiles_json = "[]"
+        return None

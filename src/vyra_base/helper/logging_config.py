@@ -170,6 +170,18 @@ class VyraLoggingConfig:
         if cls._initialized:
             logging.getLogger(__name__).debug("Logging already initialized, skipping")
             return
+
+        # If the application has already configured the vyra_base logger (e.g. via
+        # dictConfig in core_logging.json), respect that configuration and skip
+        # adding the duplicate file handler to log/vyra/.
+        _existing = logging.getLogger("vyra_base")
+        if _existing.handlers:
+            cls._initialized = True
+            _existing.debug(
+                "vyra_base logger already configured by application — "
+                "skipping VyraLoggingConfig file handler setup"
+            )
+            return
         
         # Determine log level from parameter or environment
         if log_level is None:

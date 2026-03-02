@@ -625,3 +625,28 @@ class Parameter:
         
         response['topic'] = pub_server.publisher_info.name
         return response
+
+    async def has_parameter(self, key: str) -> bool:
+        """
+        Check if a parameter with the given key exists.
+
+        :param key: The key of the parameter to check.
+        :type key: str
+        :return: True if the parameter exists, False otherwise.
+        :rtype: bool
+
+        **Example:**
+
+        .. code-block:: python
+
+            if await param_manager.has_parameter("robot_speed"):
+                result = await param_manager.get_parameter_impl("robot_speed")
+        """
+        result: DBReturnValue = await self.persistant_manipulator.get_all(
+            filters={"name": key}
+        )
+        return (
+            result.status == DBSTATUS.SUCCESS
+            and isinstance(result.value, list)
+            and len(result.value) > 0
+        )

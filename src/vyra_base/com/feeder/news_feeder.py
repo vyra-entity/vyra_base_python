@@ -99,6 +99,11 @@ class NewsFeeder(BaseFeeder):
         await super().feed(newsfeed_entry)
 
     def feed_sync(self, msg: Any) -> None:
+        """Sync version of feed() — normalises input to NewsEntry before delegating."""
+        if isinstance(msg, str) or isinstance(msg, list):
+            msg = self.build_newsfeed(msg)
+        elif not isinstance(msg, NewsEntry):
+            raise FeederException(f"Wrong Type. Expect: NewsEntry or str, got {type(msg)}")
         return super().feed_sync(msg)
 
     def _prepare_entry_for_publish(self, entry: NewsEntry) -> dict:  # type: ignore[override]

@@ -8,6 +8,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.96] - 2026-03-02
+
+### Build
+
+Update interfaces and add combined proto generation. This will allow to have function definitions from different fields in one proto file. For example you can habe set_parameter and get_parameter and sevela other functions definitions in VBASEParameter.proto
+
+
+## [0.1.8+build.95] - 2026-03-02
+
+### Build
+
+Update Feeder converting error bug
+
+
+## [0.1.8+build.94] - 2026-03-02
+
+### Build
+
+
+### Fix: AttributeError in NewsFeeder.feed_sync (vyra_base_python)
+- `NewsFeeder.feed_sync()` delegierte raw strings direkt an `BaseFeeder` → `_prepare_entry_for_publish` versuchte `str.level` → `AttributeError`
+- Fix: `feed_sync` normalisiert `str`/`list` via `build_newsfeed()` zu `NewsEntry` bevor es an `super().feed_sync()` weitergegeben wird
+- Datei: `vyra_base_python/src/vyra_base/com/feeder/news_feeder.py`
+
+
+
 ## [0.1.8+build.93] - 2026-02-27
 
 ### Build

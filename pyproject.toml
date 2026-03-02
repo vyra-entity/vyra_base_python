@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vyra_base"
-version = "0.1.8+build.93"
+version = "0.1.8+build.96"
 description = "Base library for V.Y.R.A. modules written in Python"
 authors = ["Holger Schernewski"]
 license = "LICENSE"
@@ -13,6 +13,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 include = [
+    "vyra_base/py.typed",
     "vyra_base/helper/logger_config.json",
     "vyra_base/interfaces/package.xml",
     "vyra_base/interfaces/CMakeLists.template.txt",

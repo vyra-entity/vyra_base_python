@@ -182,5 +182,147 @@
         "access_level": 1,
         "visible": true,
         "published": false
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "read_all_params",
+        "displayname": "Read All Parameters",
+        "description": "Returns all parameters with their metadata as a JSON string.",
+        "filetype": [
+            "VBASEReadAllParams.proto"
+        ],
+        "params": [],
+        "returns": [
+            {
+                "name": "all_params_json",
+                "datatype": "string",
+                "displayname": "All Params (JSON)",
+                "description": "JSON-encoded array of all parameter objects."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "get_volatile",
+        "displayname": "Get Volatile",
+        "description": "Get the current value of a volatile (transient) parameter stored in Redis.",
+        "filetype": [
+            "VBASEVolatile.proto"
+        ],
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Key",
+                "description": "The unique key identifying the volatile parameter."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the volatile was found and retrieved."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            },
+            {
+                "name": "value",
+                "datatype": "string",
+                "displayname": "Value",
+                "description": "The current value of the volatile parameter (JSON-encoded for complex types)."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "set_volatile",
+        "displayname": "Set Volatile",
+        "description": "Set the value of a volatile (transient) parameter in Redis.",
+        "filetype": [
+            "VBASEVolatile.proto"
+        ],
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Key",
+                "description": "The unique key for the volatile parameter."
+            },
+            {
+                "name": "value",
+                "datatype": "string",
+                "displayname": "Value",
+                "description": "The value to store. Use JSON encoding for complex types."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the volatile was set successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "read_all_volatiles",
+        "displayname": "Read All Volatiles",
+        "description": "Read all volatile parameters with their current values. Returns a JSON-encoded array.",
+        "filetype": [
+            "VBASEVolatile.proto"
+        ],
+        "params": [],
+        "returns": [
+            {
+                "name": "all_volatiles_json",
+                "datatype": "string",
+                "displayname": "All Volatiles (JSON)",
+                "description": "JSON-encoded array of volatile objects. Each object contains: key, value, type."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
     }
 ]
