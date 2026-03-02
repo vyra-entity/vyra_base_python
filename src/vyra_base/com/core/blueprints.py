@@ -154,7 +154,7 @@ class ServiceBlueprint(HandlerBlueprint):
         def handler(request, response=None) -> Union[dict, response_type]
     
     Example:
-        >>> @remote_service
+        >>> @remote_service()
         ... async def calculate(self, request, response=None):
         ...     result = request["x"] + request["y"]
         ...     return {"result": result}

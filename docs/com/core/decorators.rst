@@ -21,7 +21,7 @@ All decorators follow the **two-phase initialization** pattern:
 Decorator Reference
 -------------------
 
-@remote_service
+@remote_service()
 ~~~~~~~~~~~~~~~
 
 Expose a method as a request/response service.

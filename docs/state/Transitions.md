@@ -3,10 +3,14 @@
 
 | From           | Event             | To            | Beschreibung                                          |
 | -------------- | ----------------- | ------------- | ----------------------------------------------------- |
+| Offline        | start             | Initializing  | Modul-Initialisierung gestartet.                      |
 | Initializing   | init_success      | Active        | Initialisierung erfolgreich abgeschlossen.            |
 | Initializing   | init_failure      | Recovering    | Initialisierung fehlgeschlagen, Recovery nötig.       |
 | Active         | shutdown          | ShuttingDown  | Kontrolliertes Herunterfahren eingeleitet.            |
 | Active         | fault_detected    | Recovering    | Fehler erkannt, Recovery-Prozess wird gestartet.      |
+| Active         | set_suspended     | Suspended     | Modul temporär pausiert (Wartung/Updates).            |
+| Suspended      | resume_suspended  | Active        | Modul aus Suspend-Modus zurückgekehrt.                |
+| Suspended      | finished          | Offline       | Modul direkt aus Suspend heruntergefahren.            |
 | Recovering     | recovery_success  | Active        | Recovery erfolgreich, zurück zu aktiv.                |
 | Recovering     | recovery_failed   | ShuttingDown  | Recovery fehlgeschlagen, Shutdown nötig.              |
 | ShuttingDown   | finished          | Offline       | Shutdown abgeschlossen, Modul offline.                |

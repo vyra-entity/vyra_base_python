@@ -1271,7 +1271,7 @@ class VyraEntity:
             from vyra_base.com import remote_service
 
             class MyParentClass:
-                @remote_service
+                @remote_service()
                 async def my_remote_function(self, request: Any, response: Any):
                     pass
 

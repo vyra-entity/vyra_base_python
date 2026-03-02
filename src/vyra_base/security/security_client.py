@@ -324,7 +324,7 @@ def security_required(
     
     Usage with @remote_service::
     
-        @remote_service
+        @remote_service()
         @security_required(security_level=SecurityLevel.HMAC)
         def my_service_callback(self, request, response):
             # Service implementation

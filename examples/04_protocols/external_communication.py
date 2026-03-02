@@ -302,7 +302,7 @@ class ExternalBridgeComponent:
         Handle VYRA callable and forward to external system.
         
         This would be registered as a VYRA callable:
-            @remote_service
+            @remote_service()
             async def send_external_command(self, request, response=None):
                 return await bridge.handle_vyra_command(request)
         """

@@ -84,6 +84,10 @@ class LifecycleLayer:
     def is_offline(self) -> bool:
         """Check if module is offline."""
         return self.get_state() == LifecycleState.OFFLINE
+
+    def is_suspended(self) -> bool:
+        """Check if module is suspended."""
+        return self.get_state() == LifecycleState.SUSPENDED
     
     def can_accept_tasks(self) -> bool:
         """Check if module can accept operational tasks."""
@@ -177,6 +181,46 @@ class LifecycleLayer:
         self.fsm.send_event(event)
         logger.info("Shutdown completed")
         return self.get_state()
+
+    def enter_suspend(self, reason: Optional[str] = None) -> LifecycleState:
+        """
+        Suspend the module temporarily (e.g. for maintenance or updates).
+
+        Transitions: Active → Suspended
+
+        Args:
+            reason: Optional reason for suspension
+
+        Returns:
+            New lifecycle state
+
+        Raises:
+            InvalidTransitionError: If not in Active state
+        """
+        event = StateEvent(EventType.SET_SUSPENDED, payload={"reason": reason})
+        self.fsm.send_event(event)
+        logger.info(f"Module suspended: {reason}")
+        return self.get_state()
+
+    def resume_from_suspend(self, info: Optional[dict] = None) -> LifecycleState:
+        """
+        Resume module from Suspended state.
+
+        Transitions: Suspended → Active
+
+        Args:
+            info: Optional context about the resume
+
+        Returns:
+            New lifecycle state
+
+        Raises:
+            InvalidTransitionError: If not in Suspended state
+        """
+        event = StateEvent(EventType.RESUME_SUSPENDED, payload=info)
+        self.fsm.send_event(event)
+        logger.info("Module resumed from suspend")
+        return self.get_state()
     
     def enter_recovery(self, fault_info: Optional[Dict[str, Any]] = None) -> LifecycleState:
         """
@@ -216,7 +260,7 @@ class LifecycleLayer:
         """
         Mark recovery as failed.
         
-        Transitions: Recovering → Deactivated
+        Transitions: Recovering → ShuttingDown
         
         Args:
             error: Recovery failure reason

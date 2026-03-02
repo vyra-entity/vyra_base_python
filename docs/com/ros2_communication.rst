@@ -77,13 +77,13 @@ Use the ``@remote_service`` decorato:
        def __init__(self, unified_state_machine):
            super().__init__(unified_state_machine)
        
-       @remote_service
+       @remote_service()
        async def add_two_ints(self, request, response):
            """Adds two numbers"""
            response.sum = request.a + request.b
            return response
        
-       @remote_service
+       @remote_service()
        async def get_status(self, request, response):
            """Returns the current status"""
            response.status = "operational"
@@ -174,7 +174,7 @@ Inter-Module Service Call
 .. code-block:: python
 
    class RobotController(OperationalStateMachine):
-       @remote_service
+       @remote_service()
        async def move_to_position(self, request, response):
            """Moves robot to position"""
            x, y = request.target_x, request.target_y

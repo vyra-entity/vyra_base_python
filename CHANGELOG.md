@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.97] - 2026-03-02
+
+### Build
+
+bugfixing statemachine
+
+## [2026-03-02]
+### Added: Lifecycle Suspend/Resume API & fehlende UnifiedStateMachine-Delegierungen
+- **`lifecycle_layer.py`**:
+  - `is_suspended()` — State-Query für `SUSPENDED`
+  - `enter_suspend(reason)` — Übergang `Active → Suspended` via `SET_SUSPENDED` Event
+  - `resume_from_suspend(info)` — Übergang `Suspended → Active` via `RESUME_SUSPENDED` Event
+- **`unified.py`**:
+  - `suspend(reason)` / `resume_from_suspend(info)` — delegieren an LifecycleLayer
+  - `enter_recovery()`, `complete_recovery()`, `fail_recovery()` — vorher fehlende Delegierungen
+  - `is_suspended()`, `is_initializing()`, `is_active()`, `is_recovering()`, `is_shutting_down()`, `is_offline()` — Lifecycle-State-Shortcuts
+### Fixed
+- **`lifecycle_layer.py`**: `fail_recovery()` Docstring korrigiert: „Recovering → Deactivated" → „Recovering → ShuttingDown"
+### Docs
+- **`docs/state/Transitions.md`**: SUSPENDED-Transitions ergänzt (`Active↔Suspended`, `Suspended→Offline`); fehlender `Offline → Initializing` Eintrag hinzugefügt
+- **`docs/state/Events.md`**: `SET_SUSPENDED` und `RESUME_SUSPENDED` in Lifecycle-Events-Tabelle ergänzt; UnifiedStateMachine-Beispiel um Suspend/Resume und Recovery erweitert
+
+
 ## [0.1.8+build.96] - 2026-03-02
 
 ### Build

@@ -211,36 +211,36 @@ class OperationalLayer:
     # Special Operations
     # -------------------------------------------------------------------------
     
-    def start_background_processing(self, process_info: Optional[Dict[str, Any]] = None) -> OperationalState:
-        """
-        Enter background processing mode.
+    # def start_background_processing(self, process_info: Optional[Dict[str, Any]] = None) -> OperationalState:
+    #     """
+    #     Enter background processing mode.
         
-        Transitions: Running → Processing
+    #     Transitions: Running → Processing
         
-        Args:
-            process_info: Processing task details
+    #     Args:
+    #         process_info: Processing task details
             
-        Returns:
-            New operational state
-        """
-        event = StateEvent(EventType.SET_BACKGROUND, payload=process_info, origin_layer="operational")
-        self.fsm.send_event(event)
-        logger.info(f"Background processing started: {process_info}")
-        return self.get_state()
+    #     Returns:
+    #         New operational state
+    #     """
+    #     event = StateEvent(EventType.SET_BACKGROUND, payload=process_info, origin_layer="operational")
+    #     self.fsm.send_event(event)
+    #     logger.info(f"Background processing started: {process_info}")
+    #     return self.get_state()
     
-    def return_to_foreground(self) -> OperationalState:
-        """
-        Complete background processing.
+    # def return_to_foreground(self) -> OperationalState:
+    #     """
+    #     Complete background processing.
         
-        Transitions: Processing → Running
+    #     Transitions: Processing → Running
         
-        Returns:
-            New operational state
-        """
-        event = StateEvent(EventType.SET_FOREGROUND, origin_layer="operational")
-        self.fsm.send_event(event)
-        logger.info("Background processing completed")
-        return self.get_state()
+    #     Returns:
+    #         New operational state
+    #     """
+    #     event = StateEvent(EventType.SET_FOREGROUND, origin_layer="operational")
+    #     self.fsm.send_event(event)
+    #     logger.info("Background processing completed")
+    #     return self.get_state()
     
     # def delegate_to_other(self, delegation_info: Optional[Dict[str, Any]] = None) -> OperationalState:
     #     """

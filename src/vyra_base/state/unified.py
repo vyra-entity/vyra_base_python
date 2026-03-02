@@ -80,6 +80,31 @@ class UnifiedStateMachine:
     def is_healthy(self) -> bool:
         """Check if module health is OK."""
         return self.fsm.is_healthy()
+
+    # Lifecycle state shortcuts
+    def is_initializing(self) -> bool:
+        """Check if module is initializing."""
+        return self.lifecycle.is_initializing()
+
+    def is_active(self) -> bool:
+        """Check if module lifecycle is Active."""
+        return self.lifecycle.is_active()
+
+    def is_suspended(self) -> bool:
+        """Check if module is suspended."""
+        return self.lifecycle.is_suspended()
+
+    def is_recovering(self) -> bool:
+        """Check if module is in recovery."""
+        return self.lifecycle.is_recovering()
+
+    def is_shutting_down(self) -> bool:
+        """Check if module is shutting down."""
+        return self.lifecycle.is_shutting_down()
+
+    def is_offline(self) -> bool:
+        """Check if module is offline."""
+        return self.lifecycle.is_offline()
     
     # -------------------------------------------------------------------------
     # Lifecycle Methods (delegated)
@@ -96,7 +121,7 @@ class UnifiedStateMachine:
     def fail_initialization(self, error: Optional[str] = None) -> LifecycleState:
         """Mark initialization as failed."""
         return self.lifecycle.fail_initialization(error)
-    
+
     def shutdown(self, reason: Optional[str] = None) -> LifecycleState:
         """Begin controlled shutdown."""
         return self.lifecycle.shutdown(reason)
@@ -104,6 +129,76 @@ class UnifiedStateMachine:
     def complete_shutdown(self) -> LifecycleState:
         """Complete shutdown process."""
         return self.lifecycle.complete_shutdown()
+
+    def suspend(self, reason: Optional[str] = None) -> LifecycleState:
+        """
+        Suspend the module temporarily (e.g. for maintenance or updates).
+
+        Transitions: Active → Suspended
+
+        Args:
+            reason: Optional reason for suspension
+
+        Returns:
+            New lifecycle state
+        """
+        return self.lifecycle.enter_suspend(reason)
+
+    def resume_from_suspend(self, info: Optional[Dict[str, Any]] = None) -> LifecycleState:
+        """
+        Resume module from Suspended state.
+
+        Transitions: Suspended → Active
+
+        Args:
+            info: Optional context about the resume
+
+        Returns:
+            New lifecycle state
+        """
+        return self.lifecycle.resume_from_suspend(info)
+
+    def enter_recovery(self, fault_info: Optional[Dict[str, Any]] = None) -> LifecycleState:
+        """
+        Enter recovery mode due to fault.
+
+        Transitions: Active → Recovering
+
+        Args:
+            fault_info: Fault description and context
+
+        Returns:
+            New lifecycle state
+        """
+        return self.lifecycle.enter_recovery(fault_info)
+
+    def complete_recovery(self, recovery_info: Optional[Dict[str, Any]] = None) -> LifecycleState:
+        """
+        Complete recovery successfully.
+
+        Transitions: Recovering → Active
+
+        Args:
+            recovery_info: Recovery details
+
+        Returns:
+            New lifecycle state
+        """
+        return self.lifecycle.complete_recovery(recovery_info)
+
+    def fail_recovery(self, error: Optional[str] = None) -> LifecycleState:
+        """
+        Mark recovery as failed.
+
+        Transitions: Recovering → ShuttingDown
+
+        Args:
+            error: Recovery failure reason
+
+        Returns:
+            New lifecycle state
+        """
+        return self.lifecycle.fail_recovery(error)
     
     # -------------------------------------------------------------------------
     # Operational Methods (delegated)

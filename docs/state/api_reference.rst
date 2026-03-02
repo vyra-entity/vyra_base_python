@@ -98,7 +98,7 @@ Usage:
     from vyra_base.com import remote_service
     
     class MyComponent(OperationalStateMachine):
-        @remote_service
+        @remote_service()
         def initialize(self, request=None, response=None):
             return True
 

@@ -15,7 +15,7 @@ This decouples interface definition from implementation, enabling:
 
 Example:
     >>> class MyComponent:
-    ...     @remote_service
+    ...     @remote_service()
     ...     async def calculate(self, request, response=None):
     ...         return {"result": request["x"] + request["y"]}
     
@@ -62,7 +62,7 @@ def remote_service(
         
     Example:
         >>> class MyComponent(OperationalStateMachine):
-        ...     @remote_service
+        ...     @remote_service()
         ...     async def calculate(self, request, response=None):
         ...         result = request["x"] + request["y"]
         ...         return {"result": result}

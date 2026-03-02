@@ -43,6 +43,8 @@ event = StateEvent(
 | INIT_FAILURE      | Initializing → Recovering| Initialisierung fehlgeschlagen          |
 | SHUTDOWN          | Active → ShuttingDown    | Kontrolliertes Herunterfahren           |
 | FINISHED          | ShuttingDown → Offline   | Shutdown abgeschlossen                  |
+| SET_SUSPENDED     | Active → Suspended       | Modul temporär pausieren (Wartung)      |
+| RESUME_SUSPENDED  | Suspended → Active       | Modul aus Suspend-Modus zurückbringen   |
 | FAULT_DETECTED    | Active → Recovering      | Fehler erkannt, Recovery nötig          |
 | RECOVERY_SUCCESS  | Recovering → Active      | Recovery erfolgreich                    |
 | RECOVERY_FAILED   | Recovering → ShuttingDown| Recovery fehlgeschlagen                 |
@@ -120,6 +122,16 @@ from vyra_base.state.unified import UnifiedStateMachine
 
 usm = UnifiedStateMachine()
 usm.start()  # Sendet intern START event
+
+# Suspend / Resume
+usm.suspend("Wartungsarbeiten")       # Active → Suspended
+usm.resume_from_suspend()             # Suspended → Active
+
+# Recovery-Zyklus
+usm.enter_recovery({"error": "..."}) # Active → Recovering
+usm.complete_recovery()              # Recovering → Active
+# oder bei Fehler:
+usm.fail_recovery("konnte nicht recovern")  # Recovering → ShuttingDown
 ```
 
 ---
