@@ -130,7 +130,7 @@ class DbManipulator:
         
         finally:
             error_details: list = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error('Could not get tablestructure from '
                      f'{self.model.__tablename__}.')
                 error_ret = DBReturnValue()
@@ -182,7 +182,7 @@ class DbManipulator:
 
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not get data by id from {self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -227,7 +227,7 @@ class DbManipulator:
                         result = await session.execute(stmt)
                     finally:
                         logger.debug("Ran execute on session")
-                        ErrorTraceback.check_error_exist()
+                        ErrorTraceback.check_error_exist(log_print=True)
                     logger.debug(f"Executed query: {stmt}: {result}")
                     value = result.scalars().all()
 
@@ -242,7 +242,7 @@ class DbManipulator:
                         details='Data found').success_return()
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not get all data from {self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -294,7 +294,7 @@ class DbManipulator:
 
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not update data to {self.model.__tablename__}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -331,7 +331,7 @@ class DbManipulator:
                 ).success_return()
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not add tabledata to {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -367,7 +367,7 @@ class DbManipulator:
                 ).success_return()
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not delete tabledata from {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -405,7 +405,7 @@ class DbManipulator:
                 ).success_return()
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not bulk add tabledata to {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -439,7 +439,7 @@ class DbManipulator:
                 ).success_return()
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not bulk delete tabledata from {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -478,7 +478,7 @@ class DbManipulator:
 
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not check existance of {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)
@@ -511,7 +511,7 @@ class DbManipulator:
                         raise e
         finally:
             error_details = []
-            if ErrorTraceback.check_error_exist(error_details):
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
                 logger.error(f'Could not count tabledata from {self.table_name}.')
                 error_ret = DBReturnValue()
                 return error_ret.error_return(error_details)

@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.98] - 2026-03-02
+
+### Build
+
+update db manipulater loghandling
+
+
 ## [0.1.8+build.97] - 2026-03-02
 
 ### Build
