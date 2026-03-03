@@ -16,6 +16,9 @@ from vyra_base.com.feeder.interfaces import IFeeder
 from vyra_base.com.feeder.custom_feeder import CustomBaseFeeder
 from vyra_base.com.feeder.config_resolver import FeederConfigResolver, FeederResolverResult
 from vyra_base.com.feeder.registry import FeederRegistry, register_feeder
+from vyra_base.com.feeder.feeder import BaseFeeder
+from vyra_base.com.feeder import feed_tracker
+from vyra_base.com.feeder.tracking import FeedConditionRegistry, FeedTracker
 
 
 # ---------------------------------------------------------------------------
@@ -258,3 +261,187 @@ class TestBuiltinFeeders:
         from vyra_base.com.feeder.error_feeder import ErrorFeeder
         feeder = self._make_builtin(ErrorFeeder)
         assert feeder.get_feeder_name() == "ErrorFeed"
+
+
+class TestFeederTracking:
+    @pytest.mark.asyncio
+    async def test_basefeeder_debounce_suppresses_duplicate(self):
+        feeder = BaseFeeder()
+        feeder._is_ready = False
+
+        await feeder.feed({"message": "same-message"})
+        await feeder.feed({"message": "same-message"})
+
+        assert len(feeder.get_buffer()) == 1
+        assert feeder.debounced_duplicate_count == 1
+
+    def test_condition_registry_returns_messages(self):
+        feeder = BaseFeeder()
+        feeder.register_condition(
+            lambda context: context.get("ok", False),
+            name="ok_condition",
+            tag="news",
+            success_message="ok",
+            failure_message="not ok",
+        )
+
+        assert feeder.evaluate_conditions({"ok": True}) == [("news", "ok")]
+        assert feeder.evaluate_conditions({"ok": False}) == [("news", "not ok")]
+
+    def test_condition_registry_can_filter_by_rule_name(self):
+        feeder = BaseFeeder()
+        feeder.register_condition(
+            lambda context: context.get("a", False),
+            name="rule_a",
+            tag="news",
+            success_message="A",
+        )
+        feeder.register_condition(
+            lambda context: context.get("b", False),
+            name="rule_b",
+            tag="custom",
+            success_message="B",
+        )
+
+        outputs = feeder.evaluate_conditions(
+            {"a": True, "b": True},
+            rule_names=["rule_b"],
+        )
+        assert outputs == [("custom", "B")]
+
+    def test_condition_registry_can_filter_by_tag(self):
+        feeder = BaseFeeder()
+        feeder.register_condition(
+            lambda context: context.get("a", False),
+            name="rule_a",
+            tag="news",
+            success_message="A",
+        )
+        feeder.register_condition(
+            lambda context: context.get("b", False),
+            name="rule_b",
+            tag="custom",
+            success_message="B",
+        )
+
+        outputs = feeder.evaluate_conditions(
+            {"a": True, "b": True},
+            tags=["news"],
+        )
+        assert outputs == [("news", "A")]
+
+    def test_condition_registry_filters_by_execution_point(self):
+        feeder = BaseFeeder()
+        feeder.register_condition(
+            lambda context: context.get("ok", False),
+            name="before_rule",
+            tag="news",
+            execution_point="BEFORE",
+            success_message="before",
+        )
+        feeder.register_condition(
+            lambda context: context.get("ok", False),
+            name="always_rule",
+            tag="news",
+            execution_point="ALWAYS",
+            success_message="always",
+        )
+
+        outputs = feeder.evaluate_conditions(
+            {"ok": True},
+            execution_point="AFTER",
+        )
+        assert outputs == [("news", "always")]
+
+    def test_condition_registry_rejects_async_callback(self):
+        feeder = BaseFeeder()
+
+        async def async_condition(_):
+            return True
+
+        with pytest.raises(TypeError):
+            feeder.register_condition(async_condition, name="invalid")
+
+    @pytest.mark.asyncio
+    async def test_feed_tracker_lazy_entity_lookup(self):
+        class DummyErrorFeeder:
+            def __init__(self):
+                self.received = []
+
+            async def feed(self, payload):
+                self.received.append(payload)
+
+            def evaluate_conditions(self, _context):
+                return []
+
+        class DummyEntity:
+            def __init__(self):
+                self.error_feeder = DummyErrorFeeder()
+                self.news_feeder = MagicMock()
+
+        class DummyComponent:
+            def __init__(self):
+                self.entity = DummyEntity()
+
+            @feed_tracker.monitor(tag="error", label="lazy lookup", severity="WARNING")
+            async def boom(self):
+                raise RuntimeError("boom")
+
+        component = DummyComponent()
+        with pytest.raises(RuntimeError):
+            await component.boom()
+
+        assert len(component.entity.error_feeder.received) == 1
+        assert "RuntimeError: boom" in component.entity.error_feeder.received[0]["description"]
+
+    def test_feed_tracker_news_during_execution_point(self):
+        class ConditionCarrier:
+            def __init__(self):
+                self._conditions = FeedConditionRegistry()
+
+            def register_condition(self, *args, **kwargs):
+                return self._conditions.register(*args, **kwargs)
+
+            def evaluate_conditions(self, context, **kwargs):
+                return self._conditions.evaluate(context, **kwargs)
+
+        class DummyNewsSink:
+            def __init__(self):
+                self.messages = []
+
+            def feed_sync(self, message):
+                self.messages.append(message)
+
+        class DummyEntity:
+            def __init__(self):
+                self.news_feeder = DummyNewsSink()
+
+        class DummyComponent:
+            def __init__(self):
+                self.entity = DummyEntity()
+                self.a = 0
+                self.monitor_source = ConditionCarrier()
+                self.monitor_source.register_condition(
+                    lambda _context: self.a > 0,
+                    name="during_a_positive",
+                    tag="news",
+                    execution_point="DURING",
+                    success_message="a is positive during execution",
+                )
+
+        component = DummyComponent()
+
+        decorator = FeedTracker(component.monitor_source).monitor(
+            tag="news",
+            during_interval_seconds=0.01,
+        )
+
+        @decorator
+        def run_step(self):
+            import time
+            time.sleep(0.03)
+            self.a = 3
+            time.sleep(0.04)
+
+        run_step(component)
+        assert "a is positive during execution" in component.entity.news_feeder.messages

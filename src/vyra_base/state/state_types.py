@@ -8,6 +8,13 @@ industrial automation standards (ISO 13849, IEC 61508).
 from enum import Enum
 
 
+class StateType(Enum):
+    """Enum for state types."""
+    LIFECYCLE = "Lifecycle"
+    OPERATIONAL = "Operational"
+    HEALTH = "Health"
+    ANY = "Any"
+
 class LifecycleState(Enum):
     """
     Lifecycle states define the existence and high-level life of a module.
@@ -107,7 +114,7 @@ LIFECYCLE_OPERATIONAL_RULES = {
         OperationalState.ERROR,
     },
     LifecycleState.SUSPENDED: {          # Only idle when suspended
-        OperationalState.IDLE,
+        OperationalState.IDLE
     },
     LifecycleState.SHUTTING_DOWN: {       # Freezing operational state
         OperationalState.IDLE,

@@ -14,12 +14,14 @@ Features:
 - Layer interaction validation
 """
 
+import asyncio
 import threading
 import logging
-from typing import Dict, List, Callable, Optional, Any, Tuple
+from typing import Dict, List, Callable, Optional, Any, Tuple, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 from collections import deque
+from asyncio import AbstractEventLoop
 
 from .state_types import (
     LifecycleState,
@@ -31,7 +33,8 @@ from .state_types import (
     is_operational_allowed_in_lifecycle,
 )
 from .state_events import StateEvent, EventType, get_event_target_layer, is_interrupt_event
-import logging
+from .state_types import StateType
+
 logger = logging.getLogger(__name__)
 class StateMachineError(Exception):
     """Base exception for state machine errors."""
@@ -133,7 +136,7 @@ class StateMachine:
         {'lifecycle': 'Initializing', 'operational': 'Idle', 'health': 'OK'}
     """
     
-    def __init__(self, config: Optional[StateMachineConfig] = None):
+    def __init__(self, config: Optional[StateMachineConfig] = None, loop: AbstractEventLoop = None):
         """
         Initialize the state machine.
         
@@ -146,6 +149,7 @@ class StateMachine:
         self._lifecycle = self.config.initial_lifecycle
         self._operational = self.config.initial_operational
         self._health = self.config.initial_health
+        self._loop = loop
         
         # Thread safety
         self._lock = threading.RLock()
@@ -262,36 +266,49 @@ class StateMachine:
     # Public API - Callbacks
     # -------------------------------------------------------------------------
     
-    def subscribe(self, layer: str, callback: Callable[[str, str, str], None], priority: int = 0):
+    def _normalize_layer(self, layer: Union[StateType, str]) -> str:
+        if isinstance(layer, StateType):
+            key = layer.value.lower()
+        elif isinstance(layer, str):
+            key = layer.lower().strip()
+        else:
+            raise ValueError(f"Invalid layer type: {layer}. Must be StateType or str.")
+
+        if key not in self._callbacks:
+            raise ValueError(f"Invalid layer: {layer}")
+        return key
+
+    def subscribe(self, layer: Union[StateType, str], callback: Callable[[str, str, str], None], priority: int = 0):
         """
         Subscribe to state changes on a specific layer.
         
         Args:
-            layer: Layer name ('lifecycle', 'operational', 'health', 'any')
+            layer: Layer name (StateType or str: lifecycle/operational/health/any)
             callback: Function(layer, old_state, new_state)
             priority: Higher priority callbacks are called first
             
         Example:
             >>> def on_state_change(layer, old, new):
             ...     print(f"{layer}: {old} -> {new}")
-            >>> fsm.subscribe("lifecycle", on_state_change)
+            >>> fsm.subscribe(StateType.LIFECYCLE, on_state_change)
         """
+        layer_key = self._normalize_layer(layer)
+
         with self._lock:
-            if layer not in self._callbacks:
-                raise ValueError(f"Invalid layer: {layer}")
-            
-            self._callbacks[layer].append((callback, priority))
+            self._callbacks[layer_key].append((callback, priority))
             # Sort by priority (descending)
-            self._callbacks[layer].sort(key=lambda x: x[1], reverse=True)
+            self._callbacks[layer_key].sort(key=lambda x: x[1], reverse=True)
             
             logger.debug(f"Subscribed callback to {layer} layer with priority {priority}")
     
-    def unsubscribe(self, layer: str, callback: Callable):
+    def unsubscribe(self, layer: Union[StateType, str], callback: Callable):
         """Remove a callback subscription."""
+        layer_key = self._normalize_layer(layer)
+        
         with self._lock:
-            if layer in self._callbacks:
-                self._callbacks[layer] = [(cb, pri) for cb, pri in self._callbacks[layer] if cb != callback]
-    
+            if layer_key in self._callbacks:
+                self._callbacks[layer_key] = [(cb, pri) for cb, pri in self._callbacks[layer_key] if cb != callback]
+                logger.debug(f"Unsubscribed callback from {layer} layer")
     # -------------------------------------------------------------------------
     # Public API - History and Diagnostics
     # -------------------------------------------------------------------------
@@ -599,9 +616,22 @@ class StateMachine:
         # Notify global callbacks
         for callback, _ in self._callbacks.get("any", []):
             try:
-                callback(layer, old_state, new_state)
+                # Check if coroutine
+                if asyncio.iscoroutinefunction(callback):
+                    if self._loop:
+                        self._loop.create_task(callback(layer, old_state, new_state))
+                    else:
+                        logger.warning(
+                            "No event loop available for async callback. "
+                            f"Cannot execute {callback} for {layer} state change "
+                            f"from {old_state} to {new_state}")
+                else:
+                    callback(layer, old_state, new_state)
             except Exception as e:
                 logger.error(f"Global callback error: {e}")
+                logger.debug(
+                    f"Failed callback: {callback}, layer: " 
+                    f"{layer}, old: {old_state}, new: {new_state}")
     
     def __repr__(self) -> str:
         """String representation for debugging."""

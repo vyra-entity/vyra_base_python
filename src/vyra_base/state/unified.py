@@ -12,7 +12,7 @@ from .state_machine import StateMachine, StateMachineConfig
 from .lifecycle_layer import LifecycleLayer
 from .operational_layer import OperationalLayer
 from .health_layer import HealthLayer
-from .state_types import LifecycleState, OperationalState, HealthState
+from .state_types import LifecycleState, OperationalState, HealthState, StateType
 
 
 logger = logging.getLogger(__name__)
@@ -266,7 +266,7 @@ class UnifiedStateMachine:
     
     def on_any_change(self, callback: Callable, priority: int = 0):
         """Subscribe to any state change across all layers."""
-        self.fsm.subscribe("any", callback, priority)
+        self.fsm.subscribe(StateType.ANY, callback, priority)
     
     # -------------------------------------------------------------------------
     # Diagnostics

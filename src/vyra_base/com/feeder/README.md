@@ -45,6 +45,119 @@ Feeders automatically publish data (state, news, errors) to multiple subscribers
 - **Type Safety**: Native Python types or ROS2 messages
 - **Async Support**: Full async/await integration
 - **Entity Integration**: Seamless VyraEntity integration
+- **Runtime Monitoring Decorators**: `feed_tracker.monitor(...)` for method/function wrappers
+- **Condition Rules**: sync bool-only rules with success/failure messages and tags
+- **Execution Points**: rule execution at `BEFORE`, `DURING`, `AFTER`, `ALWAYS`
+- **Rule Filters**: evaluate only selected `rule_names` and/or `tags`
+- **Debouncing**: duplicate message suppression (5s window)
+
+---
+
+## Runtime Monitoring, Rules & Conditions
+
+Die neuen Feeder-Tracking-Funktionen bestehen aus drei Bausteinen:
+
+1. **Decorator-Monitoring** über `feed_tracker.monitor(...)` oder `*.monitor(...)` auf konkreten Feedern
+2. **Condition Rules** über `register_condition(...)` / `register_news_condition(...)`
+3. **Execution-Point-Auswertung** mit `BEFORE | DURING | AFTER | ALWAYS`
+
+### 1) Monitoring Decorator
+
+```python
+from vyra_base.com.feeder import feed_tracker
+
+class Component:
+    def __init__(self, entity):
+        self.entity = entity
+
+    @feed_tracker.monitor(
+        tag="error",                  # target tag: error/news/custom/...
+        label="Motor Check",          # optional human-readable label
+        severity="WARNING",           # mapped to ErrorFeed level on error output
+        during_interval_seconds=0.05,  # polling interval for DURING checks
+    )
+    async def check_motor(self):
+        ...
+```
+
+`monitor(...)` ist verfügbar über:
+
+- global: `feed_tracker.monitor(...)`
+- `entity.error_feeder.monitor(...)`
+- `entity.news_feeder.monitor(...)`
+- `CustomBaseFeeder.monitor(...)`
+
+### 2) Condition Rules
+
+Alle Feeder, die von `BaseFeeder` erben, können Conditions registrieren:
+
+```python
+def is_ready(ctx: dict) -> bool:
+    return bool(ctx.get("kwargs", {}).get("ready"))
+
+entity.news_feeder.register_condition(
+    is_ready,
+    name="ready_rule",
+    tag="news",                        # destination feeder tag
+    execution_point="AFTER",           # BEFORE/DURING/AFTER/ALWAYS
+    success_message="System is ready",
+    failure_message=None,
+)
+```
+
+Spezialfall für NewsFeeder:
+
+```python
+entity.news_feeder.register_news_condition(...)
+```
+
+**Wichtig:** Condition-Funktionen müssen synchron sein und `bool` zurückgeben.
+
+### 3) Execution Points
+
+- `BEFORE`: vor Funktionsausführung
+- `DURING`: zyklisch während der Laufzeit (Thread-basiert, Intervall über `during_interval_seconds`)
+- `AFTER`: nach Rückgabe oder Exception
+- `ALWAYS`: wird bei jedem der oben genannten Punkte mit ausgewertet
+
+### Rule- und Tag-Filter
+
+```python
+outputs = entity.news_feeder.evaluate_conditions(
+    context,
+    rule_names=["ready_rule"],
+    tags=["news", "custom"],
+    execution_point="AFTER",
+)
+```
+
+Damit kann Auswertung auf konkrete Rules/Tags begrenzt werden.
+
+### Runtime Context (Condition Input)
+
+Die Condition erhält einen Context mit u. a. folgenden Schlüsseln:
+
+- `tag`, `label`, `severity`
+- `function` (qualname)
+- `args`, `kwargs`
+- `self` (bei Methoden)
+- `entity` (lazy resolved)
+- `result` (nur nach erfolgreicher Ausführung)
+- `exception` (bei Fehlern, inkl. Typ/Message/Origin/Traceback)
+- `execution_point` (`BEFORE|DURING|AFTER`)
+
+### Dispatch-Verhalten für Condition-Ausgaben
+
+`evaluate_conditions(...)` liefert Tupel `(tag, message)`.
+
+- `tag == "error"` → `error_feeder`
+- `tag == "news"` → `news_feeder`
+- sonst → `entity.<tag>_feeder`, falls vorhanden
+
+### Debouncing
+
+Für identische Nachrichten greift ein Debouncer (Signatur-basiert, 5s Fenster).
+Unterdrückte Duplikate erhöhen intern den Duplicate-Counter statt erneut zu publishen.
 
 ---
 

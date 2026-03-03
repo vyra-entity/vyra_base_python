@@ -8,6 +8,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.102] - 2026-03-03
+
+### Build
+
+bugfixing
+
+### Documentation
+
+- Feeder-Dokumentation in `src/vyra_base/com/feeder/README.md` erweitert um:
+  - `monitor(...)` Wrapper für Error/News/Custom,
+  - Condition-Rules inkl. `execution_point` (`BEFORE|DURING|AFTER|ALWAYS`),
+  - Rule-/Tag-Filter (`rule_names`, `tags`), Runtime-Context-Felder und Dispatch-Verhalten,
+  - Debouncing-Hinweise.
+- `examples/06_feeder/README.md` um Monitoring-/Condition-Workflow ergänzt.
+
+
+## [0.1.8+build.101] - 2026-03-03
+
+### Build
+
+bugfixing feeder
+
+
+## [0.1.8+build.100] - 2026-03-03
+
+### Build
+
+Adding feeder decorator that could be used to mark functions if they fullfill a specific condfition function they will be fired too. So for example a Newsfeed could be released after a function call if a custom condition within this function was true. ErrorFeed decorator always fire if a exception in this function occures
+
+### Added
+- Feeder-Tracking-Grundlagen in `com/feeder`:
+  - Debouncing für identische Feed-Nachrichten (5s Fenster, Duplicate-Counter)
+  - Condition-Registry (sync bool-only) mit optionalen Success/Failure-Messages und Tag-Unterstützung
+  - Optionale Filterung bei Condition-Auswertung nach Rule-Namen und Tags
+  - `execution_point` pro Condition: `BEFORE`, `DURING`, `AFTER`, `ALWAYS`
+  - Lazy-Entity-Lookup-Helfer für Decorator-basierte Feed-Anbindung
+- `ErrorFeeder` Monitor-Decorator (`feed_tracker.monitor(...)`) für Exception-Überwachung mit Traceback-Analyse und automatischem ErrorFeed-Push.
+- `NewsFeeder` Condition-Tracker API (`register_news_condition`, `evaluate_tracked_conditions`).
+- Generalisierte Monitor-Unterstützung für `NewsFeeder` und `CustomBaseFeeder` (condition-getriebene Dispatches ohne Exception-Pflicht).
+
+### Changed
+- `StateType` um `ANY` erweitert und Callback-Subscription in `state_machine.py` auf robuste Layer-Normalisierung (`StateType` oder `str`) umgestellt.
+- `UnifiedStateMachine.on_any_change()` nutzt nun `StateType.ANY`.
+- `FeedTracker` aus `error_feeder.py` in gemeinsames `com/feeder/tracking.py` verschoben; Export über `vyra_base.com.feeder` vereinheitlicht.
+
+### Tests
+- Neue Tests für Callback-Enum-Subscription, Debounce, Condition-Validierung und `feed_tracker` Lazy-Entity-Lookup.
+
+
 ## [0.1.8+build.98] - 2026-03-02
 
 ### Build

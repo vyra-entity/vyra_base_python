@@ -37,9 +37,10 @@ appropriate ``tags`` (e.g. ``["zenoh"]``).
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 
 from vyra_base.com.feeder.feeder import BaseFeeder
+from vyra_base.com.feeder.tracking import FeedTracker
 from vyra_base.defaults.entries import ModuleEntry
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.com.core.interface_path_registry import InterfacePathRegistry, get_interface_registry
@@ -160,3 +161,22 @@ class CustomBaseFeeder(BaseFeeder):
         if paths:
             self.set_interface_paths(paths)
         await self.create(loggingOn=self._loggingOn)
+
+    def monitor(
+        self,
+        *,
+        tag: Optional[str] = None,
+        label: Optional[str] = None,
+        severity: str = "INFO",
+        entity: Any = None,
+        during_interval_seconds: float = 0.05,
+    ) -> Callable:
+        """Return a runtime-monitoring decorator bound to this feeder."""
+        resolved_tag = tag or self._feederName.replace("Feed", "").lower()
+        return FeedTracker(self).monitor(
+            tag=resolved_tag,
+            label=label,
+            severity=severity,
+            entity=entity,
+            during_interval_seconds=during_interval_seconds,
+        )

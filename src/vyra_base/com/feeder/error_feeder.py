@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Union, Optional
+from typing import Any, Union, Optional, Callable
 
 # Check ROS2 availability
 try:
@@ -18,8 +18,11 @@ if _ROS2_AVAILABLE:
 from vyra_base.defaults.entries import ErrorEntry, ModuleEntry
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.com.core.interface_path_registry import get_interface_registry
+from vyra_base.com.feeder.tracking import FeedTracker, feed_tracker
 
 from .feeder import BaseFeeder
+
+logger = logging.getLogger(__name__)
 
 
 class ErrorFeeder(BaseFeeder):
@@ -100,6 +103,40 @@ class ErrorFeeder(BaseFeeder):
             errorfeed_entry.uuid = uuid.uuid4()
 
         await super().feed(errorfeed_entry)
+
+    def feed_sync(self, errorElement: Union[ErrorEntry, dict]) -> None:
+        """Sync version of :meth:`feed` with ErrorEntry normalization."""
+        if isinstance(errorElement, dict):
+            errorfeed_entry = self.build_errorfeed(errorElement)
+        elif isinstance(errorElement, ErrorEntry):
+            errorfeed_entry = errorElement
+        else:
+            raise FeederException(f"Wrong Type. Expect: ErrorEntry, got {type(errorElement)}")
+
+        if errorfeed_entry.timestamp is None:
+            errorfeed_entry.timestamp = datetime.now()
+        if errorfeed_entry.uuid is None:
+            errorfeed_entry.uuid = uuid.uuid4()
+
+        super().feed_sync(errorfeed_entry)
+
+    def monitor(
+        self,
+        *,
+        tag: str = "error",
+        label: Optional[str] = None,
+        severity: str = "WARNING",
+        entity: Any = None,
+        during_interval_seconds: float = 0.05,
+    ) -> Callable:
+        """Return an exception-monitoring decorator bound to this feeder."""
+        return FeedTracker(self).monitor(
+            tag=tag,
+            label=label,
+            severity=severity,
+            entity=entity,
+            during_interval_seconds=during_interval_seconds,
+        )
 
     def _prepare_entry_for_publish(self, entry: ErrorEntry) -> dict:  # type: ignore[override]
         """

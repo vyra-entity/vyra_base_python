@@ -1,8 +1,9 @@
+import asyncio
 import logging
 import re
 import uuid
 from datetime import datetime
-from typing import Any, Union, Optional
+from typing import Any, Union, Optional, Callable
 
 # Check ROS2 availability
 try:
@@ -19,6 +20,7 @@ else:
     ROS2Handler = None
 
 from .feeder import BaseFeeder
+from .tracking import FeedTracker, ExecutionPoint
 from vyra_base.defaults.entries import ModuleEntry, NewsEntry
 from vyra_base.defaults.exceptions import FeederException
 from vyra_base.com.core.interface_path_registry import get_interface_registry
@@ -105,6 +107,84 @@ class NewsFeeder(BaseFeeder):
         elif not isinstance(msg, NewsEntry):
             raise FeederException(f"Wrong Type. Expect: NewsEntry or str, got {type(msg)}")
         return super().feed_sync(msg)
+
+    def register_news_condition(
+        self,
+        condition_function: Callable[[dict[str, Any]], bool],
+        *,
+        name: Optional[str] = None,
+        execution_point: ExecutionPoint = "ALWAYS",
+        success_message: Optional[str] = None,
+        failure_message: Optional[str] = None,
+        tag: str = "news",
+    ) -> str:
+        """Register a synchronous bool condition for tracked feeder messages."""
+        return self.register_condition(
+            condition_function,
+            name=name,
+            tag=tag,
+            execution_point=execution_point,
+            success_message=success_message,
+            failure_message=failure_message,
+        )
+
+    def monitor(
+        self,
+        *,
+        tag: str = "news",
+        label: Optional[str] = None,
+        severity: str = "INFO",
+        entity: Any = None,
+        during_interval_seconds: float = 0.05,
+    ) -> Callable:
+        """Return a runtime-monitoring decorator bound to this feeder."""
+        return FeedTracker(self).monitor(
+            tag=tag,
+            label=label,
+            severity=severity,
+            entity=entity,
+            during_interval_seconds=during_interval_seconds,
+        )
+
+    async def evaluate_tracked_conditions(self, context: dict[str, Any]) -> None:
+        """Evaluate registered conditions and publish resulting tracker messages."""
+        outputs = self.evaluate_conditions(context)
+        entity = context.get("entity")
+        for tag, message in outputs:
+            if tag == "news":
+                await self.feed(message)
+                continue
+
+            feeder = getattr(entity, f"{tag}_feeder", None) if entity is not None else None
+            if feeder is not None and hasattr(feeder, "feed"):
+                await feeder.feed(message)
+            else:
+                logger.warning("No feeder found for tracked condition tag '%s'", tag)
+
+    def evaluate_tracked_conditions_sync(self, context: dict[str, Any]) -> None:
+        """Sync variant of :meth:`evaluate_tracked_conditions`."""
+        outputs = self.evaluate_conditions(context)
+        entity = context.get("entity")
+        for tag, message in outputs:
+            if tag == "news":
+                self.feed_sync(message)
+                continue
+
+            feeder = getattr(entity, f"{tag}_feeder", None) if entity is not None else None
+            if feeder is None:
+                logger.warning("No feeder found for tracked condition tag '%s'", tag)
+                continue
+
+            if hasattr(feeder, "feed_sync"):
+                feeder.feed_sync(message)
+                continue
+
+            if hasattr(feeder, "feed"):
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(feeder.feed(message))
+                else:
+                    loop.run_until_complete(feeder.feed(message))
 
     def _prepare_entry_for_publish(self, entry: NewsEntry) -> dict:  # type: ignore[override]
         """

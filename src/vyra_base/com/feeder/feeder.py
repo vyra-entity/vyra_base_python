@@ -4,7 +4,7 @@ import asyncio
 import datetime
 import logging
 from collections import deque
-from typing import Any, Type, Optional, Sequence
+from typing import Any, Type, Optional, Sequence, Callable
 from pathlib import Path
 
 # Check ROS2 availability
@@ -32,6 +32,12 @@ from vyra_base.com.core.types import ProtocolType as PT
 from vyra_base.com.core.types import VyraPublisher
 from vyra_base.com.core.interface_loader import InterfaceLoader
 from vyra_base.com.feeder.message_mapper import MessageMapper
+from vyra_base.com.feeder.tracking import (
+    FeedConditionRegistry,
+    FeedDebouncer,
+    build_message_signature,
+    ExecutionPoint,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +110,11 @@ class BaseFeeder(IFeeder):
         self._max_retries: int = 3
         self._retry_delay: float = 1.0
 
+        # Feed monitoring helpers
+        self._debouncer = FeedDebouncer(window_seconds=5.0)
+        self._debounced_duplicate_count: int = 0
+        self._conditions = FeedConditionRegistry()
+
     # ------------------------------------------------------------------
     # IFeeder implementation
     # ------------------------------------------------------------------
@@ -146,6 +157,55 @@ class BaseFeeder(IFeeder):
     def last_feed_at(self) -> Optional[datetime.datetime]:
         """Timestamp of the last successful :meth:`feed` call."""
         return self._last_feed_at
+
+    @property
+    def debounced_duplicate_count(self) -> int:
+        """Number of duplicate messages suppressed by debouncing."""
+        return self._debounced_duplicate_count
+
+    def register_condition(
+        self,
+        condition_function: Callable[[dict[str, Any]], bool],
+        *,
+        name: Optional[str] = None,
+        tag: str = "news",
+        execution_point: ExecutionPoint = "ALWAYS",
+        success_message: Optional[str] = None,
+        failure_message: Optional[str] = None,
+    ) -> str:
+        """Register a synchronous bool-returning condition callback."""
+        return self._conditions.register(
+            condition_function,
+            name=name,
+            tag=tag,
+            execution_point=execution_point,
+            success_message=success_message,
+            failure_message=failure_message,
+        )
+
+    def unregister_condition(self, name: str) -> bool:
+        """Remove a previously registered condition callback by name."""
+        return self._conditions.unregister(name)
+
+    def evaluate_conditions(
+        self,
+        context: dict[str, Any],
+        *,
+        rule_names: Optional[list[str]] = None,
+        tags: Optional[list[str]] = None,
+        execution_point: Optional[ExecutionPoint] = None,
+    ) -> list[tuple[str, str]]:
+        """Evaluate registered conditions and return resulting messages.
+
+        By default all registered conditions are evaluated.
+        Use ``rule_names`` and/or ``tags`` to limit evaluation to a subset.
+        """
+        return self._conditions.evaluate(
+            context,
+            rule_names=rule_names,
+            tags=tags,
+            execution_point=execution_point,
+        )
 
     # ------------------------------------------------------------------
     # Initialisation helpers
@@ -392,6 +452,16 @@ class BaseFeeder(IFeeder):
         :param msg: Message to publish.
         :type msg: Any
         """
+        debounce_hit = self._debouncer.evaluate(build_message_signature(msg))
+        if not debounce_hit.should_publish:
+            self._debounced_duplicate_count += 1
+            logger.debug(
+                "🔁 Debounced duplicate in %s (count=%d)",
+                self._feederName,
+                debounce_hit.duplicate_count,
+            )
+            return
+
         if not self._is_ready:
             self._feedbuffer.append(msg)
             logger.debug("⏳ %s buffering message (not started yet).", self._feederName)
@@ -417,6 +487,16 @@ class BaseFeeder(IFeeder):
 
     def feed_sync(self, msg: Any) -> None:
         """Sync version of :meth:`feed` for use in sync contexts."""
+        debounce_hit = self._debouncer.evaluate(build_message_signature(msg))
+        if not debounce_hit.should_publish:
+            self._debounced_duplicate_count += 1
+            logger.debug(
+                "🔁 Debounced duplicate in %s (count=%d)",
+                self._feederName,
+                debounce_hit.duplicate_count,
+            )
+            return
+
         if not self._is_ready:
             self._feedbuffer.append(msg)
             logger.debug("⏳ %s buffering message (not started yet).", self._feederName)

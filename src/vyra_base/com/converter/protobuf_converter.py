@@ -17,6 +17,8 @@ try:
     PROTOBUF_AVAILABLE = True
 except ImportError:
     PROTOBUF_AVAILABLE = False
+    json_format = None
+    ProtoMessage = Any
     logger.debug("⚠️ protobuf not available")
 
 
@@ -182,6 +184,9 @@ class ProtobufConverter(ConverterInterface):
         Returns:
             Python dictionary
         """
+        if not self.is_available():
+            raise ImportError("protobuf not available")
+
         if not isinstance(data, ProtoMessage):
             raise ValueError("Data must be a Protobuf message")
         

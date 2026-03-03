@@ -23,6 +23,7 @@ from vyra_base.com.feeder.config_resolver import FeederConfigResolver, FeederRes
 from vyra_base.com.feeder.interfaces import IFeeder
 from vyra_base.com.feeder.custom_feeder import CustomBaseFeeder
 from vyra_base.com.feeder.registry import FeederRegistry, register_feeder
+from vyra_base.com.feeder.tracking import FeedConditionRegistry, FeedDebouncer, feed_tracker
 
 __all__ = [
     "FeederConfigResolver",
@@ -31,4 +32,7 @@ __all__ = [
     "CustomBaseFeeder",
     "FeederRegistry",
     "register_feeder",
+    "feed_tracker",
+    "FeedConditionRegistry",
+    "FeedDebouncer",
 ]

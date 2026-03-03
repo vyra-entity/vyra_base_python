@@ -19,6 +19,7 @@ from vyra_base.state.state_types import (
     LifecycleState,
     OperationalState,
     HealthState,
+    StateType,
 )
 from vyra_base.state.state_events import StateEvent, EventType
 
@@ -377,6 +378,20 @@ class TestCallbacks:
 
         assert "lifecycle" in callbacks
         assert "health" in callbacks
+
+    def test_enum_callback_subscription(self):
+        """StateType enum subscription uses normalized layer keys."""
+        fsm = StateMachine()
+        callback_data = []
+
+        def callback(layer, old_state, new_state):
+            callback_data.append((layer, old_state, new_state))
+
+        fsm.subscribe(StateType.LIFECYCLE, callback)
+        fsm.send_event(StateEvent(EventType.START))
+
+        assert len(callback_data) == 1
+        assert callback_data[0][0] == "lifecycle"
 
 
 class TestHistory:

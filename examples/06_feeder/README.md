@@ -1,6 +1,7 @@
 # Example 06 — VYRA Feeders
 
 Demonstrates the feeder subsystem: protocol resolution, custom feeders, and the feeder registry.
+Includes runtime monitoring via decorators and condition rules with execution points.
 
 ## Files
 
@@ -18,6 +19,34 @@ python examples/06_feeder/02_custom_feeder.py
 ```
 
 ## Key Concepts
+
+### Monitoring & Conditions
+
+- Decorator-based runtime monitoring with `feed_tracker.monitor(...)`
+- Condition registration via `register_condition(...)` / `register_news_condition(...)`
+- Execution points: `BEFORE`, `DURING`, `AFTER`, `ALWAYS`
+- Rule/tag filtering for partial evaluation (`rule_names`, `tags`)
+- Debouncing of duplicate messages (5s window)
+
+Example pattern:
+
+```python
+from vyra_base.com.feeder import feed_tracker
+
+@feed_tracker.monitor(tag="news", label="Scan", severity="INFO")
+async def scan(entity, value: int):
+  return value
+
+def cond_ok(ctx: dict) -> bool:
+  return ctx.get("result", 0) > 0
+
+entity.news_feeder.register_news_condition(
+  cond_ok,
+  name="positive_result",
+  execution_point="AFTER",
+  success_message="Scan result > 0",
+)
+```
 
 ### Protocol Resolution
 
