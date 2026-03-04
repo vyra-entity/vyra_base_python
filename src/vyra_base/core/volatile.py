@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 from typing import Any, Type, Optional
 
@@ -37,13 +39,16 @@ class Volatile:
     def __init__(
             self, 
             storage_access_transient: RedisClient, 
+            module_name: str,
             module_id: str,
             node: Optional[VyraNode],
             transient_base_types: dict[str, Any]):
         """
         Initialize the Volatile class.
         """
+        self.module_name: str = module_name
         self.module_id: str = module_id
+        self._volatile_prefix: str = f"{self.module_name}_{self.module_id}/volatile/"
         self.communication_node: Optional[VyraNode] = node
 
         self.REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
@@ -56,6 +61,16 @@ class Volatile:
         self.redis: RedisClient = storage_access_transient
         self._active_shouter: dict[str, VyraPublisher] = {}
         self._listener: asyncio.Task | None = None
+
+    def _qualified_key(self, key: str) -> str:
+        if key.startswith(self._volatile_prefix):
+            return key
+        return f"{self._volatile_prefix}{key}"
+
+    def _external_key(self, key: str) -> str:
+        if key.startswith(self._volatile_prefix):
+            return key[len(self._volatile_prefix):]
+        return key
 
 
 
@@ -195,7 +210,8 @@ class Volatile:
             print(f"Available volatiles: {keys}")
             # Output: ['temperature', 'pressure', 'humidity']
         """
-        return list(await self.redis.get_all_keys())
+        keys = list(await self.redis.get_all_keys())
+        return [self._external_key(k) for k in keys if str(k).startswith(self._volatile_prefix)]
 
     @ErrorTraceback.w_check_error_exist
     async def set_volatile_value(self, key: Any, value: Type[REDIS_TYPE]):
@@ -224,7 +240,7 @@ class Volatile:
                 "humidity": 60.2
             })
         """
-        await self.redis.set(key, value)
+        await self.redis.set(self._qualified_key(str(key)), value)
 
 
     @ErrorTraceback.w_check_error_exist
@@ -248,7 +264,7 @@ class Volatile:
             if value is not None:
                 print(f"Current temperature: {value}°C")
         """
-        return await self.redis.get(key)
+        return await self.redis.get(self._qualified_key(key))
 
     @ErrorTraceback.w_check_error_exist
     async def publish_volatile_to_ros2(self, volatile_key: str, ros2_topic_name: str | None = None):
@@ -299,13 +315,14 @@ class Volatile:
         ``/module_name/volatile/<ros2_topic_name or volatile_key>``
         """
         # Step 1: Verify volatile key exists
-        if not await self.redis.exists(volatile_key):
+        qualified_key = self._qualified_key(volatile_key)
+        if not await self.redis.exists(qualified_key):
             raise KeyError(
                 f"Volatile key '{volatile_key}' does not exist in Redis. "
                 f"Create it first with set_volatile_value().")
 
         # Step 2: Get Redis data type
-        redis_type: REDIS_TYPE | None = await self.redis.get_type(volatile_key)
+        redis_type: REDIS_TYPE | None = await self.redis.get_type(qualified_key)
 
         if redis_type is None:
             raise KeyError(f"Could not determine type for key '{volatile_key}'.")
@@ -326,10 +343,10 @@ class Volatile:
             node=self.communication_node,
             is_publisher=True
         )
-        self._active_shouter[volatile_key] = publisher
+        self._active_shouter[qualified_key] = publisher
         
         # Step 4: Subscribe to Redis key-space notifications
-        await self.redis.subscribe_to_key(volatile_key)
+        await self.redis.subscribe_to_key(qualified_key)
 
     @ErrorTraceback.w_check_error_exist
     async def unsubscribe_from_changes(self, volatile_key: str):
@@ -351,12 +368,13 @@ class Volatile:
             # Stop monitoring temperature changes
             await volatile.unsubscribe_from_changes("temperature")
         """
-        if await self.redis.exists(volatile_key):
-            await self.redis.unsubscribe_from_key(volatile_key)
+        qualified_key = self._qualified_key(volatile_key)
+        if await self.redis.exists(qualified_key):
+            await self.redis.unsubscribe_from_key(qualified_key)
             # Remove publisher from registry if it exists
-            if volatile_key in self._active_shouter:
-                await self._active_shouter[volatile_key].shutdown()
-                del self._active_shouter[volatile_key]
+            if qualified_key in self._active_shouter:
+                await self._active_shouter[qualified_key].shutdown()
+                del self._active_shouter[qualified_key]
         else:
             raise KeyError(
                 f"Volatile key '{volatile_key}' does not exist in Redis.")
@@ -377,7 +395,62 @@ class Volatile:
             if await volatile.has_volatile("temperature"):
                 value = await volatile.get_volatile_value("temperature")
         """
-        return await self.redis.exists(key)
+        return await self.redis.exists(self._qualified_key(key))
+
+    async def get_volatile_impl(self, key: str) -> dict[str, Any]:
+        if not await self.has_volatile(key):
+            return {
+                "success": False,
+                "message": f"Volatile key '{key}' does not exist.",
+                "value": "",
+            }
+
+        import json as _json
+        value = await self.get_volatile_value(key)
+        return {
+            "success": True,
+            "message": f"Volatile '{key}' retrieved successfully.",
+            "value": _json.dumps(value) if not isinstance(value, str) else value,
+        }
+
+    async def set_volatile_impl(self, key: str, value: Any) -> dict[str, Any]:
+        try:
+            await self.set_volatile_value(key, value)
+            return {
+                "success": True,
+                "message": f"Volatile '{key}' set successfully.",
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"Failed to set volatile '{key}': {e}",
+            }
+
+    async def create_new_volatile_impl(self, key: str, value: Any) -> dict[str, Any]:
+        if await self.has_volatile(key):
+            return {
+                "success": False,
+                "message": f"Volatile '{key}' already exists.",
+            }
+
+        return await self.set_volatile_impl(key, value)
+
+    async def read_all_volatiles_impl(self) -> dict[str, Any]:
+        import json as _json
+        result = []
+        keys = await self.read_all_volatile_names()
+        for key in keys:
+            value = await self.get_volatile_value(key)
+            redis_type = await self.redis.get_type(self._qualified_key(key))
+            result.append(
+                {
+                    "key": key,
+                    "value": value,
+                    "type": redis_type.value if redis_type is not None else "unknown",
+                    "address": self._qualified_key(key),
+                }
+            )
+        return {"all_volatiles_json": _json.dumps(result)}
 
     @remote_service()
     async def get_volatile(self, request: Any, response: Any) -> None:
@@ -388,17 +461,10 @@ class Volatile:
         :param response: Response object updated with ``success``, ``message``, ``value``.
         """
         key = request.key
-        if not await self.redis.exists(key):
-            response.success = False
-            response.message = f"Volatile key '{key}' does not exist."
-            response.value = ""
-            return None
-
-        value = await self.get_volatile_value(key)
-        import json as _json
-        response.success = True
-        response.message = f"Volatile '{key}' retrieved successfully."
-        response.value = _json.dumps(value) if not isinstance(value, str) else value
+        result = await self.get_volatile_impl(key)
+        response.success = result["success"]
+        response.message = result["message"]
+        response.value = result.get("value", "")
         return None
 
     @remote_service()
@@ -411,13 +477,21 @@ class Volatile:
         """
         key = request.key
         value = request.value
-        try:
-            await self.set_volatile_value(key, value)
-            response.success = True
-            response.message = f"Volatile '{key}' set successfully."
-        except Exception as e:
-            response.success = False
-            response.message = f"Failed to set volatile '{key}': {e}"
+        result = await self.set_volatile_impl(key, value)
+        response.success = result["success"]
+        response.message = result["message"]
+        return None
+
+    @remote_service()
+    async def create_new_volatile(self, request: Any, response: Any) -> None:
+        """
+        Create a new volatile key (fails if key already exists).
+        """
+        key = request.key
+        value = request.value
+        result = await self.create_new_volatile_impl(key, value)
+        response.success = result["success"]
+        response.message = result["message"]
         return None
 
     @remote_service()
@@ -430,19 +504,9 @@ class Volatile:
         :param request: Request object (unused).
         :param response: Response object updated with ``all_volatiles_json``.
         """
-        import json as _json
         try:
-            keys = await self.read_all_volatile_names()
-            result = []
-            for key in keys:
-                value = await self.get_volatile_value(key)
-                redis_type = await self.redis.get_type(key)
-                result.append({
-                    "key": key,
-                    "value": value,
-                    "type": redis_type.value if redis_type is not None else "unknown",
-                })
-            response.all_volatiles_json = _json.dumps(result)
+            result = await self.read_all_volatiles_impl()
+            response.all_volatiles_json = result["all_volatiles_json"]
         except Exception as e:
             logger.error(f"Failed to read all volatiles: {e}")
             response.all_volatiles_json = "[]"

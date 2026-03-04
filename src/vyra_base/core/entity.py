@@ -511,6 +511,7 @@ class VyraEntity:
         
         self.volatile = Volatile(
             storage_access_transient=self.redis_access,
+            module_name=self.module_entry.name,
             module_id=self.module_entry.uuid,
             node=self._node,
             transient_base_types=transient_base_types

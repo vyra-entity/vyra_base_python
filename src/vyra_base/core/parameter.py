@@ -424,6 +424,78 @@ class Parameter:
         return response
 
     @remote_service()
+    async def create_new_parameter(self, request: Any, response: Any) -> None:
+        """
+        Create a new parameter (strict mode, no upsert).
+
+        Fails if the parameter already exists.
+        """
+        key = request.key
+        value = request.value
+
+        result = await self.create_new_parameter_impl(key, value)
+        if result is None:
+            response.success = False
+            response.message = "Internal error occurred"
+            return None
+
+        response.success = result["success"]
+        response.message = result["message"]
+        return None
+
+    async def create_new_parameter_impl(self, key: str, value: Any) -> Optional[dict]:
+        """
+        Create a new parameter and fail if key already exists.
+        """
+        response: dict[str, Any] = {}
+
+        param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
+            filters={"name": key}
+        )
+
+        if param_ret.status == DBSTATUS.NOT_FOUND:
+            param_ret.status = DBSTATUS.SUCCESS
+            param_ret.value = []
+
+        if param_ret.status != DBSTATUS.SUCCESS:
+            response['success'] = False
+            response['message'] = f"Failed to retrieve parameter with key '{key}' (DB error)."
+            logger.warning(response['message'])
+            return response
+
+        if not isinstance(param_ret.value, list):
+            response['success'] = False
+            response['message'] = "Internal error: param_ret.value is not a list."
+            logger.error(response['message'])
+            return response
+
+        if len(param_ret.value) > 0:
+            response['success'] = False
+            response['message'] = f"Parameter '{key}' already exists."
+            logger.warning(response['message'])
+            return response
+
+        new_param: dict[str, Any] = {
+            "name": key,
+            "value": str(value),
+            "default_value": str(value),
+            "type": TypeEnum.string.value,
+            "displayname": key,
+        }
+        add_ret: DBReturnValue = await self.persistant_manipulator.add(new_param)
+
+        if add_ret.status != DBSTATUS.SUCCESS:
+            response['success'] = False
+            response['message'] = f"Failed to create parameter with key '{key}'."
+            logger.error(response['message'])
+            return response
+
+        response['success'] = True
+        response['message'] = f"Parameter '{key}' created successfully."
+        logger.info(response['message'])
+        return response
+
+    @remote_service()
     async def read_all_params(self, request: Any, response: Any) -> None:
         """
         Read all parameters (ROS2 service interface).

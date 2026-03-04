@@ -775,6 +775,20 @@ class InterfaceGenerator:
         for metadata in metadata_list:
             interface_type = metadata.get("type")
             functionname = metadata.get("functionname")
+
+            access_level = metadata.get("access_level", 1)
+            params = metadata.get("params", [])
+            if isinstance(access_level, int) and access_level > 1:
+                has_auth_token = any(
+                    isinstance(param, dict) and param.get("name") == "auth_token"
+                    for param in params
+                )
+                if not has_auth_token:
+                    logger.warning(
+                        "Metadata '%s' has access_level=%s but no 'auth_token' parameter.",
+                        functionname,
+                        access_level,
+                    )
             
             if not interface_type or not functionname:
                 logger.warning(f"Skipping incomplete metadata: {metadata}")

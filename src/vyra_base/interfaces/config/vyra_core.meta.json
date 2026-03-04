@@ -304,6 +304,51 @@
             "zenoh"
         ],
         "type": "service",
+        "functionname": "create_new_parameter",
+        "displayname": "Create New Parameter",
+        "description": "Create a new parameter. Fails if key already exists.",
+        "filetype": [
+            "VBASESetParam.proto"
+        ],
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Parameter Key",
+                "description": "The key of the parameter to create."
+            },
+            {
+                "name": "value",
+                "datatype": "string",
+                "displayname": "Parameter Value",
+                "description": "The initial value of the parameter to create."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the parameter was created successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
         "functionname": "read_all_volatiles",
         "displayname": "Read All Volatiles",
         "description": "Read all volatile parameters with their current values. Returns a JSON-encoded array.",
@@ -317,6 +362,51 @@
                 "datatype": "string",
                 "displayname": "All Volatiles (JSON)",
                 "description": "JSON-encoded array of volatile objects. Each object contains: key, value, type."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "create_new_volatile",
+        "displayname": "Create New Volatile",
+        "description": "Create a new volatile key/value. Fails if key already exists.",
+        "filetype": [
+            "VBASEVolatile.proto"
+        ],
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Key",
+                "description": "The unique key for the volatile parameter."
+            },
+            {
+                "name": "value",
+                "datatype": "string",
+                "displayname": "Value",
+                "description": "The initial value to store."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the volatile was created successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
             }
         ],
         "access_level": 1,

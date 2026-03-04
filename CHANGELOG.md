@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (2026-03-04)
+- `core/parameter.py`: neuer Remote-Service `create_new_parameter` mit strikt-neuer Semantik (Fehler bei existierendem Key).
+- `core/volatile.py`: impl-basierte Basisfunktionen ergänzt (`get_volatile_impl`, `set_volatile_impl`, `read_all_volatiles_impl`, `create_new_volatile_impl`) sowie Remote-Service `create_new_volatile`.
+- `tests/com/core/test_parameter_volatile_extensions.py`: neue Unit-Tests für striktes Parameter/Create-Verhalten und Volatile-Adressschema.
+
+### Changed (2026-03-04)
+- Volatile-Adressierung vereinheitlicht auf `<module_name>_<module_id>/volatile/<volatile_name>` inkl. Prefix-Normalisierung und Rückgabe der vollen `address` in `read_all_volatiles`.
+- `core/entity.py`: Übergibt `module_name` an `Volatile` für deterministische Key-Namensbildung.
+- `interfaces/config/vyra_core.meta.json`: um `create_new_parameter` und `create_new_volatile` erweitert.
+- `interfaces/tools/generate_interfaces.py`: Generierungswarnung, wenn bei `access_level > 1` der Parameter `auth_token` in `params` fehlt.
+
+
+## [0.1.8+build.104] - 2026-03-04
+
+### Build
+
+Unify interface config file naming to vyra_<domain>.meta.json
+
 ### Fixed (2026-03-04)
 - `FunctionConfigBaseTypes` um den kompatiblen Enum-Wert `publisher` ergänzt, damit bestehende Aufrufer nicht mit `AttributeError` brechen.
 - Zielgerichtete Validierung der betroffenen Defaults-Tests erfolgreich (`pytest -q --no-cov tests/test_defaults.py`).
