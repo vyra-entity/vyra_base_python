@@ -1,5 +1,6 @@
 import json
 import os
+import inspect
 import sys
 from asyncio import Lock
 from pathlib import Path
@@ -20,6 +21,13 @@ class FileReader:
 
     Reads file content from locally stored files into the module.
     """
+
+    @staticmethod
+    async def _resolve_async_open(open_result):
+        """Normalize AsyncPath.open return type across runtimes and mocks."""
+        if inspect.isawaitable(open_result):
+            return await open_result
+        return open_result
 
     @classmethod    
     async def open_json_file(
@@ -44,16 +52,21 @@ class FileReader:
         try:
             lock = await get_lock_for_file(config_file)
             async with lock:
-                async with await AsyncPath(str(config_file)).open(mode='r', 
-                                                encoding='utf-8') as file:
+                reader_cm = await cls._resolve_async_open(
+                    AsyncPath(str(config_file)).open(mode='r', encoding='utf-8')
+                )
+                async with reader_cm as file:
                     json_content = json.loads(await file.read())
                     if json_content:
                         return json_content
                     else:
-                        async with await AsyncPath(str(config_default)) \
-                                    .open(mode='r', encoding='utf-8-sig') as file:
-                            await AsyncPath(str(config_file)).write_text(str(file))
-                        return json.loads(await file.read())
+                        default_reader_cm = await cls._resolve_async_open(
+                            AsyncPath(str(config_default)).open(mode='r', encoding='utf-8-sig')
+                        )
+                        async with default_reader_cm as default_file:
+                            default_content = await default_file.read()
+                        await AsyncPath(str(config_file)).write_text(default_content)
+                        return json.loads(default_content)
         except FileNotFoundError:
             raise FileNotFoundError(f"File not found: {config_file}")
         except json.decoder.JSONDecodeError as error:
@@ -87,16 +100,21 @@ class FileReader:
         try:  
             lock = await get_lock_for_file(config_file)
             async with lock:
-                async with await AsyncPath(str(config_file)) \
-                            .open(mode='r', encoding='utf-8') as file:
+                reader_cm = await cls._resolve_async_open(
+                    AsyncPath(str(config_file)).open(mode='r', encoding='utf-8')
+                )
+                async with reader_cm as file:
                     content = await file.read()
                     if content:
                         return content
                     else:
-                        async with await AsyncPath(str(config_default)) \
-                                    .open(mode='r', encoding='utf-8-sig') as file:
-                            await AsyncPath(str(config_file)).write_text(str(file))
-                        return await file.read()
+                        default_reader_cm = await cls._resolve_async_open(
+                            AsyncPath(str(config_default)).open(mode='r', encoding='utf-8-sig')
+                        )
+                        async with default_reader_cm as default_file:
+                            default_content = await default_file.read()
+                        await AsyncPath(str(config_file)).write_text(default_content)
+                        return default_content
                     
             release_lock_for_file(config_file)
 
@@ -160,8 +178,10 @@ class FileReader:
             lock: Lock = await get_lock_for_file(config_file)
             async with lock:
                 toml_content: dict = {}
-                async with await AsyncPath(config_file) \
-                            .open(mode='r', encoding='utf-8-sig') as file:
+                reader_cm = await cls._resolve_async_open(
+                    AsyncPath(config_file).open(mode='r', encoding='utf-8-sig')
+                )
+                async with reader_cm as file:
                     raw_content = await file.read()
                     
                     if not isinstance(raw_content, str):
@@ -217,8 +237,10 @@ class FileReader:
             
             lock: Lock = await get_lock_for_file(config_file)
             async with lock:
-                async with await AsyncPath(config_file) \
-                            .open(mode='r', encoding='utf-8-sig') as file:
+                reader_cm = await cls._resolve_async_open(
+                    AsyncPath(config_file).open(mode='r', encoding='utf-8-sig')
+                )
+                async with reader_cm as file:
                     yaml_content = yaml.safe_load(await file.read())
                     return yaml_content
         finally:

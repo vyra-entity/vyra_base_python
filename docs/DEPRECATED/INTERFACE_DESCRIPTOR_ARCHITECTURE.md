@@ -1250,7 +1250,7 @@ async def test_two_phase_late_binding():
 - [ ] Replace `create_publisher()` with `PublisherDescriptor` + `create_from_descriptor()`
 - [ ] Update ActionServer to use multi-callback pattern
 - [ ] Add ActionStatus to action implementations
-- [ ] Move examples to `docs/examples/`
+- [ ] Move examples to root `examples/` and reference them from `docs/`
 - [ ] Update module `_base_.py` to create descriptors
 - [ ] Update module `interface.py` to bind callbacks
 - [ ] Add unit tests for descriptors

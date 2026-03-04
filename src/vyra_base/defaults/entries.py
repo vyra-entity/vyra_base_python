@@ -11,7 +11,7 @@ from uuid import UUID
 try:
     from rclpy.qos import QoSProfile
 except ImportError:  # ROS2 not installed (e.g. dashboard-only containers)
-    QoSProfile = int  # type: ignore[assignment,misc]  # placeholder for type hints
+    pass
 from vyra_base.helper.error_handler import ErrorTraceback
 
 

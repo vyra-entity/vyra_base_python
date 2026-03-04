@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed (2026-03-04)
+- `FunctionConfigBaseTypes` um den kompatiblen Enum-Wert `publisher` ergänzt, damit bestehende Aufrufer nicht mit `AttributeError` brechen.
+- Zielgerichtete Validierung der betroffenen Defaults-Tests erfolgreich (`pytest -q --no-cov tests/test_defaults.py`).
+
+### Changed (2026-03-04)
+- Beispiele neu strukturiert und erweitert:
+  - neue Root-Beispiele unter `examples/11_defaults_entries/` und `examples/12_security_levels/`
+  - bestehende Beispielgruppen (`08/09/10`) als primäre Referenz konsolidiert.
+- Doku-Policy geschärft: ausführbare Beispiele liegen unter `examples/`, `docs/` referenziert nur noch darauf.
+
+### Documentation (2026-03-04)
+- `docs/security/examples.rst` auf indexbasiertes Format mit Verweisen auf lauffähige Beispiele umgestellt.
+- `docs/com/feeder/README.md` und `docs/STRUCTURE.md` inhaltlich auf aktuelle Struktur und Beispiel-Workflow angehoben.
+
 
 ## [0.1.8+build.102] - 2026-03-03
 

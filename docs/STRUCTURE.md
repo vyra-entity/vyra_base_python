@@ -32,6 +32,11 @@ sphinx-build -b html -D language=de . _build/html/de
 ./build_multilingual.sh
 ```
 
+### 4. Example Policy
+- Runnable examples live in the repository root under `examples/`.
+- `docs/` contains references to examples, not large inline executable scripts.
+- Security examples are maintained in `examples/security/` and referenced from `docs/security/examples.rst`.
+
 ## 📁 Directory Structure
 
 ```
@@ -55,6 +60,14 @@ docs/
 │       └── de/                # Built German docs
 ├── build_multilingual.sh      # Build script
 └── README_i18n.md             # i18n documentation
+
+examples/
+├── 01_service/
+├── 02_publisher_subscriber/
+├── ...
+├── 11_defaults_entries/
+├── 12_security_levels/
+└── security/
 ```
 
 ## 🔧 Maintenance Workflow

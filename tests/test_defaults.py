@@ -362,7 +362,7 @@ class TestFunctionConfig:
     
     def test_function_config_base_types(self):
         """Test FunctionConfigBaseTypes enumeration"""
-        assert FunctionConfigBaseTypes.publisher.value == 'publisher'
+        assert FunctionConfigBaseTypes.message.value == 'message'
         assert FunctionConfigBaseTypes.service.value == 'service'
         assert FunctionConfigBaseTypes.action.value == 'action'
 

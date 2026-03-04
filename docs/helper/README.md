@@ -7,8 +7,8 @@ Die VYRA Helper-Module bieten nützliche Utility-Funktionen für Logging, Fehler
 **Hauptmodule:**
 - **Logger**: Strukturiertes Logging mit verschiedenen Log-Leveln
 - **ErrorTraceback**: Fehlerbehandlung und Stack-Trace-Erfassung
-- **FileReader**: Asynchrones Lesen von JSON, YAML, Markdown
-- **FileWriter**: Asynchrones Schreiben von JSON, YAML, Binary
+- **FileReader**: Asynchrones Lesen von JSON, YAML, Markdown, TOML, INI
+- **FileWriter**: Asynchrones Schreiben von JSON, YAML, Binary + synchrone Varianten
 - **EnvHandler**: Umgebungsvariablen laden und verwalten
 - **CryptoHelper**: Verschlüsselung, Hashing, Token-Generierung
 
@@ -171,6 +171,12 @@ async def process_user(user_id: int):
 
 Asynchrone Datei-I/O-Operationen mit Lock-Mechanismus.
 
+Hinweis zur Runtime-Kompatibilität:
+- Die File-Helper nutzen `vyra_base.helper._aiopath.AsyncPath` als einheitliche Schicht
+    für Python 3.11/3.12+.
+- `open_*`/`write_*` Methoden sind auf unterschiedliche Async-`open()`-Implementierungen
+    (direkter async context manager vs. awaitable wrapper) kompatibel.
+
 ### JSON Lesen
 
 ```python
@@ -224,6 +230,14 @@ config = await FileReader.open_yaml_file(
 await FileWriter.write_yaml_file(
     file=Path("/workspace/config/config.yml"),
     file_content=config
+)
+```
+
+### TOML Lesen
+
+```python
+toml_data = await FileReader.open_toml_file(
+    config_file=Path("/workspace/config/module.toml")
 )
 ```
 

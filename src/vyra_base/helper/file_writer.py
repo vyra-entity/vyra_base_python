@@ -1,4 +1,5 @@
 from asyncio import Lock
+import inspect
 import json
 from pathlib import Path
 from typing import Optional
@@ -20,6 +21,13 @@ class FileWriter:
     Writes Python objects to a file with both async and sync methods.
     """
 
+    @staticmethod
+    async def _resolve_async_open(open_result):
+        """Normalize AsyncPath.open return type across runtimes and mocks."""
+        if inspect.isawaitable(open_result):
+            return await open_result
+        return open_result
+
     # ========================================================================
     # ASYNC METHODS
     # ========================================================================
@@ -39,7 +47,8 @@ class FileWriter:
         try:
             lock: Lock = await get_lock_for_file(file)
             async with lock:
-                async with await AsyncPath(file).open(mode='w') as writer:
+                writer_cm = await cls._resolve_async_open(AsyncPath(file).open(mode='w'))
+                async with writer_cm as writer:
                     await writer.write(json.dumps(file_content, indent=4))
                     return True
         except (IOError, UnicodeDecodeError, json.decoder.JSONDecodeError, 
@@ -72,7 +81,8 @@ class FileWriter:
         try:
             lock: Lock = await get_lock_for_file(file)
             async with lock:
-                async with await AsyncPath(file).open(mode='wb') as binary_file:
+                writer_cm = await cls._resolve_async_open(AsyncPath(file).open(mode='wb'))
+                async with writer_cm as binary_file:
                     await binary_file.write(content)
                     return True
         except (FileNotFoundError, IOError) as error:
@@ -98,7 +108,8 @@ class FileWriter:
         try:
             lock: Lock = await get_lock_for_file(file)
             async with lock:
-                async with await AsyncPath(file).open(mode='w') as writer:
+                writer_cm = await cls._resolve_async_open(AsyncPath(file).open(mode='w'))
+                async with writer_cm as writer:
                     await writer.write(yaml.dump(file_content))
                     return True
         except (IOError, UnicodeDecodeError, yaml.YAMLError, 
