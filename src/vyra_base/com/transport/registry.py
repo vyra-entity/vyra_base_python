@@ -73,7 +73,7 @@ class InterfaceRegistry:
         with self._lock:
             if publisher_obj.name in self._publishers:
                 logger.warning(
-                    f"⚠️ Publisher '{publisher_obj.name}' already registered, replacing"
+                    f"🔄 Publisher '{publisher_obj.name}' already registered, replacing"
                 )
 
             self._publishers[publisher_obj.name] = publisher_obj
@@ -94,7 +94,7 @@ class InterfaceRegistry:
         with self._lock:
             if subscriber_obj.name in self._subscribers:
                 logger.warning(
-                    f"⚠️ Subscriber '{subscriber_obj.name}' already registered, replacing"
+                    f"🔄 Subscriber '{subscriber_obj.name}' already registered, replacing"
                 )
             
             self._subscribers[subscriber_obj.name] = subscriber_obj
@@ -115,7 +115,7 @@ class InterfaceRegistry:
         with self._lock:
             if server_obj.name in self._servers:
                 logger.warning(
-                    f"⚠️ Server '{server_obj.name}' already registered, replacing"
+                    f"🔄 Server '{server_obj.name}' already registered, replacing"
                 )
 
             self._servers[server_obj.name] = server_obj
@@ -136,7 +136,7 @@ class InterfaceRegistry:
         with self._lock:
             if client_obj.name in self._clients:
                 logger.warning(
-                    f"⚠️ Client '{client_obj.name}' already registered, replacing"
+                    f"🔄 Client '{client_obj.name}' already registered, replacing"
                 )
             
             self._clients[client_obj.name] = client_obj
@@ -157,7 +157,7 @@ class InterfaceRegistry:
         with self._lock:
             if action_server_obj.name in self._action_servers:
                 logger.warning(
-                    f"⚠️ Action Server '{action_server_obj.name}' already registered, replacing"
+                    f"🔄 Action Server '{action_server_obj.name}' already registered, replacing"
                 )
             
             self._action_servers[action_server_obj.name] = action_server_obj
@@ -178,7 +178,7 @@ class InterfaceRegistry:
         with self._lock:
             if action_client_obj.name in self._action_clients:
                 logger.warning(
-                    f"⚠️ Action Client '{action_client_obj.name}' already registered, replacing"
+                    f"🔄 Action Client '{action_client_obj.name}' already registered, replacing"
                 )
             
             self._action_clients[action_client_obj.name] = action_client_obj

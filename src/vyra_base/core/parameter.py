@@ -13,6 +13,20 @@ from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
 from vyra_base.storage.tb_params import Parameter as DbParameter
 from vyra_base.storage.tb_params import TypeEnum
 
+# Safe mapping from TypeEnum string values to actual Python types.
+# Using eval(type_string) fails for "string" (Python uses "str", not "string").
+_TYPE_CONVERTERS: dict = {
+    "int": int,
+    "integer": int,
+    "string": str,
+    "str": str,
+    "bool": bool,
+    "boolean": bool,
+    "float": float,
+    "list": list,
+    "dict": dict,
+}
+
 logger = logging.getLogger(__name__)
 
 
@@ -398,14 +412,16 @@ class Parameter:
                 "Updating the first one found.")
 
         try:
+            type_str = param_ret.value[0].type.value
+            converter = _TYPE_CONVERTERS.get(type_str, str)
             param_obj: dict[str, Any] = {
-                "value": (eval(param_ret.value[0].type.value))(value)
+                "value": converter(value)
             }
         except ValueError as ve:
             response['success'] = False
             response['message'] = (
                 f"Failed to convert value '{value}' to type "
-                f"'{param_ret.value[0].type.value}': {ve}")
+                f"'{type_str}': {ve}")
             logger.error(response['message'])
             return response
 

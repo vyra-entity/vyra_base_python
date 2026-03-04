@@ -88,7 +88,12 @@ class VyraServerImpl(VyraServer):
             
             # Create Zenoh Queryable
             import asyncio
-            loop = asyncio.get_event_loop()
+            # Capture the running event loop so _handle_query_sync can always
+            # schedule coroutines onto the correct loop (Zenoh calls the sync
+            # handler from a background thread where get_event_loop() may
+            # return a different, non-running loop).
+            loop = asyncio.get_running_loop()
+            self._main_loop = loop
             
             def _create_queryable():
                 return self._zenoh_session.declare_queryable(
@@ -108,27 +113,22 @@ class VyraServerImpl(VyraServer):
     def _handle_query_sync(self, query: Any):
         """
         Synchronous query handler (called by Zenoh in a background thread).
+
+        Always schedules _handle_query onto the main event loop captured during
+        initialize(), so that all asyncio objects (Redis connections, etc.) that
+        were created on that loop remain valid.
         
         Args:
             query: Zenoh Query object
         """
-        
         try:
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = None
-
-            if loop is not None and loop.is_running():
-                # Called from a thread while the main loop is running — schedule safely
-                future = asyncio.run_coroutine_threadsafe(self._handle_query(query), loop)
-                future.result(timeout=10)
-            else:
-                # No running loop — create one or reuse
-                if loop is None or loop.is_closed():
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
-                loop.run_until_complete(self._handle_query(query))
+            loop = getattr(self, '_main_loop', None)
+            if loop is None or loop.is_closed():
+                logger.error("❌ Main event loop not available — cannot handle query")
+                return
+            # Schedule onto the main loop from this background thread
+            future = asyncio.run_coroutine_threadsafe(self._handle_query(query), loop)
+            future.result(timeout=10)
         except Exception as e:
             logger.error(f"❌ Sync query handler failed: {e}")
     
