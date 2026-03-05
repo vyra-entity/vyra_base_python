@@ -44,8 +44,10 @@
             }
         ],
         "access_level": 1,
-        "visible": true,
-        "published": false
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
     },
     {
         "tags": [
@@ -124,6 +126,56 @@
         "access_level": 1,
         "displaystyle": {
             "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "message",
+        "namespace": "feeder",
+        "functionname": "LogFeed",
+        "displayname": "Log Feed",
+        "description": "Stream structured log records from the module in real-time. Allows other modules or dashboards to subscribe to live log output.",
+        "filetype": [
+            "VBASELogFeed.proto"
+        ],
+        "returns": [
+            {
+                "datatype": "string",
+                "displayname": "level",
+                "description": "Log level (e.g. DEBUG, INFO, WARNING, ERROR, CRITICAL)"
+            },
+            {
+                "datatype": "string",
+                "displayname": "message",
+                "description": "The log message content"
+            },
+            {
+                "datatype": "string",
+                "displayname": "logger_name",
+                "description": "Name of the Python logger that emitted this record"
+            },
+            {
+                "datatype": "string",
+                "displayname": "module_id",
+                "description": "The ID of the module that emitted this log record"
+            },
+            {
+                "datatype": "string",
+                "displayname": "module_name",
+                "description": "The name of the module that emitted this log record"
+            },
+            {
+                "datatype": "datetime",
+                "displayname": "timestamp",
+                "description": "The timestamp when the log record was created"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
             "published": false
         }
     }

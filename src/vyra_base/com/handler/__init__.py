@@ -56,6 +56,8 @@ try:
 except ImportError:
     HandlerFactory = None  # type: ignore[assignment,misc]
 
+from vyra_base.com.handler.logger import VyraLogHandler
+
 __all__ = [
     # Abstract interface
     "IFeederHandler",
@@ -71,5 +73,7 @@ __all__ = [
     "DatabaseWriter",
     # Factory
     "HandlerFactory",
+    # In-memory log ring-buffer
+    "VyraLogHandler",
 ]
 

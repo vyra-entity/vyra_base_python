@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (2026-03-05)
+- **Docs: VyraLogHandler**: Neue Dokumentation `docs/com/handler/LOGGER_HANDLER.md` beschreibt Klasse, `get_recent()`-API, Zenoh-Service-Integration und SSE-Polling-Pattern.
+- **README: VyraLogHandler**: Abschnitt `#### 4. Log History` und Link in `Core Documentation` ergänzt.
+- `vyra_base/com/handler/logger.py`: Neues Modul mit öffentlicher `VyraLogHandler`-Klasse (in-memory Ring-Buffer für Log-Records, `deque(maxlen=1000)`).
+- `VyraLogHandler` wird von `com/handler/__init__.py` exportiert.
+- `VyraEntity.get_log_history`: Neuer `@remote_service` der bis zu 1000 Log-Einträge als `logs_json` (JSON-Array) zurückgibt. Für den Dashboard-Logs-Tab.
+
+### Changed (2026-03-05)
+- `_VyraLogHandler` aus `core/entity.py` in `com/handler/logger.py` verschoben und als `VyraLogHandler` öffentlich gemacht.
+- `entity.py` importiert nun `VyraLogHandler` aus `vyra_base.com.handler.logger`.
+
 
 ## [0.1.8+build.108] - 2026-03-04
 

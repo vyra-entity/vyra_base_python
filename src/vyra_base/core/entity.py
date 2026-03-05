@@ -20,6 +20,7 @@ from vyra_base.com.providers.provider_registry import ProviderRegistry
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
+from vyra_base.com.handler.logger import VyraLogHandler
 
 from vyra_base.com.transport.t_zenoh.provider import ZenohProvider, ZENOH_AVAILABLE
 
@@ -130,6 +131,12 @@ class VyraEntity:
         :raises RuntimeError: If the node name is already available in the ROS2 system.
         """
         self._init_logger(log_config)
+
+        # Install in-memory log ring-buffer — accessible via get_log_history Zenoh service
+        self._log_handler = VyraLogHandler(capacity=1000)
+        self._log_handler.setLevel(logging.DEBUG)
+        # Attach to the module's top-level logger so all module + vyra_base lines are captured
+        logging.getLogger().addHandler(self._log_handler)
 
         # Check ROS2 availability
         self._ros2_available = _ROS2_AVAILABLE
@@ -1259,6 +1266,34 @@ class VyraEntity:
 
         response["interface_list"] = response_interface_list
         return response
+
+    # ------------------------------------------------------------------
+    # Log history (in-memory ring buffer)
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def get_log_history(self, request: Any, response: Any) -> Any:
+        """
+        Return recent log lines from the in-memory ring-buffer.
+
+        Useful for the Dashboard "Logs" tab: the modulemanager polls this
+        service every few seconds via Zenoh and streams new lines to the
+        browser via Server-Sent Events.
+
+        Request fields:
+            limit (int): Max number of lines to return (default 200, max 1000).
+
+        Response fields:
+            logs_json (str): JSON array of
+                ``{level, message, logger_name, timestamp, seq}`` dicts,
+                ordered oldest-to-newest.  Consumers should use the ``seq``
+                field (millisecond UNIX timestamp) to de-duplicate on polling.
+        """
+        limit = int(getattr(request, "limit", 200) or 200)
+        limit = max(1, min(limit, 1000))
+        recent = self._log_handler.get_recent(limit)
+        response.logs_json = json.dumps(recent)
+        return None
 
     @staticmethod
     def register_service_callbacks(callback_parent: object):
