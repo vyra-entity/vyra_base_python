@@ -12,6 +12,7 @@ from vyra_base.storage.db_access import DBSTATUS, DbAccess
 from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
 from vyra_base.storage.tb_params import Parameter as DbParameter
 from vyra_base.storage.tb_params import TypeEnum
+from vyra_base.core.parameter_validator import ParameterValidator, _convert_value
 
 # Safe mapping from TypeEnum string values to actual Python types.
 # Using eval(type_string) fails for "string" (Python uses "str", not "string").
@@ -26,6 +27,9 @@ _TYPE_CONVERTERS: dict = {
     "list": list,
     "dict": dict,
 }
+
+# Module-level singleton validator loaded from parameter_rules.yaml
+_validator = ParameterValidator()
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +90,34 @@ class Parameter:
                 node=self._node,
                 is_publisher=True
             )
+
+    @staticmethod
+    def replace_validation_rules(rules: dict) -> None:
+        """
+        Replace the active validation ruleset for all :class:`Parameter` instances.
+
+        This modifies the *module-level* ``_validator`` singleton, so every
+        Parameter instance created in this process will use the new rules.
+
+        :param rules: New ruleset dict – must match the structure of
+            ``parameter_rules.yaml``.
+
+        Example::
+
+            import yaml
+            with open("/etc/myapp/custom_param_rules.yaml") as f:
+                Parameter.replace_validation_rules(yaml.safe_load(f))
+        """
+        _validator.replace_rules(rules)
+
+    @staticmethod
+    def load_validation_rules_from_file(path: str) -> None:
+        """
+        Load a YAML ruleset from a file and make it active.
+
+        :param path: Absolute or relative path to the YAML rules file.
+        """
+        _validator.load_rules_from_file(path)
 
     @ErrorTraceback.w_check_error_exist
     async def load_defaults(
@@ -322,8 +354,8 @@ class Parameter:
         """
         Set a parameter value by its key (internal implementation).
         
-        This method contains the actual business logic for updating a parameter.
-        It validates the input, performs type conversion, and updates the database.
+        Validates type compatibility, min/max bounds and range constraints
+        before writing to the database.
 
         :param key: The key of the parameter to set.
         :type key: str
@@ -331,38 +363,13 @@ class Parameter:
         :type value: Any
         :return: Dictionary with success status and message, or None on error.
         :rtype: Optional[dict]
-        
-        **Return format:**
-        
-        .. code-block:: python
-        
-            {
-                "success": True,
-                "message": "Parameter 'key' updated successfully."
-            }
-        
-        **Example:**
-        
-        .. code-block:: python
-        
-            result = await param_manager.set_parameter_impl("robot_speed", "3.0")
-            if result and result["success"]:
-                print(result["message"])
-            else:
-                print(f"Error: {result['message'] if result else 'Unknown'}")
-        
-        **Error handling:**
-        
-        - Returns success=False if parameter doesn't exist
-        - Returns success=False if type conversion fails
-        - Returns None on internal errors
         """
         response: dict = {}
 
         param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
             filters={"name": key})
 
-        # DBSTATUS.NOT_FOUND means the query ran fine but no rows matched (empty table/filter).
+        # DBSTATUS.NOT_FOUND means the query ran fine but no rows matched.
         # Treat NOT_FOUND the same as SUCCESS+empty-list: fall through to the upsert path.
         if param_ret.status == DBSTATUS.NOT_FOUND:
             param_ret.status = DBSTATUS.SUCCESS
@@ -407,21 +414,34 @@ class Parameter:
                 return response
             
         if len(param_ret.value) > 1:
-            logger.warn(
+            logger.warning(
                 f"Multiple parameters found with key '{key}'. "
                 "Updating the first one found.")
 
+        param_record = param_ret.value[0]
+
+        # ── Validate type / min / max / range via ParameterValidator ────────
+        validation_errors = _validator.validate_set(
+            param_record=param_record,
+            new_value=value,
+        )
+        if validation_errors:
+            response['success'] = False
+            response['message'] = validation_errors[0]
+            logger.warning("set_parameter validation failed for '%s': %s", key, validation_errors[0])
+            return response
+
+        # ── Type conversion ──────────────────────────────────────────────────
         try:
-            type_str = param_ret.value[0].type.value
-            converter = _TYPE_CONVERTERS.get(type_str, str)
-            param_obj: dict[str, Any] = {
-                "value": converter(value)
-            }
-        except ValueError as ve:
+            type_str = param_record.type.value if hasattr(param_record.type, 'value') else str(param_record.type)
+            converted, conv_error = _convert_value(value, type_str)
+            if conv_error:
+                raise ValueError(conv_error)
+            param_obj: dict[str, Any] = {"value": converted}
+        except (ValueError, TypeError) as ve:
             response['success'] = False
             response['message'] = (
-                f"Failed to convert value '{value}' to type "
-                f"'{type_str}': {ve}")
+                f"Failed to convert value '{value}' to type '{type_str}': {ve}")
             logger.error(response['message'])
             return response
 
@@ -510,6 +530,248 @@ class Parameter:
         response['message'] = f"Parameter '{key}' created successfully."
         logger.info(response['message'])
         return response
+
+    # ------------------------------------------------------------------
+    # create_parameter_full – create with full metadata & validation
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def create_parameter_full(self, request: Any, response: Any) -> None:
+        """
+        Create a new parameter with full metadata and validation.
+
+        Request fields:
+            name (str): Parameter key (required).
+            default_value (Any): Default value (required).
+            type (str): Type string — one of int, float, string, bool, list, dict (required).
+            description (str): Human-readable description (required).
+            displayname (str, optional): Display name (max 255 chars).
+            visible (bool, optional): Visibility flag (default False).
+            editable (bool, optional): Editable flag (default False).
+            min_value (str, optional): Minimum value/length constraint.
+            max_value (str, optional): Maximum value/length constraint.
+            range_value (dict, optional): Allowed values/types dict.
+        """
+        result = await self.create_parameter_full_impl(
+            name=str(request.name),
+            default_value=getattr(request, "default_value", None),
+            type_str=str(request.type),
+            description=str(request.description),
+            displayname=getattr(request, "displayname", None),
+            visible=bool(getattr(request, "visible", False)),
+            editable=bool(getattr(request, "editable", False)),
+            min_value=getattr(request, "min_value", None),
+            max_value=getattr(request, "max_value", None),
+            range_value=getattr(request, "range_value", None),
+        )
+        if result is None:
+            response.success = False
+            response.message = "Internal error occurred"
+            return None
+        response.success = result["success"]
+        response.message = result["message"]
+        return None
+
+    async def create_parameter_full_impl(
+        self,
+        name: str,
+        default_value: Any,
+        type_str: str,
+        description: str,
+        displayname: Optional[str] = None,
+        visible: bool = False,
+        editable: bool = False,
+        min_value: Any = None,
+        max_value: Any = None,
+        range_value: Optional[dict] = None,
+    ) -> Optional[dict]:
+        """
+        Create a new parameter with full metadata and strict validation.
+
+        Validation is delegated to the module-level :data:`_validator`
+        (a :class:`~vyra_base.core.parameter_validator.ParameterValidator`
+        instance loaded from ``parameter_rules.yaml``).
+        """
+        resp: dict[str, Any] = {}
+
+        # Delegate all field/type/range validation to ParameterValidator
+        errors = _validator.validate_create(
+            name=name,
+            default_value=default_value,
+            type_str=type_str,
+            description=description,
+            displayname=displayname,
+            min_value=min_value,
+            max_value=max_value,
+            range_value=range_value,
+        )
+        if errors:
+            resp['success'] = False
+            resp['message'] = errors[0]
+            logger.warning(resp['message'])
+            return resp
+
+        # Convert default_value to the correct Python type
+        default_value, conv_error = _convert_value(default_value, type_str)
+        if conv_error:
+            resp['success'] = False
+            resp['message'] = f"Cannot convert default_value to type '{type_str}': {conv_error}"
+            logger.warning(resp['message'])
+            return resp
+
+        dn = displayname if displayname else name
+
+        # Handle range_value JSON deserialization if passed as string
+        if isinstance(range_value, str):
+            try:
+                range_value = json.loads(range_value)
+            except json.JSONDecodeError:
+                range_value = None
+
+        # --- Check for duplicate ---
+        param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
+            filters={"name": name}
+        )
+        if param_ret.status not in (DBSTATUS.SUCCESS, DBSTATUS.NOT_FOUND):
+            resp['success'] = False
+            resp['message'] = f"DB error while checking for existing parameter '{name}'."
+            logger.error(resp['message'])
+            return resp
+
+        existing = param_ret.value if isinstance(param_ret.value, list) else []
+        if len(existing) > 0:
+            resp['success'] = False
+            resp['message'] = f"Parameter '{name}' already exists."
+            logger.warning(resp['message'])
+            return resp
+
+        # --- Build record ---
+        new_param: dict[str, Any] = {
+            "name": name,
+            "value": default_value,
+            "default_value": default_value,
+            "type": type_str,
+            "description": description,
+            "displayname": dn,
+            "visible": visible,
+            "editable": editable,
+        }
+        if min_value not in (None, ''):
+            new_param["min_value"] = str(min_value)
+        if max_value not in (None, ''):
+            new_param["max_value"] = str(max_value)
+        if range_value is not None:
+            new_param["range_value"] = range_value
+
+        add_ret: DBReturnValue = await self.persistant_manipulator.add(new_param)
+        if add_ret.status != DBSTATUS.SUCCESS:
+            resp['success'] = False
+            resp['message'] = f"Failed to create parameter '{name}'."
+            logger.error(resp['message'])
+            return resp
+
+        resp['success'] = True
+        resp['message'] = f"Parameter '{name}' created successfully."
+        logger.info(resp['message'])
+        return resp
+
+    # ------------------------------------------------------------------
+    # update_parameter_metadata – update displayname / visible / editable
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def update_parameter_metadata(self, request: Any, response: Any) -> None:
+        """
+        Update display metadata for an existing parameter.
+
+        Request fields:
+            name (str): Parameter key (required).
+            displayname (str, optional): New display name.
+            visible (bool, optional): New visibility flag.
+            editable (bool, optional): New editable flag.
+        """
+        result = await self.update_parameter_metadata_impl(
+            key=str(request.name),
+            displayname=getattr(request, "displayname", None),
+            visible=getattr(request, "visible", None),
+            editable=getattr(request, "editable", None),
+        )
+        if result is None:
+            response.success = False
+            response.message = "Internal error occurred"
+            return None
+        response.success = result["success"]
+        response.message = result["message"]
+        return None
+
+    async def update_parameter_metadata_impl(
+        self,
+        key: str,
+        displayname: Optional[str] = None,
+        visible: Optional[bool] = None,
+        editable: Optional[bool] = None,
+    ) -> Optional[dict]:
+        """
+        Update only displayname, visible, and/or editable for an existing parameter.
+        """
+        resp: dict[str, Any] = {}
+
+        if not key:
+            resp['success'] = False
+            resp['message'] = "Parameter name (key) is required."
+            logger.warning(resp['message'])
+            return resp
+
+        # Fetch existing
+        param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
+            filters={"name": key}
+        )
+        if param_ret.status == DBSTATUS.NOT_FOUND or (
+            isinstance(param_ret.value, list) and len(param_ret.value) == 0
+        ):
+            resp['success'] = False
+            resp['message'] = f"Parameter '{key}' not found."
+            logger.warning(resp['message'])
+            return resp
+
+        if param_ret.status != DBSTATUS.SUCCESS:
+            resp['success'] = False
+            resp['message'] = f"DB error while fetching parameter '{key}'."
+            logger.error(resp['message'])
+            return resp
+
+        updates: dict[str, Any] = {}
+        if displayname is not None:
+            if len(str(displayname)) > 255:
+                resp['success'] = False
+                resp['message'] = "displayname exceeds 255 characters."
+                logger.warning(resp['message'])
+                return resp
+            updates["displayname"] = str(displayname)
+        if visible is not None:
+            updates["visible"] = bool(visible)
+        if editable is not None:
+            updates["editable"] = bool(editable)
+
+        if not updates:
+            resp['success'] = True
+            resp['message'] = "No metadata fields to update."
+            return resp
+
+        upd_ret: DBReturnValue = await self.persistant_manipulator.update(
+            filters={"name": key},
+            data=updates,
+        )
+        if upd_ret.status != DBSTATUS.SUCCESS:
+            resp['success'] = False
+            resp['message'] = f"Failed to update metadata for parameter '{key}'."
+            logger.error(resp['message'])
+            return resp
+
+        resp['success'] = True
+        resp['message'] = f"Metadata for parameter '{key}' updated successfully."
+        logger.info(resp['message'])
+        return resp
 
     @remote_service()
     async def read_all_params(self, request: Any, response: Any) -> None:

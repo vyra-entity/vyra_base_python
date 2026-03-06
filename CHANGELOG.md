@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-03-06
+
+### Added
+
+- `vyra_base.plugin` Modul: Plugin-Runtime-Abstraktion für WASM-Plugins
+  - `PluginRuntime` (ABC): Gemeinsame API für WASM- und Stub-Implementierungen
+  - `StubRuntime`: Python-Stub ohne WASM-Execution — vollständig funktional für Entwicklung/Tests; implementiert `init`, `increment`, `reset`, `get_state`, `ping`, `set_state`
+  - `HostFunctions` (Protocol): Schnittstelle für Host-Funktionen (`notify_ui`, `zenoh_get`, `zenoh_put`, `log`)
+  - `NullHostFunctions`: No-op Implementierung für Tests
+  - `PluginCallError`: Exception bei fehlgeschlagenen Plugin-Aufrufen
+- WASM-Execution (Extism) als Phase 2 vorbereitet — API bleibt kompatibel
+
+## [0.1.8+build.109] - 2026-03-06
+
+### Build
+
+Update parameter structure. Implementing ruleset and create_parameter
+
 ### Added (2026-03-05)
 - **Docs: VyraLogHandler**: Neue Dokumentation `docs/com/handler/LOGGER_HANDLER.md` beschreibt Klasse, `get_recent()`-API, Zenoh-Service-Integration und SSE-Polling-Pattern.
 - **README: VyraLogHandler**: Abschnitt `#### 4. Log History` und Link in `Core Documentation` ergänzt.

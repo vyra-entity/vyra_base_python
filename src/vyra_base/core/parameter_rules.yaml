@@ -1,0 +1,83 @@
+# VYRA Parameter Validation Ruleset
+# ============================================================
+# This file defines validation rules for parameter creation and
+# parameter value updates. Rules can be replaced at runtime by
+# calling ParameterValidator.replace_rules(new_rules).
+#
+# Structure:
+#   create:  rules applied during parameter creation
+#   set:     rules applied when setting an existing parameter value
+#
+# Each rule has:
+#   enabled:  bool  – enable/disable the check
+#   params:   dict  – rule-specific settings
+
+create:
+  name:
+    pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+    max_length: 64
+    required: true
+    message_invalid_chars: >
+      Parameter name must start with a letter or underscore and contain
+      only letters, digits, or underscores.
+    message_too_long: "Parameter name exceeds {max_length} characters."
+
+  description:
+    required: true
+    message_required: "description is required."
+
+  default_value:
+    required: true
+    message_required: "default_value is required."
+
+  displayname:
+    max_length: 255
+    message_too_long: "displayname exceeds {max_length} characters."
+
+  types:
+    # Must match TypeEnum values in tb_params.py
+    allowed:
+      - integer
+      - float
+      - string
+      - boolean
+      - list
+      - dict
+    message_invalid: >
+      Invalid type '{type}'. Must be one of: {allowed_csv}.
+
+  range_value:
+    allowed_keys:
+      - allowed_values
+      - allowed_types
+    message_unknown_keys: >
+      range_value contains unknown keys: {unknown_keys}.
+      Only 'allowed_values' and 'allowed_types' are permitted.
+
+  numeric:
+    check_min_max: true
+    message_below_min: "default_value {value} is below min_value {min}."
+    message_above_max: "default_value {value} exceeds max_value {max}."
+
+  list_length:
+    check_min_max: true
+    message_below_min: "List length {length} is below min_value {min}."
+    message_above_max: "List length {length} exceeds max_value {max}."
+
+set:
+  type_check:
+    enabled: true
+    message_wrong_type: >
+      Value '{value}' cannot be converted to type '{expected_type}': {error}
+
+  min_max:
+    enabled: true
+    message_below_min: "Value {value} is below min_value {min}."
+    message_above_max: "Value {value} exceeds max_value {max}."
+    message_list_below_min: "List length {length} is below min_value {min}."
+    message_list_above_max: "List length {length} exceeds max_value {max}."
+    message_non_numeric: "min_value/max_value must be numeric: {error}"
+
+  range_value:
+    enabled: true
+    message_not_in_allowed: "Value '{value}' is not in allowed_values {allowed}."

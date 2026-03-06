@@ -54,7 +54,7 @@
                 "name": "params",
                 "datatype": "string[]",
                 "displayname": "Pause Parameters",
-                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+                "description": "An array of key-value pairs providing the necessary parameters for pausing."
             }
         ],
         "returns": [
@@ -93,7 +93,7 @@
                 "name": "params",
                 "datatype": "string[]",
                 "displayname": "Stop Parameters",
-                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+                "description": "An array of key-value pairs providing the necessary parameters for stopping."
             }
         ],
         "returns": [
@@ -132,7 +132,7 @@
                 "name": "params",
                 "datatype": "string[]",
                 "displayname": "Resume Parameters",
-                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+                "description": "An array of key-value pairs providing the necessary parameters for resuming."
             }
         ],
         "returns": [
@@ -171,7 +171,7 @@
                 "name": "params",
                 "datatype": "string[]",
                 "displayname": "Reset Parameters",
-                "description": "An array of key-value pairs providing the necessary parameters for initialization."
+                "description": "An array of key-value pairs providing the necessary parameters for resetting."
             }
         ],
         "returns": [

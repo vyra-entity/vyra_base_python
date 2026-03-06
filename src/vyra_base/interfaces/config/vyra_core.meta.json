@@ -13,10 +13,10 @@
         "params": [],
         "returns": [
             {
-                "name": "capabilities",
+                "name": "interface_list",
                 "datatype": "string[]",
-                "displayname": "Capabilities",
-                "description": "A list of strings representing the system capabilities"
+                "displayname": "Interface List",
+                "description": "A list of JSON-serialised interface configuration strings"
             }
         ],
         "access_level": 1,
@@ -412,6 +412,227 @@
         "access_level": 1,
         "displaystyle": {
             "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "get_state",
+        "displayname": "Get State",
+        "description": "Returns the current 3-layer state (lifecycle, operational, health) of the module.",
+        "filetype": [
+            "VBASEGetState.proto"
+        ],
+        "params": [],
+        "returns": [
+            {
+                "name": "lifecycle",
+                "datatype": "string",
+                "displayname": "Lifecycle State",
+                "description": "Current lifecycle state"
+            },
+            {
+                "name": "operational",
+                "datatype": "string",
+                "displayname": "Operational State",
+                "description": "Current operational state"
+            },
+            {
+                "name": "health",
+                "datatype": "string",
+                "displayname": "Health State",
+                "description": "Current health state"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "get_log_history",
+        "displayname": "Get Log History",
+        "description": "Returns recent log lines from the in-memory ring buffer.",
+        "filetype": [
+            "VBASEGetLogHistory.proto"
+        ],
+        "params": [
+            {
+                "name": "limit",
+                "datatype": "int",
+                "displayname": "Limit",
+                "description": "Max number of lines to return"
+            }
+        ],
+        "returns": [
+            {
+                "name": "logs_json",
+                "datatype": "string",
+                "displayname": "Logs (JSON)",
+                "description": "JSON array of log entry objects"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "create_parameter_full",
+        "displayname": "Create Parameter (Full)",
+        "description": "Create a new parameter with full specification and validation.",
+        "filetype": [
+            "VBASESetParam.proto"
+        ],
+        "params": [
+            {
+                "name": "name",
+                "datatype": "string",
+                "displayname": "Name",
+                "description": "Parameter identifier"
+            },
+            {
+                "name": "default_value",
+                "datatype": "any",
+                "displayname": "Default Value",
+                "description": "Initial and default value"
+            },
+            {
+                "name": "type",
+                "datatype": "string",
+                "displayname": "Type",
+                "description": "Data type: int, float, string, bool, list, dict"
+            },
+            {
+                "name": "description",
+                "datatype": "string",
+                "displayname": "Description",
+                "description": "Human-readable description"
+            },
+            {
+                "name": "displayname",
+                "datatype": "string",
+                "displayname": "Display Name",
+                "description": "Human-readable display name"
+            },
+            {
+                "name": "visible",
+                "datatype": "bool",
+                "displayname": "Visible",
+                "description": "Visibility in UI"
+            },
+            {
+                "name": "editable",
+                "datatype": "bool",
+                "displayname": "Editable",
+                "description": "Can be modified by user"
+            },
+            {
+                "name": "min_value",
+                "datatype": "string",
+                "displayname": "Min Value",
+                "description": "Minimum value or element count"
+            },
+            {
+                "name": "max_value",
+                "datatype": "string",
+                "displayname": "Max Value",
+                "description": "Maximum value or element count"
+            },
+            {
+                "name": "range_value",
+                "datatype": "object",
+                "displayname": "Range",
+                "description": "Allowed values/types ruleset"
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether creation succeeded"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Status message"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "update_parameter_metadata",
+        "displayname": "Update Parameter Metadata",
+        "description": "Update displayname, visible, and editable fields of an existing parameter.",
+        "filetype": [
+            "VBASESetParam.proto"
+        ],
+        "params": [
+            {
+                "name": "name",
+                "datatype": "string",
+                "displayname": "Name",
+                "description": "Parameter identifier"
+            },
+            {
+                "name": "displayname",
+                "datatype": "string",
+                "displayname": "Display Name",
+                "description": "New display name"
+            },
+            {
+                "name": "visible",
+                "datatype": "bool",
+                "displayname": "Visible",
+                "description": "Visibility flag"
+            },
+            {
+                "name": "editable",
+                "datatype": "bool",
+                "displayname": "Editable",
+                "description": "Editability flag"
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether update succeeded"
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Status message"
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
             "published": false
         }
     }

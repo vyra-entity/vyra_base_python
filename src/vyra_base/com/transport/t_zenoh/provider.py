@@ -533,6 +533,9 @@ class ZenohProvider(AbstractProtocolProvider):
         direct_response: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
         goal_response_callback: Optional[Callable] = None,
+        # Factory-style aliases (InterfaceFactory.create_action_client uses these names)
+        direct_response_callback: Optional[Callable] = None,
+        goal_callback: Optional[Callable] = None,
         **kwargs
     ) -> VyraActionClient:
         """
@@ -550,6 +553,10 @@ class ZenohProvider(AbstractProtocolProvider):
         Returns:
             ZenohActionClientImpl instance
         """
+        # Resolve factory-style aliases
+        direct_response = direct_response or direct_response_callback
+        goal_response_callback = goal_response_callback or goal_callback
+
         self.require_initialization()
         
         try:

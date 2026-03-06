@@ -45,6 +45,11 @@ class VyraActionClientImpl(VyraActionClient):
         action_type: type = None,
         **kwargs
     ):
+        # Pop factory-style aliases from kwargs to avoid duplicate-argument errors
+        # when InterfaceFactory passes direct_response_callback / goal_callback.
+        direct_response = direct_response or kwargs.pop("direct_response_callback", None)
+        goal_response_callback = goal_response_callback or kwargs.pop("goal_callback", None)
+
         super().__init__(
             name, topic_builder,
             direct_response, feedback_callback, goal_response_callback,

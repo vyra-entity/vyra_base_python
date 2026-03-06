@@ -1268,6 +1268,26 @@ class VyraEntity:
         return response
 
     # ------------------------------------------------------------------
+    # State query
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def get_state(self, request: Any, response: Any) -> Any:
+        """
+        Return the current three-layer state (lifecycle / operational / health)
+        via Zenoh.
+
+        Response fields:
+            lifecycle  (str): Current lifecycle state value.
+            operational (str): Current operational state value.
+            health (str): Current health state value.
+        """
+        response.lifecycle = self.state_machine.get_lifecycle_state().value
+        response.operational = self.state_machine.get_operational_state().value
+        response.health = self.state_machine.get_health_state().value
+        return None
+
+    # ------------------------------------------------------------------
     # Log history (in-memory ring buffer)
     # ------------------------------------------------------------------
 
