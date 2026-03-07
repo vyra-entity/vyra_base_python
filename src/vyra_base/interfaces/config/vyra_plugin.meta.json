@@ -1,0 +1,39 @@
+[
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "message",
+        "namespace": "plugin",
+        "functionname": "plugin_event",
+        "displayname": "Plugin Event",
+        "description": "Generischer Ausgangs-Publisher für WASM-Plugin-Events an das Frontend. Wird von der HostFunctions-Implementierung eines Moduls genutzt, um Plugin-Aktivitätsmeldungen per Zenoh zu senden. Subscriber im Frontend empfangen diese Events für reaktive UI-Updates.",
+        "filetype": [],
+        "params": [],
+        "returns": [
+            {
+                "name": "event_name",
+                "datatype": "string",
+                "displayname": "Event-Name",
+                "description": "Generischer Event-Name, z.B. 'plugin.increment.result', 'plugin.reset.result'."
+            },
+            {
+                "name": "plugin_id",
+                "datatype": "string",
+                "displayname": "Plugin-ID",
+                "description": "Eindeutige ID des Plugins (z.B. 'counter-widget')."
+            },
+            {
+                "name": "data",
+                "datatype": "object",
+                "displayname": "Payload",
+                "description": "Beliebige JSON-serialisierbare Nutzdaten des Events."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    }
+]

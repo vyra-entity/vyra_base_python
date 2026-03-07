@@ -8,38 +8,54 @@ Klassen:
     PluginCallError  — Basis-Exception für Fehler beim Plugin-Aufruf
     PluginRuntime    — Abstrakte Basis / WASM-Schnittstelle
     WasmRuntime      — Echter WASM-Executor via wasmtime (aktiv wenn verfügbar)
-    StubRuntime      — Python-Stub-Implementierung (Fallback ohne wasmtime)
+    StubRuntime      — Python-Stub ohne WASM (Fallback für Tests / Connectivity)
 
-Die WasmRuntime führt die echte logic.wasm aus (init, increment, reset, get_count,
-get_step) und ist die bevorzugte Implementierung wenn wasmtime installiert ist.
-Die StubRuntime ist der Pure-Python-Fallback für Umgebungen ohne wasmtime.
+Die WasmRuntime führt beliebige WASM-Plugins aus. Welche Funktionen ein Plugin
+anbietet, wird in seiner metadata.json unter ``exports[]`` beschrieben::
+
+    {
+        "exports": [
+            {
+                "name": "init",
+                "args": [
+                    {"name": "initial_value", "type": "i32"},
+                    {"name": "step",          "type": "i32"}
+                ]
+            },
+            {
+                "name": "increment",
+                "args": [{"name": "step", "type": "i32"}]
+            },
+            ...
+        ]
+    }
+
+Die Runtime mappt die Keys eines ``data``-Dicts **in Reihenfolge der args-Definition**
+auf i32-Parameter — kein hartkodiertes Wissen über einzelne Plugins nötig.
 
 Nutze create_plugin_runtime() um automatisch die beste verfügbare Runtime zu erhalten.
 
 Integrationsbeispiel (v2_modulemanager)::
 
     from vyra_base.plugin.runtime import create_plugin_runtime
-    from vyra_base.plugin.host_functions import ModuleManagerHostFunctions
+    from mymodule.host_functions_impl import ModuleHostFunctions
 
-    host_fns = ModuleManagerHostFunctions(zenoh_session, redis)
+    host_fns = ModuleHostFunctions(plugin_event_publisher, zenoh_session)
     runtime  = create_plugin_runtime(
-        plugin_id   = "counter-widget",
-        wasm_path   = "/nfs/plugins/pool/counter-widget/1.0.0/logic.wasm",
+        plugin_id   = "my-plugin",
+        wasm_path   = "/opt/vyra/plugin_pool/my-plugin/1.0.0/logic.wasm",
         host        = host_fns,
-        initial_state = {"count": 0, "step": 1},
+        initial_state = {"initial_value": 0, "step": 1},
     )
     await runtime.start()
 
-    result = await runtime.call("increment", {})
-    # WasmRuntime:  WASM increment(0) ausgeführt -> {"count": 1}
-    # StubRuntime:  Python-Logik -> {"count": 1}
-
-    result = await runtime.call("get_state", {})
-    # -> {"count": 1, "step": 1}
+    result = await runtime.call("increment", {"step": 2})
+    # → {"result": 2}   (WasmRuntime: echte WASM-Ausführung)
 """
 
 from __future__ import annotations
 
+import json
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -135,16 +151,18 @@ class WasmRuntime(PluginRuntime):
     """
     Echter WASM-Executor für VYRA-Plugins via wasmtime.
 
-    Lädt das kompilierte logic.wasm, instanziiert es und führt die
-    exportierten Funktionen direkt im WASM aus:
+    Lädt das kompilierte logic.wasm und liest die zur WASM-Datei gehörende
+    metadata.json. Aus ``metadata.json["exports"]`` werden Funktionssignaturen
+    dynamisch gecacht — kein hartkodiertes Wissen über einzelne Plugin-Funktionen.
 
-      init(initial_count: i32, step: i32) -> i32
-      increment(step_override: i32) -> i32   (0 = gespeicherten step nutzen)
-      reset() -> i32
-      get_count() -> i32
-      get_step() -> i32
+    Aufruf-Konvention (Metadata-driven i32):
+      - ``metadata.json`` enthält ``exports[]`` mit Funktionsnamen und arg-Definitionen
+      - ``call(function_name, data)`` mappt ``data``-Keys in Reihenfolge der args auf i32
+      - Fehlende Keys → 0; überschüssige Keys → ignoriert
+      - Rückgabe: WASM-Funktionen mit i32-Rückgabe → ``{"result": <int>}``
+      - ``ping`` ist eingebaut (kein WASM-Export nötig)
 
-    Nur verfügbar wenn `wasmtime` installiert ist.
+    Nur verfügbar wenn ``wasmtime`` installiert ist.
     Nutze create_plugin_runtime() für automatische Auswahl.
     """
 
@@ -163,7 +181,10 @@ class WasmRuntime(PluginRuntime):
         self._initial_state: dict[str, Any] = initial_state.copy() if initial_state else {}
         self._store: Any = None
         self._instance: Any = None
+        # fn_name → wasmtime callable
         self._exports: dict[str, Any] = {}
+        # fn_name → list of {"name": str, "type": str} (aus metadata.json)
+        self._exports_meta: dict[str, list[dict[str, str]]] = {}
 
     async def start(self) -> None:
         if self._started:
@@ -175,17 +196,45 @@ class WasmRuntime(PluginRuntime):
                 f"[{self.plugin_id}] WASM-Datei nicht gefunden: {self.wasm_path}"
             )
 
+        # --- metadata.json laden -----------------------------------------------
+        meta_path = self.wasm_path.parent / "metadata.json"
+        if meta_path.exists():
+            try:
+                meta = json.loads(meta_path.read_text())
+                for export in meta.get("exports", []):
+                    fn_name = export.get("name", "")
+                    if fn_name:
+                        self._exports_meta[fn_name] = export.get("args", [])
+                logger.info(
+                    "📋 [%s] metadata.json geladen | exports=%s",
+                    self.plugin_id, list(self._exports_meta.keys()),
+                )
+            except Exception as exc:
+                logger.warning("[%s] metadata.json nicht lesbar: %s", self.plugin_id, exc)
+        else:
+            logger.warning(
+                "[%s] Keine metadata.json neben WASM-Datei gefunden: %s",
+                self.plugin_id, meta_path,
+            )
+
+        # --- WASM laden --------------------------------------------------------
         engine = Engine()
         self._store = Store(engine)
         wasm_module = WasmModule(engine, self.wasm_path.read_bytes())
         linker = Linker(engine)
         self._instance = linker.instantiate(self._store, wasm_module)
 
-        # Exportierte Funktionen cachen
-        for fn_name in ("init", "increment", "reset", "get_count", "get_step"):
-            fn = self._instance.exports(self._store).get(fn_name)
+        # Alle aus metadata.json bekannten Funktionen cachen
+        exports_obj = self._instance.exports(self._store)
+        for fn_name in self._exports_meta.keys():
+            fn = exports_obj.get(fn_name)
             if fn is not None:
                 self._exports[fn_name] = fn
+            else:
+                logger.warning(
+                    "[%s] WASM exportiert '%s' nicht (in metadata.json deklariert)",
+                    self.plugin_id, fn_name,
+                )
 
         self._started = True
         logger.info(
@@ -195,15 +244,15 @@ class WasmRuntime(PluginRuntime):
             self.wasm_path.stat().st_size,
         )
 
-        # WASM init aufrufen falls initial_state gesetzt
-        initial_count = self._initial_state.get("count", 0)
-        initial_step  = self._initial_state.get("step", 1)
-        await self.call("init", {"initial_value": initial_count, "step": initial_step})
+        # init aufrufen falls initial_state gesetzt und 'init' exportiert
+        if self._initial_state and "init" in self._exports:
+            await self.call("init", self._initial_state)
 
     async def stop(self) -> None:
         self._started = False
         self._instance = None
         self._exports = {}
+        self._exports_meta = {}
         logger.info("🛑 [%s] WasmRuntime stopped", self.plugin_id)
 
     async def call(self, function_name: str, data: dict[str, Any]) -> dict[str, Any]:
@@ -213,70 +262,69 @@ class WasmRuntime(PluginRuntime):
         logger.debug("[%s] wasm.call(%s, %s)", self.plugin_id, function_name, data)
         result = await self._dispatch_wasm(function_name, data)
         logger.debug("[%s] wasm.call(%s) -> %s", self.plugin_id, function_name, result)
-
         return result
 
     async def on_event(self, event_name: str, data: dict[str, Any]) -> None:
-        logger.debug("[%s] on_event(%s) — WASM hat keine Event-Exports", self.plugin_id, event_name)
+        logger.debug("[%s] on_event(%s) — kein WASM-Event-Handler", self.plugin_id, event_name)
 
-    def _wasm_fn(self, name: str) -> Any:
+    def _get_wasm_fn(self, name: str) -> Any:
         fn = self._exports.get(name)
         if fn is None:
             raise PluginCallError(
                 self.plugin_id, name,
-                f"WASM-Funktion '{name}' nicht exportiert. Verfügbar: {list(self._exports.keys())}"
+                f"WASM-Funktion '{name}' nicht verfügbar. "
+                f"Bekannte Exports: {list(self._exports.keys())}"
             )
         return fn
 
     async def _dispatch_wasm(self, function_name: str, data: dict[str, Any]) -> dict[str, Any]:
-        """Mapped die Plugin-API auf konkrete WASM i32-Funktionen."""
+        """
+        Generischer Metadata-driven WASM-Dispatch.
 
-        if function_name == "init":
-            initial = int(data.get("initial_value", 0))
-            step    = int(data.get("step", 1))
-            label   = data.get("label", "Counter")
-            count   = self._wasm_fn("init")(self._store, initial, step)
-            await self.host.notify_ui("plugin.initialized", {
-                "plugin_id": self.plugin_id,
-                "state": {"count": count, "step": step, "label": label},
-            })
-            return {"count": count, "step": step, "label": label}
-
-        elif function_name == "increment":
-            step_override = int(data.get("step", 0))  # 0 = nutze gespeicherten step
-            count = self._wasm_fn("increment")(self._store, step_override)
-            await self.host.notify_ui("counter.updated", {
-                "plugin_id": self.plugin_id,
-                "count": count,
-            })
-            return {"count": count}
-
-        elif function_name == "reset":
-            count = self._wasm_fn("reset")(self._store)
-            await self.host.notify_ui("counter.updated", {
-                "plugin_id": self.plugin_id,
-                "count": count,
-            })
-            return {"count": count}
-
-        elif function_name == "get_state":
-            count = self._wasm_fn("get_count")(self._store)
-            step  = self._wasm_fn("get_step")(self._store)
-            return {"count": count, "step": step}
-
-        elif function_name == "get_count":
-            count = self._wasm_fn("get_count")(self._store)
-            return {"count": count}
-
-        elif function_name == "ping":
+        Mappt ``data``-Keys auf i32-Parameter in Reihenfolge der ``exports_meta``-Definition.
+        Gibt ``{"result": <wasm_return>}`` zurück und publiziert generisch via notify_ui.
+        """
+        # ping ist eingebaut — kein WASM-Export nötig
+        if function_name == "ping":
             return {"status": "ok", "plugin_id": self.plugin_id, "runtime": "wasm"}
 
-        else:
+        # Funktion in metadata bekannt?
+        if function_name not in self._exports_meta:
             raise PluginCallError(
                 self.plugin_id, function_name,
                 f"Unbekannte Funktion '{function_name}'. "
-                f"Unterstützt: init, increment, reset, get_state, get_count, ping"
+                f"In metadata.json definierte Exports: {list(self._exports_meta.keys())}"
             )
+
+        fn = self._get_wasm_fn(function_name)
+        arg_defs = self._exports_meta[function_name]
+
+        # i32-Argumente in Reihenfolge der Metadaten-Definition bauen
+        args: list[int] = []
+        for arg_def in arg_defs:
+            arg_name = arg_def.get("name", "")
+            args.append(int(data.get(arg_name, 0)))
+
+        # WASM aufrufen
+        raw_result = fn(self._store, *args)
+
+        # Ergebnis normalisieren
+        if isinstance(raw_result, int):
+            result: dict[str, Any] = {"result": raw_result}
+        elif isinstance(raw_result, (list, tuple)):
+            result = {"result": list(raw_result)}
+        elif raw_result is None:
+            result = {}
+        else:
+            result = {"result": raw_result}
+
+        # Generisches Event an UI/Frontend senden
+        await self.host.notify_ui(f"plugin.{function_name}.result", {
+            "plugin_id": self.plugin_id,
+            "result":    result,
+        })
+
+        return result
 
 
 # ---------------------------------------------------------------------------
@@ -294,29 +342,30 @@ def create_plugin_runtime(
     Factory-Funktion: Gibt WasmRuntime zurück wenn wasmtime installiert ist
     und die .wasm-Datei existiert. Andernfalls StubRuntime.
 
-    :param plugin_id:     Plugin-ID (z.B. "counter-widget")
-    :param wasm_path:     Pfad zur logic.wasm Datei
-    :param host:          Host-Funktionen-Implementierung (optional)
-    :param initial_state: Startzustand ({"count": 0, "step": 1})
+    :param plugin_id:     Plugin-ID (z.B. "my-plugin")
+    :param wasm_path:     Pfad zur logic.wasm Datei (neben ihr muss metadata.json liegen)
+    :param host:          Host-Funktionen-Implementierung (optional, sonst NullHostFunctions)
+    :param initial_state: Startzustand — Keys müssen zu den args des 'init'-Exports passen
     :param prefer_stub:   Erzwinge StubRuntime auch wenn wasmtime verfügbar ist
     :returns:             WasmRuntime oder StubRuntime Instanz
 
     Beispiel::
 
         runtime = create_plugin_runtime(
-            "counter-widget",
-            "/nfs/plugins/pool/counter-widget/1.0.0/logic.wasm",
-            initial_state={"count": 0, "step": 1},
+            plugin_id     = "my-plugin",
+            wasm_path     = "/opt/vyra/plugin_pool/my-plugin/1.0.0/logic.wasm",
+            host          = my_host_functions,
+            initial_state = {"initial_value": 0, "step": 1},
         )
         await runtime.start()
-        await runtime.call("increment", {})
+        result = await runtime.call("increment", {"step": 2})
     """
     wasm_path = Path(wasm_path)
     use_wasm = (
         not prefer_stub
         and _WASMTIME_AVAILABLE
         and wasm_path.exists()
-        and wasm_path.stat().st_size > 8  # mehr als reiner Stub
+        and wasm_path.stat().st_size > 8
     )
 
     if use_wasm:
@@ -343,17 +392,18 @@ class StubRuntime(PluginRuntime):
     """
     Python-Stub-Implementierung der PluginRuntime.
 
-    Ersetzt Extism/WASM vollständig in Python — ermöglicht vollständige
-    Integration und Tests ohne echte WASM-Ausführung.
+    Fallback für Umgebungen ohne wasmtime oder wenn die WASM-Datei fehlt.
+    Eignet sich für Connectivity-Tests und Infrastruktur-Validierung ohne
+    echte Plugin-Logik.
 
-    Die Stub-Logik deckt Standard-Szenarien ab:
-      - counter-plugin:  "increment", "reset", "get_state"
-      - Allgemein:       "get_state", "set_state", "ping"
+    Unterstützte Funktionen (generisch für alle Plugins):
+      - ``ping``      — Lebenszeichen zurückgeben
+      - ``get_state`` — Internen State zurückgeben
+      - ``set_state`` — Internen State setzen
 
-    Für Plugin-spezifische Logik kann eine Unterklasse mit _dispatch() überschrieben werden.
-
-    Phase 2: Diese Klasse wird durch ExtismRuntime ersetzt, welche die selbe API
-    implementiert, aber die Funktionen im WASM-Modul ausführt.
+    Für alle anderen Funktionsnamen wird ein ``PluginCallError`` geworfen,
+    da Plugin-spezifische Logik ausschließlich in der WasmRuntime ausgeführt wird.
+    Unterklassen können ``_dispatch()`` erweitern um eigene Test-Stubs hinzuzufügen.
     """
 
     def __init__(
@@ -371,10 +421,6 @@ class StubRuntime(PluginRuntime):
     # ------------------------------------------------------------------
 
     async def start(self) -> None:
-        """
-        Stub: Prüft nur ob die WASM-Datei existiert, lädt sie aber nicht.
-        Gibt eine Warnung aus, dass WASM-Execution noch nicht aktiv ist.
-        """
         if self._started:
             logger.warning("[%s] StubRuntime already started", self.plugin_id)
             return
@@ -382,14 +428,12 @@ class StubRuntime(PluginRuntime):
         if not self.wasm_path.exists():
             logger.warning(
                 "[%s] WASM-Datei nicht gefunden: %s — Stub läuft ohne WASM",
-                self.plugin_id,
-                self.wasm_path,
+                self.plugin_id, self.wasm_path,
             )
         else:
             logger.info(
-                "[%s] ⚠️  StubRuntime gestartet (WASM %s vorhanden aber nicht ausgeführt — Phase 2)",
+                "[%s] ⚠️  StubRuntime gestartet (WASM vorhanden aber nicht ausgeführt)",
                 self.plugin_id,
-                self.wasm_path.name,
             )
 
         self._started = True
@@ -404,23 +448,15 @@ class StubRuntime(PluginRuntime):
     # ------------------------------------------------------------------
 
     async def call(self, function_name: str, data: dict[str, Any]) -> dict[str, Any]:
-        """
-        Führt eine Plugin-Funktion im Stub aus.
-
-        Bekannte Funktionen haben eine eingebaute Python-Implementierung.
-        Unbekannte Funktionen werfen PluginCallError.
-        """
         if not self._started:
             raise PluginCallError(self.plugin_id, function_name, "Runtime not started")
 
         logger.debug("[%s] call(%s, %s)", self.plugin_id, function_name, data)
-
         result = await self._dispatch(function_name, data)
         logger.debug("[%s] call(%s) -> %s", self.plugin_id, function_name, result)
         return result
 
     async def on_event(self, event_name: str, data: dict[str, Any]) -> None:
-        """Stub: Loggt eingehende Events, leitet sie nicht weiter (kein WASM)."""
         logger.debug("[%s] on_event(%s, %s) — Stub: ignoriert", self.plugin_id, event_name, data)
 
     # ------------------------------------------------------------------
@@ -429,18 +465,14 @@ class StubRuntime(PluginRuntime):
 
     async def _dispatch(self, function_name: str, data: dict[str, Any]) -> dict[str, Any]:
         """
-        Routing zu Stub-Implementierungen.
+        Routing zu generischen Stub-Implementierungen.
         Unterklassen können diese Methode erweitern oder ersetzen.
+        Plugin-spezifische Funktionen werden nicht unterstützt — dafür WasmRuntime nutzen.
         """
         handlers: dict[str, Any] = {
-            # Standard (alle Plugins)
-            "ping":          self._fn_ping,
-            "get_state":     self._fn_get_state,
-            "set_state":     self._fn_set_state,
-            # Counter-Widget spezifisch
-            "init":          self._fn_init,
-            "increment":     self._fn_increment,
-            "reset":         self._fn_reset,
+            "ping":      self._fn_ping,
+            "get_state": self._fn_get_state,
+            "set_state": self._fn_set_state,
         }
 
         handler = handlers.get(function_name)
@@ -448,13 +480,15 @@ class StubRuntime(PluginRuntime):
             raise PluginCallError(
                 self.plugin_id,
                 function_name,
-                f"Unknown function '{function_name}'. Available in stub: {list(handlers.keys())}",
+                f"Funktion '{function_name}' wird im StubRuntime nicht unterstützt. "
+                f"Generisch verfügbar: {list(handlers.keys())}. "
+                f"Plugin-spezifische Logik erfordert WasmRuntime.",
             )
 
         return await handler(data)
 
     # ------------------------------------------------------------------
-    # Stub-Implementierungen
+    # Generische Stub-Implementierungen
     # ------------------------------------------------------------------
 
     async def _fn_ping(self, _data: dict) -> dict:
@@ -466,41 +500,3 @@ class StubRuntime(PluginRuntime):
     async def _fn_set_state(self, data: dict) -> dict:
         self._state.update(data)
         return dict(self._state)
-
-    async def _fn_init(self, data: dict) -> dict:
-        """init: Initialisiert den Zähler mit optionalem initial_value aus config_overlay."""
-        self._state.setdefault("count", data.get("initial_value", 0))
-        self._state.setdefault("step", data.get("step", 1))
-        self._state.setdefault("label", data.get("label", "Counter"))
-        logger.info("✅ [%s] init | state=%s", self.plugin_id, self._state)
-
-        # Host-Funktion: UI über Init informieren
-        await self.host.notify_ui("plugin.initialized", {
-            "plugin_id": self.plugin_id,
-            "state": self._state,
-        })
-        return dict(self._state)
-
-    async def _fn_increment(self, data: dict) -> dict:
-        """increment: Erhöht den Zähler um 'step' (aus data oder state)."""
-        step = data.get("step", self._state.get("step", 1))
-        self._state["count"] = self._state.get("count", 0) + step
-        logger.info("[%s] increment +%s -> %s", self.plugin_id, step, self._state["count"])
-
-        # Host-Funktion: UI über neuen Wert informieren
-        await self.host.notify_ui("counter.updated", {
-            "plugin_id": self.plugin_id,
-            "count":     self._state["count"],
-        })
-        return {"count": self._state["count"]}
-
-    async def _fn_reset(self, _data: dict) -> dict:
-        """reset: Setzt den Zähler auf 0 zurück."""
-        self._state["count"] = 0
-        logger.info("[%s] reset -> 0", self.plugin_id)
-
-        await self.host.notify_ui("counter.updated", {
-            "plugin_id": self.plugin_id,
-            "count":     0,
-        })
-        return {"count": 0}

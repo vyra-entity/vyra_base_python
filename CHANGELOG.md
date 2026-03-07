@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (Plugin-System Generalisierung)
+- **`plugin/runtime.py` — WasmRuntime generisch**: Hardcodierte counter-widget-Logik (`init`, `increment`, `reset`) entfernt. Die Runtime liest jetzt `metadata.json exports[]` beim Start und dispatcht alle Funktionen dynamisch (metadata-gesteuerter i32-Dispatch). Kein statisches Wissen über einzelne Plugins mehr.
+- **`plugin/runtime.py` — StubRuntime bereinigt**: Counter-spezifische Methoden (`_fn_init`, `_fn_increment`, `_fn_reset`) entfernt. Nur generische Operationen bleiben (`ping`, `get_state`, `set_state`).
+- **`plugin/host_functions.py` — BaseHostFunctions**: Neue abstrakte Basisklasse `BaseHostFunctions(ABC)` hinzugefügt. Konkretes `log()`, abstrakte `notify_ui()`, `zenoh_get()`, `zenoh_put()`.
+- **`plugin/__init__.py`**: `BaseHostFunctions` exportiert.
+
+### Added
+- **`interfaces/config/vyra_plugin.meta.json`**: Neue Zenoh-Interface-Definition für `plugin_event` Publisher (Typ: message, Namespace: plugin).
+- **`docs/backend/PLUGIN_SYSTEM.md`**: Vollständige Architekturdokumentation des Plugin-Systems.
+
 ## [0.1.9] - 2026-03-06
 
 ### Added
