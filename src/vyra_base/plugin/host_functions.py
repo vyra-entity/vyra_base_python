@@ -9,6 +9,10 @@ muss eine konkrete Implementierung bereitstellen.
 WASM-Plugins können ausschließlich über diese Funktionen mit dem Host interagieren
 (kein direktes Filesystem, kein direktes Network-Access aus dem WASM-Kontext).
 
+Kommunikation läuft ausschließlich über die InterfaceFactory (create_publisher,
+create_subscriber, create_server, create_client) — kein direkter Zenoh-Zugriff.
+Der PluginFacade sitzt oberhalb und prüft Berechtigungen aus metadata.json.
+
 Klassen:
     HostFunctions       — Protocol (structural typing, für isinstance-Checks)
     BaseHostFunctions   — Abstrakte Basisklasse für eigene Implementierungen;
@@ -18,12 +22,12 @@ Klassen:
 Für ein Modul das Plugins hostet::
 
     from vyra_base.plugin.host_functions import BaseHostFunctions
+    from vyra_base.com.core.factory import InterfaceFactory
 
     class MyModuleHostFunctions(BaseHostFunctions):
-        def __init__(self, zenoh_publisher, zenoh_session):
+        def __init__(self, plugin_event_publisher):
             super().__init__()
-            self._publisher = zenoh_publisher
-            self._session   = zenoh_session
+            self._publisher = plugin_event_publisher
 
         async def notify_ui(self, event_name: str, data: dict) -> None:
             await self._publisher.publish({
@@ -32,18 +36,28 @@ Für ein Modul das Plugins hostet::
                 "data":       data,
             })
 
-        async def zenoh_get(self, key: str):
-            return await self._session.get(key)
+        async def create_publisher(self, name, module_name, module_id=None, **kwargs):
+            return await InterfaceFactory.create_publisher(name, module_id=module_id,
+                                                           module_name=module_name, **kwargs)
 
-        async def zenoh_put(self, key: str, value) -> None:
-            await self._session.put(key, value)
+        async def create_subscriber(self, name, callback, module_name, module_id=None, **kwargs):
+            return await InterfaceFactory.create_subscriber(name, subscriber_callback=callback,
+                                                            module_id=module_id,
+                                                            module_name=module_name, **kwargs)
+
+        async def create_server(self, name, callback, **kwargs):
+            return await InterfaceFactory.create_server(name, response_callback=callback, **kwargs)
+
+        async def create_client(self, name, module_name, module_id=None, **kwargs):
+            return await InterfaceFactory.create_client(name, module_id=module_id,
+                                                        module_name=module_name, **kwargs)
 """
 
 from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Callable, Optional, Protocol, runtime_checkable
 
 logger = logging.getLogger(__name__)
 
@@ -56,52 +70,80 @@ class HostFunctions(Protocol):
     Jede Methode entspricht einer Funktion, die in die WASM-Sandbox exportiert wird.
     Implementierungen müssen alle Methoden bereitstellen.
 
-    Beispiel-Implementierung im v2_modulemanager::
-
-        class ModuleManagerHostFunctions:
-            def __init__(self, zenoh_session, redis_client):
-                self._zenoh = zenoh_session
-                self._redis = redis_client
-
-            async def notify_ui(self, event_name: str, data: dict) -> None:
-                await self._zenoh.put(f"vyra/ui/events/{event_name}", json.dumps(data))
-
-            async def zenoh_get(self, key: str) -> Any:
-                return await self._zenoh.get(key)
-
-            async def zenoh_put(self, key: str, value: Any) -> None:
-                await self._zenoh.put(key, value)
-
-            async def log(self, level: str, message: str) -> None:
-                getattr(logger, level, logger.info)(f"[plugin] {message}")
+    Kommunikation erfolgt über InterfaceFactory-Methoden (kein direkter Zenoh-Zugriff).
+    Der PluginFacade prüft Berechtigungen vor Delegierung an BaseHostFunctions.
     """
 
     async def notify_ui(self, event_name: str, data: dict[str, Any]) -> None:
         """
-        Sendet ein Event an das Dashboard-Frontend über Zenoh.
-
-        Das Plugin nutzt diese Funktion, um UI-Updates auszulösen (z.B. Zähler-Update).
+        Sendet ein Event an das Modul-Frontend über Vyra-Interface.
 
         :param event_name: Eindeutiger Event-Name (z.B. "counter.updated")
         :param data:       Beliebige JSON-serialisierbare Nutzdaten
         """
         ...
 
-    async def zenoh_get(self, key: str) -> Any:
+    async def create_publisher(
+        self,
+        name: str,
+        module_name: str,
+        module_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Any:
         """
-        Liest einen Wert vom Zenoh-Bus. Scope wird vom Host geprüft.
+        Erstellt einen Publisher über InterfaceFactory.
 
-        :param key: Zenoh-Key-Expression (muss im erlaubten Scope des Plugins liegen)
-        :returns:   Gelesener Wert oder None
+        :param name:        Interface-Name
+        :param module_name: Ziel-Modulname
+        :param module_id:   Optionale Modul-ID (spezifische Instanz)
         """
         ...
 
-    async def zenoh_put(self, key: str, value: Any) -> None:
+    async def create_subscriber(
+        self,
+        name: str,
+        callback: Callable,
+        module_name: str,
+        module_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Any:
         """
-        Schreibt einen Wert auf den Zenoh-Bus. Scope wird vom Host geprüft.
+        Erstellt einen Subscriber über InterfaceFactory.
 
-        :param key:   Zenoh-Key-Expression
-        :param value: Zu schreibender Wert (wird JSON-serialisiert)
+        :param name:        Interface-Name
+        :param callback:    Async-Callback für eingehende Nachrichten
+        :param module_name: Quell-Modulname
+        :param module_id:   Optionale Modul-ID
+        """
+        ...
+
+    async def create_server(
+        self,
+        name: str,
+        callback: Callable,
+        **kwargs: Any,
+    ) -> Any:
+        """
+        Erstellt einen Service-Server über InterfaceFactory.
+
+        :param name:     Service-Name
+        :param callback: Async-Callback für eingehende Requests
+        """
+        ...
+
+    async def create_client(
+        self,
+        name: str,
+        module_name: str,
+        module_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Any:
+        """
+        Erstellt einen Service-Client über InterfaceFactory.
+
+        :param name:        Service-Name
+        :param module_name: Ziel-Modulname
+        :param module_id:   Optionale Modul-ID
         """
         ...
 
@@ -124,12 +166,17 @@ class NullHostFunctions:
     async def notify_ui(self, event_name: str, data: dict[str, Any]) -> None:
         logger.debug("[NullHostFunctions] notify_ui(%s, %s)", event_name, data)
 
-    async def zenoh_get(self, key: str) -> Any:
-        logger.debug("[NullHostFunctions] zenoh_get(%s)", key)
-        return None
+    async def create_publisher(self, name: str, module_name: str, module_id: Optional[str] = None, **kwargs: Any) -> None:
+        logger.debug("[NullHostFunctions] create_publisher(%s, %s)", name, module_name)
 
-    async def zenoh_put(self, key: str, value: Any) -> None:
-        logger.debug("[NullHostFunctions] zenoh_put(%s, %s)", key, value)
+    async def create_subscriber(self, name: str, callback: Callable, module_name: str, module_id: Optional[str] = None, **kwargs: Any) -> None:
+        logger.debug("[NullHostFunctions] create_subscriber(%s, %s)", name, module_name)
+
+    async def create_server(self, name: str, callback: Callable, **kwargs: Any) -> None:
+        logger.debug("[NullHostFunctions] create_server(%s)", name)
+
+    async def create_client(self, name: str, module_name: str, module_id: Optional[str] = None, **kwargs: Any) -> None:
+        logger.debug("[NullHostFunctions] create_client(%s, %s)", name, module_name)
 
     async def log(self, level: str, message: str) -> None:
         getattr(logger, level, logger.info)("[plugin] %s", message)
@@ -140,43 +187,51 @@ class BaseHostFunctions(ABC):
     Abstrakte Basisklasse für modul-spezifische HostFunctions-Implementierungen.
 
     Implementiert `log()` konkret über Python-Logging.
-    `notify_ui`, `zenoh_get` und `zenoh_put` müssen von der Unterklasse
-    implementiert werden — typischerweise über einen VyraPublisher bzw.
-    eine Zenoh-Session aus dem Modul-Kontext.
+    `notify_ui`, `create_publisher`, `create_subscriber`, `create_server`,
+    `create_client` müssen von der Unterklasse implementiert werden.
 
-    Zenoh-Interface-Referenz:
+    Kommunikation läuft ausschließlich über die InterfaceFactory — kein direkter
+    Zenoh-Zugriff. Der PluginFacade (vyra_base.plugin.plugin_facade) sitzt
+    oberhalb und prüft Berechtigungen aus metadata.json vor jeder Operation.
+
+    Interface-Referenz:
         Der `plugin_event`-Publisher wird in
-        ``vyra_base/interfaces/config/vyra_plugin.meta.json`` (type: message,
-        namespace: plugin, functionname: plugin_event) beschrieben.
-        Modulspezifische Services werden in der
-        ``{module}_interfaces/config/{module}_plugin.meta.json`` definiert.
+        ``vyra_base/interfaces/config/vyra_plugin.meta.json`` beschrieben.
+        Modulspezifische Services stehen in
+        ``{module}_interfaces/config/{module}_plugin.meta.json``.
 
     Beispiel::
 
         class MyModuleHostFunctions(BaseHostFunctions):
-            def __init__(self, plugin_event_publisher, zenoh_session):
+            def __init__(self, plugin_event_publisher):
                 super().__init__()
-                self._pub     = plugin_event_publisher
-                self._session = zenoh_session
+                self._pub = plugin_event_publisher
 
             async def notify_ui(self, event_name: str, data: dict) -> None:
-                await self._pub.publish({
-                    "event_name": event_name,
-                    "plugin_id":  "<plugin_id>",
-                    "data":       data,
-                })
+                await self._pub.publish({"event_name": event_name, "data": data})
 
-            async def zenoh_get(self, key: str):
-                return await self._session.get(key)
+            async def create_publisher(self, name, module_name, module_id=None, **kw):
+                return await InterfaceFactory.create_publisher(
+                    name, module_id=module_id, module_name=module_name, **kw)
 
-            async def zenoh_put(self, key: str, value) -> None:
-                await self._session.put(key, value)
+            async def create_subscriber(self, name, callback, module_name, module_id=None, **kw):
+                return await InterfaceFactory.create_subscriber(
+                    name, subscriber_callback=callback,
+                    module_id=module_id, module_name=module_name, **kw)
+
+            async def create_server(self, name, callback, **kw):
+                return await InterfaceFactory.create_server(
+                    name, response_callback=callback, **kw)
+
+            async def create_client(self, name, module_name, module_id=None, **kw):
+                return await InterfaceFactory.create_client(
+                    name, module_id=module_id, module_name=module_name, **kw)
     """
 
     @abstractmethod
     async def notify_ui(self, event_name: str, data: dict[str, Any]) -> None:
         """
-        Sendet ein Event an das Frontend über Zenoh (plugin_event Publisher).
+        Sendet ein Event an das Frontend über den plugin_event Publisher.
 
         :param event_name: Generischer Event-Name, z.B. 'plugin.increment.result'
         :param data:       JSON-serialisierbare Nutzdaten
@@ -184,22 +239,51 @@ class BaseHostFunctions(ABC):
         ...
 
     @abstractmethod
-    async def zenoh_get(self, key: str) -> Any:
-        """
-        Liest einen Wert vom Zenoh-Bus. Scope-Validierung liegt beim Aufrufer.
-
-        :param key: Zenoh-Key-Expression
-        :returns:   Gelesener Wert oder None
-        """
+    async def create_publisher(
+        self,
+        name: str,
+        module_name: str,
+        module_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Erstellt einen Publisher via InterfaceFactory."""
         ...
 
     @abstractmethod
-    async def zenoh_put(self, key: str, value: Any) -> None:
-        """
-        Schreibt einen Wert auf den Zenoh-Bus. Scope-Validierung liegt beim Aufrufer.
+    async def create_subscriber(
+        self,
+        name: str,
+        callback: Callable,
+        module_name: str,
+        module_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Erstellt einen Subscriber via InterfaceFactory."""
+        ...
 
-        :param key:   Zenoh-Key-Expression
-        :param value: Zu schreibender Wert (wird JSON-serialisiert)
+    @abstractmethod
+    async def create_server(
+        self,
+        name: str,
+        callback: Callable,
+        **kwargs: Any,
+    ) -> Any:
+        """Erstellt einen Service-Server via InterfaceFactory."""
+        ...
+
+    @abstractmethod
+    async def create_client(
+        self,
+        name: str,
+        module_name: str,
+        module_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Erstellt einen Service-Client via InterfaceFactory.
+
+        :param name:        Service-Name
+        :param module_name: Ziel-Modulname
+        :param module_id:   Optionale Modul-ID
         """
         ...
 
