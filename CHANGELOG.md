@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (Plugin HostFunctions Refactoring)
+- **`plugin/host_functions.py`**: `zenoh_get`/`zenoh_put` aus Protocol, `BaseHostFunctions` und `NullHostFunctions` entfernt. Neue abstrakte Methoden: `create_publisher`, `create_subscriber`, `create_server`, `create_client` \u2014 spiegeln `InterfaceFactory`-Signaturen wider.
+
+### Added
+- **`plugin/plugin_facade.py`**: Neuer `PluginFacade` als Permission-Gate + Rate-Limiter \u00fcber `BaseHostFunctions`. Pr\u00fcft `permissions.interfaces` aus `metadata.json` (Transport-Typ: subscribe/publish/server/client; Zielmodul: module_name, module_id). Blockiert oder verlangsamt Plugins bei \u00fcberm\u00e4\u00dfigen Anfragen.
+
 
 ## [0.1.8+build.110] - 2026-03-09
 
