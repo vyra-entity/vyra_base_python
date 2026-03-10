@@ -5,9 +5,9 @@
         ],
         "type": "message",
         "namespace": "plugin",
-        "functionname": "plugin_event",
-        "displayname": "Plugin Event",
-        "description": "Generischer Ausgangs-Publisher für WASM-Plugin-Events an das Frontend. Wird von der HostFunctions-Implementierung eines Moduls genutzt, um Plugin-Aktivitätsmeldungen per Zenoh zu senden. Subscriber im Frontend empfangen diese Events für reaktive UI-Updates.",
+        "functionname": "logic_event",
+        "displayname": "Plugin Logic Event",
+        "description": "Generic topic for plugin logic events. This is been used for plugin logic to push information for UI components related to this plugin logic",
         "filetype": [],
         "params": [],
         "returns": [
@@ -28,6 +28,93 @@
                 "datatype": "object",
                 "displayname": "Payload",
                 "description": "Beliebige JSON-serialisierbare Nutzdaten des Events."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "message",
+        "namespace": "plugin",
+        "functionname": "ui_event",
+        "displayname": "Plugin UI Event",
+        "description": "Generic topic for plugin logic events. This is been used for plugin logic to push information for UI components related to this plugin logic",
+        "filetype": [],
+        "params": [],
+        "returns": [
+            {
+                "name": "event_name",
+                "datatype": "string",
+                "displayname": "Event-Name",
+                "description": "Generischer Event-Name, z.B. 'plugin.increment.result', 'plugin.reset.result'."
+            },
+            {
+                "name": "plugin_id",
+                "datatype": "string",
+                "displayname": "Plugin-ID",
+                "description": "Eindeutige ID des Plugins (z.B. 'counter-widget')."
+            },
+            {
+                "name": "data",
+                "datatype": "object",
+                "displayname": "Payload",
+                "description": "Beliebige JSON-serialisierbare Nutzdaten des Events."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "namespace": "plugin",
+        "functionname": "ui_function_call",
+        "displayname": "Plugin UI Request Call",
+        "description": "Generic request from a ui-component to a related plugin logic",
+        "filetype": [],
+        "params": [
+            {
+                "name": "plugin_id",
+                "datatype": "string",
+                "displayname": "Plugin-ID",
+                "description": "Unique ID of the plugin to be called (e.g., 'counter-widget')."
+            },
+            {
+                "name": "data",
+                "datatype": "object",
+                "displayname": "Payload",
+                "description": "Any JSON-serializable data for the event."
+            }
+        ],
+        "returns": [
+            {
+                "name": "plugin_id",
+                "datatype": "string",
+                "displayname": "Plugin-ID",
+                "description": "Unique ID of the plugin (e.g., 'counter-widget')."
+            },
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True or False wether the funktion call was successfull"
+            },
+            {
+                "name": "data",
+                "datatype": "object",
+                "displayname": "Payload",
+                "description": "Any JSON-serializable response data."
             }
         ],
         "access_level": 1,
