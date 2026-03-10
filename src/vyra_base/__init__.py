@@ -58,6 +58,13 @@ def extract_interfaces(target_path: str | Path):
     for i_type in interface_subs:
         iface_path: Path = source_path / i_type
         t_subs_path: Path = target_path / i_type
+
+        if not iface_path.exists():
+            continue
+
+        # Ensure the target sub-directory exists before copying
+        t_subs_path.mkdir(parents=True, exist_ok=True)
+
         for file in iface_path.glob(f'*.{i_type}'):
             shutil.copy2(file, t_subs_path)
             print(f"Copied {file.name} to {t_subs_path}")

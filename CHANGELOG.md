@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`__init__.py` / `extract_interfaces()`**: Fehlender `mkdir` für `msg/`, `srv/`, `action/` Unterverzeichnisse im Ziel-Interface-Paket. `shutil.copy2` scheiterte stumm, wenn das Unterverzeichnis noch nicht existierte — dadurch wurden `.msg`-Dateien aus `vyra_base/interfaces/msg/` nicht ins Modul-Interface-Paket kopiert. Jetzt wird `t_subs_path.mkdir(parents=True, exist_ok=True)` vor dem Kopier-Loop ausgeführt. Zusätzlich wird übersprungen, wenn das Quell-Unterverzeichnis nicht existiert (`continue`).
+
 ### Changed (Plugin HostFunctions Refactoring)
 - **`plugin/host_functions.py`**: `zenoh_get`/`zenoh_put` aus Protocol, `BaseHostFunctions` und `NullHostFunctions` entfernt. Neue abstrakte Methoden: `create_publisher`, `create_subscriber`, `create_server`, `create_client` \u2014 spiegeln `InterfaceFactory`-Signaturen wider.
 

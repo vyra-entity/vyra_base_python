@@ -258,4 +258,4 @@ from vyra_base.plugin import (
 | `v2_modulemanager/plugin/models.py` | PluginManager-Singleton |
 | `v2_modulemanager/plugin/router.py` | REST-Endpunkte |
 | `v2_modulemanager_interfaces/config/modulemanager_plugin.meta.json` | Zenoh-Services |
-| `local_module_repository/plugins/*/metadata.json` | Plugin-Metadaten (inkl. exports[]) |
+| `local_repository/plugins/*/metadata.json` | Plugin-Metadaten (inkl. exports[]) |
