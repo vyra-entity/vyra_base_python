@@ -337,6 +337,82 @@ class DbManipulator:
                 return error_ret.error_return(error_details)
 
             
+    async def get_one(self, filters: dict | None = None) -> DBReturnValue:
+        """
+        Read a single row from the database table, optionally filtered.
+
+        Returns the first matching model instance using ``scalars().first()``,
+        consistent with :meth:`get_all`. Use this instead of ``get_by_id`` when
+        you need to filter by arbitrary columns or want a guaranteed model
+        instance (not a raw Row).
+
+        :param filters: Optional column/value pairs to filter by.
+        :type filters: dict | None
+        :return: DBReturnValue with ``.value`` = model instance or ``None``.
+        :rtype: DBReturnValue
+        """
+        try:
+            async with self._db.session()() as session:
+                stmt = select(self.model)
+                if filters:
+                    for key, value in filters.items():
+                        stmt = stmt.where(getattr(self.model, key) == value)
+                result = await session.execute(stmt)
+                obj = result.scalars().first()
+
+            if obj is None:
+                ret = DBReturnValue()
+                return ret.error_return(f"No entry found in {self.model.__tablename__} for filters: {filters}")
+
+            return DBReturnValue(
+                value=obj,
+                details={"filters": filters},
+            ).success_return()
+        finally:
+            error_details = []
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
+                logger.error(f"Could not get_one from {self.model.__tablename__}.")
+                error_ret = DBReturnValue()
+                return error_ret.error_return(error_details)
+
+    async def add_instance(self, obj: Any) -> DBReturnValue:
+        """
+        Add a pre-built model instance to the database.
+
+        Use this instead of :meth:`add` when you need full control over the
+        object's fields (e.g. custom primary keys or enum values) and have
+        already constructed the model instance yourself.
+
+        :param obj: A model instance (subclass of the declarative base).
+        :type obj: Any
+        :return: Add status and details.
+        :rtype: DBReturnValue
+        """
+        try:
+            async with self._db.session()() as session:
+                async with session.begin():
+                    try:
+                        session.add(obj)
+                        await session.flush()
+                        await session.refresh(obj)
+                    except Exception as e:
+                        logger.error(str(e))
+                        raise e
+
+            return DBReturnValue(
+                value=f"Successfully added instance to {self.model.__tablename__}.",
+                details={
+                    "id": getattr(obj, self._read_pkey()),
+                    "data": self.to_dict(obj),
+                },
+            ).success_return()
+        finally:
+            error_details = []
+            if ErrorTraceback.check_error_exist(error_details, log_print=True):
+                logger.error(f"Could not add instance to {self.model.__tablename__}.")
+                error_ret = DBReturnValue()
+                return error_ret.error_return(error_details)
+
     async def delete(self, id: Any) -> DBReturnValue:
         """
         Update a line in a datatable of database by a given 'id'.

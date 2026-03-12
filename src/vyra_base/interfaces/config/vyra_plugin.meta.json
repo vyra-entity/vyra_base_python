@@ -91,6 +91,12 @@
                 "description": "Unique ID of the plugin to be called (e.g., 'counter-widget')."
             },
             {
+                "name": "function_name",
+                "datatype": "string",
+                "displayname": "Function Name",
+                "description": "Name of the exported WASM function to call (e.g., 'increment', 'reset')."
+            },
+            {
                 "name": "data",
                 "datatype": "object",
                 "displayname": "Payload",
