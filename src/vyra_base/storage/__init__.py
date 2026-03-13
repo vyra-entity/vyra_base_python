@@ -39,6 +39,7 @@ from .storage import Storage
 
 # Example table definitions (for reference)
 from .tb_params import Parameter as tb_parameters
+from .tb_error_log import ErrorLog as tb_error_logs, ERROR_LOG_MAX_ROWS
 
 __all__ = [
     # Base classes
@@ -62,6 +63,8 @@ __all__ = [
     
     # Example tables
     "tb_parameters",
+    "tb_error_logs",
+    "ERROR_LOG_MAX_ROWS",
 ]
 
 # Usage example for developers:

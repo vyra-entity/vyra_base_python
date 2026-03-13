@@ -43,9 +43,25 @@ class IFeederHandler(logging.Handler, abc.ABC):
     :cvar __handlerName__: Human-readable handler identifier.  Set in each
         subclass.
     :cvar __doc__: One-line description of what this handler transports.
+    :ivar activated: Whether this handler is active. Inactive handlers are
+        skipped during dispatch without raising errors.
+    :vartype activated: bool
     """
 
     __handlerName__: str = "AbstractHandler"
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialise the handler and set :attr:`activated` to ``True``."""
+        super().__init__(*args, **kwargs)
+        self.activated: bool = True
+
+    def activate(self) -> None:
+        """Enable this handler so it participates in message dispatch."""
+        self.activated = True
+
+    def deactivate(self) -> None:
+        """Disable this handler so it is silently skipped during dispatch."""
+        self.activated = False
 
     # ------------------------------------------------------------------
     # Abstract interface — every handler must implement these
@@ -110,6 +126,8 @@ class IFeederHandler(logging.Handler, abc.ABC):
         via :func:`asyncio.get_event_loop` so that the synchronous logging
         call does not block the event loop.
 
+        If :attr:`activated` is ``False`` the record is silently discarded.
+
         Subclasses that need a different bridging strategy (e.g. formatting
         the record as a plain string for a database) should override this
         method directly.
@@ -117,6 +135,9 @@ class IFeederHandler(logging.Handler, abc.ABC):
         :param record: Python :class:`~logging.LogRecord` to emit.
         :type record: logging.LogRecord
         """
+        if not self.activated:
+            return
+
         import asyncio
 
         try:

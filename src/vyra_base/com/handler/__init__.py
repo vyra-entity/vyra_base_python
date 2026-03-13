@@ -32,6 +32,12 @@ except ImportError:
     DatabaseWriter = None  # type: ignore[assignment,misc]
 
 try:
+    from vyra_base.com.handler.error_log_database import ErrorLogDatabaseHandler, FieldSpec
+except ImportError:
+    ErrorLogDatabaseHandler = None  # type: ignore[assignment,misc]
+    FieldSpec = None  # type: ignore[assignment,misc]
+
+try:
     from vyra_base.com.handler.ros2 import ROS2Handler
 except ImportError:
     ROS2Handler = None  # type: ignore[assignment,misc]
@@ -68,9 +74,12 @@ __all__ = [
     "ZenohHandler",
     "RedisHandler",
     "UDSHandler",
-    # Database handler
+    # Database handler (generic)
     "DBCommunicationHandler",
     "DatabaseWriter",
+    # Error log database handler (ring-buffer, generic)
+    "ErrorLogDatabaseHandler",
+    "FieldSpec",
     # Factory
     "HandlerFactory",
     # In-memory log ring-buffer

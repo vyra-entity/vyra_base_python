@@ -13,6 +13,11 @@
         ],
         "returns": [
             {
+                "datatype": "string",
+                "displayname": "error_id",
+                "description": "The unique identifier (UUID) of the error entry"
+            },
+            {
                 "datatype": "uint32",
                 "displayname": "error_code",
                 "description": "The error code representing the specific error"
@@ -27,9 +32,9 @@
                 "displayname": "description",
                 "description": "A description of the error"
             },
-            {
-                "datatype": "string",
+            {"datatype": "string",
                 "displayname": "solution",
+                
                 "description": "A solution or suggestion for the error"
             },
             {
@@ -176,6 +181,51 @@
         "access_level": 1,
         "displaystyle": {
             "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "acknowledge_error",
+        "displayname": "Acknowledge Error",
+        "description": "Acknowledge an error entry by its unique error_id. Marks the error as reviewed by a user.",
+        "filetype": [
+            "VBASEAcknowledgeError.proto"
+        ],
+        "params": [
+            {
+                "name": "error_id",
+                "datatype": "string",
+                "displayname": "Error ID",
+                "description": "The unique UUID of the error entry to acknowledge."
+            },
+            {
+                "name": "user",
+                "datatype": "string",
+                "displayname": "User",
+                "description": "The user acknowledging the error (optional, defaults to 'system')."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Indicates whether the error was acknowledged successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
             "published": false
         }
     }

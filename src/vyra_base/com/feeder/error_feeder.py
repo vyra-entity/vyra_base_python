@@ -145,6 +145,7 @@ class ErrorFeeder(BaseFeeder):
         (``VBASEErrorFeed``).
         """
         return {
+            'error_id': str(entry.uuid) if entry.uuid else '',
             'error_code': int(entry.code or 0),
             'module_id': str(entry.module_id) if entry.module_id else '',
             'description': str(entry.description or ''),

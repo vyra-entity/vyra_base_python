@@ -559,6 +559,8 @@ class BaseFeeder(IFeeder):
                     )
                 self._feed_count += 1
                 self._last_feed_at = datetime.datetime.utcnow()
+                # Dispatch to all attached handlers (fire-and-forget, parallel)
+                self._dispatch_to_handlers(wire_data)
                 return
             except Exception as exc:
                 last_exc = exc
@@ -568,6 +570,9 @@ class BaseFeeder(IFeeder):
         self._error_count += 1
         logger.error("❌ %s publish failed after %d attempt(s): %s",
                      self._feederName, self._max_retries, last_exc)
+        # Dispatch to handlers even on publish failure so DB/logging handlers
+        # record the event regardless of transport availability.
+        self._dispatch_to_handlers(wire_data)
 
     # ------------------------------------------------------------------
     # Feeder logger setup
@@ -602,6 +607,37 @@ class BaseFeeder(IFeeder):
         # self._feeder.addHandler(handler)
         self._handler.append(handler)
         return True
+
+    def _dispatch_to_handlers(self, wire_data: Any) -> None:
+        """Schedule :meth:`~CommunicationHandler.dispatch` on every active handler.
+
+        Each active handler is dispatched as a fire-and-forget
+        :class:`asyncio.Task` so that slow/blocking handlers cannot stall the
+        feeder's publish path.  Inactive handlers (``handler.activated ==
+        False``) are silently skipped.
+
+        This method is called from :meth:`_publish` both on successful publish
+        *and* on publish failure, ensuring that DB/logging handlers always
+        record the event regardless of transport availability.
+
+        :param wire_data: The pre-processed message dict (output of
+            :meth:`_prepare_entry_for_publish`) passed verbatim to every handler.
+        :type wire_data: Any
+        """
+        if not self._handler:
+            return
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            logger.warning("⚠️ _dispatch_to_handlers: no event loop available")
+            return
+        for handler in self._handler:
+            if not getattr(handler, 'activated', True):
+                continue
+            if loop.is_running():
+                loop.create_task(handler.dispatch(wire_data))
+            else:
+                loop.run_until_complete(handler.dispatch(wire_data))
 
     def add_handler_class(self, handler_class: Type[CommunicationHandler]) -> None:
         """Register a handler class to be instantiated during :meth:`create`.

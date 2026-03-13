@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.8+build.115] - 2026-03-13
+
+### Build
+
+see below
+
+### Added
+- **`storage/tb_error_log.py`**: Added `error_id` column (indexed `Text`, nullable) to the
+  `ErrorLog` model so each ring-buffer entry carries the UUID of the originating `ErrorEntry`.
+- **`com/feeder/error_feeder.py`**: `_prepare_entry_for_publish()` now includes `error_id`
+  (the string representation of `ErrorEntry.uuid`) in the wire dict sent via Zenoh.
+- **`com/handler/error_log_database.py`**: `_build_record()` maps `error_id` / fallback `uuid`
+  to the `error_id` column; `default_error_log_fields()` declares `error_id` as an optional,
+  nullable `str` field.
+- **`interfaces/config/vyra_com.meta.json`**: `ErrorFeed` returns now include `error_id`
+  (string UUID). New `acknowledge_error` Zenoh service entry with params `error_id` and
+  optional `user`.
+- **`core/entity.py`** — `VyraEntity.acknowledge_error()`: new `@remote_service()` endpoint
+  that accepts an `error_id` and optional `user`, looks up the matching row in `error_logs`
+  via `DbManipulator`, and writes `{timestamp, user}` to the `acknowledged` column.
+- **`tests/com/handler/test_error_log_database_handler.py`**: Added tests for `error_id`
+  field mapping (`test_dispatch_maps_error_id`, `test_dispatch_maps_uuid_as_error_id`).
+
+
+## [0.1.8+build.114] - 2026-03-13
+
+### Build
+
+update errorfeed with handler to store errorfeeds in database
+
+### Added
+- **`com/handler/interfaces.py`**: `activated: bool` attribute on `IFeederHandler` (default `True`).
+  `activate()` / `deactivate()` convenience methods. `emit()` now short-circuits when `activated=False`.
+- **`com/feeder/feeder.py`**: `_dispatch_to_handlers(wire_data)` helper — fire-and-forget
+  `asyncio.create_task` dispatch to all active handlers after every `_publish()` call (success and failure).
+- **`storage/tb_error_log.py`**: New SQLAlchemy model `ErrorLog` for the `error_logs` ring-buffer
+  table (fields: `id`, `occured_at`, `error_code`, `severity`, `context_snap`, `message`,
+  `acknowledged`). `ERROR_LOG_MAX_ROWS = 10_000`.
+- **`com/handler/error_log_database.py`**: New generic `ErrorLogDatabaseHandler` with
+  `FieldSpec`-based validation and ID-rotation ring buffer (`(counter % max_rows) + 1`).
+  Writes via `DbManipulator`; upserts existing slots, inserts empty ones. `configure(db_access)`
+  enables late binding after `setup_storage()`.
+- **`core/entity.py`** — `VyraEntity`:
+  - `__init_feeder()` registers an **inactive** `ErrorLogDatabaseHandler` placeholder on the
+    error feeder at startup (no `DbAccess` needed yet).
+  - `_activate_errorfeed_db_handler()` helper: creates `error_logs` table and activates the handler
+    once persistent storage is ready.
+  - `setup_storage()` calls `_activate_errorfeed_db_handler()` automatically after storage init.
+
+### Fixed
+- **`com/feeder/feeder.py`**: Handlers in `self._handler` were never called during the publish path.
+  They are now dispatched by `_dispatch_to_handlers()`.
+
+
+## [0.1.8+build.113] - 2026-03-13
+
+### Build
+
+Rebuild all the changed stuff
+
 ### Fixed
 - **`__init__.py` / `extract_interfaces()`**: Fehlender `mkdir` für `msg/`, `srv/`, `action/` Unterverzeichnisse im Ziel-Interface-Paket. `shutil.copy2` scheiterte stumm, wenn das Unterverzeichnis noch nicht existierte — dadurch wurden `.msg`-Dateien aus `vyra_base/interfaces/msg/` nicht ins Modul-Interface-Paket kopiert. Jetzt wird `t_subs_path.mkdir(parents=True, exist_ok=True)` vor dem Kopier-Loop ausgeführt. Zusätzlich wird übersprungen, wenn das Quell-Unterverzeichnis nicht existiert (`continue`).
 

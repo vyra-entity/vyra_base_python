@@ -21,6 +21,7 @@ from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
 from vyra_base.com.handler.logger import VyraLogHandler
+from vyra_base.storage.db_manipulator import DbManipulator
 
 from vyra_base.com.transport.t_zenoh.provider import ZenohProvider, ZENOH_AVAILABLE
 
@@ -56,6 +57,7 @@ from vyra_base.state import (
 )
 from vyra_base.storage.db_access import DbAccess
 from vyra_base.storage.db_access import DBTYPE
+from vyra_base.storage.tb_error_log import ErrorLog, ERROR_LOG_MAX_ROWS
 from vyra_base.com.transport.t_redis import RedisClient
 from vyra_base.storage.storage import Storage
 from vyra_base.core.interface_builder import InterfaceBuilder
@@ -64,6 +66,7 @@ from vyra_base.core.volatile import Volatile
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.security import SecurityManager, SecurityLevel
 from vyra_base.helper.logging_config import VyraLoggingConfig
+from vyra_base.com.handler.error_log_database import ErrorLogDatabaseHandler
 
 logger = logging.getLogger(__name__)
 
@@ -424,8 +427,11 @@ class VyraEntity:
         """
         Initialize the feeders for the entity.
 
-        This method sets up the state, news, and error feeders for the entity.
-        It should be called during the initialization of the entity.
+        Creates state, news, and error feeders.  An
+        :class:`~vyra_base.com.handler.error_log_database.ErrorLogDatabaseHandler`
+        placeholder is registered on the error feeder immediately but starts
+        *deactivated* (no ``DbAccess`` yet).  It is activated later in
+        :meth:`_activate_errorfeed_db_handler` once storage is ready.
         """
         state_feeder = StateFeeder(
             type=state_entry._type, 
@@ -447,6 +453,18 @@ class VyraEntity:
             module_entity=self.module_entry,
             loggingOn=True
         )
+
+        # Register the DB-handler placeholder — deactivated until setup_storage() is called
+        self._error_log_db_handler = ErrorLogDatabaseHandler(
+            database=None,
+            model=ErrorLog,
+            field_definitions=ErrorLogDatabaseHandler.default_error_log_fields(),
+            max_rows=ERROR_LOG_MAX_ROWS,
+            activated=False,
+            source=self.module_entry.name,
+        )
+        error_feeder.add_handler(self._error_log_db_handler)
+
         return state_feeder, news_feeder, error_feeder
 
     async def _init_storages_accesses(
@@ -898,6 +916,9 @@ class VyraEntity:
             transient_config=transient_config
         )
 
+        # Activate the ErrorFeed database handler now that DbAccess is ready
+        await self._activate_errorfeed_db_handler()
+
         if 'default_database' not in persistent_config[self.database_access.db_type]:
             logger.warning(
                 "No default database configuration provided. "
@@ -912,6 +933,44 @@ class VyraEntity:
         self._init_volatiles(transient_base_types=transient_base_types)
 
         logger.info("Storage access initialized.")
+
+    async def _activate_errorfeed_db_handler(self) -> None:
+        """Create the ``error_logs`` table and activate the DB handler on the error feeder.
+
+        This helper is called from :meth:`setup_storage` once the persistent
+        :class:`~vyra_base.storage.db_access.DbAccess` is initialised.  It:
+
+        1. Ensures the ``error_logs`` table exists in the database.
+        2. Calls :pymeth:`~vyra_base.com.handler.error_log_database.ErrorLogDatabaseHandler.configure`
+           on the pre-registered (but deactivated) placeholder handler, wiring
+           it to the live ``DbAccess`` and activating it.
+
+        If the placeholder handler was never registered (e.g. because
+        ``__init_feeder`` was overridden) the method logs a warning and returns
+        without raising.
+        """
+        try:
+            # Ensure the ring-buffer table exists
+            await self.database_access.create_selected_table([ErrorLog])
+        except Exception as exc:
+            logger.warning("⚠️ Could not ensure error_logs table: %s", exc)
+
+        handler: Optional[ErrorLogDatabaseHandler] = getattr(
+            self, "_error_log_db_handler", None
+        )
+        if handler is None:
+            logger.warning(
+                "⚠️ _activate_errorfeed_db_handler: no _error_log_db_handler found — "
+                "was __init_feeder overridden without calling super()?"
+            )
+            return
+
+        handler.configure(self.database_access)
+        logger.info(
+            "✅ ErrorFeed DB handler activated for module '%s' (table: error_logs, max_rows: %d)",
+            self.module_entry.name,
+            ERROR_LOG_MAX_ROWS,
+        )
 
     async def set_interfaces(
             self,
@@ -1313,6 +1372,75 @@ class VyraEntity:
         limit = max(1, min(limit, 1000))
         recent = self._log_handler.get_recent(limit)
         response.logs_json = json.dumps(recent)
+        return None
+
+    # ------------------------------------------------------------------
+    # Error acknowledgement
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def acknowledge_error(self, request: Any, response: Any) -> Any:
+        """
+        Acknowledge an error entry identified by its ``error_id``.
+
+        Finds the matching entry in the ``error_logs`` ring-buffer table and
+        sets its ``acknowledged`` column to
+        ``{timestamp, user}``.
+
+        Request fields:
+            error_id (str): UUID of the error entry to acknowledge (required).
+            user (str): Name of the acknowledging user (optional, default: ``"system"``).
+
+        Response fields:
+            success (bool): ``True`` when the entry was found and updated.
+            message (str): Human-readable status message.
+        """
+
+        error_id = str(getattr(request, "error_id", "") or "").strip()
+        user = str(getattr(request, "user", "") or "system").strip() or "system"
+
+        if not error_id:
+            response.success = False
+            response.message = "Missing error_id"
+            return None
+
+        if not hasattr(self, "database_access") or self.database_access is None:
+            response.success = False
+            response.message = "Database not available"
+            return None
+
+        try:
+            manipulator = DbManipulator(db_access=self.database_access, model=ErrorLog)
+
+            existing = await manipulator.get_one(filters={"error_id": error_id})
+            if existing is None or getattr(existing, "status", None) == "not_found" or existing.value is None:
+                response.success = False
+                response.message = f"Error with id '{error_id}' not found"
+                return None
+
+            ack_payload = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "user": user,
+            }
+            result = await manipulator.update(
+                data={"acknowledged": ack_payload},
+                filters={"error_id": error_id},
+            )
+
+            if getattr(result, "status", None) in ("success", "updated"):
+                response.success = True
+                response.message = f"Error '{error_id}' acknowledged by '{user}'"
+                logger.info("✅ Error '%s' acknowledged by '%s'", error_id, user)
+            else:
+                response.success = False
+                response.message = f"Update failed: {getattr(result, 'status', 'unknown')}"
+                logger.warning("⚠️ acknowledge_error update failed for '%s': %s", error_id, result)
+
+        except Exception as exc:
+            logger.error("❌ acknowledge_error failed for '%s': %s", error_id, exc)
+            response.success = False
+            response.message = str(exc)
+
         return None
 
     @staticmethod
