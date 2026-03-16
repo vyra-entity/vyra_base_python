@@ -6,6 +6,7 @@ with state validation and transition logic, following industrial automation
 best practices.
 """
 
+import asyncio
 import functools
 import logging
 from typing import Callable, Any, Optional
@@ -145,20 +146,85 @@ class MetaOperationalState(type):
     def _wrap_method(original_method: Callable, method_name: str, rules: dict) -> Callable:
         """
         Wrap a lifecycle method with state validation and transition logic.
-        
+
+        Supports both sync and async (coroutine) original methods.  When the
+        wrapped method is async the returned wrapper is also ``async def`` so
+        that callers can properly ``await`` it.
+
         Args:
-            original_method: Original user-defined method
+            original_method: Original user-defined method (sync or async)
             method_name: Name of the method
             rules: State transition rules
-            
+
         Returns:
-            Wrapped method with state management
+            Wrapped method with state management (async if original is async)
         """
+        is_async = asyncio.iscoroutinefunction(original_method)
+
+        if is_async:
+            @functools.wraps(original_method)
+            async def async_wrapper(self, *args, **kwargs) -> Any:
+                current_state = self.get_operational_state()
+
+                required_states = rules['required_states']
+                if current_state not in required_states:
+                    error_msg = (
+                        f"Cannot call {method_name} in state {current_state.value}. "
+                        f"Required states: {[s.value for s in required_states]}"
+                    )
+                    logger.error(error_msg)
+                    raise OperationalStateError(error_msg)
+
+                logger.info(f"Executing {method_name} from state {current_state.value}")
+
+                if rules['pre_transition'] is not None:
+                    logger.debug(f"Pre-transition: {current_state.value} -> {rules['pre_transition'].value}")
+                    self._set_operational_state(rules['pre_transition'])
+
+                success = False
+                result = None
+                error = None
+
+                try:
+                    result = await original_method(self, *args, **kwargs)
+
+                    if isinstance(result, bool):
+                        success = result
+                    else:
+                        success = True
+
+                except Exception as e:
+                    logger.error(f"{method_name} failed with exception: {e}", exc_info=True)
+                    success = False
+                    error = e
+
+                if success and rules['success_transition'] is not None:
+                    new_state = rules['success_transition']
+                    logger.info(f"Success transition: {self.get_operational_state().value} -> {new_state.value}")
+
+                    if rules.get('reset_counter', False):
+                        logger.debug(f"Resetting operation counter (was {self.get_operation_counter()})")
+                        self._reset_operation_counter()
+
+                    self._set_operational_state(new_state)
+                elif not success and rules['failure_transition'] is not None:
+                    new_state = rules['failure_transition']
+                    logger.warning(f"Failure transition: {self.get_operational_state().value} -> {new_state.value}")
+                    self._set_operational_state(new_state)
+
+                if error is not None:
+                    raise error
+
+                logger.info(f"{method_name} completed. Current state: {self.get_operational_state().value}")
+                return result
+
+            return async_wrapper
+
         @functools.wraps(original_method)
         def wrapper(self, *args, **kwargs) -> Any:
             # Get current operational state
             current_state = self.get_operational_state()
-            
+
             # Validate pre-condition
             required_states = rules['required_states']
             if current_state not in required_states:
@@ -168,55 +234,55 @@ class MetaOperationalState(type):
                 )
                 logger.error(error_msg)
                 raise OperationalStateError(error_msg)
-            
+
             logger.info(f"Executing {method_name} from state {current_state.value}")
-            
+
             # Apply pre-transition if defined
             if rules['pre_transition'] is not None:
                 logger.debug(f"Pre-transition: {current_state.value} -> {rules['pre_transition'].value}")
                 self._set_operational_state(rules['pre_transition'])
-            
+
             # Execute user method
             success = False
             result = None
             error = None
-            
+
             try:
                 result = original_method(self, *args, **kwargs)
-                
+
                 # Determine success based on return value
                 # If method returns bool, use it; otherwise assume success
                 if isinstance(result, bool):
                     success = result
                 else:
                     success = True
-                    
+
             except Exception as e:
                 logger.error(f"{method_name} failed with exception: {e}", exc_info=True)
                 success = False
                 error = e
-            
+
             # Apply post-transition based on success/failure
             if success and rules['success_transition'] is not None:
                 new_state = rules['success_transition']
                 logger.info(f"Success transition: {self.get_operational_state().value} -> {new_state.value}")
-                
+
                 # Reset operation counter if specified
                 if rules.get('reset_counter', False):
                     logger.debug(f"Resetting operation counter (was {self.get_operation_counter()})")
                     self._reset_operation_counter()
-                
+
                 self._set_operational_state(new_state)
             elif not success and rules['failure_transition'] is not None:
                 new_state = rules['failure_transition']
                 logger.warning(f"Failure transition: {self.get_operational_state().value} -> {new_state.value}")
                 self._set_operational_state(new_state)
-            
+
             # Re-raise exception if occurred
             if error is not None:
                 raise error
-            
+
             logger.info(f"{method_name} completed. Current state: {self.get_operational_state().value}")
             return result
-        
+
         return wrapper
