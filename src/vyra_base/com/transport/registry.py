@@ -93,7 +93,7 @@ class InterfaceRegistry:
         """
         with self._lock:
             if subscriber_obj.name in self._subscribers:
-                logger.warning(
+                logger.debug(
                     f"🔄 Subscriber '{subscriber_obj.name}' already registered, replacing"
                 )
             
@@ -135,7 +135,7 @@ class InterfaceRegistry:
         """
         with self._lock:
             if client_obj.name in self._clients:
-                logger.warning(
+                logger.debug(
                     f"🔄 Client '{client_obj.name}' already registered, replacing"
                 )
             
@@ -177,7 +177,7 @@ class InterfaceRegistry:
         """
         with self._lock:
             if action_client_obj.name in self._action_clients:
-                logger.warning(
+                logger.debug(
                     f"🔄 Action Client '{action_client_obj.name}' already registered, replacing"
                 )
             

@@ -31,7 +31,9 @@
         "int[]":      "int32",
         "int32[]":    "int32",
         "float[]":    "float32",
-        "bool[]":     "bool"
+        "bool[]":     "bool",
+        "object":     "string",
+        "object[]":   "string"
     },
     "proto_map": {
         "_comment": "JSON/Python type name -> Protobuf scalar type. Used by generate_interfaces.py _map_to_proto_type().",
@@ -53,7 +55,9 @@
         "string":     "string",
         "datetime":   "int64",
         "time":       "int64",
-        "duration":   "int64"
+        "duration":   "int64",
+        "object":     "google.protobuf.Struct",
+        "object[]":   "google.protobuf.Struct"
     },
     "valid_ros2_native_types": {
         "_comment": "ROS2 IDL primitive types accepted verbatim (no mapping needed). These are pass-through types used directly in generated .msg/.srv/.action files.",

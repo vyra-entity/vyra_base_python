@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.117] - 2026-03-17
+
+### Build
+
+Change log warning for replacing transport client to debug level
+
+
+## [0.1.8+build.116] - 2026-03-17
+
+### Build
+
+just update
+
+
 ## [0.1.8+build.115] - 2026-03-13
 
 ### Build

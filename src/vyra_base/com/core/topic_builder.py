@@ -471,12 +471,12 @@ class TopicBuilder:
             
             if interface:
                 logger.debug(
-                    f"✓ Loaded interface for '{function_name}' "
+                    f"✓ Loaded interface for '{self.module_name}:{function_name}' "
                     f"(protocol: {protocol})"
                 )
             else:
                 logger.debug(
-                    f"Interface not found for '{function_name}' "
+                    f"Interface not found for '{self.module_name}:{function_name}' "
                     f"(protocol: {protocol})"
                 )
             
@@ -484,7 +484,7 @@ class TopicBuilder:
         
         except Exception as e:
             logger.error(
-                f"❌ Failed to load interface for '{function_name}': {e}",
+                f"❌ Failed to load interface for '{self.module_name}:{function_name}': {e}",
                 exc_info=True
             )
             return None
