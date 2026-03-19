@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.119] - 2026-03-19
+
+### Build
+
+update vyra log handler
+
+
+## [0.1.8+build.118] - 2026-03-19
+
+### Build
+
+Add get_log_history and refactoring
+
+
 ## [0.1.8+build.117] - 2026-03-17
 
 ### Build

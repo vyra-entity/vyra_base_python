@@ -138,8 +138,15 @@ class VyraEntity:
         # Install in-memory log ring-buffer — accessible via get_log_history Zenoh service
         self._log_handler = VyraLogHandler(capacity=1000)
         self._log_handler.setLevel(logging.DEBUG)
-        # Attach to the module's top-level logger so all module + vyra_base lines are captured
+        # Attach to root logger AND to each named top-level logger that has
+        # propagate=False in the logging config (e.g. core_logging.json).
+        # Without this, messages from "vyra_base" and the module's own logger
+        # never reach the root logger and therefore never enter the ring-buffer.
         logging.getLogger().addHandler(self._log_handler)
+        for _log_ns in ("vyra_base", module_entry.name):
+            _lg = logging.getLogger(_log_ns)
+            if not any(isinstance(h, VyraLogHandler) for h in _lg.handlers):
+                _lg.addHandler(self._log_handler)
 
         # Check ROS2 availability
         self._ros2_available = _ROS2_AVAILABLE

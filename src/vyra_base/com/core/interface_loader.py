@@ -351,9 +351,6 @@ class InterfaceLoader:
                     entries = data if isinstance(data, list) else [data]
                     
                     for entry in entries:
-                        # Skip if not visible or missing required fields
-                        if not entry.get('displaystyle', {}).get('visible', True):
-                            continue
                         
                         function_name = entry.get('functionname')
                         if not function_name:
