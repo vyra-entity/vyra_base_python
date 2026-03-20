@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.120] - 2026-03-20
+
+### Build
+
+add logger to every subscription, call and actionCall of any transport option (ros2, zenoh, redis, uds)
+
+## [Unreleased] - 2026-03-20
+
+### Added
+
+- `InterfaceFactory._debug_wrap()`: transport introspection wrapper that emits a `DEBUG` log entry to `core_stdout.log` whenever any inbound transport event fires.  Covered operations and log tags:
+  - `subscribe` – subscriber callback invoked (any protocol: ros2, zenoh, redis, uds)
+  - `call` – server `response_callback` invoked; client `call()` logs both outbound request and inbound response
+  - `actionCall.goal` / `actionCall.cancel` / `actionCall.execute` – action-server lifecycle callbacks
+  - `actionCall.response` / `actionCall.feedback` / `actionCall.result` – action-client callbacks
+- Log format: `[TRANSPORT IN] type=<type>  name='<name>'  protocol=<proto> | args=<...>  kwargs=<...>`
+
+
+
 ## [0.1.8+build.119] - 2026-03-19
 
 ### Build

@@ -3,6 +3,8 @@ Interface Factory
 
 Unified interface creation with automatic protocol selection and fallback.
 """
+import asyncio
+import functools
 import logging
 
 from typing import Any, Callable, Dict, Optional, List, Union
@@ -168,6 +170,56 @@ class InterfaceFactory:
                     logger.error(f"❌ Failed to initialize pending interface '{name}': {e}")
 
     @staticmethod
+    def _debug_wrap(
+        callback: Optional[Callable],
+        name: str,
+        iface_type: str,
+        protocol: str,
+    ) -> Optional[Callable]:
+        """Wrap a callback with a DEBUG log entry on every invocation.
+
+        Logs the interface type, topic/service name, protocol and the raw
+        arguments that were received from the transport layer.  The wrapper
+        is transparent – it forwards all positional and keyword arguments
+        unchanged and returns whatever the original callback returns.
+
+        Args:
+            callback:   The original callback to wrap. If *None* the method
+                        returns *None* unchanged.
+            name:       Topic / service name of the interface.
+            iface_type: Human-readable interface category used in the log
+                        message (e.g. ``"subscribe"``, ``"call"``,
+                        ``"actionCall.execute"``).
+            protocol:   Protocol name as reported by
+                        :class:`~vyra_base.com.core.types.ProtocolType`
+                        (e.g. ``"ros2"``, ``"zenoh"``).
+
+        Returns:
+            Wrapped callback (async-safe) or *None* if *callback* was *None*.
+        """
+        if callback is None:
+            return None
+
+        if asyncio.iscoroutinefunction(callback):
+            @functools.wraps(callback)
+            async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
+                logger.debug(
+                    "[TRANSPORT IN] type=%s  name='%s'  protocol=%s | args=%r  kwargs=%r",
+                    iface_type, name, protocol, args, kwargs,
+                )
+                return await callback(*args, **kwargs)
+            return _async_wrapper
+        else:
+            @functools.wraps(callback)
+            def _sync_wrapper(*args: Any, **kwargs: Any) -> Any:
+                logger.debug(
+                    "[TRANSPORT IN] type=%s  name='%s'  protocol=%s | args=%r  kwargs=%r",
+                    iface_type, name, protocol, args, kwargs,
+                )
+                return callback(*args, **kwargs)
+            return _sync_wrapper
+
+    @staticmethod
     def register_provider(provider: Union[AbstractProtocolProvider, list]) -> None:
         """
         Register one or more protocol providers.
@@ -329,7 +381,9 @@ class InterfaceFactory:
                 
                 subscriber = await provider.create_subscriber(
                     name=name,
-                    subscriber_callback=subscriber_callback,
+                    subscriber_callback=InterfaceFactory._debug_wrap(
+                        subscriber_callback, name, "subscribe", protocol.value
+                    ),
                     **kwargs
                 )
                 
@@ -410,7 +464,9 @@ class InterfaceFactory:
                 
                 server = await provider.create_server(
                     name=name,
-                    response_callback=response_callback,
+                    response_callback=InterfaceFactory._debug_wrap(
+                        response_callback, name, "call", protocol.value
+                    ),
                     **kwargs
                 )
                 
@@ -488,6 +544,24 @@ class InterfaceFactory:
                 )
                 
                 add_client_registry(client)
+
+                # Wrap client.call() so every outbound call and its inbound
+                # response are logged at DEBUG level.
+                _proto = protocol.value
+                _name = name
+                _original_call = client.call
+                async def _logged_call(request: Any, timeout: float = 5.0) -> Any:
+                    logger.debug(
+                        "[TRANSPORT OUT] type=call  name='%s'  protocol=%s | request=%r  timeout=%r",
+                        _name, _proto, request, timeout,
+                    )
+                    result = await _original_call(request, timeout=timeout)
+                    logger.debug(
+                        "[TRANSPORT IN]  type=call  name='%s'  protocol=%s | result=%r",
+                        _name, _proto, result,
+                    )
+                    return result
+                client.call = _logged_call
 
                 logger.info(f"✅ Client '{name}' created via {protocol.value}")
                 
@@ -576,9 +650,15 @@ class InterfaceFactory:
 
                 action_server = await provider.create_action_server(
                     name=name,
-                    handle_goal_request=handle_goal_request,
-                    handle_cancel_request=handle_cancel_request,
-                    execution_callback=execution_callback,
+                    handle_goal_request=InterfaceFactory._debug_wrap(
+                        handle_goal_request, name, "actionCall.goal", protocol.value
+                    ),
+                    handle_cancel_request=InterfaceFactory._debug_wrap(
+                        handle_cancel_request, name, "actionCall.cancel", protocol.value
+                    ),
+                    execution_callback=InterfaceFactory._debug_wrap(
+                        execution_callback, name, "actionCall.execute", protocol.value
+                    ),
                     **kwargs
                 )
                 
@@ -683,9 +763,15 @@ class InterfaceFactory:
                 
                 action_client = await provider.create_action_client(
                     name=name,
-                    direct_response_callback=direct_response_callback,
-                    feedback_callback=feedback_callback,
-                    goal_callback=goal_callback,
+                    direct_response_callback=InterfaceFactory._debug_wrap(
+                        direct_response_callback, name, "actionCall.response", protocol.value
+                    ),
+                    feedback_callback=InterfaceFactory._debug_wrap(
+                        feedback_callback, name, "actionCall.feedback", protocol.value
+                    ),
+                    goal_callback=InterfaceFactory._debug_wrap(
+                        goal_callback, name, "actionCall.result", protocol.value
+                    ),
                     **kwargs
                 )
                 
