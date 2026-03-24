@@ -66,6 +66,19 @@ class InterfaceBuilder:
     def wants_uds(cls, tags: list[FunctionConfigTags]) -> bool:
         return cls._wants(tags, FunctionConfigTags.UDS)
 
+    @classmethod
+    def has_ros2_type(cls, interfacetypes: Any) -> bool:
+        """Return True if *interfacetypes* contains at least one actual Python class (ROS2 type).
+
+        When a proto-only interface is configured, all entries in the list are strings.
+        Only if at least one entry is a resolved class should we attempt ROS2 creation.
+        """
+        if interfacetypes is None:
+            return False
+        if isinstance(interfacetypes, list):
+            return any(not isinstance(t, str) for t in interfacetypes)
+        return not isinstance(interfacetypes, str)
+
     # ── Service (request / response) ─────────────────────────────────────────
 
     @classmethod
@@ -96,7 +109,7 @@ class InterfaceBuilder:
         tags = setting.tags
 
         # ROS2
-        if ros2_available and cls.wants_ros2(tags):
+        if ros2_available and cls.wants_ros2(tags) and cls.has_ros2_type(setting.interfacetypes):
             try:
                 await InterfaceFactory.create_server(
                     name=name,
@@ -175,12 +188,19 @@ class InterfaceBuilder:
         callbacks: dict[str, Any] | None,
         node: Any,
         ros2_available: bool,
+        registry: ProviderRegistry | None = None,
     ) -> None:
         """
         Create action servers for all protocols the entry's tags request.
 
+        Tries each tagged protocol in order (ROS2, Zenoh, Redis, UDS).
+        A failure on one protocol is logged as a warning and the next is attempted.
+
         :raises ValueError: When callbacks are missing (required for action servers).
         """
+        if registry is None:
+            registry = ProviderRegistry()
+
         name = setting.functionname
 
         if not callbacks:
@@ -192,29 +212,95 @@ class InterfaceBuilder:
             raise ValueError(msg)
 
         tags = setting.tags
+        on_goal = callbacks.get("on_goal")
+        on_cancel = callbacks.get("on_cancel")
+        execute = callbacks.get("execute")
 
-        # ROS2 (currently only ROS2 action servers are supported)
-        if ros2_available and cls.wants_ros2(tags):
-            logger.debug(
-                f"ActionServer '{name}' callbacks — "
-                f"on_goal={bool(callbacks.get('on_goal'))}, "
-                f"on_cancel={bool(callbacks.get('on_cancel'))}, "
-                f"execute={bool(callbacks.get('execute'))}"
-            )
-            await InterfaceFactory.create_action_server(
-                name=name,
-                handle_goal_request=callbacks.get("on_goal"),
-                handle_cancel_request=callbacks.get("on_cancel"),
-                execution_callback=callbacks.get("execute"),
-                protocols=[ProtocolType.ROS2],
-                action_type=setting.interfacetypes,
-                node=node,
-            )
-        else:
-            logger.debug(
-                f"⏭️ Skipping action server '{name}': "
-                f"ros2_available={ros2_available}, tags={tags}"
-            )
+        logger.debug(
+            f"ActionServer '{name}' callbacks — "
+            f"on_goal={bool(on_goal)}, "
+            f"on_cancel={bool(on_cancel)}, "
+            f"execute={bool(execute)}"
+        )
+
+        # ROS2
+        if ros2_available and cls.wants_ros2(tags) and cls.has_ros2_type(setting.interfacetypes):
+            try:
+                await InterfaceFactory.create_action_server(
+                    name=name,
+                    handle_goal_request=on_goal,
+                    handle_cancel_request=on_cancel,
+                    execution_callback=execute,
+                    protocols=[ProtocolType.ROS2],
+                    action_type=setting.interfacetypes,
+                    node=node,
+                )
+                logger.info(f"✅ ROS2 action server created: {name}")
+            except Exception as exc:
+                logger.warning(f"⚠️ ROS2 action server '{name}' failed: {exc}")
+
+        # Zenoh
+        if registry.is_available(ProtocolType.ZENOH) and cls.wants_zenoh(tags):
+            try:
+                result = await InterfaceFactory.create_action_server(
+                    name=name,
+                    handle_goal_request=on_goal,
+                    handle_cancel_request=on_cancel,
+                    execution_callback=execute,
+                    protocols=[ProtocolType.ZENOH],
+                    action_type=setting.interfacetypes,
+                )
+                if result is not None:
+                    logger.info(f"✅ Zenoh action server created: {name}")
+                else:
+                    logger.debug(
+                        f"⏳ Zenoh action server '{name}' pending "
+                        f"— no callback bound yet"
+                    )
+            except Exception as exc:
+                logger.warning(f"⚠️ Zenoh action server '{name}' failed: {exc}")
+
+        # Redis
+        if registry.is_available(ProtocolType.REDIS) and cls.wants_redis(tags):
+            try:
+                result = await InterfaceFactory.create_action_server(
+                    name=name,
+                    handle_goal_request=on_goal,
+                    handle_cancel_request=on_cancel,
+                    execution_callback=execute,
+                    protocols=[ProtocolType.REDIS],
+                    action_type=setting.interfacetypes,
+                )
+                if result is not None:
+                    logger.info(f"✅ Redis action server created: {name}")
+                else:
+                    logger.debug(
+                        f"⏳ Redis action server '{name}' pending "
+                        f"— no callback bound yet"
+                    )
+            except Exception as exc:
+                logger.warning(f"⚠️ Redis action server '{name}' failed: {exc}")
+
+        # UDS
+        if registry.is_available(ProtocolType.UDS) and cls.wants_uds(tags):
+            try:
+                result = await InterfaceFactory.create_action_server(
+                    name=name,
+                    handle_goal_request=on_goal,
+                    handle_cancel_request=on_cancel,
+                    execution_callback=execute,
+                    protocols=[ProtocolType.UDS],
+                    action_type=setting.interfacetypes,
+                )
+                if result is not None:
+                    logger.info(f"✅ UDS action server created: {name}")
+                else:
+                    logger.debug(
+                        f"⏳ UDS action server '{name}' pending "
+                        f"— no callback bound yet"
+                    )
+            except Exception as exc:
+                logger.warning(f"⚠️ UDS action server '{name}' failed: {exc}")
 
     # ── Publisher (one-way message) ───────────────────────────────────────────
 
@@ -245,7 +331,7 @@ class InterfaceBuilder:
             periodic_interval = setting.periodic.interval
 
         # ROS2
-        if ros2_available and cls.wants_ros2(tags):
+        if ros2_available and cls.wants_ros2(tags) and cls.has_ros2_type(setting.interfacetypes):
             try:
                 await InterfaceFactory.create_publisher(
                     name=name,
@@ -264,6 +350,8 @@ class InterfaceBuilder:
                 logger.warning(
                     f"⚠️ ROS2 publisher '{name}' could not be created (non-fatal): {exc}"
                 )
+        elif ros2_available and cls.wants_ros2(tags):
+            logger.debug(f"⏭️ Skipping ROS2 publisher '{name}': no resolved ROS2 type in interfacetypes")
         else:
             logger.debug(f"⏭️ Skipping ROS2 publisher '{name}': tags={tags}")
 

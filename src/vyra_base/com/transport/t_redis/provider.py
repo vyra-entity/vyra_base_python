@@ -456,17 +456,17 @@ class RedisProvider(AbstractProtocolProvider):
                     f"No execution_callback provided for action server '{name}' and no bound blueprint found in CallbackRegistry"
                 )
         
-        if not isinstance(_bp, ActionBlueprint):
-            raise ProviderError(
-                f"Blueprint for action server '{name}' must be an ActionBlueprint. Found: {type(_bp).__name__}"
-            )
+            if not isinstance(_bp, ActionBlueprint):
+                raise ProviderError(
+                    f"Blueprint for action server '{name}' must be an ActionBlueprint. Found: {type(_bp).__name__}"
+                )
             
         if handle_goal_request is None:
-            _bp = CallbackRegistry.get_blueprint(name)
+            _bp: ActionBlueprint = CallbackRegistry.get_blueprint(name)
             if _bp and _bp.is_bound('on_goal'):
                 handle_goal_request = _bp.get_callback('on_goal')
         if handle_cancel_request is None:
-            _bp = CallbackRegistry.get_blueprint(name)
+            _bp: ActionBlueprint = CallbackRegistry.get_blueprint(name)
             if _bp and _bp.is_bound('on_cancel'):
                 handle_cancel_request = _bp.get_callback('on_cancel')
         

@@ -64,6 +64,9 @@ class VyraSubscriberImpl(VyraSubscriber):
                 data = serializer.deserialize(sample.payload, format=SerializationFormat.JSON)
 
                 cb = self.subscriber_callback
+                if loop.is_closed():
+                    logger.error("Event loop is closed, cannot dispatch callback")
+                    return
                 if asyncio.iscoroutinefunction(cb):
                     # Async callback: schedule on the event loop from this thread
                     asyncio.run_coroutine_threadsafe(cb(data), loop)

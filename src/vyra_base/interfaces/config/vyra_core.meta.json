@@ -635,5 +635,83 @@
             "visible": false,
             "published": false
         }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "delete_parameter",
+        "displayname": "Delete Parameter",
+        "description": "Delete an existing parameter from persistence by key.",
+        "filetype": [
+            "VBASESetParam.proto"
+        ],
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Parameter Key",
+                "description": "The key of the parameter to delete."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether deletion succeeded."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "delete_volatile",
+        "displayname": "Delete Volatile",
+        "description": "Delete an existing volatile parameter from Redis by key.",
+        "filetype": [
+            "VBASEVolatile.proto"
+        ],
+        "params": [
+            {
+                "name": "key",
+                "datatype": "string",
+                "displayname": "Key",
+                "description": "The volatile key to delete."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether deletion succeeded."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
     }
 ]

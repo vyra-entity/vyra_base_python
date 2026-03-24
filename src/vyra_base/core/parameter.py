@@ -695,6 +695,7 @@ class Parameter:
             displayname=getattr(request, "displayname", None),
             visible=getattr(request, "visible", None),
             editable=getattr(request, "editable", None),
+            default_value=getattr(request, "default_value", None),
         )
         if result is None:
             response.success = False
@@ -710,9 +711,10 @@ class Parameter:
         displayname: Optional[str] = None,
         visible: Optional[bool] = None,
         editable: Optional[bool] = None,
+        default_value: Optional[Any] = None,
     ) -> Optional[dict]:
         """
-        Update only displayname, visible, and/or editable for an existing parameter.
+        Update only displayname, visible, editable, and/or default_value for an existing parameter.
         """
         resp: dict[str, Any] = {}
 
@@ -752,6 +754,8 @@ class Parameter:
             updates["visible"] = bool(visible)
         if editable is not None:
             updates["editable"] = bool(editable)
+        if default_value is not None:
+            updates["default_value"] = str(default_value)
 
         if not updates:
             resp['success'] = True
@@ -770,6 +774,88 @@ class Parameter:
 
         resp['success'] = True
         resp['message'] = f"Metadata for parameter '{key}' updated successfully."
+        logger.info(resp['message'])
+        return resp
+
+    # ------------------------------------------------------------------
+    # delete_parameter – remove a parameter from persistence
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def delete_parameter(self, request: Any, response: Any) -> None:
+        """
+        Delete a parameter from persistence by key.
+
+        Request fields:
+            key (str): Parameter key to delete (required).
+        """
+        result = await self.delete_parameter_impl(key=str(request.key))
+        if result is None:
+            response.success = False
+            response.message = "Internal error occurred"
+            return None
+        response.success = result["success"]
+        response.message = result["message"]
+        return None
+
+    async def delete_parameter_impl(self, key: str) -> Optional[dict]:
+        """
+        Delete a parameter from the database by key.
+
+        :param key: The parameter name/key to delete.
+        :type key: str
+        :return: Result dict with ``success`` and ``message``, or None on internal error.
+        :rtype: Optional[dict]
+        """
+        resp: dict[str, Any] = {}
+
+        if not key:
+            resp['success'] = False
+            resp['message'] = "Parameter key is required."
+            logger.warning(resp['message'])
+            return resp
+
+        param_ret: DBReturnValue = await self.persistant_manipulator.get_all(
+            filters={"name": key}
+        )
+
+        if param_ret.status == DBSTATUS.NOT_FOUND or (
+            isinstance(param_ret.value, list) and len(param_ret.value) == 0
+        ):
+            resp['success'] = False
+            resp['message'] = f"Parameter '{key}' not found."
+            logger.warning(resp['message'])
+            return resp
+
+        if param_ret.status != DBSTATUS.SUCCESS:
+            resp['success'] = False
+            resp['message'] = f"DB error while fetching parameter '{key}'."
+            logger.error(resp['message'])
+            return resp
+
+        # Retrieve primary key from the first matching record
+        param_record = param_ret.value[0]
+        pkey_field = self.persistant_manipulator._read_pkey()
+        record_id = getattr(param_record, pkey_field, None)
+        if record_id is None:
+            record_dict = self.persistant_manipulator.to_dict(param_record)
+            record_id = record_dict.get(pkey_field)
+
+        if record_id is None:
+            resp['success'] = False
+            resp['message'] = f"Could not determine primary key for parameter '{key}'."
+            logger.error(resp['message'])
+            return resp
+
+        del_ret: DBReturnValue = await self.persistant_manipulator.delete(record_id)
+        if del_ret.status != DBSTATUS.SUCCESS:
+            resp['success'] = False
+            resp['message'] = f"Failed to delete parameter '{key}'."
+            logger.error(resp['message'])
+            return resp
+
+        resp['success'] = True
+        resp['message'] = f"Parameter '{key}' deleted successfully."
         logger.info(resp['message'])
         return resp
 

@@ -8,6 +8,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.123] - 2026-03-24
+
+### Build
+
+update params
+
+
+## [0.1.8+build.122] - 2026-03-24
+
+### Build
+
+update default
+
+
+## [0.1.8+build.121] - 2026-03-24
+
+### Build
+
+update subscriber.py if no async loop is available
+
+
+## [0.1.8+build.120] - 2026-03-24
+
+### Fixed
+
+- `interface_builder.py` – `create_action()` completely rewritten: added Zenoh/Redis/UDS fallback (matching `create_service` pattern); no longer raises `InterfaceError` when ROS2 fails.
+- `interface_builder.py` – Added `has_ros2_type()` guard to `create_action`, `create_service`, and `create_publisher`: ROS2 is skipped silently when `interfacetypes` contains only strings (no actual ROS2 class), preventing spurious ERROR log entries for proto-only interfaces.
+- `entity.py` – `create_action` now receives the `ProviderRegistry` instance to avoid unnecessary re-instantiation.
+- `t_redis/provider.py` – Fixed `UnboundLocalError` in `create_action_server()`: the `isinstance(_bp, ActionBlueprint)` check was outside the block where `_bp` is assigned.
+- `t_zenoh/vyra_models/subscriber.py` – `_callback_wrapper` now checks `loop.is_closed()` before calling `call_soon_threadsafe`/`run_coroutine_threadsafe`, preventing `RuntimeError: Event loop is closed` during module shutdown/restart.
+
 ## [0.1.8+build.120] - 2026-03-20
 
 ### Build

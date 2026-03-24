@@ -1045,7 +1045,7 @@ class VyraEntity:
             elif t == FunctionConfigBaseTypes.action.value:
                 logger.info(f"Creating actionServer: {setting.functionname}")
                 await InterfaceBuilder.create_action(
-                    setting, callbacks, self._node, self._ros2_available
+                    setting, callbacks, self._node, self._ros2_available, _registry
                 )
 
             elif t == FunctionConfigBaseTypes.message.value:

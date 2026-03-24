@@ -495,6 +495,46 @@ class Volatile:
         return None
 
     @remote_service()
+    async def delete_volatile(self, request: Any, response: Any) -> None:
+        """
+        Delete a volatile parameter from Redis by key.
+
+        Request fields:
+            key (str): Volatile key to delete (required).
+        """
+        result = await self.delete_volatile_impl(key=str(request.key))
+        response.success = result["success"]
+        response.message = result["message"]
+        return None
+
+    async def delete_volatile_impl(self, key: str) -> dict[str, Any]:
+        """
+        Delete a volatile parameter from Redis.
+
+        :param key: The volatile key to delete.
+        :type key: str
+        :return: Result dict with ``success`` and ``message``.
+        :rtype: dict[str, Any]
+        """
+        if not key:
+            return {"success": False, "message": "Volatile key is required."}
+
+        if not await self.has_volatile(key):
+            return {"success": False, "message": f"Volatile '{key}' not found."}
+
+        # Stop any active ROS2 publisher for this volatile
+        qualified = self._qualified_key(key)
+        if qualified in self._active_shouter:
+            try:
+                await self.unsubscribe_from_changes(key)
+            except Exception:
+                pass
+
+        await self.redis.delete(qualified)
+        logger.info(f"Volatile '{key}' deleted successfully.")
+        return {"success": True, "message": f"Volatile '{key}' deleted successfully."}
+
+    @remote_service()
     async def read_all_volatiles(self, request: Any, response: Any) -> None:
         """
         Read all volatile parameters with their current values (remote service interface).
