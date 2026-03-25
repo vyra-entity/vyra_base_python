@@ -8,6 +8,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.125] - 2026-03-25
+
+### Build
+
+see fixes below
+
+### Fixed — Double JSON serialization causing backslash flooding in logs (2026-03-25)
+
+- **`src/vyra_base/core/entity.py`**
+  - `get_log_history()` now assigns `response.logs_json = recent` (list) instead of `json.dumps(recent)` (JSON string).
+  - **Root cause**: The Zenoh transport serializer (`ZenohSerializer.serialize()`) was applying `json.dumps()` to the entire response object. When `logs_json` was already a JSON string, this created nested escaping (e.g., `"` → `\"` → `\\\"` → `\\\\\\\"` etc.), producing millions of backslashes after repeated calls.
+  - **Impact**: Each time the modulemanager polled `get_log_history`, the backslash count doubled, eventually writing multi-megabyte lines to `core_stdout.log` and freezing the browser.
+  - **Solution**: Return the raw list so the Zenoh serializer handles JSON conversion exactly once.
+  - Updated docstring to clarify that `logs_json` is now a list, not a JSON string.
+
+### Fixed — Log message truncation to prevent browser freezing (2026-03-25)
+
+- **`src/vyra_base/com/handler/logger.py`**
+  - Added `max_message_length` parameter (default 10000) to `VyraLogHandler.__init__()` to prevent extremely long log messages from causing memory overflow and browser freezing.
+  - Modified `emit()` method to truncate log messages exceeding `max_message_length` with a `[TRUNCATED: X chars]` suffix.
+  - Fixes issue where 2.7 MB single-line log entries with backslashes caused the modulemanager log tab to freeze.
+
+
+## [0.1.8+build.124] - 2026-03-25
+
+### Build
+
+bugfixing see CHANGELOGS below
+
+### Fixed — `_handle_query_sync` timeout and empty error message (2026-03-25)
+
+- **`src/vyra_base/com/transport/t_zenoh/vyra_models/server.py`**
+  - `future.result(timeout=10)` → `future.result(timeout=30)`: 10 s was too short for slow event loops under load, causing spurious TimeoutError every ~13 s.
+  - `logger.error(f"... failed: {e}")` → `logger.error(f"... failed: {type(e).__name__}: {e!r}")`: `concurrent.futures.TimeoutError()` has an empty `str()` representation, making the error log unreadable. Now logs the exception class name and repr.
+
+
 ## [0.1.8+build.123] - 2026-03-24
 
 ### Build

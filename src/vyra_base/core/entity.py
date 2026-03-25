@@ -1370,15 +1370,19 @@ class VyraEntity:
             limit (int): Max number of lines to return (default 200, max 1000).
 
         Response fields:
-            logs_json (str): JSON array of
-                ``{level, message, logger_name, timestamp, seq}`` dicts,
-                ordered oldest-to-newest.  Consumers should use the ``seq``
-                field (millisecond UNIX timestamp) to de-duplicate on polling.
+            logs_json (list): List of ``{level, message, logger_name, timestamp, seq}`` dicts,
+                ordered oldest-to-newest.  The Zenoh serializer will convert this list to JSON.
+                Consumers should use the ``seq`` field (millisecond UNIX timestamp) to de-duplicate on polling.
+                
+        Note:
+            Previously this returned a JSON string, but that caused double-serialization when
+            the Zenoh transport layer serialized the response object again, producing escaped
+            backslashes that accumulated with each call.
         """
         limit = int(getattr(request, "limit", 200) or 200)
         limit = max(1, min(limit, 1000))
         recent = self._log_handler.get_recent(limit)
-        response.logs_json = json.dumps(recent)
+        response.logs_json = recent  # Return list, not JSON string - Zenoh serializer handles JSON conversion
         return None
 
     # ------------------------------------------------------------------

@@ -128,9 +128,9 @@ class VyraServerImpl(VyraServer):
                 return
             # Schedule onto the main loop from this background thread
             future = asyncio.run_coroutine_threadsafe(self._handle_query(query), loop)
-            future.result(timeout=10)
+            future.result(timeout=30)
         except Exception as e:
-            logger.error(f"❌ Sync query handler failed: {e}")
+            logger.error(f"❌ Sync query handler failed: {type(e).__name__}: {e!r}")
     
     async def _handle_query(self, query: Any):
         """

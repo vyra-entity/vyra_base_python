@@ -37,11 +37,14 @@ class VyraLogHandler(logging.Handler):
 
     :param capacity: Maximum number of log records to keep in the ring-buffer.
     :type capacity: int
+    :param max_message_length: Maximum length of a single log message (default 10000 chars).
+    :type max_message_length: int
     """
 
-    def __init__(self, capacity: int = 1000) -> None:
+    def __init__(self, capacity: int = 1000, max_message_length: int = 10000) -> None:
         super().__init__()
         self._records: collections.deque = collections.deque(maxlen=capacity)
+        self._max_message_length: int = max_message_length
 
     # ------------------------------------------------------------------
     # logging.Handler interface
@@ -50,9 +53,16 @@ class VyraLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         """Append a formatted log record to the ring-buffer."""
         try:
+            # Format the message (use formatter if available, else getMessage())
+            message = self.format(record) if self.formatter else record.getMessage()
+            
+            # Truncate extremely long messages to prevent memory overflow and browser freezing
+            if len(message) > self._max_message_length:
+                message = message[:self._max_message_length] + f"... [TRUNCATED: {len(message) - self._max_message_length} chars]"
+            
             self._records.append({
                 "level": record.levelname,
-                "message": self.format(record) if self.formatter else record.getMessage(),
+                "message": message,
                 "logger_name": record.name,
                 "timestamp": datetime.fromtimestamp(record.created).isoformat(),
                 # Use created * 1000 as a monotone sequence number (ms precision).
