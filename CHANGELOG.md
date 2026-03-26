@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.127] - 2026-03-26
+
+### Build
+
+see below
+
+
+## [0.1.8+build.126] - 2026-03-26
+
+### Build
+
+see fixes below
+
+### Fixed — Action server namespace propagation from FunctionConfigEntry (2026-07-14)
+
+- **`src/vyra_base/core/interface_builder.py`** — `create_action()`: all four protocol branches (ROS2, Zenoh, Redis, UDS) now pass `namespace=setting.namespace` to `InterfaceFactory.create_action_server()`. The `namespace` value flows through `**kwargs` → `provider.create_action_server(**kwargs)` → `VyraActionServerImpl(**kwargs)` → `VyraTransport.__init__()` → `self.namespace`. As a result `initialize()` calls `topic_builder.build(name, namespace=self.namespace)` which produces the correct key including the namespace segment (e.g. `v2_modulemanager_id/test/action_test`). Previously the server always omitted the namespace, causing a mismatch with clients that correctly forwarded namespace from the HTTP request.
+
+### Fixed — Zenoh action server/client Zenoh 1.x API (2026-06-10)
+
+- **`action_server.py`**: `_handle_goal_request_sync` / `_handle_cancel_request_sync` replaced `loop.run_until_complete()` (deadlock when called from Zenoh thread) with `asyncio.run_coroutine_threadsafe(..., self._main_loop).result(timeout=30)`. Loop captured in `initialize()` as `self._main_loop`. Fixed `query.value.payload` → `query.payload`.
+- **`action_client.py`**: Fixed `value=` → `payload=` kwarg and added `bytes()` conversion around `reply.ok.payload`.
+
+
 ## [0.1.8+build.125] - 2026-03-25
 
 ### Build

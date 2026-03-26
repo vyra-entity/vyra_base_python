@@ -234,6 +234,7 @@ class InterfaceBuilder:
                     protocols=[ProtocolType.ROS2],
                     action_type=setting.interfacetypes,
                     node=node,
+                    namespace=setting.namespace,
                 )
                 logger.info(f"✅ ROS2 action server created: {name}")
             except Exception as exc:
@@ -249,6 +250,7 @@ class InterfaceBuilder:
                     execution_callback=execute,
                     protocols=[ProtocolType.ZENOH],
                     action_type=setting.interfacetypes,
+                    namespace=setting.namespace,
                 )
                 if result is not None:
                     logger.info(f"✅ Zenoh action server created: {name}")
@@ -270,6 +272,7 @@ class InterfaceBuilder:
                     execution_callback=execute,
                     protocols=[ProtocolType.REDIS],
                     action_type=setting.interfacetypes,
+                    namespace=setting.namespace,
                 )
                 if result is not None:
                     logger.info(f"✅ Redis action server created: {name}")
@@ -291,6 +294,7 @@ class InterfaceBuilder:
                     execution_callback=execute,
                     protocols=[ProtocolType.UDS],
                     action_type=setting.interfacetypes,
+                    namespace=setting.namespace,
                 )
                 if result is not None:
                     logger.info(f"✅ UDS action server created: {name}")

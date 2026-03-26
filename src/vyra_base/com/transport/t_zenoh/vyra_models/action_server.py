@@ -71,9 +71,11 @@ class VyraActionServerImpl(VyraActionServer):
             if not self._zenoh_session:
                 raise InterfaceError("Zenoh session not initialized")
             
+            # Capture running event loop so sync Zenoh callbacks can schedule coroutines
+            loop = asyncio.get_running_loop()
+            self._main_loop = loop
+
             # Create queryable for goal requests
-            loop = asyncio.get_event_loop()
-            
             def _create_goal_queryable():
                 if not self._zenoh_session:
                     raise InterfaceError("Zenoh session not initialized")
@@ -105,14 +107,16 @@ class VyraActionServerImpl(VyraActionServer):
             return False
     
     def _handle_goal_request_sync(self, query: Any):
-        """Sync wrapper for async goal handler."""
+        """Sync wrapper for async goal handler (called from Zenoh background thread)."""
+        loop = getattr(self, '_main_loop', None)
+        if loop is None or loop.is_closed():
+            logger.error("❌ Main event loop not available — cannot handle goal request")
+            return
         try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        loop.run_until_complete(self._handle_goal_request(query))
+            future = asyncio.run_coroutine_threadsafe(self._handle_goal_request(query), loop)
+            future.result(timeout=30)
+        except Exception as e:
+            logger.error(f"❌ Sync goal handler failed: {type(e).__name__}: {e!r}")
     
     async def _handle_goal_request(self, query: Any):
         """
@@ -120,7 +124,7 @@ class VyraActionServerImpl(VyraActionServer):
         """
         try:            
             # Deserialize goal
-            goal = self._serializer.deserialize(query.value.payload, format=self._format)
+            goal = self._serializer.deserialize(query.payload, format=self._format)
             
             if self.handle_goal_request is None:
                 logger.warning("No goal handler defined, rejecting goal")
@@ -155,14 +159,16 @@ class VyraActionServerImpl(VyraActionServer):
             query.reply(self._key_goal, error_bytes)
     
     def _handle_cancel_request_sync(self, query: Any):
-        """Sync wrapper for async cancel handler."""
+        """Sync wrapper for async cancel handler (called from Zenoh background thread)."""
+        loop = getattr(self, '_main_loop', None)
+        if loop is None or loop.is_closed():
+            logger.error("❌ Main event loop not available — cannot handle cancel request")
+            return
         try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        loop.run_until_complete(self._handle_cancel_request(query))
+            future = asyncio.run_coroutine_threadsafe(self._handle_cancel_request(query), loop)
+            future.result(timeout=30)
+        except Exception as e:
+            logger.error(f"❌ Sync cancel handler failed: {type(e).__name__}: {e!r}")
     
     async def _handle_cancel_request(self, query: Any):
         """
@@ -170,7 +176,7 @@ class VyraActionServerImpl(VyraActionServer):
         """
         try:
             # Extract goal_id from request
-            request = self._serializer.deserialize(query.value.payload, format=self._format)
+            request = self._serializer.deserialize(query.payload, format=self._format)
             goal_id = request.get('goal_id')
             
             if goal_id in self._active_goals:

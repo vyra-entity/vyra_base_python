@@ -113,10 +113,10 @@ class VyraActionClientImpl(VyraActionClient):
                     raise InterfaceError("Zenoh session not initialized")
                 replies = self._zenoh_session.get(  # type: ignore[union-attr]
                     self._key_goal,
-                    value=goal_bytes
+                    payload=goal_bytes
                 )
                 for reply in replies:
-                    return reply.ok.payload
+                    return bytes(reply.ok.payload)
                 return None
             
             payload = await loop.run_in_executor(None, _send_goal_query)
@@ -234,10 +234,10 @@ class VyraActionClientImpl(VyraActionClient):
                     raise InterfaceError("Zenoh session not initialized")
                 replies = self._zenoh_session.get(  # type: ignore[union-attr]
                     self._key_cancel,
-                    value=cancel_bytes
+                    payload=cancel_bytes
                 )
                 for reply in replies:
-                    return reply.ok.payload
+                    return bytes(reply.ok.payload)
                 return None
             
             payload = await loop.run_in_executor(None, _send_cancel_query)
