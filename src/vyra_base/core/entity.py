@@ -136,7 +136,10 @@ class VyraEntity:
         self._init_logger(log_config)
 
         # Install in-memory log ring-buffer — accessible via get_log_history Zenoh service
-        self._log_handler = VyraLogHandler(capacity=1000)
+        self._log_handler = VyraLogHandler(capacity=10000)
+
+        # Human-readable alias set by the module manager or via set_alias service
+        self._alias: str | None = None
         self._log_handler.setLevel(logging.DEBUG)
         # Attach to root logger AND to each named top-level logger that has
         # propagate=False in the logging config (e.g. core_logging.json).
@@ -167,9 +170,6 @@ class VyraEntity:
 
         self.module_entry: ModuleEntry = module_entry
         self.module_config: dict[str, Any] = module_config
-        
-        # Store ROS2 message types for creating entries
-        self._error_entry_type = error_entry._type
 
         # Create ROS2 node only if ROS2 is available
         if self._ros2_available and VyraNode and NodeSettings:
@@ -441,21 +441,18 @@ class VyraEntity:
         :meth:`_activate_errorfeed_db_handler` once storage is ready.
         """
         state_feeder = StateFeeder(
-            type=state_entry._type, 
             node=self._node, 
             module_entity=self.module_entry,
             loggingOn=False
         )
 
         news_feeder = NewsFeeder(
-            type=news_entry._type, 
             node=self._node,
             module_entity=self.module_entry,
             loggingOn=False
         )
         
         error_feeder = ErrorFeeder(
-            type=error_entry._type, 
             node=self._node,
             module_entity=self.module_entry,
             loggingOn=True
@@ -624,7 +621,6 @@ class VyraEntity:
                 module_id=self.module_entry.uuid,
                 module_name=self.module_entry.name,
                 timestamp=datetime.now(),
-                _type="lifecycle"
             )
             self.state_feeder.feed_sync(state_data)
             
@@ -648,7 +644,6 @@ class VyraEntity:
                 module_id=self.module_entry.uuid,
                 module_name=self.module_entry.name,
                 timestamp=datetime.now(),
-                _type="operational"
             )
             self.state_feeder.feed_sync(state_data)
         
@@ -664,7 +659,6 @@ class VyraEntity:
                 module_id=self.module_entry.uuid,
                 module_name=self.module_entry.name,
                 timestamp=datetime.now(),
-                _type="health"
             )
             self.state_feeder.feed_sync(state_data)
             
@@ -673,7 +667,6 @@ class VyraEntity:
                 self.news_feeder.feed_sync(f"Module '{self.module_entry.name}' health warning")
             elif new_state == "Faulted":
                 error_entry = ErrorEntry(
-                    _type=self._error_entry_type,
                     level=ErrorEntry.ERROR_LEVEL.MAJOR_FAULT,
                     description=f"Module '{self.module_entry.name}' has faulted",
                     module_id=self.module_entry.uuid,
@@ -683,7 +676,6 @@ class VyraEntity:
                 self.error_feeder.feed_sync(error_entry)
             elif new_state == "Critical":
                 error_entry = ErrorEntry(
-                    _type=self._error_entry_type,
                     level=ErrorEntry.ERROR_LEVEL.CRITICAL_FAULT,
                     description=f"CRITICAL: Module '{self.module_entry.name}' in critical state",
                     module_id=self.module_entry.uuid,
@@ -770,7 +762,6 @@ class VyraEntity:
             try:
                 self.state_machine.fail_initialization(error=str(e))
                 error_entry = ErrorEntry(
-                    _type=self._error_entry_type,
                     level=ErrorEntry.ERROR_LEVEL.CRITICAL_FAULT,
                     description=f"Entity startup failed: {e}",
                     solution="Check entity initialization and module dependencies",
@@ -817,7 +808,6 @@ class VyraEntity:
         except Exception as e:
             logger.error(f"Entity shutdown failed: {e}")
             error_entry = ErrorEntry(
-                _type=self._error_entry_type,
                 level=ErrorEntry.ERROR_LEVEL.MAJOR_FAULT,
                 description=f"Entity shutdown error: {e}",
                 solution="Check entity cleanup and resource deallocation",
@@ -1367,7 +1357,11 @@ class VyraEntity:
         browser via Server-Sent Events.
 
         Request fields:
-            limit (int): Max number of lines to return (default 200, max 1000).
+            limit (int): Max number of lines to return (default 200, max 10000).
+            since_date (str, optional): ISO date (``YYYY-MM-DD``) or datetime
+                (``YYYY-MM-DDTHH:MM:SS``) string.  When provided **without** a
+                time component the whole day (00:00:00 – 23:59:59 local) is
+                included.  Entries before this point are excluded from the result.
 
         Response fields:
             logs_json (list): List of ``{level, message, logger_name, timestamp, seq}`` dicts,
@@ -1379,9 +1373,31 @@ class VyraEntity:
             the Zenoh transport layer serialized the response object again, producing escaped
             backslashes that accumulated with each call.
         """
+        from datetime import datetime as _dt, timezone as _tz
+
         limit = int(getattr(request, "limit", 200) or 200)
-        limit = max(1, min(limit, 1000))
-        recent = self._log_handler.get_recent(limit)
+        limit = max(1, min(limit, 10000))
+
+        since_ts: float | None = None
+        since_date_raw: str | None = getattr(request, "since_date", None)
+        if since_date_raw:
+            try:
+                # Try full ISO datetime first (with or without seconds)
+                for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+                    try:
+                        parsed = _dt.strptime(since_date_raw, fmt)
+                        since_ts = parsed.replace(tzinfo=_tz.utc).timestamp() if "T" in since_date_raw else parsed.timestamp()
+                        break
+                    except ValueError:
+                        continue
+                if since_ts is None:
+                    # Date only: use start of that day (local time)
+                    parsed_date = _dt.strptime(since_date_raw[:10], "%Y-%m-%d")
+                    since_ts = parsed_date.timestamp()
+            except Exception:
+                pass  # Ignore malformed since_date; return all entries up to limit
+
+        recent = self._log_handler.get_recent(limit, since_ts=since_ts)
         response.logs_json = recent  # Return list, not JSON string - Zenoh serializer handles JSON conversion
         return None
 
@@ -1452,6 +1468,43 @@ class VyraEntity:
             response.success = False
             response.message = str(exc)
 
+        return None
+
+    # ------------------------------------------------------------------
+    # Module alias
+    # ------------------------------------------------------------------
+
+    @remote_service()
+    async def get_alias(self, request: Any, response: Any) -> Any:
+        """
+        Return the human-readable alias for this module instance.
+
+        The alias is set by the module manager at startup (synced from the
+        database) or updated at runtime via ``set_alias``.
+
+        Response fields:
+            alias (str): The current alias, or an empty string when not set.
+        """
+        response.alias = self._alias or ""
+        return None
+
+    @remote_service()
+    async def set_alias(self, request: Any, response: Any) -> Any:
+        """
+        Set the human-readable alias for this module instance.
+
+        Called by the module manager on startup to sync the persisted alias,
+        or by the user via the browser UI to rename a module.
+
+        Request fields:
+            alias (str): New alias string (may be empty to clear the alias).
+
+        Response fields:
+            success (bool): Always ``True`` after a successful update.
+        """
+        self._alias = str(getattr(request, "alias", "") or "")
+        logger.info("✅ Module alias set to '%s'", self._alias)
+        response.success = True
         return None
 
     @staticmethod

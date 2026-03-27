@@ -19,17 +19,23 @@ Author: VYRA Framework Team
 License: Proprietary
 """
 
+from __future__ import annotations
+
+import importlib.util
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Callable, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, Optional, Type
 from functools import wraps
 from dataclasses import dataclass
 
-import rclpy
-from rclpy.node import Node
-from rclpy.publisher import Publisher
-from rclpy.client import Client
+_ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+
+if TYPE_CHECKING or _ROS2_AVAILABLE:
+    import rclpy
+    from rclpy.node import Node
+    from rclpy.publisher import Publisher
+    from rclpy.client import Client
 
 from vyra_base.security.security_levels import (
     SecurityLevel,

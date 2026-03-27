@@ -29,19 +29,16 @@ class ErrorFeeder(BaseFeeder):
     """
     Collection of the error messages.
 
-    :param type: The ros2-msg type for the feeder.
-    :type type: Any
-    :param node: The VyraNode instance associated with this feeder (ROS2 Node).
-    :type node: VyraNode
+    :param node: The VyraNode instance associated with this feeder.
+    :type node: Optional[Any]
     :param module_entity: The module configuration entry.
     :type module_entity: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
     :type loggingOn: bool, Optional
-    :raises FeederException: If the VyraSpeaker cannot be created with the given type.
+    :raises FeederException: If the publisher cannot be created.
     """
     def __init__(
             self, 
-            type: Any,
             node: Optional[Any],
             module_entity: ModuleEntry,
             loggingOn: bool = True
@@ -52,7 +49,6 @@ class ErrorFeeder(BaseFeeder):
         self._feederName: str = 'ErrorFeed'
         self._doc: str = 'Collect error messages of this module.'
         self._level: int = logging.ERROR
-        self._type: Any = type
         self._node: Optional[Any] = node
         self._module_entity: ModuleEntry = module_entity
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
@@ -172,7 +168,6 @@ class ErrorFeeder(BaseFeeder):
         :rtype: ErrorEntry
         """
         errorfeed_entry = ErrorEntry(
-            _type=self._type,
             code=errorDict.get('error_code', 0x00000000),
             module_id=self._module_entity.uuid,
             module_name=self._module_entity.name,

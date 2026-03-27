@@ -491,6 +491,65 @@
             "zenoh"
         ],
         "type": "service",
+        "functionname": "get_alias",
+        "displayname": "Get Alias",
+        "description": "Returns the human-readable alias for this module instance.",
+        "filetype": [
+            "VBASEGetAlias.proto"
+        ],
+        "params": [],
+        "returns": [
+            {
+                "name": "alias",
+                "datatype": "string",
+                "displayname": "Alias",
+                "description": "The current alias of this module instance, or empty string when not set."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "set_alias",
+        "displayname": "Set Alias",
+        "description": "Sets the human-readable alias for this module instance.",
+        "filetype": [
+            "VBASESetAlias.proto"
+        ],
+        "params": [
+            {
+                "name": "alias",
+                "datatype": "string",
+                "displayname": "Alias",
+                "description": "New alias string. Pass an empty string to clear the alias."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "True when the alias was updated successfully."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
         "functionname": "create_parameter_full",
         "displayname": "Create Parameter (Full)",
         "description": "Create a new parameter with full specification and validation.",

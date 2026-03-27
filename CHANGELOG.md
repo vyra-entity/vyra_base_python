@@ -8,6 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.129] - 2026-03-27
+
+### Build
+
+rebuild see below
+
+
+## [0.1.8+build.128] - 2026-03-27
+
+### Build
+
+see below
+
+### Changed — decouple ROS2 from core transport layer (2026-03-27)
+
+- **`defaults/entries.py`**: Removed `_type` field from `ErrorEntry`, `NewsEntry`, `StateEntry`, `PullRequestEntry`. Message types are now resolved internally by the interface layer.
+- **`core/entity.py`**: Removed all references to `_type` / `_error_entry_type`; feeder constructors no longer receive a `type` argument.
+- **`com/feeder/state_feeder.py`**, **`news_feeder.py`**, **`error_feeder.py`**: Removed `type: Any` parameter from `__init__`; `_type` attribute dropped.
+- **`com/feeder/feeder.py`**: `message_type` kwarg in `create_publisher` calls is now conditional — only passed when `self._type is not None`.
+- **`core/parameter.py`**: `_init_publisher` now uses `ProtocolType.ZENOH` instead of `ProtocolType.ROS2`; `message_type` kwarg removed (Zenoh resolves type from the interface proto file).
+- **`core/volatile.py`**: `REDIS_TYPE_MAP` uses `.get()` instead of `[]` so an empty `transient_base_types` dict is safe; `publish_volatile_to_ros2` now raises `RuntimeError` when `communication_node is None`; `VyraNode` import wrapped in `try/except ImportError`.
+
+### Added — log history date filtering (2026-03-27)
+
+- **`com/handler/logger.py`** `VyraLogHandler.get_recent()`: New optional parameter
+  `since_ts: Optional[float]` (Unix timestamp in seconds). When provided, only entries
+  whose `seq` value (millisecond epoch) corresponds to a time ≥ `since_ts` are returned.
+- **`core/entity.py`** `get_log_history`:
+  - New request field `since_date` (ISO date `YYYY-MM-DD` or datetime `YYYY-MM-DDTHH:MM:SS`).
+    Date-only values cover the whole day from 00:00:00 local time. Malformed values are
+    silently ignored (falls back to returning all entries).
+  - `limit` max increased from 1 000 to 10 000.
+  - Ring-buffer capacity (`VyraLogHandler`) increased from 1 000 to 10 000 entries.
+
+
 ## [0.1.8+build.127] - 2026-03-26
 
 ### Build

@@ -26,30 +26,26 @@ logger = logging.getLogger(__name__)
 
 class StateFeeder(BaseFeeder):
     """
-    Responsible for loading a ROS2 Handler and feeding StateEntry elements to this handler.
+    Responsible for loading a VYRA Handler and feeding StateEntry elements to this handler.
 
-    :param type: The ros2-msg type for the feeder.
-    :type type: Any
-    :param node: The VyraNode instance associated with this feeder (ROS2 Node).
-    :type node: VyraNode
+    :param node: The VyraNode instance associated with this feeder.
+    :type node: Optional[Any]
     :param module_entity: Module configuration entry.
     :type module_entity: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
     :type loggingOn: bool, Optional
 
-    :raises FeederException: If the VyraSpeaker cannot be created with the given type.
+    :raises FeederException: If the publisher cannot be created.
 
     :ivar _feederName: Name of the feeder.
     :ivar _doc: Documentation string for the feeder.
     :ivar _level: Logging level.
-    :ivar _type: ROS2 message type.
     :ivar _node: VyraNode instance.
     :ivar _module_entity: Module configuration.
     """
 
     def __init__(
             self, 
-            type: Any,
             node: Optional[Any],
             module_entity: ModuleEntry,
             loggingOn: bool = False,
@@ -57,8 +53,6 @@ class StateFeeder(BaseFeeder):
         """
         Initializes a StateFeeder instance for sending changes in state of a module.
 
-        :param type: The ros2-msg type for the feeder.
-        :type type: Any
         :param node: The VyraNode instance (optional, None if ROS2 unavailable).
         :type node: Optional[Any]
         :param module_entity: Module configuration entry.
@@ -66,7 +60,7 @@ class StateFeeder(BaseFeeder):
         :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
         :type loggingOn: bool, Optional
 
-        :raises FeederException: If the VyraSpeaker cannot be created with the given type.
+        :raises FeederException: If the publisher cannot be created.
         """
         super().__init__()
 
@@ -74,7 +68,6 @@ class StateFeeder(BaseFeeder):
         self._feederName: str = 'StateFeed'
         self._doc: str = 'Collect states from this module.'
         self._level: int = logging.INFO
-        self._type: Any = type
         self._node: Optional[Any] = node
         self._module_entity: ModuleEntry = module_entity
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None

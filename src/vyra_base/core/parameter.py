@@ -76,7 +76,7 @@ class Parameter:
 
         # Store node reference for lazy publisher initialization
         self._node = node
-        self.update_parameter_publisher: Optional[Any] = None  # Will be ROS2Publisher
+        self.update_parameter_publisher: Optional[Any] = None  # Will be VYRA/Zenoh publisher
 
         self.storage_access_transient: Any|None = storage_access_transient
 
@@ -85,8 +85,7 @@ class Parameter:
         if self.update_parameter_publisher is None:
             self.update_parameter_publisher = await InterfaceFactory.create_publisher(
                 name=self.update_param_event_ident,
-                protocols=[ProtocolType.ROS2],
-                message_type=self.parameter_base_types['UpdateParamEvent'],
+                protocols=[ProtocolType.ZENOH],
                 node=self._node,
                 is_publisher=True
             )

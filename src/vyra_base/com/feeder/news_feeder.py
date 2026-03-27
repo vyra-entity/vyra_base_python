@@ -32,20 +32,17 @@ class NewsFeeder(BaseFeeder):
     """
     Collection of the news messages.
 
-    :param type: The ros2-msg type for the feeder.
-    :type type: Any
-    :param node: The VyraNode instance associated with this feeder (ROS2 Node).
-    :type node: VyraNode
+    :param node: The VyraNode instance associated with this feeder.
+    :type node: Optional[Any]
     :param module_entity: Module configuration entry.
     :type module_entity: ModuleEntry
     :param loggingOn: Flag to enable or disable logging next to feeding. Defaults to False.
     :type loggingOn: bool, Optional
-    :raises FeederException: If the VyraSpeaker cannot be created with the given type.
+    :raises FeederException: If the publisher cannot be created.
     """
 
     def __init__(
             self, 
-            type: Any,
             node: Optional[Any],
             module_entity: ModuleEntry,
             loggingOn: bool = False
@@ -56,7 +53,6 @@ class NewsFeeder(BaseFeeder):
         self._feederName: str = 'NewsFeed'
         self._doc: str = 'Collect news messages of this module.'
         self._level: int = logging.INFO
-        self._type: Any = type
         self._node: Optional[Any] = node
         self._module_entity: ModuleEntry = module_entity
         self._ros2_available: bool = _ROS2_AVAILABLE and node is not None
@@ -246,7 +242,6 @@ class NewsFeeder(BaseFeeder):
             uuid= uuid.uuid4(),
             module_name= self._module_entity.name,
             module_id= self._module_entity.uuid,
-            _type= self._type
 
         )
         return newsfeed_entry

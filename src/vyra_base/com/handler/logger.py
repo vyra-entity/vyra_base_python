@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import collections
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Optional
 
 
 __all__ = ["VyraLogHandler"]
@@ -76,18 +77,25 @@ class VyraLogHandler(logging.Handler):
     # Public API
     # ------------------------------------------------------------------
 
-    def get_recent(self, limit: int = 200) -> list:
+    def get_recent(self, limit: int = 200, since_ts: Optional[float] = None) -> list:
         """
         Return up to *limit* most-recent log entries, ordered oldest-first.
 
         :param limit: Maximum number of entries to return.  ``0`` or a negative
-            value returns the entire buffer.
+            value returns the entire buffer (subject to *since_ts* filter).
         :type limit: int
+        :param since_ts: Optional UNIX timestamp in seconds (float).  When provided,
+            only entries whose ``seq`` value (millisecond epoch) corresponds to a time
+            >= *since_ts* are returned.  Entries from before this point are excluded.
+        :type since_ts: float, optional
         :returns: List of dicts with keys ``level``, ``message``,
             ``logger_name``, ``timestamp``, ``seq``.
         :rtype: list[dict]
         """
         buf = list(self._records)
+        if since_ts is not None:
+            since_ms = since_ts * 1000.0
+            buf = [e for e in buf if e.get("seq", 0) >= since_ms]
         if 0 < limit < len(buf):
             return buf[-limit:]
         return buf

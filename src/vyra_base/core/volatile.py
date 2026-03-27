@@ -3,7 +3,10 @@ from __future__ import annotations
 import asyncio
 from typing import Any, Type, Optional
 
-from vyra_base.com.transport.t_ros2.node import VyraNode
+try:
+    from vyra_base.com.transport.t_ros2.node import VyraNode  # noqa: F401
+except ImportError:
+    VyraNode = None  # type: ignore[assignment,misc]
 from vyra_base.com.core.types import VyraPublisher
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
@@ -41,7 +44,7 @@ class Volatile:
             storage_access_transient: RedisClient, 
             module_name: str,
             module_id: str,
-            node: Optional[VyraNode],
+            node: Optional[Any],
             transient_base_types: dict[str, Any]):
         """
         Initialize the Volatile class.
@@ -49,13 +52,13 @@ class Volatile:
         self.module_name: str = module_name
         self.module_id: str = module_id
         self._volatile_prefix: str = f"{self.module_name}_{self.module_id}/volatile/"
-        self.communication_node: Optional[VyraNode] = node
+        self.communication_node: Optional[Any] = node
 
-        self.REDIS_TYPE_MAP: dict[REDIS_TYPE, type] = {
-            REDIS_TYPE.STRING: transient_base_types['VolatileString'],
-            REDIS_TYPE.HASH: transient_base_types['VolatileHash'],
-            REDIS_TYPE.LIST: transient_base_types['VolatileList'],
-            REDIS_TYPE.SET: transient_base_types['VolatileSet']
+        self.REDIS_TYPE_MAP: dict[REDIS_TYPE, Any] = {
+            REDIS_TYPE.STRING: transient_base_types.get('VolatileString'),
+            REDIS_TYPE.HASH: transient_base_types.get('VolatileHash'),
+            REDIS_TYPE.LIST: transient_base_types.get('VolatileList'),
+            REDIS_TYPE.SET: transient_base_types.get('VolatileSet')
         }
         
         self.redis: RedisClient = storage_access_transient
@@ -332,6 +335,19 @@ class Volatile:
                 f"Unsupported Redis type: {redis_type}. "
                 f"Supported types: {list(self.REDIS_TYPE_MAP.keys())}")
 
+        if self.communication_node is None:
+            raise RuntimeError(
+                "ROS2 node not available. publish_volatile_to_ros2 requires an active ROS2 node. "
+                "Pass a VyraNode instance when constructing Volatile in FULL mode."
+            )
+
+        mapped_type = self.REDIS_TYPE_MAP[redis_type]
+        if mapped_type is None:
+            raise ValueError(
+                f"No message type mapped for Redis type '{redis_type}'. "
+                f"Ensure transient_base_types contains '{redis_type.name}' entries."
+            )
+
         # Use custom topic name or default to volatile_key
         topic_name = ros2_topic_name if ros2_topic_name is not None else volatile_key
 
@@ -339,7 +355,7 @@ class Volatile:
         publisher: VyraPublisher = await InterfaceFactory.create_publisher(
             name=topic_name,
             protocols=[ProtocolType.ROS2],
-            message_type=self.REDIS_TYPE_MAP[redis_type],
+            message_type=mapped_type,
             node=self.communication_node,
             is_publisher=True
         )

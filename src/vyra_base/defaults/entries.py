@@ -280,8 +280,6 @@ class ErrorEntry(DCBase):
 
     Stores the error details.
 
-    :param _type: The interface type of the error entry
-    :type _type: Any
     :param level: The level of the error (default: 0, MINOR_FAULT)
     :type level: Union[ErrorEntry.ERROR_LEVEL, int]
     :param code: The error code (default: 0x00000000)
@@ -301,7 +299,6 @@ class ErrorEntry(DCBase):
     :param module_id: Unique identifier for the module
     :type module_id: Union[UUID, Any]
     """
-    _type: Any
     level: Union["ErrorEntry.ERROR_LEVEL", int] = 0
     code: int = 0x00000000
     uuid: Union[UUID, Any] = field(default_factory=uuid.uuid4)
@@ -339,8 +336,6 @@ class NewsEntry(dict):
 
     Writes informational data to the graphical user interface.
 
-    :param _type: The type of the news entry
-    :type _type: Any
     :param level: The level of the message (default: 2, INFO)
     :type level: Union[NewsEntry.MESSAGE_LEVEL, int]
     :param message: The message content
@@ -355,7 +350,6 @@ class NewsEntry(dict):
     :type module_id: Union[UUID, Any]
     """
     __slots__ = (
-        '_type',
         'level',
         'message',
         'timestamp',
@@ -366,7 +360,6 @@ class NewsEntry(dict):
 
     def __init__(
         self,
-        _type: Any,
         level: Union["NewsEntry.MESSAGE_LEVEL", int] = 2,
         message: str = '',
         timestamp: Any = datetime.now(),
@@ -380,7 +373,6 @@ class NewsEntry(dict):
         self.uuid: Union[UUID, Any] = uuid
         self.module_name: str = module_name
         self.module_id: Union[UUID, Any] = module_id
-        self._type: Any = _type
 
     def __repr__(self) -> str:
         return (
@@ -411,8 +403,6 @@ class PullRequestEntry(DCBase):
 
     Stores the pull request details.
 
-    :param _type: The ros2 type of the pull request entry
-    :type _type: Any
     :param uuid: Unique identifier for the pull request
     :type uuid: str
     :param ack_by_user: User who acknowledged the pull request
@@ -436,7 +426,6 @@ class PullRequestEntry(DCBase):
     :param color: Color code for visual representation in GUI
     :type color: int
     """
-    _type: Any
     uuid: str
     ack_by_user: str
     ack_on_date: str
@@ -466,8 +455,6 @@ class StateEntry(DCBase):
 
     Stores the state details for life cycle overview of the module.
 
-    :param _type: The ros2 type of the state entry
-    :type _type: Any
     :param current: Current state of the module
     :type current: str
     :param trigger: Trigger that caused the state change
@@ -481,7 +468,6 @@ class StateEntry(DCBase):
     :param previous: Previous state of the module (default: 'N/A')
     :type previous: str
     """
-    _type: Any
     current: str
     trigger: str
     module_id: Union[UUID, Any]

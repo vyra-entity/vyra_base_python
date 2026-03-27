@@ -267,9 +267,10 @@ class BaseFeeder(IFeeder):
         try:
             pub_kwargs: dict[str, Any] = {
                 "name": self._feederName,
-                "message_type": self._type,
                 "namespace": "feeder",
             }
+            if getattr(self, '_type', None) is not None:
+                pub_kwargs["message_type"] = self._type
             if resolved_protocols:
                 pub_kwargs["protocols"] = resolved_protocols
             else:
@@ -298,14 +299,19 @@ class BaseFeeder(IFeeder):
                            exc_primary)
             try:
                 fallback = [PT.ROS2, PT.REDIS] if self._ros2_available else [PT.REDIS]
+                fallback_kwargs: dict[str, Any] = {
+                    "name": self._feederName,
+                    "protocols": fallback,
+                    "namespace": "feeder",
+                    "is_publisher": True,
+                }
+                if getattr(self, '_type', None) is not None:
+                    fallback_kwargs["message_type"] = self._type
+                if self._ros2_available and self._node:
+                    fallback_kwargs["node"] = self._node
+                    fallback_kwargs["qos_profile"] = self._qos
                 self._publisher = await InterfaceFactory.create_publisher(
-                    name=self._feederName,
-                    protocols=fallback,
-                    message_type=self._type,
-                    namespace="feeder",
-                    is_publisher=True,
-                    **({'node': self._node, 'qos_profile': self._qos}
-                       if self._ros2_available and self._node else {})
+                    **fallback_kwargs
                 )
             except Exception as exc_fallback:
                 logger.error("❌ Failed to create feeder publisher for '%s': %s",
