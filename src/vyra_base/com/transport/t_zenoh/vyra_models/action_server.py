@@ -245,18 +245,25 @@ class VyraActionServerImpl(VyraActionServer):
             
             # Execute goal
             result = await self.execution_callback(goal_handle)
-            
+
+            # Yield to the event loop before publishing the result.
+            # This prevents a race condition where fast-completing actions (e.g.
+            # repeat_count=0) publish the result before the action client in the
+            # same process has finished setting up its result subscriber via
+            # _subscribe_to_goal().  The client's two run_in_executor calls
+            # (feedback + result subscriber creation) need at least one full
+            # event-loop cycle to complete after send_goal() returns the goal_id.
+            await asyncio.sleep(0.05)
+
             # Publish result
             goal_handle.set_succeeded(result)
             result_bytes = self._serializer.serialize(result, format=self._format)
-            
-            
-            
+
             def _create_result_pub():
                 if not self._zenoh_session:
                     raise InterfaceError("Zenoh session not initialized")
-            
-                pub = self._zenoh_session.declare_publisher(  # type: ignore[union-attr]  # type: ignore[union-attr]
+
+                pub = self._zenoh_session.declare_publisher(  # type: ignore[union-attr]
                     self._action_channel(f"{goal_id}/result")
                 )
                 pub.put(result_bytes)

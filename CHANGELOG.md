@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.8+build.130] - 2026-03-30
+
+### Build
+
+bugfixing see below
+
 ### Added
 - `tests/plugin/test_plugin_runtime.py` — 24 unit tests for `StubRuntime`, `create_plugin_runtime()` factory, and `PluginCallError` (no wasmtime required)
 - `tests/security/test_security_levels.py` — 29 unit tests for `SecurityLevel` enum values, `is_valid()`, `get_name()`, ordering, `requires_hmac()`, and `requires_certificate()`
