@@ -177,6 +177,21 @@ class UDSProvider(AbstractProtocolProvider):
             logger.error(f"❌ Failed to initialize provider: {e}")
             return False
     
+    async def _ensure_initialized(self) -> None:
+        """
+        Ensure the provider is initialized, attempting lazy initialization if not.
+
+        Raises:
+            ProviderError: If initialization cannot be completed.
+        """
+        if self._initialized:
+            return
+        logger.info("🔄 UDS provider not initialized — attempting lazy initialization")
+        try:
+            await self.initialize()
+        except Exception as e:
+            raise ProviderError(f"UDS lazy initialization failed: {e}")
+
     async def shutdown(self) -> None:
         """Shutdown the provider and cleanup resources."""
         if not self._initialized:
@@ -213,8 +228,7 @@ class UDSProvider(AbstractProtocolProvider):
         Returns:
             UdsPublisherImpl instance
         """
-        if not self._initialized:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
 
         effective_topic_builder = topic_builder or self._topic_builder
 
@@ -265,8 +279,7 @@ class UDSProvider(AbstractProtocolProvider):
         Returns:
             UdsSubscriberImpl instance
         """
-        if not self._initialized:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
 
         effective_topic_builder = topic_builder or self._topic_builder
 
@@ -329,8 +342,7 @@ class UDSProvider(AbstractProtocolProvider):
         Returns:
             UdsServerImpl instance
         """
-        if not self._initialized:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
 
         effective_topic_builder = topic_builder or self._topic_builder
 
@@ -393,16 +405,13 @@ class UDSProvider(AbstractProtocolProvider):
         Returns:
             UdsClientImpl instance
         """
-        if not self._initialized:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
 
         effective_topic_builder = topic_builder or self._topic_builder
 
         if service_type is None:
             service_type = effective_topic_builder.load_interface_type(name, self.protocol)
-
-        if service_type is None:
-            raise ProviderError(f"Service type for client '{name}' not found in topic builder")
+            # service_type is optional for UDS — dict-based communication works without it
 
         module_name = kwargs.pop('module_name', self.module_name)
         
@@ -450,8 +459,7 @@ class UDSProvider(AbstractProtocolProvider):
         Returns:
             UdsActionServerImpl instance
         """
-        if not self._initialized:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
 
         effective_topic_builder = topic_builder or self._topic_builder
 
@@ -535,16 +543,13 @@ class UDSProvider(AbstractProtocolProvider):
         Returns:
             UdsActionClientImpl instance
         """
-        if not self._initialized:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
 
         effective_topic_builder = topic_builder or self._topic_builder
 
         if action_type is None:
             action_type = effective_topic_builder.load_interface_type(name, self.protocol)
-
-        if action_type is None:
-            raise ProviderError(f"Action type for action server '{name}' not found in topic builder")
+            # action_type is optional for UDS — dict-based communication works without it
 
         module_name = kwargs.pop('module_name', self.module_name)
         

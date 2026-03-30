@@ -37,7 +37,7 @@ class VyraActionClientImpl(VyraActionClient):
         direct_response: Optional[Callable[[Any], Awaitable[None]]],
         feedback_callback: Optional[Callable[[Any], Awaitable[None]]],
         goal_response_callback: Optional[Callable[[Any], Awaitable[None]]],
-        action_type: type,
+        action_type: Optional[type] = None,
         module_name: str = "vyra",
         **kwargs
     ):

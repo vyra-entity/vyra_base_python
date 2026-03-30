@@ -5,7 +5,7 @@ Implements AbstractProtocolProvider for Redis transport.
 Provides message queue and key-value storage via Redis.
 """
 import logging
-from typing import Any, Callable, Optional, Dict
+from typing import Any, Callable, Optional, Dict, cast
 
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.types import (
@@ -101,7 +101,7 @@ class RedisProvider(AbstractProtocolProvider):
         super().__init__(protocol)
         self.module_name = module_name
         self._redis_kwargs = redis_kwargs
-        self._client: Optional[Any] = None  # RedisClient instance
+        self._client: Optional[RedisClient] = None
         self._topic_builder = TopicBuilder(module_name, module_id)
 
         
@@ -157,11 +157,38 @@ class RedisProvider(AbstractProtocolProvider):
         except Exception as e:
             raise ProviderError(f"Redis initialization failed: {e}")
     
+    async def _ensure_initialized(self) -> None:
+        """
+        Ensure the provider is initialized, attempting lazy initialization if not.
+
+        Raises:
+            ProviderError: If initialization cannot be completed.
+        """
+        if self._initialized and self._client:
+            return
+        logger.info("🔄 Redis provider not initialized — attempting lazy initialization")
+        try:
+            await self.initialize()
+        except Exception as e:
+            raise ProviderError(f"Redis lazy initialization failed: {e}")
+        if not self._client:
+            raise ProviderError("Redis initialization succeeded but client is None")
+
+    def _require_client(self) -> RedisClient:
+        """
+        Return the initialized Redis client, raising ProviderError if not available.
+
+        Must only be called after _ensure_initialized().
+        """
+        if self._client is None:
+            raise ProviderError("Redis client is None after initialization")
+        return cast(RedisClient, self._client)
+
     async def shutdown(self) -> None:
         """Shutdown Redis client."""
         if self._client:
             try:
-                await self._client.disconnect()
+                await self._client.close()
                 logger.info("✅ Redis provider shutdown complete")
             except Exception as e:
                 logger.error(f"❌ Redis shutdown error: {e}")
@@ -192,8 +219,7 @@ class RedisProvider(AbstractProtocolProvider):
         Returns:
             RedisPublisherImpl instance
         """
-        if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
         
         effective_topic_builder = topic_builder or self._topic_builder
         
@@ -210,7 +236,7 @@ class RedisProvider(AbstractProtocolProvider):
             publisher = RedisPublisherImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
-                redis_client=self._client,
+                redis_client=self._require_client(),
                 message_type=message_type,
                 **kwargs
             )
@@ -245,8 +271,7 @@ class RedisProvider(AbstractProtocolProvider):
         Returns:
             RedisSubscriberImpl instance
         """
-        if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
         
         effective_topic_builder = topic_builder or self._topic_builder
         
@@ -274,7 +299,7 @@ class RedisProvider(AbstractProtocolProvider):
                 name=name,
                 topic_builder=effective_topic_builder,
                 subscriber_callback=subscriber_callback,
-                redis_client=self._client,
+                redis_client=self._require_client(),
                 message_type=message_type,
                 **kwargs
             )
@@ -310,8 +335,7 @@ class RedisProvider(AbstractProtocolProvider):
         Returns:
             RedisServerImpl instance
         """
-        if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
         
         effective_topic_builder = topic_builder or self._topic_builder
         
@@ -339,7 +363,7 @@ class RedisProvider(AbstractProtocolProvider):
                 name=name,
                 topic_builder=effective_topic_builder,
                 response_callback=response_callback,
-                redis_client=self._client,
+                redis_client=self._require_client(),
                 service_type=service_type,
                 **kwargs
             )
@@ -375,8 +399,7 @@ class RedisProvider(AbstractProtocolProvider):
         Returns:
             RedisClientImpl instance
         """
-        if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
         
         effective_topic_builder = topic_builder or self._topic_builder
         
@@ -385,16 +408,14 @@ class RedisProvider(AbstractProtocolProvider):
                 name,
                 self.protocol,
             )
-            
-        if service_type is None:
-            raise ProviderError(f"Service type for client '{name}' not found in topic builder")
+            # service_type is optional for Redis — dict-based communication works without it
         
         try:
             client = RedisClientImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
                 request_callback=request_callback,
-                redis_client=self._client,
+                redis_client=self._require_client(),
                 service_type=service_type,
                 **kwargs
             )
@@ -433,8 +454,7 @@ class RedisProvider(AbstractProtocolProvider):
         Returns:
             RedisActionServerImpl instance
         """
-        if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
         
         effective_topic_builder = topic_builder or self._topic_builder
         
@@ -462,13 +482,13 @@ class RedisProvider(AbstractProtocolProvider):
                 )
             
         if handle_goal_request is None:
-            _bp: ActionBlueprint = CallbackRegistry.get_blueprint(name)
-            if _bp and _bp.is_bound('on_goal'):
-                handle_goal_request = _bp.get_callback('on_goal')
+            _bp_goal = cast(Optional[ActionBlueprint], CallbackRegistry.get_blueprint(name))
+            if _bp_goal and _bp_goal.is_bound('on_goal'):
+                handle_goal_request = _bp_goal.get_callback('on_goal')
         if handle_cancel_request is None:
-            _bp: ActionBlueprint = CallbackRegistry.get_blueprint(name)
-            if _bp and _bp.is_bound('on_cancel'):
-                handle_cancel_request = _bp.get_callback('on_cancel')
+            _bp_cancel = cast(Optional[ActionBlueprint], CallbackRegistry.get_blueprint(name))
+            if _bp_cancel and _bp_cancel.is_bound('on_cancel'):
+                handle_cancel_request = _bp_cancel.get_callback('on_cancel')
         
         if execution_callback is None or handle_goal_request is None or handle_cancel_request is None:
             raise ProviderError(
@@ -486,7 +506,7 @@ class RedisProvider(AbstractProtocolProvider):
                 handle_goal_request=handle_goal_request,
                 handle_cancel_request=handle_cancel_request,
                 execution_callback=execution_callback,
-                redis_client=self._client,
+                redis_client=self._require_client(),
                 action_type=action_type,
                 **kwargs
             )
@@ -525,8 +545,7 @@ class RedisProvider(AbstractProtocolProvider):
         Returns:
             RedisActionClientImpl instance
         """
-        if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+        await self._ensure_initialized()
         
         effective_topic_builder = topic_builder or self._topic_builder
         
@@ -535,9 +554,7 @@ class RedisProvider(AbstractProtocolProvider):
                 name,
                 self.protocol,
             )
-            
-        if action_type is None:
-            raise ProviderError(f"Action type for action client '{name}' not found in topic builder")
+            # action_type is optional for Redis — dict-based communication works without it
         
         try:
             action_client = RedisActionClientImpl(
@@ -546,7 +563,7 @@ class RedisProvider(AbstractProtocolProvider):
                 direct_response=direct_response,
                 feedback_callback=feedback_callback,
                 goal_response_callback=goal_response_callback,
-                redis_client=self._client,
+                redis_client=self._require_client(),
                 action_type=action_type,
                 **kwargs
             )
@@ -571,6 +588,6 @@ class RedisProvider(AbstractProtocolProvider):
             ProviderError: If provider not initialized
         """
         if not self._initialized or not self._client:
-            raise ProviderError("Provider not initialized")
+            raise ProviderError("Provider not initialized — call initialize() first or use create_client() for lazy init")
         
         return self._client

@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.131] - 2026-03-30
+
+### Build
+
+extending protocols see below
+
+### Fixed
+- `com/transport/t_redis/provider.py`: Added lazy initialization via `_ensure_initialized()` — Redis provider now reconnects on first use if initial startup connection failed
+- `com/transport/t_redis/provider.py`: Added `_require_client()` helper for Pyright type narrowing; replaced `disconnect()` (non-existent) with `close()`; fixed `ActionBlueprint` cast errors in `create_action_server`
+- `com/transport/t_uds/provider.py`: Added lazy initialization via `_ensure_initialized()` — UDS provider now initializes on first use
+- `com/transport/t_uds/provider.py`: `service_type` and `action_type` guards removed — dict-based communication works without schema type
+- `com/transport/t_uds/vyra_models/client.py`: `service_type` parameter made `Optional[type] = None`
+- `com/transport/t_uds/vyra_models/action_client.py`: `action_type` parameter made `Optional[type] = None`
+- `core/entity.py`: UDS provider now correctly initialized with `check_availability()` + `initialize()` during `_register_transport_provider()`
+
+
 ## [0.1.8+build.130] - 2026-03-30
 
 ### Build

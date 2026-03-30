@@ -32,7 +32,7 @@ class VyraClientImpl(VyraClient):
         name: str,
         topic_builder: TopicBuilder,
         request_callback: Optional[Callable[[Any], Awaitable[None]]],
-        service_type: type,
+        service_type: Optional[type] = None,
         module_name: str = "vyra",
         **kwargs
     ):

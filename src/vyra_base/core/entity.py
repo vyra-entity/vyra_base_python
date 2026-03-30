@@ -307,8 +307,16 @@ class VyraEntity:
                 module_id=self.module_entry.uuid
             )
             
-            providers.append(uds_provider)
-            logger.info("✅ Registered UDS protocol provider")
+            try:
+                await uds_provider.check_availability()
+                uds_config = self.module_config.get("uds", {})
+                await uds_provider.initialize(uds_config if uds_config else None)
+                providers.append(uds_provider)
+                logger.info("✅ Registered UDS protocol provider")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to initialize UDS provider: {e}")
+                providers.append(uds_provider)
+                logger.info("✅ Registered UDS protocol provider (limited mode)")
         
         # Register all available providers
         InterfaceFactory.register_provider(providers)
