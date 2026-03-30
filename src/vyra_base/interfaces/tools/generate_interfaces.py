@@ -224,13 +224,13 @@ class InterfaceGenerator:
                     needed.add(imp)
         return sorted(needed)
 
-
+    def map_type(self, datatype: str) -> Tuple[str, bool]:
         """
         Map Python/JSON type to ROS2 type.
-        
+
         Args:
             datatype: Input type string
-            
+
         Returns:
             Tuple of (ros2_type, is_array)
         """

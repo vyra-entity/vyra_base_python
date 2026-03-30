@@ -4,6 +4,8 @@ Unit tests for UDS (Unix Domain Socket) transport protocol.
 import pytest
 import asyncio
 from vyra_base.com.transport.t_uds.provider import UDSProvider
+from vyra_base.com.transport.t_uds.vyra_models.subscriber import VyraSubscriberImpl as UdsSubscriberImpl
+from vyra_base.com.transport.t_uds.vyra_models.publisher import VyraPublisherImpl as UdsPublisherImpl
 from vyra_base.com.core.types import ProtocolType
 
 
@@ -133,3 +135,39 @@ class TestUdsSpeaker:
             pytest.skip(f"create_publisher not fully implemented: {e}")
         finally:
             await provider.shutdown()
+
+
+@pytest.mark.unit
+class TestUdsSocketPathLength:
+    """Verify that UDS socket paths stay within the AF_UNIX 108-char limit."""
+
+    def test_subscriber_short_socket_name_under_limit(self):
+        """Subscriber socket path must not exceed 108 chars even with long identifiers."""
+        long_module = "v2_modulemanager"
+        long_topic = "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff/test/message_test"
+        instance_id = "abcd1234"
+
+        name = UdsSubscriberImpl._short_socket_name("sub", long_module, long_topic, instance_id)
+        full_path = f"/vyra/sockets/{name}"
+        assert len(full_path) <= 108, f"Path too long ({len(full_path)}): {full_path}"
+
+    def test_publisher_short_socket_name_under_limit(self):
+        """Publisher socket path must not exceed 108 chars even with long identifiers."""
+        long_module = "v2_modulemanager"
+        long_topic = "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff/test/message_test"
+
+        name = UdsPublisherImpl._short_socket_name("pub", long_module, long_topic)
+        full_path = f"/vyra/sockets/{name}"
+        assert len(full_path) <= 108, f"Path too long ({len(full_path)}): {full_path}"
+
+    def test_different_topics_produce_different_names(self):
+        """Different topic names must produce different socket filenames."""
+        name_a = UdsSubscriberImpl._short_socket_name("sub", "mod", "topic_a", "1234")
+        name_b = UdsSubscriberImpl._short_socket_name("sub", "mod", "topic_b", "1234")
+        assert name_a != name_b
+
+    def test_same_inputs_produce_same_name(self):
+        """Identical inputs must produce the same filename (deterministic)."""
+        name1 = UdsSubscriberImpl._short_socket_name("sub", "mod", "topic", "x")
+        name2 = UdsSubscriberImpl._short_socket_name("sub", "mod", "topic", "x")
+        assert name1 == name2

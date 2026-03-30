@@ -525,9 +525,9 @@ class RedisProvider(AbstractProtocolProvider):
         name: str,
         topic_builder: Optional[TopicBuilder] = None,
         action_type: type = None,
-        direct_response: Optional[Callable] = None,
+        direct_response_callback: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
-        goal_response_callback: Optional[Callable] = None,
+        goal_callback: Optional[Callable] = None,
         **kwargs
     ) -> VyraActionClient:
         """
@@ -537,9 +537,9 @@ class RedisProvider(AbstractProtocolProvider):
             name: Action client name
             topic_builder: TopicBuilder instance (uses provider's default if omitted)
             action_type: Action type class
-            direct_response: Optional async callback for results
+            direct_response_callback: Optional async callback for results
             feedback_callback: Optional async callback for feedback
-            goal_response_callback: Optional async callback for goal responses
+            goal_callback: Optional async callback for goal responses
             **kwargs: Additional action client options
             
         Returns:
@@ -560,9 +560,9 @@ class RedisProvider(AbstractProtocolProvider):
             action_client = RedisActionClientImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
-                direct_response=direct_response,
+                direct_response=direct_response_callback,
                 feedback_callback=feedback_callback,
-                goal_response_callback=goal_response_callback,
+                goal_response_callback=goal_callback,
                 redis_client=self._require_client(),
                 action_type=action_type,
                 **kwargs

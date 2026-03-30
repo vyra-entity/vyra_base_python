@@ -446,9 +446,10 @@ class ROS2Provider(AbstractProtocolProvider):
         """Create ROS2 action client."""
         self.require_initialization()
         
+        topic_builder = kwargs.pop("topic_builder", None) or self._topic_builder
         action_type = kwargs.pop("action_type", None)
         if not action_type:
-            action_type = self._topic_builder.load_interface_type(name, self.protocol)
+            action_type = topic_builder.load_interface_type(name, self.protocol)
         if not action_type:
             raise ArgumentError("action_type is required for ROS2 action client")
         
@@ -458,7 +459,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         action_client = VyraActionClientImpl(
             name=name,
-            topic_builder=self._topic_builder,
+            topic_builder=topic_builder,
             node=node or self._node,
             action_type=action_type,
             direct_response_callback=direct_response_callback,

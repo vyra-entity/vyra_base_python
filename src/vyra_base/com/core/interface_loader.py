@@ -14,6 +14,7 @@ import importlib
 import importlib.util
 import json
 import logging
+import pkgutil
 import sys
 from pathlib import Path
 from typing import Any, Optional, Union
@@ -472,7 +473,7 @@ class InterfaceLoader:
     
     def _infer_package_name(self, metadata: dict, interface_name: str) -> str:
         """
-        Infer ROS2 package name from metadata or default to vyra_module_template_interfaces.
+        Infer ROS2 package name from metadata, interface paths, or importable packages.
         
         Args:
             metadata: Interface metadata dict
@@ -481,19 +482,71 @@ class InterfaceLoader:
         Returns:
             Package name
         """
+        # Standard ROS2 packages to skip when scanning for module-specific packages
+        _STANDARD_ROS2_INTERFACES = frozenset({
+            "builtin_interfaces", "action_msgs", "std_msgs", "std_srvs",
+            "geometry_msgs", "sensor_msgs", "nav_msgs", "rcl_interfaces",
+            "rosgraph_msgs", "unique_identifier_msgs", "lifecycle_msgs",
+            "composition_interfaces", "diagnostic_msgs", "shape_msgs",
+            "stereo_msgs", "trajectory_msgs", "visualization_msgs",
+            "statistics_msgs", "test_msgs", "example_interfaces",
+            "type_description_interfaces", "service_msgs",
+            "logging_demo", "pendulum_msgs",
+        })
+
         # Check if package info in metadata (future extension)
         if 'package' in metadata:
             return metadata['package']
         
-        # Try to infer from interface paths first (most reliable)
+        # Try to infer from interface paths
         for interface_path in self.interface_paths:
             # Path typically: .../share/<package_name>
             if "share" in interface_path.parts:
                 share_idx = interface_path.parts.index("share")
                 if share_idx + 1 < len(interface_path.parts):
                     return interface_path.parts[share_idx + 1]
+            
+            # Path like: .../src/<package_name>_interfaces or just .../<package_name>_interfaces
+            if interface_path.name.endswith("_interfaces"):
+                return interface_path.name
         
-        # Fallback to default
+        # Try to find a matching *_interfaces package that is importable
+        # (skip standard ROS2 interface packages)
+        try:
+            for importer, modname, ispkg in pkgutil.iter_modules():
+                if (modname.endswith("_interfaces") and ispkg
+                        and modname not in _STANDARD_ROS2_INTERFACES):
+                    try:
+                        mod = importlib.import_module(modname)
+                        if hasattr(mod, 'action') or hasattr(mod, 'srv') or hasattr(mod, 'msg'):
+                            logger.debug(f"Inferred ROS2 package from importable modules: {modname}")
+                            return modname
+                    except Exception:
+                        continue
+        except Exception as e:
+            logger.debug(f"Failed to scan importable packages: {e}")
+        
+        # Fallback: scan AMENT_PREFIX_PATH for installed interface packages
+        # (skip standard ROS2 interface packages)
+        try:
+            import os
+            ament_path = os.environ.get("AMENT_PREFIX_PATH", "")
+            for prefix in ament_path.split(":"):
+                if not prefix:
+                    continue
+                share_dir = Path(prefix) / "share"
+                if share_dir.is_dir():
+                    for pkg_dir in share_dir.iterdir():
+                        if (pkg_dir.name.endswith("_interfaces") and pkg_dir.is_dir()
+                                and pkg_dir.name not in _STANDARD_ROS2_INTERFACES):
+                            logger.debug(f"Inferred ROS2 package from AMENT_PREFIX_PATH: {pkg_dir.name}")
+                            return pkg_dir.name
+        except Exception as e:
+            logger.debug(f"Failed to scan AMENT_PREFIX_PATH: {e}")
+        
+        logger.warning(
+            "⚠️ Could not infer ROS2 package name, falling back to 'vyra_module_template_interfaces'"
+        )
         return "vyra_module_template_interfaces"
     
     def clear_cache(self) -> None:

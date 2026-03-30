@@ -8,6 +8,7 @@ import logging
 import socket
 import json
 import asyncio
+import hashlib
 import uuid
 from typing import Optional, Any, Callable, Awaitable
 from pathlib import Path
@@ -46,11 +47,25 @@ class VyraSubscriberImpl(VyraSubscriber):
         self._socket_path = None  # Set in initialize()
         self._listen_task: Optional[asyncio.Task] = None
         
+    @staticmethod
+    def _short_socket_name(prefix: str, module_name: str, topic_name: str, instance_id: str) -> str:
+        """Build a short socket filename that stays within AF_UNIX 108-char limit.
+
+        Uses a SHA-256 hash (12 hex chars) of the full identifier so the
+        resulting path ``<socket_dir>/<result>`` never exceeds ~60 chars.
+        """
+        raw = f"{module_name}_{topic_name}_{instance_id}"
+        digest = hashlib.sha256(raw.encode()).hexdigest()[:12]
+        # Keep a human-readable hint (first 20 chars of module name)
+        hint = module_name[:20]
+        return f"{prefix}_{hint}_{digest}.sock"
+
     async def initialize(self) -> bool:
         """Initialize UDS subscriber."""
         try:
             topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
-            self._socket_path = self._socket_dir / f"sub_{self._module_name}_{topic_name}_{self._instance_id}.sock"
+            sock_name = self._short_socket_name("sub", self._module_name, topic_name, self._instance_id)
+            self._socket_path = self._socket_dir / sock_name
             
             # Create socket directory
             self._socket_dir.mkdir(parents=True, exist_ok=True)

@@ -7,6 +7,7 @@ Uses Unix Datagram Sockets for message broadcasting.
 import logging
 import socket
 import json
+import hashlib
 import os
 from typing import Optional, Any
 from pathlib import Path
@@ -46,11 +47,24 @@ class VyraPublisherImpl(VyraPublisher):
         self._socket_path = None  # Set in initialize()
         self._subscribers = []  # List of subscriber socket paths
         
+    @staticmethod
+    def _short_socket_name(prefix: str, module_name: str, topic_name: str) -> str:
+        """Build a short socket filename that stays within AF_UNIX 108-char limit.
+
+        Uses a SHA-256 hash (12 hex chars) of the full identifier so the
+        resulting path ``<socket_dir>/<result>`` never exceeds ~60 chars.
+        """
+        raw = f"{module_name}_{topic_name}"
+        digest = hashlib.sha256(raw.encode()).hexdigest()[:12]
+        hint = module_name[:20]
+        return f"{prefix}_{hint}_{digest}.sock"
+
     async def initialize(self) -> bool:
         """Initialize UDS publisher."""
         try:
             topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
-            self._socket_path = self._socket_dir / f"pub_{self._module_name}_{topic_name}.sock"
+            sock_name = self._short_socket_name("pub", self._module_name, topic_name)
+            self._socket_path = self._socket_dir / sock_name
             
             # TODO: Initialize UDS publisher socket
             logger.warning(f"{self.name} - UDS publisher initialization not fully implemented")

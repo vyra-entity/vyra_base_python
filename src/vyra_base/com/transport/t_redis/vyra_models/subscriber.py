@@ -60,8 +60,25 @@ class RedisSubscriberImpl(VyraSubscriber):
             await self._redis.subscribe_channel(self._topic_name)
             logger.info(f"✅ RedisSubscriber initialized: {self._topic_name}")
 
+            # Wrap the user callback to match the Redis transport signature
+            # (message_dict, context) and extract only the data payload.
+            user_cb = self.subscriber_callback
+
+            async def _redis_callback(message: dict, context: Any = None) -> None:
+                raw = message.get("data", "{}")
+                if isinstance(raw, (bytes, bytearray)):
+                    raw = raw.decode("utf-8")
+                try:
+                    data = json.loads(raw) if isinstance(raw, str) else raw
+                except (json.JSONDecodeError, TypeError):
+                    data = raw
+                if asyncio.iscoroutinefunction(user_cb):
+                    await user_cb(data)
+                else:
+                    user_cb(data)
+
             await self._redis.create_pubsub_listener(
-                self._topic_name, self.subscriber_callback
+                self._topic_name, _redis_callback
             )
             
             logger.info(f"📡 Subscribed to Redis channel: {self._topic_name}")

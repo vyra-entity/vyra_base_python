@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.134] - 2026-03-30
+
+### Build
+
+bugfixing
+
+### Fixed
+
+- Redis subscriber callback signature mismatch: `_on_message()` was called with 2 args (message, context) but only accepted 1. RedisSubscriberImpl now wraps the user callback to extract and parse the data payload.
+- UDS transport `AF_UNIX path too long`: socket filenames now use a SHA-256 hash to stay within the 108-char limit for both publisher and subscriber.
+
+
+## [0.1.8+build.133] - 2026-03-30
+
+### Build
+
+bugfixing transport provider
+
+
+## [0.1.8+build.132] - 2026-03-30
+
+### Build
+
+bugfixing see below
+
+### Fixed — InterfaceGenerator missing `map_type` method (2026-03-30)
+
+- **`src/vyra_base/interfaces/tools/generate_interfaces.py`**: Restored the missing `def map_type(self, datatype: str) -> Tuple[str, bool]:` method definition. The method body was present in the file but the `def` line had been accidentally deleted, leaving the implementation as an orphaned docstring/code block. This caused `'InterfaceGenerator' object has no attribute 'map_type'` errors during `colcon` builds in Docker (e.g. `get_state`, `get_lifecycle_state`, etc.).
+
+
 ## [0.1.8+build.131] - 2026-03-30
 
 ### Build

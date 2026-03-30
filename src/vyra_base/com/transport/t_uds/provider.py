@@ -523,9 +523,9 @@ class UDSProvider(AbstractProtocolProvider):
         name: str,
         topic_builder: Optional[TopicBuilder] = None,
         action_type: Optional[type] = None,
-        direct_response: Optional[Callable[[Any], Awaitable[None]]] = None,
+        direct_response_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
         feedback_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
-        goal_response_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
+        goal_callback: Optional[Callable[[Any], Awaitable[None]]] = None,
         **kwargs
     ) -> VyraActionClient:
         """
@@ -535,9 +535,9 @@ class UDSProvider(AbstractProtocolProvider):
             name: Action client name
             topic_builder: TopicBuilder instance
             action_type: Action type class
-            direct_response: Optional async callback for results
+            direct_response_callback: Optional async callback for results
             feedback_callback: Optional async callback for feedback
-            goal_response_callback: Optional async callback for goal responses
+            goal_callback: Optional async callback for goal responses
             **kwargs: Additional action client options (module_name override)
             
         Returns:
@@ -557,9 +557,9 @@ class UDSProvider(AbstractProtocolProvider):
             action_client = VyraActionClientImpl(
                 name=name,
                 topic_builder=effective_topic_builder,
-                direct_response=direct_response,
+                direct_response=direct_response_callback,
                 feedback_callback=feedback_callback,
-                goal_response_callback=goal_response_callback,
+                goal_response_callback=goal_callback,
                 action_type=action_type,
                 module_name=module_name,
                 **kwargs
