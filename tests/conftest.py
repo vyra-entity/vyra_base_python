@@ -59,6 +59,32 @@ for module_name in _ros2_mock_modules:
 rclpy_mock = create_mock_module()
 sys.modules['rclpy'] = rclpy_mock
 
+# Mock cryptography package — the system Rust extension (pyo3) panics when
+# loaded under a different Python version than it was compiled against.
+_crypto_mock_modules = [
+    'cryptography',
+    'cryptography.x509',
+    'cryptography.x509.oid',
+    'cryptography.x509.certificate_transparency',
+    'cryptography.hazmat',
+    'cryptography.hazmat.primitives',
+    'cryptography.hazmat.primitives.hashes',
+    'cryptography.hazmat.primitives.hmac',
+    'cryptography.hazmat.primitives.serialization',
+    'cryptography.hazmat.primitives.asymmetric',
+    'cryptography.hazmat.primitives.asymmetric.rsa',
+    'cryptography.hazmat.primitives.asymmetric.padding',
+    'cryptography.hazmat.primitives.asymmetric.ec',
+    'cryptography.hazmat.backends',
+    'cryptography.hazmat.backends.default_backend',
+    'cryptography.hazmat.bindings',
+    'cryptography.hazmat.bindings._rust',
+    'cryptography.exceptions',
+    'cryptography.fernet',
+]
+for module_name in _crypto_mock_modules:
+    sys.modules[module_name] = create_mock_module()
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():

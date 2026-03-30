@@ -6,8 +6,10 @@
 Vyra-Base Documentation
 =======================
 
-VYRA Base Python Library provides core functionality for the VYRA Framework,
-including state management, ROS2 integration, security, and communication utilities.
+VYRA Base Python is the core library of the VYRA Framework — a standalone Python
+package providing transport-agnostic communication (Zenoh, ROS2, Redis, UDS), a
+3-layer state machine, structured parameter + volatile storage, a 5-level security
+framework, and a WASM plugin runtime.
 
 .. toctree::
    :maxdepth: 2
@@ -58,6 +60,12 @@ including state management, ROS2 integration, security, and communication utilit
    :caption: Security Framework
 
    security
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Plugin Runtime
+
+   plugin
 
 .. toctree::
    :maxdepth: 2

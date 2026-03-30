@@ -30,7 +30,7 @@ class CalculatorComponent:
     
     @remote_service(
         name="add",
-        protocols=[ProtocolType.REDIS],  # Prefer Redis for simplicity
+        protocols=[ProtocolType.ZENOH],  # Default Zenoh transport
         namespace="calculator"
     )
     async def add_numbers(self, request, response=None):
@@ -42,7 +42,7 @@ class CalculatorComponent:
     
     @remote_service(
         name="multiply",
-        protocols=[ProtocolType.REDIS],
+        protocols=[ProtocolType.ZENOH],
         namespace="calculator"
     )
     async def multiply_numbers(self, request, response=None):
@@ -54,7 +54,7 @@ class CalculatorComponent:
     
     @remote_service(
         name="divide",
-        protocols=[ProtocolType.REDIS],
+        protocols=[ProtocolType.ZENOH],
         namespace="calculator"
     )
     async def divide_numbers(self, request, response=None):
@@ -88,7 +88,7 @@ async def demonstrate_old_way():
         service = await InterfaceFactory.create_server(
             name="add",
             response_callback=component.add_numbers,  # Must exist NOW
-            protocols=[ProtocolType.REDIS]
+            protocols=[ProtocolType.ZENOH]
         )
     
     Problems:

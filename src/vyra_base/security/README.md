@@ -1,122 +1,140 @@
-# VYRA Security Framework
+# vyra_base.security
 
 Comprehensive 5-level security framework for inter-module communication in the VYRA ecosystem.
 
 ## Features
 
 - **5 Security Levels**: From no security to certificate-based PKI
-- **Automatic Metadata**: Transparent SafetyMetadata handling for messages
+- **Automatic Metadata**: Transparent `SafetyMetadata` handling for messages
 - **Session Management**: Token-based authentication with configurable expiration
 - **Replay Protection**: Timestamp and nonce validation
 - **HMAC Signatures**: Message integrity with HMAC-SHA256 (Level 4)
 - **PKI Support**: Full certificate infrastructure (Level 5)
 - **Easy Integration**: Mixin-based design for simple module integration
 
+## Public API
+
+```python
+from vyra_base.security import (
+    SecurityManager,
+    SecurityLevel,
+    SecurityClient,
+    SecurityValidator,
+)
+```
+
+---
+
 ## Security Levels
 
-| Level | Name | Features | Use Case |
-|-------|------|----------|----------|
-| 1 | NONE | No security | Public information |
-| 2 | BASIC_AUTH | Module ID verification | Basic access control |
-| 3 | TIMESTAMP | ID + timestamp | Replay attack prevention |
-| 4 | HMAC | HMAC-SHA256 signatures | Message integrity |
-| 5 | DIGITAL_SIGNATURE | Certificate-based PKI | Maximum security |
+| Level | Name | Protection | Use Case |
+|---|---|---|---|
+| 1 | `NONE` | No checks | Public information |
+| 2 | `BASIC_AUTH` | Module ID verification | Basic access control |
+| 3 | `EXTENDED_AUTH` | ID + password authentication | Enhanced access control |
+| 4 | `HMAC` | HMAC-SHA256 signatures | Message integrity |
+| 5 | `DIGITAL_SIGNATURE` | Certificate-based PKI | Maximum security |
+
+---
 
 ## Quick Start
 
-### Server Module
+### Server-Side: SecurityManager
+
+Attach `SecurityManager` as a mixin to enable the authentication service endpoint:
 
 ```python
-from vyra_base.security.security_manager import SecurityManager
-from vyra_base.security.security_levels import SecurityLevel
+from vyra_base.security import SecurityManager, SecurityLevel
 
-class MyModule(Node, SecurityManager):
+class MyModule(SecurityManager):
     def __init__(self):
-        Node.__init__(self, 'my_module')
         SecurityManager.__init__(
             self,
-            max_security_level=SecurityLevel.HMAC
+            max_security_level=SecurityLevel.HMAC,
         )
 ```
 
-### Client Module
+### Client-Side: SecurityClient + SecurePublisher
 
 ```python
-from vyra_base.security.security_client import (
-    create_security_context,
-    SecurePublisher
-)
+from vyra_base.security import SecurityClient
+from vyra_base.security.security_client import create_security_context, SecurePublisher
 
-# 1. Authenticate
-response = await access_client.call_async(request)
+# 1. Authenticate against the server module
+client = SecurityClient(module_id="my-module-id")
+response = await client.authenticate(target_module="other_module")
 
-# 2. Create context
+# 2. Create a security context from the grant
 ctx = create_security_context(
-    module_id=str(uuid),
-    security_level=response.granted_sl,
+    module_id="my-module-id",
+    security_level=response.granted_level,
     session_token=response.session_token,
-    hmac_key=response.hmac_key
+    hmac_key=response.hmac_key,
 )
 
-# 3. Use secure communication
-pub = SecurePublisher(node, MsgType, 'topic', ctx)
-pub.publish(msg)  # SafetyMetadata added automatically
+# 3. Use SecurePublisher — SafetyMetadata added automatically per message
+pub = SecurePublisher(publisher=my_publisher, context=ctx)
+await pub.publish({"value": 42})
 ```
+
+---
 
 ## Installation
 
 ```bash
-# Install dependencies
 pip install cryptography
-
-# Build interfaces
-cd /path/to/vyra_base_python
-colcon build
-source install/setup.bash
 ```
 
-## Documentation
-
-- **[Security Framework Guide](docs/security/SECURITY_FRAMEWORK.md)** - Complete documentation
-- **[Integration Guide](docs/security/INTEGRATION_GUIDE.md)** - Quick integration reference
-- **[Sphinx Docs](docs/security.rst)** - API reference
-- **[Examples](examples/security/)** - Working examples
+---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│         Module A (Client)               │
-│  ┌────────────┐      ┌──────────────┐   │
-│  │  Security  │ ───> │   Secure     │   │
-│  │  Context   │      │  Publisher   │   │
-│  └────────────┘      └──────────────┘   │
-└─────────────────────────────────────────┘
-              │
-              │ ROS2 (with SafetyMetadata)
-              ▼
-┌─────────────────────────────────────────┐
-│         Module B (Server)               │
-│  ┌────────────┐      ┌──────────────┐   │
-│  │  Security  │ <─── │  Security    │   │
-│  │  Manager   │      │  Validator   │   │
-│  └────────────┘      └──────────────┘   │
-└─────────────────────────────────────────┘
+Module A (Client)                    Module B (Server)
+┌──────────────────────┐             ┌───────────────────────┐
+│  SecurityClient      │ ──auth──>   │  SecurityManager      │
+│  create_security_ctx │ <─grant──  │  (RequestAccess srv)  │
+│  SecurePublisher     │ ──msg+sig─> │  SecurityValidator    │
+└──────────────────────┘             └───────────────────────┘
 ```
 
-## Components
-
-### SecurityManager (Server-side)
-- Provides `RequestAccess` service
+### SecurityManager (server-side)
+- Provides `RequestAccess` service endpoint
 - Manages sessions and tokens
-- Issues HMAC keys and certificates
-- Validates authentication requests
+- Issues HMAC keys and certificates for Level 4/5
+- Validates incoming authentication requests
 
-### SecurityClient (Client-side)
-- Requests authentication
-- Wraps publishers/clients
-- Generates SafetyMetadata
-- Signs messages automatically
+### SecurityValidator (server-side)
+- Verifies `SafetyMetadata` on each incoming message
+- Checks module ID, timestamp freshness, and HMAC signature
+
+### SecurityClient (client-side)
+- Requests and stores the security grant
+- Transparently wraps publishers with `SecurePublisher`
+
+### trust.py
+- Certificate loading and trust chain verification for Level 5
+
+---
+
+## Documentation
+
+- **[Security Framework Guide](../../../../docs/security/SECURITY_FRAMEWORK.md)**
+- **[Integration Guide](../../../../docs/security/INTEGRATION_GUIDE.md)**
+- **[API Reference](../../../../docs/security/api.rst)**
+- **[Examples](../../../../examples/security/)**
+
+---
+
+## Files
+
+| File | Description |
+|---|---|
+| `security_levels.py` | `SecurityLevel` enum (NONE → DIGITAL_SIGNATURE) |
+| `security_manager.py` | `SecurityManager` — server-side mixin |
+| `security_client.py` | `SecurityClient`, `SecurePublisher`, `create_security_context` |
+| `security_validator.py` | `SecurityValidator` — message validation |
+| `trust.py` | Certificate trust chain helpers |
 
 ### SecurityValidator (Server-side)
 - Validates incoming SafetyMetadata

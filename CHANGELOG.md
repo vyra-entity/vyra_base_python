@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `tests/plugin/test_plugin_runtime.py` — 24 unit tests for `StubRuntime`, `create_plugin_runtime()` factory, and `PluginCallError` (no wasmtime required)
+- `tests/security/test_security_levels.py` — 29 unit tests for `SecurityLevel` enum values, `is_valid()`, `get_name()`, ordering, `requires_hmac()`, and `requires_certificate()`
+- `tests/plugin/__init__.py` and `tests/security/__init__.py` — package markers for new test directories
+- `cryptography` submodule mocks in `tests/conftest.py` to prevent pyo3 Rust-extension panic under Python 3.11
+- `pytest.ini` now includes `vyra_base.plugin` and `vyra_base.security` in coverage collection
+
+### Fixed
+- `security/security_client.py`: replaced fragile `importlib.util.find_spec("rclpy")` check with `try/except ImportError` to avoid `ValueError` when rclpy is mocked in sys.modules
+
+### Changed
+- `tests/README.md` rewritten to reflect actual test directory structure
+
 
 ## [0.1.8+build.129] - 2026-03-27
 

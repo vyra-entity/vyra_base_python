@@ -1,544 +1,277 @@
 # VYRA Interfaces
 
-This directory contains the core interface definitions for the VYRA framework. Interfaces define the communication contracts between modules and are available through multiple transport protocols.
+This directory contains the built-in interface definitions for the VYRA framework, plus the tooling that generates interface files for individual modules. Interfaces define the communication contracts between VYRA entities and are transported via **Zenoh** (default) or other registered transports.
 
 ## Directory Structure
 
 ```
 interfaces/
-├── speaker/        # .msg files - VYRA Speakers (ROS2 Messages)
-├── callable/       # .srv files - VYRA Callables (ROS2 Services)
-├── job/            # .action files - VYRA Jobs (ROS2 Actions)
-├── proto/          # .proto files - Protocol Buffers for Redis/gRPC/external
-├── config/         # Metadata JSON files describing interfaces
-├── package.xml     # ROS2 package metadata
-└── CMakeLists.template.txt  # ROS2 build configuration
-
+├── config/         # Metadata JSON files (*.meta.json) for built-in interfaces
+│   ├── vyra_core.meta.json      # Core VYRA interfaces (get_interface_list, etc.)
+│   ├── vyra_com.meta.json       # Communication interfaces
+│   ├── vyra_security.meta.json  # Security interfaces
+│   ├── vyra_state.meta.json     # State-machine interfaces
+│   ├── vyra_plugin.meta.json    # Plugin interfaces
+│   └── RESERVED.list            # Reserved function names (module override forbidden)
+├── tools/
+│   └── generate_interfaces.py   # Interface file generator (consumed by modules)
+├── package.xml                   # ROS2 package stub (build tooling only)
+└── CMakeLists.template.txt       # CMakeLists template used during generation
 ```
 
 ## Interface Types
 
-### Speaker (`.msg` files)
-**Purpose**: Publish/Subscribe messaging for event streams  
-**Transport**: ROS2 DDS (Data Distribution Service)  
-**Location**: `speaker/` directory  
-**Use Cases**: 
-- Status updates (error feeds, state changes)
-- Event notifications (news feed)
-- Sensor data streams
+The VYRA framework knows four logical interface types, each mapping to a different
+communication pattern.
 
-**Example**: `VBASEErrorFeed.msg`
-```
-string error_id
-string message
-uint8 severity
-time timestamp
+### Speaker — event stream
+**Pattern**: one-to-many publish/subscribe  
+**Transport**: Zenoh pub/sub  
+**Proto pattern**: message type pushed to a topic key expression  
+**Use cases**: error feeds, state-change notifications, news feeds, sensor data
+
+```python
+# Exposing a Speaker via VyraEntity
+await entity.expose_speaker("error_feed", ErrorFeedHandler)
 ```
 
-### Callable (`.srv` files)
-**Purpose**: Request/Response communication for synchronous operations  
-**Transport**: ROS2 DDS + Protocol Buffers (Redis/gRPC)  
-**Location**: `callable/` directory (ROS2), `proto/` directory (gRPC)  
-**Use Cases**:
-- Health checks
-- Parameter get/set operations
-- State transitions
-- Data queries
+### Callable — request/response
+**Pattern**: synchronous call, waits for one reply  
+**Transport**: Zenoh queryable / remote-service decorator  
+**Proto pattern**: request + response message pair  
+**Use cases**: health checks, parameter get/set, data queries
 
-**Example**: `VBASEHealthCheck.srv`
-```
-# Request
----
-# Response
-bool alive
-string state
-string health_status
-string[] issues
+```python
+# Registering a Callable
+@remote_service(entity, "health_check")
+async def health_check(self) -> dict:
+    return {"alive": True, "state": self.state}
 ```
 
-**Equivalent Proto**: `HealthCheck.proto`
-```protobuf
-syntax = "proto3";
-package vyra_base;
+### Job — long-running action
+**Pattern**: goal → feedback stream → result (ROS2 action style)  
+**Transport**: Zenoh (multi-key expression pattern)  
+**Use cases**: multi-step workflows, cancelable tasks, progress-based operations
 
-message HealthCheckRequest {
-    // Empty request
-}
-
-message HealthCheckResponse {
-    bool alive = 1;
-    string state = 2;
-    string health_status = 3;
-    repeated string issues = 4;
-}
-
-service HealthCheckService {
-    rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
-}
-```
-
-### Job (`.action` files)
-**Purpose**: Long-running operations with progress feedback  
-**Transport**: ROS2 Actions  
-**Location**: `job/` directory  
-**Use Cases**:
-- Multi-step workflows
-- Operations requiring progress updates
-- Cancelable tasks
-
-**Example**: `VBASELongTask.action`
-```
-# Goal
-string task_id
----
-# Result
-bool success
-string result_data
----
-# Feedback
-float32 progress
-string current_step
-```
-
-### Proto (`.proto` files)
-**Purpose**: Protocol Buffer definitions for non-ROS2 transports  
-**Transport**: Redis Pub/Sub, gRPC, external systems  
-**Location**: `proto/` directory  
-**Use Cases**:
-- Redis-based communication
-- External system integration
-- Language-agnostic interfaces (C++, Java, Go, etc.)
-- High-performance serialization
-
-**Key Benefits**:
-- Transport-independent definitions
-- Multi-language support
-- Efficient binary serialization
-- Strong typing with code generation
+### Proto (`.proto` files) — serialisation contract
+**Purpose**: Protocol Buffer definitions used as the wire format for all Zenoh,
+gRPC, and external REST/TCP transports.  
+**Location**: `.proto` files are *generated* per-module from the `*.meta.json`
+config files by `tools/generate_interfaces.py`.  
+**Key benefits**:
+- Transport-independent schema
+- Multi-language support (Python, C++, Go, …)
+- Efficient binary serialisation
+- Strong typing with auto-generated stubs
 
 ## Configuration Files (`config/` directory)
 
-Metadata files describe how interfaces are exposed and used by the VYRA framework.
+Each `*.meta.json` file is a JSON array that describes one or more interfaces.
+The built-in files ship with `vyra_base` and are merged with module-specific
+configs during the module build pipeline.
 
 ### File Format
 
-Configuration files are JSON arrays containing interface metadata objects.
-
-**Example**: `vyra_core_meta.json`
 ```json
 [
     {
-        "tags": ["ros2", "redis"],
-        "type": "callable",
-        "functionname": "health_check",
-        "displayname": "Health Check",
-        "description": "Check module health and operational status",
-        "filetype": [
-            "VBASEHealthCheck.srv",
-            "HealthCheck.proto"
-        ],
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "get_interface_list",
+        "displayname": "Get Interface List",
+        "description": "Retrieve the list of interfaces exposed by this entity.",
+        "filetype": ["VBASEGetInterfaceList.proto"],
         "params": [],
         "returns": [
             {
-                "name": "alive",
-                "type": "bool",
-                "description": "Module is alive and responding"
-            },
-            {
-                "name": "state",
-                "type": "string",
-                "description": "Current operational state"
-            },
-            {
-                "name": "health_status",
-                "type": "string",
-                "description": "Health status description"
-            },
-            {
-                "name": "issues",
-                "type": "string[]",
-                "description": "List of current issues"
+                "name": "interface_list",
+                "datatype": "string[]",
+                "displayname": "Interface List",
+                "description": "JSON-serialised interface config strings"
             }
         ],
+        "access_level": 1,
         "displaystyle": {
             "visible": true,
-            "category": "System",
-            "icon": "health"
+            "published": false
         }
     }
 ]
 ```
 
-### Configuration Schema
+### Field Reference
 
-#### Required Fields
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `tags` | `string[]` | yes | Transport tags — use `["zenoh"]` for standard interfaces |
+| `type` | `string` | yes | `"service"` / `"message"` / `"action"` |
+| `functionname` | `string` | yes | Unique snake_case identifier; becomes the Zenoh key suffix |
+| `displayname` | `string` | yes | Human-readable name (UI labels) |
+| `description` | `string` | yes | Short description |
+| `filetype` | `string[]` | yes | Generated file names; Zenoh-only interfaces use a single `.proto` entry |
+| `params` | `object[]` | no | Request parameters (see Parameter Schema below) |
+| `returns` | `object[]` | no | Response fields |
+| `access_level` | `int` | no | Minimum security level required (1–5, default `1`) |
+| `displaystyle` | `object` | no | UI display hints (`visible`, `published`, `category`, `icon`, `order`) |
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `tags` | string[] | Transport protocols: `["ros2"]`, `["zenoh"]`, `["redis"]`, `["uds"]` or any combination |
-| `type` | string | Interface type: `"service"`, `"message"`, or `"action"` |
-| `functionname` | string | Unique machine-readable identifier, used as the function/topic name component. Pattern: `^[a-zA-Z][a-zA-Z0-9_]*$` |
-| `displayname` | string | Human-readable name for UI/documentation |
-| `description` | string | Purpose and behavior description |
+### Tags
 
-#### Optional Fields
+All built-in VYRA interfaces use `"tags": ["zenoh"]`.  Custom modules may extend
+this with additional transport tags if they register extra transports, but
+`["zenoh"]` must always be present for a callable to be reachable via the
+default transport.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `namespace` | string | Namespace segment inserted between module identifier and function name in the topic path: `{module}_{id}/{namespace}/{functionname}`. Pattern: `^[a-zA-Z][a-zA-Z0-9_]*$`. Feeder publishers automatically use `namespace: "feeder"`. |
-| `subsection` | string | Subsection appended after the function name: `{module}_{id}[/{namespace}]/{functionname}/{subsection}`. Pattern: `^[a-zA-Z][a-zA-Z0-9_]*$`. |
-| `filetype` | string[] | List of interface type file references generated from this config (e.g., `["MyService.srv", "MyMessage.proto"]`). Required for `type: "service"`. |
-| `params` | object[] | Input parameters (for services/actions) |
-| `returns` | object[] | Output/result fields |
-| `access_level` | integer | Minimum security level (1 = public, higher = restricted, default: 1) |
-| `displaystyle` | object | UI presentation configuration: `{ "visible": bool, "published": bool }` |
-| `qosprofile` | integer | Message queue depth for ROS2/Zenoh (default: 10) |
+### Parameter / Return Schema
 
-#### Topic Path Structure
+```json
+{
+    "name": "key",
+    "datatype": "string",
+    "displayname": "Parameter Key",
+    "description": "The parameter key to look up.",
+    "required": true,
+    "default": null,
+    "validation": {
+        "pattern": "^[a-z_]+$"
+    }
+}
+```
 
-The full topic path for an interface is assembled by `TopicBuilder`:
+Supported `datatype` values: `bool`, `int`, `int32`, `int64`, `float`, `float64`,
+`string`, `string[]`, `int[]`, `float[]`, `bool[]`, `object`, `object[]`
+
+### Display Style Schema
+
+```json
+{
+    "visible": true,
+    "published": false,
+    "category": "System",
+    "icon": "settings",
+    "color": "#4a90e2",
+    "order": 10
+}
+```
+
+`published: true` marks the interface as part of the public module API that is
+exposed in the VYRA Dashboard.
+
+## Zenoh Topic Naming
+
+Every interface function maps to a Zenoh key expression following this pattern:
 
 ```
 {module_name}_{module_id}[/{namespace}]/{functionname}[/{subsection}]
 ```
 
 Examples:
-- `v2_modulemanager_abc123/get_interface_list` (no namespace/subsection)
-- `v2_modulemanager_abc123/feeder/NewsFeed` (namespace = `feeder`, used by all feeder publishers)
-- `v2_modulemanager_abc123/action/run_task/cancel` (namespace = `action`, subsection = `cancel`)
+- `v2_modulemanager_abc123/get_interface_list`
+- `v2_modulemanager_abc123/feeder/news_feed` (with namespace)
+- `v2_modulemanager_abc123/action/run_task/cancel` (with subsection)
 
-#### Schema Validation
+## Interface Generator (`tools/generate_interfaces.py`)
 
-All `*_meta.json` files are automatically validated against the JSON Schema at
-`assets/schemas/interface_config.json` during `setup_interfaces.py` execution
-(Step 2.5 in the build pipeline). Files that fail validation are:
-1. Excluded from interface generation with a `WARNING` log entry
-2. Temporarily renamed to `*.json.invalid` during generation
-3. Restored to their original name after generation completes
-
-This means schema-invalid files are never silently ignored at runtime — they
-are caught at build time with a clear warning message.
-
-To validate manually:
-```python
-import vyra_base
-
-valid, invalid = vyra_base.validate_config_schema(
-    list(Path("config").glob("*_meta.json"))
-)
-for bad_file, reason in invalid:
-    print(f"INVALID: {bad_file.name}\n  {reason}")
-```
-
-#### Parameter/Return Schema
-
-```json
-{
-    "name": "parameter_name",
-    "type": "bool|int|float|string|array",
-    "description": "What this parameter represents",
-    "default": "Optional default value",
-    "required": true,
-    "validation": {
-        "min": 0,
-        "max": 100,
-        "pattern": "^[a-z]+$"
-    }
-}
-```
-
-#### Display Style Schema
-
-```json
-{
-    "visible": true,
-    "category": "Category Name",
-    "icon": "icon_name",
-    "color": "#hexcolor",
-    "order": 10
-}
-```
-
-### Tags Explanation
-
-- **`["ros2"]`**: Available via ROS2 DDS transport only
-- **`["redis"]`**: Available via Redis/gRPC transport only
-- **`["ros2", "redis"]`**: Available via both transports (dual-transport)
-
-**Typical Usage**:
-- Speakers: `["ros2"]` (ROS2 pub/sub)
-- Callables: `["ros2", "redis"]` (both transports for flexibility)
-- Jobs: `["ros2"]` (ROS2 actions)
-
-### Filetype Format
-
-The `filetype` field lists all interface definition files for an interface:
-
-**Single Transport**:
-```json
-"filetype": ["VBASEErrorFeed.msg"]
-```
-
-**Dual Transport** (ROS2 + Redis):
-```json
-"filetype": [
-    "VBASEHealthCheck.srv",
-    "HealthCheck.proto"
-]
-```
-
-**Rules**:
-- First entry: ROS2 format (`.msg`, `.srv`, or `.action`)
-- Second entry: Proto format (`.proto`) for Redis/gRPC
-- Use VBASE prefix for ROS2 files to avoid naming conflicts
-- Proto files use clean names without prefix
-
-## Transport Protocols
-
-### ROS2 DDS Transport
-
-**When to Use**:
-- Module-to-module communication within the VYRA system
-- Real-time data distribution
-- QoS-managed communication
-- Discovery-based networking
-
-**Interface Files**: `.msg`, `.srv`, `.action`  
-**Generated Code**: ROS2 Python/C++ packages  
-**Deployment**: `/nfs/vyra_interfaces/{module}_interfaces/`
-
-### Redis/gRPC Transport
-
-**When to Use**:
-- Cross-language communication
-- External system integration
-- Web service APIs
-- Redis-based messaging
-- Non-ROS2 environments
-
-**Interface Files**: `.proto`  
-**Generated Code**: Python (`*_pb2.py`, `*_pb2_grpc.py`), C++ (`.pb.h`, `.pb.cc`)  
-**Deployment**: `/nfs/vyra_interfaces/{module}_proto_interfaces/`
-
-## Build Process
-
-### ROS2 Interfaces (colcon)
+The `generate_interfaces.py` script is called by module build pipelines during
+`setup_interfaces.py` execution. It reads the merged base + module `*.meta.json`
+files and generates:
+- `.proto` files for Zenoh / gRPC serialisation
+- (optionally) `.msg` / `.srv` / `.action` stubs for ROS2 transport
 
 ```bash
-# Copy interfaces to module
-python3 tools/setup_interfaces.py
-
-# Build with colcon
-colcon build --packages-select {module}_interfaces
-
-# Result: install/{module}_interfaces/
-#   ├── msg/ (compiled .msg files)
-#   ├── srv/ (compiled .srv files)
-#   ├── action/ (compiled .action files)
-#   └── Python/C++ libraries
-```
-
-### Proto Interfaces (protoc)
-
-```bash
-# Generate Python + C++ from .proto files
-python3 tools/setup_proto_interfaces.py
-
-# Result: install/{module}_proto_interfaces/
-#   ├── *_pb2.py (Python messages)
-#   ├── *_pb2_grpc.py (Python services)
-#   ├── *_pb2.pyi (Python type hints)
-#   ├── *.pb.h (C++ headers)
-#   └── *.pb.cc (C++ implementation)
-```
-
-### Unified Build
-
-```bash
-# Build everything (ROS2 + Proto)
-python3 tools/setup_interfaces.py --all
-
-# Build only ROS2 interfaces
-python3 tools/setup_interfaces.py --ros2-only
-
-# Build only Proto interfaces
-python3 tools/setup_interfaces.py --proto-only
+# Run from within a module's interface package:
+python3 tools/generate_interfaces.py              # Generate all interfaces
+python3 tools/generate_interfaces.py --validate   # Validate configs, no output
+python3 tools/generate_interfaces.py --cleanup    # Mark deprecated files
 ```
 
 ### Build Pipeline
 
-`setup_interfaces.py` executes a sequential pipeline:
+`setup_interfaces.py` (module-side) executes:
 
-1. **Copy** config + build files from the installed `vyra_base` library into the interface package.
-2. **Validate** module-specific config JSONs against the `RESERVED` function name list — exits with error on violation.
-3. **Schema validation** (`Step 2.5`) — validates every `*_meta.json` against `assets/schemas/interface_config.json`.
-   Invalid files are excluded from generation with a `WARNING` log (non-fatal).
-4. **Generate** `.msg` / `.srv` / `.action` / `.proto` files via `InterfaceGenerator`.
-5. **Update** `CMakeLists.txt` and `package.xml` with the generated file list.
-6. **Compile** Protobuf stubs (Python + optional C++) via `protoc`.
+1. **Copy** config + build files from the installed `vyra_base` library into the
+   interface package.
+2. **Validate** module-specific config JSONs against the `RESERVED.list` function
+   name list — exits with an error on violation.
+3. **Schema validation** — validates every `*.meta.json` against
+   `assets/schemas/interface_config.json`. Invalid files are excluded from
+   generation with a `WARNING` log (non-fatal).
+4. **Generate** `.proto` files (and optional `.msg`/`.srv`/`.action` stubs) via
+   `generate_interfaces.py`.
+5. **Compile** Protobuf stubs (Python `*_pb2.py` / `*_pb2_grpc.py`) via `protoc`.
 
-## NFS Deployment
+### RESERVED.list
 
-All interfaces are deployed to NFS for cross-module access:
-
-```
-/nfs/vyra_interfaces/
-├── {module1}_interfaces/           # ROS2 interfaces
-│   ├── msg/
-│   ├── srv/
-│   ├── action/
-│   └── config/
-├── {module1}_proto_interfaces/     # Proto interfaces
-│   ├── health_check_pb2.py
-│   ├── health_check_pb2_grpc.py
-│   ├── health_check.pb.h
-│   └── health_check.pb.cc
-├── {module2}_interfaces/
-└── {module2}_proto_interfaces/
-```
-
-**Loading**:
-- ROS2: Automatic via `ROS_INTERFACE_PATH`
-- Proto: Added to `PYTHONPATH` and `LD_LIBRARY_PATH`
+`config/RESERVED.list` contains function names that are owned by `vyra_base` and
+may not be overridden by module config files. Any config entry whose
+`functionname` appears in the reserved list will cause the build to abort with a
+descriptive error.
 
 ## Usage Examples
 
-### Python - ROS2 Interface
+### Calling a built-in Callable (Python)
 
 ```python
-from v2_modulemanager_interfaces.msg import VBASEErrorFeed
-from v2_modulemanager_interfaces.srv import VBASEHealthCheck
+from vyra_base.com.transport.t_zenoh import ZenohTransport
 
-# Publish message
-error_msg = VBASEErrorFeed()
-error_msg.error_id = "ERR001"
-error_msg.message = "System warning"
-publisher.publish(error_msg)
-
-# Call service
-client = node.create_client(VBASEHealthCheck, '/v2_modulemanager/health_check')
-request = VBASEHealthCheck.Request()
-response = await client.call_async(request)
+transport = ZenohTransport(entity)
+response = await transport.call(
+    "v2_modulemanager_abc123/get_interface_list",
+    payload={}
+)
+print(response["interface_list"])
 ```
 
-### Python - Proto Interface
+### Subscribing to a Speaker (Python)
 
 ```python
-from v2_modulemanager_proto_interfaces.health_check_pb2 import (
-    HealthCheckRequest,
-    HealthCheckResponse
-)
-from v2_modulemanager_proto_interfaces.health_check_pb2_grpc import (
-    HealthCheckServiceStub
-)
+from vyra_base.interfaces import InterfaceBuilder
 
-# Call via gRPC
-channel = grpc.insecure_channel('localhost:50051')
-stub = HealthCheckServiceStub(channel)
-request = HealthCheckRequest()
-response = stub.HealthCheck(request)
+async def on_error_feed(payload: dict) -> None:
+    print(f"Error: {payload['message']}")
 
-# Or via Redis
-import redis
-r = redis.Redis()
-request_data = HealthCheckRequest()
-r.publish('health_check_request', request_data.SerializeToString())
+await entity.subscribe_speaker("error_feed", on_error_feed)
 ```
 
-### C++ - Proto Interface
-
-```cpp
-#include "health_check.pb.h"
-
-vyra_base::HealthCheckRequest request;
-vyra_base::HealthCheckResponse response;
-
-// Use with gRPC or custom transport
-channel->CallMethod(method, &request, &response);
-```
-
-## Adding New Interfaces
-
-### 1. Create Interface File
-
-**For ROS2 Transport**:
-- Speaker: Create `{Name}.msg` in `speaker/`
-- Callable: Create `VBASE{Name}.srv` in `callable/`
-- Job: Create `VBASE{Name}.action` in `job/`
-
-**For Redis/gRPC Transport**:
-- Create `{Name}.proto` in `proto/`
-
-### 2. Create Configuration Entry
-
-Add to appropriate `config/*_meta.json`:
+### Custom module config entry
 
 ```json
-{
-    "tags": ["ros2", "redis"],
-    "type": "callable",
-    "functionname": "my_new_function",
-    "displayname": "My New Function",
-    "description": "Does something useful",
-    "filetype": [
-        "VBASEMyFunction.srv",
-        "MyFunction.proto"
-    ],
-    "params": [...],
-    "returns": [...]
-}
+[
+    {
+        "tags": ["zenoh"],
+        "type": "service",
+        "functionname": "my_custom_service",
+        "displayname": "My Custom Service",
+        "description": "Does something module-specific.",
+        "filetype": ["MyCustomService.proto"],
+        "params": [
+            {
+                "name": "input",
+                "datatype": "string",
+                "displayname": "Input",
+                "description": "The input value."
+            }
+        ],
+        "returns": [
+            {
+                "name": "result",
+                "datatype": "string",
+                "displayname": "Result",
+                "description": "The computed result."
+            }
+        ],
+        "access_level": 2,
+        "displaystyle": {
+            "visible": true,
+            "published": true
+        }
+    }
+]
 ```
 
-### 3. Build and Deploy
+## See Also
 
-```bash
-# In vyra_base_python
-cd src/vyra_base/interfaces
+- [`src/vyra_base/com/transport/README.md`](../com/transport/README.md) — Zenoh and other transport details
+- [`src/vyra_base/core/README.md`](../core/README.md) — VyraEntity and InterfaceBuilder
+- [`src/vyra_base/security/README.md`](../security/README.md) — Access levels and security framework
 
-# If adding proto, convert from srv if needed
-python3 ../../../tools/convert_srv_to_proto.py
-
-# Commit changes
-git add speaker/ callable/ job/ proto/ config/
-git commit -m "Add MyFunction interface"
-```
-
-### 4. Update Modules
-
-```bash
-# Modules will automatically pick up new interfaces on next build
-cd /workspace/module
-python3 tools/setup_interfaces.py --all
-colcon build
-```
-
-## Best Practices
-
-1. **Use VBASE Prefix**: All ROS2 interfaces should use `VBASE` prefix to avoid conflicts
-2. **Dual Transport for Callables**: Provide both `.srv` and `.proto` for maximum flexibility
-3. **Comprehensive Metadata**: Fill out all config fields for better UI integration
-4. **Semantic Versioning**: Update interface versions carefully to maintain compatibility
-5. **Documentation**: Add clear descriptions in both interface files and config JSONs
-6. **Type Safety**: Use specific types (bool, int32, string) rather than generic types
-7. **Validation**: Define validation rules in config for input parameters
-
-## Troubleshooting
-
-**Issue**: Interfaces not found after build  
-**Solution**: Check NFS mount and PYTHONPATH/ROS_INTERFACE_PATH
-
-**Issue**: Proto generation fails  
-**Solution**: Ensure `grpcio-tools` is installed: `pip install grpcio-tools`
-
-**Issue**: ROS2 interfaces not compiling  
-**Solution**: Verify `package.xml` and `CMakeLists.txt` are correctly configured
-
-**Issue**: Config changes not reflected in UI  
-**Solution**: Config files are cached - restart module or clear cache
-
-## References
-
-- [ROS2 Interface Documentation](https://docs.ros.org/en/rolling/Concepts/About-ROS-Interfaces.html)
-- [Protocol Buffers Guide](https://protobuf.dev/)
-- [gRPC Documentation](https://grpc.io/docs/)
-- VYRA Framework Documentation: `/workspace/docs/`
+        "type": "callable",

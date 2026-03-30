@@ -29,7 +29,11 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, Type
 from functools import wraps
 from dataclasses import dataclass
 
-_ROS2_AVAILABLE = importlib.util.find_spec("rclpy") is not None
+try:
+    import rclpy as _rclpy_check  # noqa: F401
+    _ROS2_AVAILABLE = True
+except ImportError:
+    _ROS2_AVAILABLE = False
 
 if TYPE_CHECKING or _ROS2_AVAILABLE:
     import rclpy

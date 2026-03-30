@@ -65,8 +65,8 @@ Level 3: EXTENDED_AUTH
 **Performance**: Low overhead (~1ms)
 
 **Validation**:
-- Sender ID verification
-- Password verification against configured credentials
+- Sender ID present
+- Password verified against the configured ``module_passwords`` dictionary
 
 **Configuration**:
 

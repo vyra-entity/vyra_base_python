@@ -420,44 +420,6 @@
             "zenoh"
         ],
         "type": "service",
-        "functionname": "get_state",
-        "displayname": "Get State",
-        "description": "Returns the current 3-layer state (lifecycle, operational, health) of the module.",
-        "filetype": [
-            "VBASEGetState.proto"
-        ],
-        "params": [],
-        "returns": [
-            {
-                "name": "lifecycle",
-                "datatype": "string",
-                "displayname": "Lifecycle State",
-                "description": "Current lifecycle state"
-            },
-            {
-                "name": "operational",
-                "datatype": "string",
-                "displayname": "Operational State",
-                "description": "Current operational state"
-            },
-            {
-                "name": "health",
-                "datatype": "string",
-                "displayname": "Health State",
-                "description": "Current health state"
-            }
-        ],
-        "access_level": 1,
-        "displaystyle": {
-            "visible": false,
-            "published": false
-        }
-    },
-    {
-        "tags": [
-            "zenoh"
-        ],
-        "type": "service",
         "functionname": "get_log_history",
         "displayname": "Get Log History",
         "description": "Returns recent log lines from the in-memory ring buffer.",
