@@ -8,6 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.137] - 2026-03-31
+
+### Build
+
+bugfix <com/transport>/service. see below
+
+### Fixed
+
+- **Redis client**: Added missing `context` parameter to `_handle_response()` — pubsub loop calls `handler(message, context)` but method only accepted one arg, causing response future to never resolve
+- **Redis server**: Replaced `_ResponseHolder` with `_AttrDict` to support attribute access on request dicts (`request.t1`); capture and use callback return value instead of empty response holder
+- **UDS server/client**: Sanitize `/` in topic names with `_` for filesystem-safe socket paths (matching existing action_server/action_client pattern) — fixes `[Errno 2] No such file or directory`
+- **UDS server**: Added `(request, response)` ROS2-style callback support with `_AttrDict` wrapper and `inspect.signature` detection, matching Redis server pattern
+
+
+## [0.1.8+build.136] - 2026-03-31
+
+### Build
+
+bugfix interface schemas
+
+
+## [0.1.8+build.135] - 2026-03-31
+
+### Build
+
+bugfix transport see below
+
+
 ## [0.1.8+build.134] - 2026-03-30
 
 ### Build

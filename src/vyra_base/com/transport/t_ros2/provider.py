@@ -305,6 +305,25 @@ class ROS2Provider(AbstractProtocolProvider):
         logger.info(f"✅ ROS2 subscriber created: {name}")
         return subscriber
     
+    @staticmethod
+    def _resolve_ros2_type(service_type: Any) -> Optional[type]:
+        """Extract the actual ROS2 class from a mixed list or return the type as-is.
+
+        ``interfacetypes`` passed from the interface builder is a list that may
+        contain both string file names (e.g. ``"ServiceTest.proto"``) and the
+        resolved Python class for ROS2 (e.g.
+        ``<class 'v2_modulemanager_interfaces.srv._service_test.ServiceTest'>``).
+        ROS2 needs the bare class; all non-class entries are ignored.
+        """
+        if service_type is None:
+            return None
+        if isinstance(service_type, list):
+            for item in service_type:
+                if not isinstance(item, str):
+                    return item
+            return None  # list contained only strings (proto names) → no ROS2 type
+        return service_type  # already a class or module
+
     async def create_server(
         self,
         name: str,
@@ -314,7 +333,7 @@ class ROS2Provider(AbstractProtocolProvider):
         """Create ROS2 service server."""
         self.require_initialization()
         
-        service_type = kwargs.pop("service_type", None)
+        service_type = self._resolve_ros2_type(kwargs.pop("service_type", None))
         if not service_type:
             service_type = self._topic_builder.load_interface_type(name, self.protocol)
         if not service_type:
@@ -351,33 +370,57 @@ class ROS2Provider(AbstractProtocolProvider):
     async def create_client(
         self,
         name: str,
+        topic_builder: Optional[TopicBuilder] = None,
+        service_type: Optional[type] = None,
+        request_callback: Optional[Callable] = None,
         **kwargs
     ) -> VyraClient:
-        """Create ROS2 service client."""
+        """
+        Create ROS2 service client.
+
+        Args:
+            name: Service name
+            topic_builder: TopicBuilder instance. When provided (e.g. injected by
+                the factory for cross-module proxy calls), it is used for both
+                interface-type discovery and topic-name building, so that the
+                correct module-specific interface paths are consulted. Falls back
+                to the provider's own ``_topic_builder`` when omitted.
+            service_type: Explicit ROS2 service type class.  Resolved via
+                ``topic_builder.load_interface_type`` when not supplied.
+            request_callback: Optional async callback for responses.
+            **kwargs: Additional parameters forwarded to ``VyraClientImpl``
+                (node, qos_profile, …).
+        """
         self.require_initialization()
-        
-        service_type = kwargs.pop("service_type", None)
+
+        # Use injected topic_builder first so cross-module proxy calls resolve
+        # interface types from the target module's interface package rather than
+        # the provider's default (which only covers the local vyra_base interfaces).
+        effective_topic_builder = topic_builder or self._topic_builder
+
+        # service_type may be a mixed list from interface_builder; extract the class
+        service_type = self._resolve_ros2_type(service_type)
+
         if not service_type:
-            service_type = self._topic_builder.load_interface_type(name, self.protocol)
+            service_type = effective_topic_builder.load_interface_type(name, self.protocol)
         if not service_type:
             raise ArgumentError("service_type is required for ROS2 client")
-        
+
         node = kwargs.pop("node", None)
         qos_profile = kwargs.pop("qos_profile", None)
-        request_callback = kwargs.pop("request_callback", None)
-        
+
         logger.info(f"🔧 Creating ROS2 client: {name} (type: {service_type})")
-        
+
         client = VyraClientImpl(
             name=name,
-            topic_builder=self._topic_builder,
+            topic_builder=effective_topic_builder,
             node=node or self._node,
             service_type=service_type,
             request_callback=request_callback,
             qos_profile=qos_profile,
             **kwargs
         )
-        
+
         await client.initialize()
         logger.info(f"✅ ROS2 client created: {name}")
         return client

@@ -8,6 +8,7 @@ import logging
 import json
 import asyncio
 import uuid
+import inspect
 from typing import Optional, Any, Callable, Awaitable
 
 from vyra_base.com.core.types import VyraServer, ProtocolType
@@ -125,25 +126,38 @@ class RedisServerImpl(VyraServer):
             
             # Call user callback - support both (request, response) ROS2-style
             # and plain (request) callbacks. Use a dynamic response holder.
-            class _ResponseHolder:
-                """Dynamic attribute container for ROS2-style response objects."""
+            class _AttrDict:
+                """Dict wrapper providing attribute access for request/response objects."""
+                def __init__(self, data: dict | None = None):
+                    if data:
+                        for k, v in data.items():
+                            object.__setattr__(self, k, v)
+
                 def __getattr__(self, name):
                     return None
+
                 def __setattr__(self, name, value):
                     object.__setattr__(self, name, value)
+
                 def to_dict(self):
                     return {k: v for k, v in self.__dict__.items()
                             if not k.startswith('_')}
 
-            import inspect
+            # Wrap request dict so callbacks can use attribute access (request.t1)
+            request_obj = _AttrDict(request_data) if isinstance(request_data, dict) else request_data
+
             sig = inspect.signature(self.response_callback)
             num_params = len(sig.parameters)
 
             if num_params >= 2:
                 # ROS2-style: callback(request, response)
-                response_holder = _ResponseHolder()
-                await self.response_callback(request_data, response_holder)
-                response_data = response_holder.to_dict()
+                response_holder = _AttrDict()
+                result = await self.response_callback(request_obj, response_holder)
+                # Prefer explicit return value over response_holder attributes
+                if isinstance(result, dict):
+                    response_data = result
+                else:
+                    response_data = response_holder.to_dict()
             else:
                 # Plain callback: callback(request)
                 result = await self.response_callback(request_data)

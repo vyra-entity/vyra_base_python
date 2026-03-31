@@ -527,7 +527,7 @@
             },
             {
                 "name": "default_value",
-                "datatype": "any",
+                "datatype": "string",
                 "displayname": "Default Value",
                 "description": "Initial and default value"
             },

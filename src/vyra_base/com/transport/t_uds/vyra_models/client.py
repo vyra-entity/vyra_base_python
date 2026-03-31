@@ -46,7 +46,9 @@ class VyraClientImpl(VyraClient):
         """Initialize UDS client."""
         try:
             service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
-            self._server_socket_path = self._socket_dir / f"srv_{self._module_name}_{service_name}.sock"
+            # Sanitize for filesystem use (topic names may contain '/')
+            safe_name = service_name.replace("/", "_")
+            self._server_socket_path = self._socket_dir / f"srv_{self._module_name}_{safe_name}.sock"
             
             # Check if server socket exists
             if not self._server_socket_path.exists():

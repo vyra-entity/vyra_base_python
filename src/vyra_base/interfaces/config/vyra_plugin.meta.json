@@ -8,7 +8,9 @@
         "functionname": "logic_event",
         "displayname": "Plugin Logic Event",
         "description": "Generic topic for plugin logic events. This is been used for plugin logic to push information for UI components related to this plugin logic",
-        "filetype": [],
+        "filetype": [
+            "VBASEPluginEvent.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -45,7 +47,9 @@
         "functionname": "ui_event",
         "displayname": "Plugin UI Event",
         "description": "Generic topic for plugin logic events. This is been used for plugin logic to push information for UI components related to this plugin logic",
-        "filetype": [],
+        "filetype": [
+            "VBASEPluginEvent.proto"
+        ],
         "params": [],
         "returns": [
             {
@@ -82,7 +86,9 @@
         "functionname": "ui_function_call",
         "displayname": "Plugin UI Request Call",
         "description": "Generic request from a ui-component to a related plugin logic",
-        "filetype": [],
+        "filetype": [
+            "VBASEPluginCall.proto"
+        ],
         "params": [
             {
                 "name": "plugin_id",

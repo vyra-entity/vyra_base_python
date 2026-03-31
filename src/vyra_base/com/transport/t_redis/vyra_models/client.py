@@ -126,8 +126,13 @@ class RedisClientImpl(VyraClient):
             # Cleanup pending request
             self._pending_requests.pop(request_id, None)
     
-    async def _handle_response(self, message: Any):
-        """Handle incoming response message."""
+    async def _handle_response(self, message: Any, context=None):
+        """Handle incoming response message.
+
+        Args:
+            message: The raw Redis PubSub message dict.
+            context: Optional context passed by the PubSub listener loop.
+        """
         try:
             response_msg = json.loads(message['data'])
             request_id = response_msg.get('request_id')

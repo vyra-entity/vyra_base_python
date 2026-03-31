@@ -163,7 +163,7 @@ class ROS2ServiceServer:
             )
         
         elif callable(self._service_info.callback):
-            logger.log(f"Executing sync callback for service {self._service_info.name}.")
+            logger.debug(f"Executing sync callback for service {self._service_info.name}.")
             # Fallback: just call the callback directly (sync)
             self._service_info.callback(request=request, response=response)
 

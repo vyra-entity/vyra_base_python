@@ -152,7 +152,7 @@ class Parameter:
         )
 
         if not await storage_access_default.check_table_exists(DbParameter):
-            logger.warn(
+            logger.info(
                 f"Table '{DbParameter.__tablename__}' does not exist in the default "
                 "database. Skipping default parameter loading.")
             return False
@@ -833,7 +833,14 @@ class Parameter:
             return resp
 
         # Retrieve primary key from the first matching record
-        param_record = param_ret.value[0]
+        if isinstance(param_ret.value, list) and len(param_ret.value) > 0:
+            param_record = param_ret.value[0]
+        else:
+            resp['success'] = False
+            resp['message'] = "Internal error: param_ret.value is not a list or is empty."
+            logger.error(resp['message'])
+            return resp
+        
         pkey_field = self.persistant_manipulator._read_pkey()
         record_id = getattr(param_record, pkey_field, None)
         if record_id is None:

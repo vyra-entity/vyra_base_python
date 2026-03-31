@@ -8,6 +8,7 @@ import logging
 import socket
 import json
 import asyncio
+import inspect
 from typing import Optional, Any, Callable, Awaitable
 from pathlib import Path
 
@@ -48,7 +49,9 @@ class VyraServerImpl(VyraServer):
         """Initialize UDS server."""
         try:
             service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
-            self._socket_path = self._socket_dir / f"srv_{self._module_name}_{service_name}.sock"
+            # Sanitize for filesystem use (topic names may contain '/')
+            safe_name = service_name.replace("/", "_")
+            self._socket_path = self._socket_dir / f"srv_{self._module_name}_{safe_name}.sock"
             
             # Create socket directory
             self._socket_dir.mkdir(parents=True, exist_ok=True)
@@ -141,44 +144,51 @@ class VyraServerImpl(VyraServer):
             # Deserialize request
             request_dict = json.loads(request_data.decode('utf-8'))
             
-            # Convert dict to srv_type.Request
-            if self.service_type:
-                # Try to instantiate service type Request from dict
-                try:
-                    if hasattr(self.service_type, 'Request'):
-                        # ROS2-style service with Request inner class
-                        request_obj = self.service_type.Request(**request_dict)
-                    elif hasattr(request_dict, '__dict__'):
-                        # Already an object
-                        request_obj = request_dict
-                    else:
-                        # Fallback: use dict directly
-                        request_obj = request_dict
-                except Exception as e:
-                    logger.warning(f"Could not convert dict to {self.service_type}.Request: {e}")
-                    request_obj = request_dict
-            else:
-                request_obj = request_dict
-            
-            # Call user callback
-            response = await self.response_callback(request_obj)
-            
-            # Convert response to srv_type.Response
-            if self.service_type and hasattr(response, '__dict__'):
-                # If response is an object with attributes, convert to dict
-                if hasattr(response, 'to_dict'):
-                    response_dict = response.to_dict()
-                elif hasattr(response, '__dict__'):
-                    # Extract public attributes
-                    response_dict = {k: v for k, v in response.__dict__.items() if not k.startswith('_')}
+            # Wrap request dict for attribute access (request.t1 etc.)
+            class _AttrDict:
+                """Dict wrapper providing attribute access for request/response objects."""
+                def __init__(self, data: dict | None = None):
+                    if data:
+                        for k, v in data.items():
+                            object.__setattr__(self, k, v)
+
+                def __getattr__(self, name):
+                    return None
+
+                def __setattr__(self, name, value):
+                    object.__setattr__(self, name, value)
+
+                def to_dict(self):
+                    return {k: v for k, v in self.__dict__.items()
+                            if not k.startswith('_')}
+
+            request_obj = _AttrDict(request_dict)
+
+            # Support both (request, response) ROS2-style and plain (request) callbacks
+            sig = inspect.signature(self.response_callback)
+            num_params = len(sig.parameters)
+
+            if num_params >= 2:
+                # ROS2-style: callback(request, response)
+                response_holder = _AttrDict()
+                result = await self.response_callback(request_obj, response_holder)
+                if isinstance(result, dict):
+                    response_dict = result
                 else:
-                    response_dict = {'result': str(response)}
-            elif isinstance(response, dict):
-                response_dict = response
+                    response_dict = response_holder.to_dict()
             else:
-                response_dict = {'result': str(response)}
-                
-            response_bytes = json.dumps(response_dict).encode('utf-8')
+                # Plain callback: callback(request)
+                result = await self.response_callback(request_obj)
+                if isinstance(result, dict):
+                    response_dict = result
+                elif result is not None and hasattr(result, '__dict__'):
+                    response_dict = {k: v for k, v in result.__dict__.items() if not k.startswith('_')}
+                elif result is not None:
+                    response_dict = {'result': str(result)}
+                else:
+                    response_dict = {}
+
+            response_bytes = json.dumps(response_dict, default=str).encode('utf-8')
             
             # Send response (with length prefix)
             length_prefix = len(response_bytes).to_bytes(4, byteorder='big')

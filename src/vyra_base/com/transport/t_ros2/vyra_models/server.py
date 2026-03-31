@@ -46,24 +46,46 @@ class VyraServerImpl(VyraServer):
         try:
             service_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             
-            # Wrap async callback for ROS2 sync context
+            # Capture the running event loop now (initialize() is called from the
+            # main asyncio context).  The sync_callback runs in a ROS2 executor
+            # thread, so we must use run_coroutine_threadsafe instead of
+            # run_until_complete (which would deadlock on an already-running loop).
+            main_loop = asyncio.get_event_loop()
+
             def sync_callback(request, response):
+                """Bridge between ROS2 sync service handler and Vyra's async callbacks."""
                 try:
-                    loop = asyncio.get_event_loop()
-                    if loop.is_closed():
-                        loop = asyncio.new_event_loop()
-                        asyncio.set_event_loop(loop)
-                    
                     if self.response_callback:
                         if asyncio.iscoroutinefunction(self.response_callback):
-                            result = loop.run_until_complete(self.response_callback(request))
+                            future = asyncio.run_coroutine_threadsafe(
+                                self.response_callback(request), main_loop
+                            )
+                            result = future.result(timeout=30.0)
                         else:
                             result = self.response_callback(request)
-                        
-                        # Copy result fields to response
+
+                        # Copy result fields to response.
+                        # Callbacks may return a dict (most common in Vyra applications)
+                        # or a ROS2 response object with __slots__.
                         if result:
-                            for field in result.__slots__:
-                                setattr(response, field, getattr(result, field))
+                            if isinstance(result, dict):
+                                for key, value in result.items():
+                                    if hasattr(response, key):
+                                        setattr(response, key, value)
+                                    elif hasattr(response, key.lower()):
+                                        setattr(response, key.lower(), value)
+                                    else:
+                                        logger.debug(
+                                            f"⚠️ Response field '{key}' not found on "
+                                            f"{type(response).__name__} — skipping"
+                                        )
+                            elif hasattr(result, '__slots__'):
+                                for field in result.__slots__:
+                                    setattr(response, field, getattr(result, field))
+                            else:
+                                for field, value in vars(result).items():
+                                    if not field.startswith('_') and hasattr(response, field):
+                                        setattr(response, field, value)
                     
                     return response
                 except Exception as e:
