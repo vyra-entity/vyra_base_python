@@ -26,8 +26,9 @@ import hmac
 import hashlib
 import secrets
 import base64
-from datetime import datetime, timedelta
-from typing import Optional, Tuple
+import uuid
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Tuple, Dict, Any
 from pathlib import Path
 
 from cryptography import x509
@@ -432,3 +433,139 @@ def verify_message_rsa(message: str, signature: str, cert_pem: str) -> bool:
         return True
     except Exception as e:
         raise SignatureValidationError(f"Signature verification failed: {e}")
+
+
+# ============================================================================
+# JWT Operations (RS256)
+# ============================================================================
+
+def _ensure_jwt_crypto() -> None:
+    """
+    Ensure PyJWT has RS256 and other cryptographic algorithms registered.
+
+    ``redis-py`` may import ``jwt`` before ``cryptography`` is fully
+    available (e.g. during pytest collection), causing
+    ``jwt.algorithms.has_crypto`` to be stuck at ``False``.  This
+    function detects the situation and re-registers the missing
+    crypto algorithms on the global PyJWS instance.
+    """
+    import jwt
+    import jwt.algorithms as jwt_alg
+    from jwt.api_jws import _jws_global_obj
+
+    if "RS256" in _jws_global_obj._algorithms:
+        return  # already registered, nothing to do
+
+    # cryptography is guaranteed to be available (top-level import in this file).
+    # Reload jwt.algorithms so it re-evaluates the try/except cryptography block.
+    import importlib
+    importlib.reload(jwt_alg)
+
+    # Now get_default_algorithms() includes the crypto algorithms
+    for name, algo in jwt_alg.get_default_algorithms().items():
+        if name not in _jws_global_obj._algorithms:
+            _jws_global_obj._algorithms[name] = algo
+
+
+def create_jwt_token(
+    payload: Dict[str, Any],
+    private_key: rsa.RSAPrivateKey,
+    algorithm: str = "RS256",
+    expires_delta: Optional[timedelta] = None,
+) -> str:
+    """
+    Create a JWT token signed with an RSA private key.
+
+    :param payload: Claims to include in the token
+    :param private_key: RSA private key for signing
+    :param algorithm: Signing algorithm (default RS256)
+    :param expires_delta: Optional token lifetime; defaults to 8 hours
+    :return: Encoded JWT string
+    """
+    import jwt  # lazy import to avoid circular dependency
+    _ensure_jwt_crypto()
+
+    now = datetime.now(timezone.utc)
+    claims = {
+        **payload,
+        "iat": now,
+        "jti": uuid.uuid4().hex,
+    }
+    if expires_delta is None:
+        expires_delta = timedelta(hours=8)
+    claims["exp"] = now + expires_delta
+
+    pem_bytes = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    return jwt.encode(claims, pem_bytes, algorithm=algorithm)
+
+
+def verify_jwt_token(
+    token: str,
+    public_key_pem: bytes,
+    algorithms: Optional[list] = None,
+) -> Dict[str, Any]:
+    """
+    Verify and decode a JWT token using a public key (PEM-encoded bytes).
+
+    :param token: Encoded JWT string
+    :param public_key_pem: PEM-encoded public key or certificate bytes
+    :param algorithms: Allowed algorithms (default ``["RS256"]``)
+    :return: Decoded claims dictionary
+    :raises jwt.ExpiredSignatureError: If the token has expired
+    :raises jwt.InvalidTokenError: If the token is invalid
+    """
+    import jwt  # lazy import to avoid circular dependency
+    _ensure_jwt_crypto()
+
+    if algorithms is None:
+        algorithms = ["RS256"]
+    return jwt.decode(token, public_key_pem, algorithms=algorithms)
+
+
+def decode_jwt_token_unverified(token: str) -> Dict[str, Any]:
+    """
+    Decode a JWT token **without** verifying the signature.
+
+    Useful for inspecting claims (e.g. ``jti``, ``sub``) before full
+    verification.
+
+    :param token: Encoded JWT string
+    :return: Decoded claims dictionary
+    """
+    import jwt  # lazy import to avoid circular dependency
+    _ensure_jwt_crypto()
+
+    return jwt.decode(token, options={"verify_signature": False})
+
+
+# ============================================================================
+# Bcrypt Password Hashing
+# ============================================================================
+
+def hash_password_bcrypt(password: str) -> str:
+    """
+    Hash a password using bcrypt.
+
+    :param password: Plain-text password
+    :return: Bcrypt hash string (includes salt)
+    """
+    import bcrypt  # lazy import to avoid circular dependency
+
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password_bcrypt(password: str, hashed: str) -> bool:
+    """
+    Verify a plain-text password against a bcrypt hash.
+
+    :param password: Plain-text password
+    :param hashed: Bcrypt hash to check against
+    :return: ``True`` if the password matches
+    """
+    import bcrypt  # lazy import to avoid circular dependency
+
+    return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))

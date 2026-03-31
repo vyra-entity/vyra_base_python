@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — JWT and bcrypt support in crypto_helper
+
+- **`crypto_helper.py`**: Added `create_jwt_token()`, `verify_jwt_token()`, `decode_jwt_token_unverified()` for RS256-signed JWT creation and verification using PyJWT
+- **`crypto_helper.py`**: Added `hash_password_bcrypt()` and `verify_password_bcrypt()` for bcrypt password hashing
+- **`crypto_helper.py`**: Added `_ensure_jwt_crypto()` internal helper to work around redis-py importing jwt before cryptography is fully available
+- **`pyproject.toml`**: Added `PyJWT[crypto]` and `bcrypt` dependencies
+- **`security/__init__.py`**: Refactored to lazy `__getattr__` imports to break circular import chain (`crypto_helper` → `security_levels` → `security/__init__` → `security_manager`)
+- **`tests/security/conftest.py`**: Added fixture that restores real `cryptography` and `jwt` modules (mocked globally for ROS2 tests)
+- **`tests/security/test_crypto_jwt.py`**: Added 9 unit tests for JWT token lifecycle and bcrypt password hashing
+
 
 ## [0.1.8+build.138] - 2026-03-31
 

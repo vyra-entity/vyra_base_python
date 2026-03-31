@@ -48,28 +48,30 @@ from vyra_base.security.security_levels import (
     MAX_TIMESTAMP_DRIFT_SECONDS,
 )
 
-# Security Manager (Server-side)
-from vyra_base.security.security_manager import (
-    SecurityManager,
-    SecuritySession,
-)
+# Lazy imports to break circular dependency with crypto_helper
+# (crypto_helper -> security_levels -> __init__ -> security_manager -> crypto_helper)
+_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
+    "SecurityManager": ("vyra_base.security.security_manager", "SecurityManager"),
+    "SecuritySession": ("vyra_base.security.security_manager", "SecuritySession"),
+    "SecurityContext": ("vyra_base.security.security_client", "SecurityContext"),
+    "SecurePublisher": ("vyra_base.security.security_client", "SecurePublisher"),
+    "SecureServiceClient": ("vyra_base.security.security_client", "SecureServiceClient"),
+    "SafetyMetadataBuilder": ("vyra_base.security.security_client", "SafetyMetadataBuilder"),
+    "security_required": ("vyra_base.security.security_client", "security_required"),
+    "create_security_context": ("vyra_base.security.security_client", "create_security_context"),
+    "SecurityValidator": ("vyra_base.security.security_validator", "SecurityValidator"),
+    "MessageSecurityFilter": ("vyra_base.security.security_validator", "MessageSecurityFilter"),
+    "create_secure_subscription": ("vyra_base.security.security_validator", "create_secure_subscription"),
+}
 
-# Security Client (Client-side)
-from vyra_base.security.security_client import (
-    SecurityContext,
-    SecurePublisher,
-    SecureServiceClient,
-    SafetyMetadataBuilder,
-    security_required,
-    create_security_context,
-)
 
-# Security Validator (Server-side)
-from vyra_base.security.security_validator import (
-    SecurityValidator,
-    MessageSecurityFilter,
-    create_secure_subscription,
-)
+def __getattr__(name: str):
+    if name in _LAZY_IMPORTS:
+        module_path, attr = _LAZY_IMPORTS[name]
+        import importlib
+        mod = importlib.import_module(module_path)
+        return getattr(mod, attr)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
     # Security Levels
