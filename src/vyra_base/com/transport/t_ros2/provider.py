@@ -238,9 +238,14 @@ class ROS2Provider(AbstractProtocolProvider):
         """Create ROS2 publisher."""
         self.require_initialization()
         
-        message_type = kwargs.pop("message_type", None)
-        if not message_type:
-            message_type = self._topic_builder.load_interface_type(name, self.protocol)
+        topic_builder = kwargs.pop("topic_builder", None) or self._topic_builder
+        
+        message_type = self._resolve_ros2_type(kwargs.pop("message_type", None))
+        # Only accept message_type if it's a valid ROS2 type (has _TYPE_SUPPORT).
+        # Generic Python types like dict are not valid for ROS2; fall through
+        # to topic_builder resolution in that case.
+        if not message_type or not hasattr(message_type, '_TYPE_SUPPORT'):
+            message_type = topic_builder.load_interface_type(name, self.protocol)
         if not message_type:
             raise ArgumentError("message_type is required for ROS2 publisher")
         
@@ -251,7 +256,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         publisher = VyraPublisherImpl(
             name=name,
-            topic_builder=self._topic_builder,
+            topic_builder=topic_builder,
             node=node or self._node,
             message_type=message_type,
             qos_profile=qos_profile,
@@ -271,9 +276,11 @@ class ROS2Provider(AbstractProtocolProvider):
         """Create ROS2 subscriber."""
         self.require_initialization()
         
-        message_type = kwargs.pop("message_type", None)
-        if not message_type:
-            message_type = self._topic_builder.load_interface_type(name, self.protocol)
+        topic_builder = kwargs.pop("topic_builder", None) or self._topic_builder
+        
+        message_type = self._resolve_ros2_type(kwargs.pop("message_type", None))
+        if not message_type or not hasattr(message_type, '_TYPE_SUPPORT'):
+            message_type = topic_builder.load_interface_type(name, self.protocol)
         if not message_type:
             raise ArgumentError("message_type is required for ROS2 subscriber")
         
@@ -293,7 +300,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         subscriber = VyraSubscriberImpl(
             name=name,
-            topic_builder=self._topic_builder,
+            topic_builder=topic_builder,
             node=node or self._node,
             message_type=message_type,
             subscriber_callback=subscriber_callback,
@@ -333,9 +340,11 @@ class ROS2Provider(AbstractProtocolProvider):
         """Create ROS2 service server."""
         self.require_initialization()
         
+        topic_builder = kwargs.pop("topic_builder", None) or self._topic_builder
+        
         service_type = self._resolve_ros2_type(kwargs.pop("service_type", None))
         if not service_type:
-            service_type = self._topic_builder.load_interface_type(name, self.protocol)
+            service_type = topic_builder.load_interface_type(name, self.protocol)
         if not service_type:
             raise ArgumentError("service_type is required for ROS2 server")
         
@@ -355,7 +364,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         server = VyraServerImpl(
             name=name,
-            topic_builder=self._topic_builder,
+            topic_builder=topic_builder,
             node=node or self._node,
             service_type=service_type,
             response_callback=response_callback,
@@ -436,9 +445,11 @@ class ROS2Provider(AbstractProtocolProvider):
         """Create ROS2 action server."""
         self.require_initialization()
         
-        action_type = kwargs.pop("action_type", None)
+        topic_builder = kwargs.pop("topic_builder", None) or self._topic_builder
+        
+        action_type = self._resolve_ros2_type(kwargs.pop("action_type", None))
         if not action_type:
-            action_type = self._topic_builder.load_interface_type(name, self.protocol)
+            action_type = topic_builder.load_interface_type(name, self.protocol)
         if not action_type:
             raise ArgumentError("action_type is required for ROS2 action server")
         
@@ -465,7 +476,7 @@ class ROS2Provider(AbstractProtocolProvider):
         
         action_server = VyraActionServerImpl(
             name=name,
-            topic_builder=self._topic_builder,
+            topic_builder=topic_builder,
             node=node or self._node,
             action_type=action_type,
             handle_goal_request=handle_goal_request,
@@ -490,7 +501,7 @@ class ROS2Provider(AbstractProtocolProvider):
         self.require_initialization()
         
         topic_builder = kwargs.pop("topic_builder", None) or self._topic_builder
-        action_type = kwargs.pop("action_type", None)
+        action_type = self._resolve_ros2_type(kwargs.pop("action_type", None))
         if not action_type:
             action_type = topic_builder.load_interface_type(name, self.protocol)
         if not action_type:

@@ -237,18 +237,35 @@ class RedisClient():
     @ErrorTraceback.w_check_error_exist
     async def close(self):
         """Close the Redis connection."""
-        for ac in self._active_channels:
+        # Stop the pubsub listener loop first to avoid SSL errors
+        # during cleanup (the loop may be blocked on get_message).
+        self._listener_running = False
+        if self._listener_task and not self._listener_task.done():
+            self._listener_task.cancel()
+            try:
+                await self._listener_task
+            except asyncio.CancelledError:
+                pass
+            self._listener_task = None
+
+        for ac in list(self._active_channels):
             try:
                 await self.remove_listener_channels(ac)
             except Exception as e:
                 logger.warning(f"Error unsubscribing from {ac} during close: {e}")
 
         if self._pubsub:
-            await self._pubsub.close()
+            try:
+                await self._pubsub.close()
+            except Exception as e:
+                logger.debug(f"PubSub close error (expected during shutdown): {e}")
             self._pubsub = None
         
         if self._redis_engine:
-            await self._redis_engine.close()
+            try:
+                await self._redis_engine.close()
+            except Exception as e:
+                logger.debug(f"Redis engine close error: {e}")
             self._redis_engine = None
         
         self._connected = False

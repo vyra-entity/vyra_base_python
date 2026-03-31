@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.138] - 2026-03-31
+
+### Build
+
+see fixes below
+
+### Fixed
+
+- **ROS2 provider**: Skip non-ROS2 types (e.g. `dict`) in `create_publisher` / `create_subscriber` — fall through to `topic_builder.load_interface_type()` instead of failing with `'dict' has no attribute '_TYPE_SUPPORT'`
+- **ROS2 provider**: Pop `topic_builder` from `**kwargs` in `create_publisher`, `create_subscriber`, `create_server`, `create_action_server` to prevent duplicate keyword argument error when factory injects `topic_builder` via kwargs
+- **Redis client**: Iterate over copy of `_active_channels` in `close()` to prevent `RuntimeError: Set changed size during iteration`
+- **ROS2 provider**: Added `_resolve_ros2_type()` to `create_publisher`, `create_subscriber`, `create_action_server`, `create_action_client` — extracts ROS2 class from mixed `interfacetypes` lists (e.g. `["MessageTest.proto", <class MessageTest>]`) preventing `'list' object has no attribute '_TYPE_SUPPORT'`
+- **UDS publisher**: Implemented `initialize()` and `publish()` — datagram broadcast using SOCK_DGRAM with `.topic` meta file based subscriber discovery
+- **UDS subscriber**: Added `.topic` meta file writing in `initialize()` and cleanup in `cleanup()` to enable publisher discovery
+- **UDS action_client**: Fixed socket path mismatch — removed extra `module_name_` prefix to match action_server path (`{safe_name}.sock`)
+- **Redis client**: Fixed SSL `APPLICATION_DATA_AFTER_CLOSE_NOTIFY` in `close()` — cancel pubsub listener task before closing connection
+
+
 ## [0.1.8+build.137] - 2026-03-31
 
 ### Build

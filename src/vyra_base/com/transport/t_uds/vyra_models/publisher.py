@@ -63,11 +63,20 @@ class VyraPublisherImpl(VyraPublisher):
         """Initialize UDS publisher."""
         try:
             topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
+            self._topic_name = topic_name
             sock_name = self._short_socket_name("pub", self._module_name, topic_name)
             self._socket_path = self._socket_dir / sock_name
             
-            # TODO: Initialize UDS publisher socket
-            logger.warning(f"{self.name} - UDS publisher initialization not fully implemented")
+            # Ensure socket directory exists
+            self._socket_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Create datagram socket for sending
+            if self._socket_path.exists():
+                self._socket_path.unlink()
+            
+            self._socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+            self._socket.setblocking(False)
+            self._socket.bind(str(self._socket_path))
             
             self._initialized = True
             logger.info(f"✅ UDS Publisher '{self.name}' initialized: {self._socket_path}")
@@ -92,14 +101,62 @@ class VyraPublisherImpl(VyraPublisher):
         self._initialized = False
         
     async def publish(self, message: Any) -> bool:
-        """Publish message (async)."""
+        """Publish message via UDS datagram broadcast to all matching subscribers.
+        
+        Discovers subscribers by scanning for .topic meta files in the socket directory.
+        Sends the serialized message to each subscriber whose topic matches.
+        """
         if not self._initialized:
             raise InterfaceError(f"VyraPublisher '{self.name}' not initialized")
         
         try:
-            # TODO: Implement UDS publish via datagram broadcast
-            logger.warning(f"⚠️ VyraPublisher '{self.name}' - UDS publish not fully implemented")
+            # Serialize message to JSON bytes
+            if hasattr(message, '__dict__'):
+                data = json.dumps(message.__dict__).encode('utf-8')
+            elif isinstance(message, dict):
+                data = json.dumps(message).encode('utf-8')
+            else:
+                data = json.dumps({"data": message}).encode('utf-8')
+            
+            # Discover subscriber sockets via .topic meta files
+            subscribers = self._discover_subscribers()
+            
+            if not subscribers:
+                logger.debug(f"VyraPublisher '{self.name}': No subscribers found for topic '{self._topic_name}'")
+                return True
+            
+            sent_count = 0
+            for sub_path in subscribers:
+                try:
+                    self._socket.sendto(data, str(sub_path))
+                    sent_count += 1
+                except (ConnectionRefusedError, FileNotFoundError, OSError) as e:
+                    logger.debug(f"VyraPublisher '{self.name}': Failed to send to {sub_path}: {e}")
+            
+            logger.debug(f"VyraPublisher '{self.name}': Sent to {sent_count}/{len(subscribers)} subscribers")
             return True
+            
         except Exception as e:
             logger.error(f"❌ VyraPublisher '{self.name}' failed to publish: {e}")
             return False
+    
+    def _discover_subscribers(self) -> list:
+        """Discover subscriber sockets by scanning .topic meta files.
+        
+        Returns list of Path objects for subscriber sockets whose topic matches.
+        """
+        subscribers = []
+        try:
+            for topic_file in self._socket_dir.glob("sub_*.sock.topic"):
+                try:
+                    topic = topic_file.read_text().strip()
+                    if topic == self._topic_name:
+                        # The socket path is the .topic file path without .topic suffix
+                        sock_path = topic_file.with_suffix('')
+                        if sock_path.exists():
+                            subscribers.append(sock_path)
+                except Exception:
+                    continue
+        except Exception as e:
+            logger.debug(f"VyraPublisher '{self.name}': Error discovering subscribers: {e}")
+        return subscribers

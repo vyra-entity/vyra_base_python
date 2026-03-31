@@ -59,7 +59,8 @@ class VyraActionClientImpl(VyraActionClient):
             action_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
             # Sanitize for filesystem use (topic names may contain '/')
             safe_name = action_name.replace("/", "_")
-            self._server_socket_path = self._socket_dir / f"{self._module_name}_{safe_name}.sock"
+            # Must match action_server path: {safe_name}.sock (no extra module_name prefix)
+            self._server_socket_path = self._socket_dir / f"{safe_name}.sock"
             
             if not self._server_socket_path.exists():
                 logger.warning(f"Server socket not found: {self._server_socket_path}")

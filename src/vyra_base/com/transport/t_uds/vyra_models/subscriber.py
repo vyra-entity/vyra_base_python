@@ -81,6 +81,10 @@ class VyraSubscriberImpl(VyraSubscriber):
             # Bind to socket path
             self._socket.bind(str(self._socket_path))
             
+            # Write .topic meta file so publishers can discover us
+            self._topic_meta_path = Path(f"{self._socket_path}.topic")
+            self._topic_meta_path.write_text(topic_name)
+            
             self._initialized = True
             logger.info(f"✅ VyraSubscriber '{self.name}' initialized: {self._socket_path}")
             return True
@@ -182,6 +186,13 @@ class VyraSubscriberImpl(VyraSubscriber):
                 self._socket_path.unlink()
             except Exception as e:
                 logger.warning(f"❌ Failed to remove socket file: {e}")
+        
+        # Remove .topic meta file
+        if hasattr(self, '_topic_meta_path') and self._topic_meta_path and self._topic_meta_path.exists():
+            try:
+                self._topic_meta_path.unlink()
+            except Exception as e:
+                logger.warning(f"❌ Failed to remove topic meta file: {e}")
                 
         logger.info(f"🔄 VyraSubscriber cleaned up: {self._socket_path}")
     
