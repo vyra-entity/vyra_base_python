@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.8+build.140] - 2026-04-01
+
+### Build
+
+adding bcrypt
+
 ### Added — JWT and bcrypt support in crypto_helper
 
 - **`crypto_helper.py`**: Added `create_jwt_token()`, `verify_jwt_token()`, `decode_jwt_token_unverified()` for RS256-signed JWT creation and verification using PyJWT
