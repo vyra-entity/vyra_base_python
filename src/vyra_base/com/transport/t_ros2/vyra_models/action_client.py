@@ -119,6 +119,14 @@ class VyraActionClientImpl(VyraActionClient):
         try:
             loop = asyncio.get_event_loop()
             
+            # Convert dict to typed Goal if needed
+            if isinstance(goal, dict) and self.action_type is not None:
+                goal_obj = self.action_type.Goal()
+                for key, value in goal.items():
+                    if hasattr(goal_obj, key):
+                        setattr(goal_obj, key, value)
+                goal = goal_obj
+
             # Send goal async
             goal_coro = self._ros2_action_client.send_goal_async(goal)
             

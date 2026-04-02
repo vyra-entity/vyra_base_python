@@ -64,6 +64,9 @@ class ZenohPublisher:
             )
             
             # Publish via Zenoh
+            if not self._publisher:
+                raise RuntimeError("Publisher is not initialized.")
+            
             self._publisher.put(payload)
             
             logger.debug(
@@ -82,6 +85,7 @@ class ZenohPublisher:
         try:
             if self._publisher:
                 self._publisher.undeclare()
+                self._publisher = None
                 logger.debug(f"Undeclared Zenoh publisher: {self.publisher_info.key_expr}")
         except Exception as e:
             logger.error(f"Error deleting publisher: {e}")

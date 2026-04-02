@@ -104,9 +104,12 @@ class RedisActionServerImpl(VyraActionServer):
             logger.error(f"❌ Failed to initialize RedisActionServer: {e}")
             return False
     
-    async def _handle_goal_request(self, raw_data: bytes):
+    async def _handle_goal_request(self, message: dict, context=None):
         """Handle incoming goal request."""
         try:
+            raw_data = message.get('data', b'')
+            if isinstance(raw_data, bytes):
+                raw_data = raw_data.decode('utf-8')
             goal_msg = json.loads(raw_data)
             goal_id = goal_msg.get('goal_id', str(uuid.uuid4()))
             goal_data = goal_msg.get('goal')
@@ -151,10 +154,13 @@ class RedisActionServerImpl(VyraActionServer):
         except Exception as e:
             logger.error(f"❌ Goal request handling failed: {e}")
     
-    async def _handle_cancel_request(self, raw_data: bytes):
+    async def _handle_cancel_request(self, message: dict, context=None):
         """Handle cancel request."""
         try:
             assert self._redis is not None, "Redis client not initialized"
+            raw_data = message.get('data', b'')
+            if isinstance(raw_data, bytes):
+                raw_data = raw_data.decode('utf-8')
             cancel_msg = json.loads(raw_data)
             goal_id = cancel_msg.get('goal_id')
             response_channel = cancel_msg.get('response_channel')

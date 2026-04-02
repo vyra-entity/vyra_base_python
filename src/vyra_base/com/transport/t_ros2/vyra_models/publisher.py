@@ -94,6 +94,13 @@ class VyraPublisherImpl(VyraPublisher):
         try:
             # ROS2 publish is sync, wrap in executor for async
             loop = asyncio.get_event_loop()
+            # Convert dict to typed message if needed
+            if isinstance(message, dict) and self.message_type is not None:
+                msg_obj = self.message_type()
+                for key, value in message.items():
+                    if hasattr(msg_obj, key):
+                        setattr(msg_obj, key, value)
+                message = msg_obj
             await loop.run_in_executor(None, self._ros2_publisher.publish, message)
             return True
             

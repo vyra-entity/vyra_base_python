@@ -510,6 +510,7 @@ class UDSProvider(AbstractProtocolProvider):
             )
             
             await action_server.initialize()
+            await action_server.serve()
             
             logger.info(f"✅ UDS Action Server created: {module_name}.{name}")
             return action_server
