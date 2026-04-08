@@ -7,8 +7,6 @@ import asyncio
 import logging
 from typing import Any, Callable, Optional
 
-from grpc import Future
-
 from vyra_base.com.core.types import VyraActionClient, ProtocolType
 from vyra_base.com.core.topic_builder import TopicBuilder
 from vyra_base.com.core.exceptions import InterfaceError, TimeoutError
@@ -99,26 +97,30 @@ class VyraActionClientImpl(VyraActionClient):
     async def send_goal(self, goal: Any, **kwargs) -> Any:
         """
         Send goal to action server (async).
-        
+
+        Uses the same explicit spin_once pattern as the ROS2 service client
+        (vyra_models/client.py) so that DDS responses are not missed by the
+        background spinner's 1 ms wait-set window.
+
         Args:
             goal: Goal message
             **kwargs: Additional parameters (timeout, etc.)
-            
+
         Returns:
             Result message
-            
+
         Raises:
             InterfaceError: If not initialized or send fails
             TimeoutError: If goal times out
         """
         if not self._initialized or not self._ros2_action_client:
             raise InterfaceError(f"ActionClient '{self.name}' not initialized")
-        
-        timeout = kwargs.get('timeout', 10.0)
-        
+
+        timeout = kwargs.get('timeout', 30.0)
+
         try:
             loop = asyncio.get_event_loop()
-            
+
             # Convert dict to typed Goal if needed
             if isinstance(goal, dict) and self.action_type is not None:
                 goal_obj = self.action_type.Goal()
@@ -127,50 +129,98 @@ class VyraActionClientImpl(VyraActionClient):
                         setattr(goal_obj, key, value)
                 goal = goal_obj
 
-            # Send goal async
-            goal_coro = self._ros2_action_client.send_goal_async(goal)
-            
-            # Wait for acceptance
-            goal_handle = await asyncio.wait_for(
-                goal_coro,
-                timeout=timeout
-            )
-            
-            if not goal_handle.accepted:
-                if self.direct_response_callback:
-                    if asyncio.iscoroutinefunction(self.direct_response_callback):
-                        await self.direct_response_callback(False)
-                    else:
-                        self.direct_response_callback(False)
-                raise InterfaceError(f"Goal rejected by action server '{self.name}'")
-            
-            # Goal accepted callback
-            if self.direct_response_callback:
-                if asyncio.iscoroutinefunction(self.direct_response_callback):
-                    await self.direct_response_callback(True)
-                else:
-                    self.direct_response_callback(True)
-            
-            # Wait for result
-            result_future = await loop.run_in_executor(
+            # Wait for the action server to be discovered (blocking, run in executor)
+            server_ready = await loop.run_in_executor(
                 None,
-                goal_handle.get_result_async
+                lambda: self._ros2_action_client._action_info.client.wait_for_server(timeout_sec=5.0)
             )
-            
-            result = await asyncio.wait_for(
-                asyncio.wrap_future(result_future),
-                timeout=timeout
-            )
-            
-            # Goal completed callback
+            if not server_ready:
+                raise InterfaceError(f"Action server '{self.name}' not available")
+
+            # Send goal – returns rclpy Future immediately
+            send_goal_future = self._ros2_action_client._action_info.client.send_goal_async(goal)
+
+            logger.debug(f"🎯 Goal sent for '{self.name}', waiting for acceptance (spin polling)...")
+
+            # Spin until goal accepted — mirrors the service client pattern in client.py.
+            # The background spinner uses timeout_sec=0.001 which is too short; 0.05 s
+            # gives the DDS wait-set enough time to detect the response.
+            import rclpy as _rclpy
+            deadline = loop.time() + timeout
+            spin_count_goal = 0
+            while not send_goal_future.done():
+                if loop.time() > deadline:
+                    raise TimeoutError(
+                        operation="send_goal",
+                        timeout=timeout,
+                        details={"action_name": self.name}
+                    )
+                try:
+                    await loop.run_in_executor(
+                        None,
+                        lambda: _rclpy.spin_once(self.node, timeout_sec=0.05),
+                    )
+                    spin_count_goal += 1
+                    if spin_count_goal % 10 == 0:
+                        logger.debug(f"  send_goal spin {spin_count_goal}, done={send_goal_future.done()}")
+                except Exception:
+                    pass
+                await asyncio.sleep(0.001)
+
+            logger.debug(f"✅ Goal accepted for '{self.name}' after {spin_count_goal} spins")
+            goal_handle = send_goal_future.result()
+
+            if not goal_handle.accepted:
+                raise InterfaceError(f"Goal rejected by action server '{self.name}'")
+
+            # Goal accepted callback
             if self.goal_callback:
                 if asyncio.iscoroutinefunction(self.goal_callback):
-                    await self.goal_callback(result.result)
+                    await self.goal_callback(True)
                 else:
-                    self.goal_callback(result.result)
-            
-            return result.result
-            
+                    self.goal_callback(True)
+
+            # Give the background spinner a brief window to process the execute_callback
+            # before we request the result (so the server-side result is ready)
+            await asyncio.sleep(0.05)
+
+            # Request the execution result
+            result_future = goal_handle.get_result_async()
+            logger.debug(f"🎯 GetResult requested for '{self.name}', spinning for response...")
+
+            deadline = loop.time() + timeout
+            spin_count_result = 0
+            while not result_future.done():
+                if loop.time() > deadline:
+                    raise TimeoutError(
+                        operation="get_result",
+                        timeout=timeout,
+                        details={"action_name": self.name}
+                    )
+                try:
+                    await loop.run_in_executor(
+                        None,
+                        lambda: _rclpy.spin_once(self.node, timeout_sec=0.05),
+                    )
+                    spin_count_result += 1
+                    if spin_count_result % 5 == 0:
+                        logger.debug(f"  result_future spin {spin_count_result}, done={result_future.done()}")
+                except Exception:
+                    pass
+                await asyncio.sleep(0.001)
+
+            logger.debug(f"✅ Result received for '{self.name}' after {spin_count_result} spins")
+            wrapped_result = result_future.result()
+
+            # Goal completed callback
+            if self.direct_response_callback:
+                if asyncio.iscoroutinefunction(self.direct_response_callback):
+                    await self.direct_response_callback(wrapped_result.result)
+                else:
+                    self.direct_response_callback(wrapped_result.result)
+
+            return wrapped_result.result
+
         except asyncio.TimeoutError:
             raise TimeoutError(
                 operation="send_goal",

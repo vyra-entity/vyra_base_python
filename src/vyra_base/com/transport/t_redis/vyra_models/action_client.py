@@ -194,20 +194,24 @@ class RedisActionClientImpl(VyraActionClient):
             try:
                 update = json.loads(message['data'])
                 update_type = update.get('type')
-                
+
                 if update_type == 'feedback' and self.feedback_callback:
-                    # Fetch feedback from Redis key
-                    await self.feedback_callback(update['feedback'])
-                        
-                elif update_type == 'result' and self.goal_callback:
-                    # Fetch result from Redis key
-                    await self.goal_callback(update['result'])
-                        
+                    # Fetch feedback payload from Redis key set by the action server
+                    raw = await self._redis.get(self._action_channel(f"{goal_id}/feedback"))
+                    if raw:
+                        await self.feedback_callback(json.loads(raw))
+
+                elif update_type == 'result':
+                    # Fetch result payload from Redis key set by the action server
+                    raw = await self._redis.get(self._action_channel(f"{goal_id}/result"))
+                    if raw and self.direct_response_callback:
+                        await self.direct_response_callback(json.loads(raw))
+
             except Exception as e:
                 logger.error(f"❌ Update handling failed: {e}")
-            
+
             await asyncio.sleep(0.01)
-                
+
         except asyncio.CancelledError:
             pass
         except Exception as e:

@@ -19,30 +19,28 @@ logger = logging.getLogger(__name__)
 
 
 class CallbackAdapter:
-    """Adapter to convert async callbacks to sync for ROS2."""
-    
-    def __init__(self, async_callback: Callable):
+    """
+    Adapter to convert async subscriber callbacks to sync for ROS2.
+
+    The main asyncio event loop must be provided at construction time
+    (captured while ``initialize()`` runs in the async context). Callbacks
+    from the ROS2 executor thread are dispatched onto this loop via
+    ``asyncio.run_coroutine_threadsafe`` to avoid deadlocking a running loop.
+    """
+
+    def __init__(self, async_callback: Callable, main_loop: asyncio.AbstractEventLoop):
         self.async_callback = async_callback
-        
+        self._main_loop = main_loop
+
     def __call__(self, msg: Any):
-        """Sync wrapper that runs async callback."""
+        """Sync wrapper that schedules the async callback on the main event loop."""
         try:
-            # Create new event loop if none exists (ROS2 callback context)
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_closed():
-                    raise RuntimeError("Event loop is closed")
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-            
-            # Run async callback
             if asyncio.iscoroutinefunction(self.async_callback):
-                loop.run_until_complete(self.async_callback(msg))
+                asyncio.run_coroutine_threadsafe(
+                    self.async_callback(msg), self._main_loop
+                )
             else:
-                # Fallback for sync callbacks
                 self.async_callback(msg)
-                
         except Exception as e:
             logger.error(f"❌ Callback error: {e}")
 
@@ -75,10 +73,15 @@ class VyraSubscriberImpl(VyraSubscriber):
         """Initialize ROS2 subscriber."""
         try:
             topic_name = self.topic_builder.build(self.name, namespace=self.namespace, subsection=self.subsection)
-            
+
+            # Capture the running event loop now (initialize() runs in main
+            # async context) so the CallbackAdapter can dispatch onto it from
+            # the ROS2 executor thread via run_coroutine_threadsafe.
+            main_loop = asyncio.get_event_loop()
+
             # Wrap async callback for ROS2 sync context
             if self.subscriber_callback:
-                self._callback_adapter = CallbackAdapter(self.subscriber_callback)
+                self._callback_adapter = CallbackAdapter(self.subscriber_callback, main_loop)
             
             subscriber_info = SubscriberInfo(
                 name=topic_name,

@@ -720,57 +720,83 @@ class RedisClient():
     @ErrorTraceback.w_check_error_exist
     async def _start_pubsub_loop(self, callback_handler, callback_context):
         """
-        Start the PubSub message processing loop (runs as background task)
-        
+        Start the PubSub message processing loop (runs as background task).
+
+        Automatically reconnects on connection errors so that persistent
+        subscriptions (e.g. action-server goal channels) survive Redis
+        connection resets.
+
         Args:
             callback_handler: Async function to process messages
             callback_context: Optional context object for message handling
         """
         if self._pubsub is None:
             raise RuntimeError("PubSub not available")
-        
-        try:
-            logger.info(f"🔄 Starting Redis PubSub message loop for {len(self._active_channels)} channels...")
-            
-            async for message in self._pubsub.listen():
+
+        logger.info(f"🔄 Starting Redis PubSub message loop for {len(self._active_channels)} channels...")
+
+        while True:
+            try:
+                async for message in self._pubsub.listen():
+                    if not self._listener_running:
+                        logger.info("⏹️  PubSub loop stopped by flag")
+                        return
+
+                    if message["type"] in ["message", "pmessage"]:
+                        try:
+                            # Route to per-channel callback if registered, else use default
+                            channel = message.get('channel', b'')
+                            if isinstance(channel, bytes):
+                                channel = channel.decode('utf-8')
+
+                            if channel in self._channel_callbacks:
+                                ch_handler, ch_context = self._channel_callbacks[channel]
+                            else:
+                                ch_handler = callback_handler
+                                ch_context = callback_context
+
+                            # Process message through callback
+                            if inspect.iscoroutinefunction(ch_handler):
+                                await ch_handler(message, ch_context)
+                            else:
+                                ch_handler(message, ch_context)
+
+                            logger.debug(f"📨 Processed message from {channel}")
+
+                        except Exception as e:
+                            logger.error(f"❌ Error processing message: {e}")
+                            # Continue processing other messages
+
+                # async-for ended cleanly — exit only if the stop flag is set
                 if not self._listener_running:
                     logger.info("⏹️  PubSub loop stopped by flag")
-                    break
-                
-                if message["type"] in ["message", "pmessage"]:
-                    try:
-                        # Route to per-channel callback if registered, else use default
-                        channel = message.get('channel', b'')
-                        if isinstance(channel, bytes):
-                            channel = channel.decode('utf-8')
-                        
-                        if channel in self._channel_callbacks:
-                            ch_handler, ch_context = self._channel_callbacks[channel]
-                        else:
-                            ch_handler = callback_handler
-                            ch_context = callback_context
+                    return
 
-                        # Process message through callback
-                        if asyncio.iscoroutinefunction(ch_handler):
-                            await ch_handler(message, ch_context)
+            except asyncio.CancelledError:
+                logger.info("⏹️  PubSub loop cancelled")
+                raise
+            except Exception as e:
+                if not self._listener_running:
+                    return
+                logger.error(f"❌ PubSub loop error: {e} — reconnecting in 2s...")
+                await asyncio.sleep(2.0)
+                try:
+                    # Recreate pubsub connection and re-subscribe to all active channels
+                    client = await self._ensure_connected()
+                    self._pubsub = client.pubsub()
+                    for ch in list(self._active_channels):
+                        if '*' in ch:
+                            await self._pubsub.psubscribe(ch)
                         else:
-                            ch_handler(message, ch_context)
-                            
-                        logger.debug(f"📨 Processed message from {channel}")
-                        
-                    except Exception as e:
-                        logger.error(f"❌ Error processing message: {e}")
-                        # Continue processing other messages
-                        
-        except asyncio.CancelledError:
-            logger.info("⏹️  PubSub loop cancelled")
-            raise
-        except Exception as e:
-            logger.error(f"❌ PubSub loop error: {e}")
-            raise
-        finally:
-            self._listener_running = False
-            logger.info("🛑 PubSub message loop stopped")
+                            await self._pubsub.subscribe(ch)
+                    logger.info(f"🔄 PubSub reconnected, re-subscribed to {len(self._active_channels)} channels")
+                except Exception as reconnect_err:
+                    logger.error(f"❌ PubSub reconnect failed: {reconnect_err} — retrying...")
+                    await asyncio.sleep(2.0)
+                # continue outer while-loop to restart listening
+        # (loop only exits via CancelledError or stop-flag return above)
+        self._listener_running = False
+        logger.info("🛑 PubSub message loop stopped")
 
     @ErrorTraceback.w_check_error_exist
     async def parse_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
