@@ -183,16 +183,18 @@ class ROS2Provider(AbstractProtocolProvider):
                 rclpy.init()
                 logger.debug("✅ rclpy initialized")
             
-            # Create node (we'll use the existing VyraNode or create a basic one)
-            # Note: In actual usage, this will be integrated with existing VyraNode
-            
-            
-            node_settings = NodeSettings(
-                name=self._config["node_name"],
-                parameters=self._config.get("parameter_overrides", {})
-            )
-            
-            self._node = VyraNode(node_settings)
+            # Use the node passed from VyraEntity if available; otherwise create a new one.
+            # Sharing the entity's node ensures the background spinner (which spins entity.node)
+            # also processes ActionServer/ActionClient callbacks.
+            if self._config.get("node") is not None:
+                self._node = self._config["node"]
+                logger.debug(f"✅ ROS2 provider reusing entity node: {self._node.get_name()}")
+            else:
+                node_settings = NodeSettings(
+                    name=self._config["node_name"],
+                    parameters=self._config.get("parameter_overrides", {})
+                )
+                self._node = VyraNode(node_settings)
             
             self._initialized = True
             logger.info(
@@ -211,10 +213,10 @@ class ROS2Provider(AbstractProtocolProvider):
         
         logger.info(f"🛑 Shutting down ROS2 provider: {self.node_name}")
         
-        # Destroy node
-        if self._node:
+        # Destroy node only if we own it (not shared with entity)
+        if self._node and self._config.get("node") is None:
             self._node.destroy_node()
-            self._node = None
+        self._node = None
         
         # Shutdown rclpy
         if rclpy.ok():

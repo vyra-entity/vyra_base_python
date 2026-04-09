@@ -97,7 +97,7 @@ class ROS2ActionServer:
         self._node.get_logger().info(f"Executing action: {self._action.name}")
 
         if self._action.execute_callback:
-            self._action.execute_callback(goal_handle)
+            return self._action.execute_callback(goal_handle)
 
     def goal_callback(self, goal_handle) -> GoalResponse:
         """

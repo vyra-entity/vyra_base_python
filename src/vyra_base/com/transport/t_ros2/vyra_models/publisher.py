@@ -101,6 +101,23 @@ class VyraPublisherImpl(VyraPublisher):
                     if hasattr(msg_obj, key):
                         setattr(msg_obj, key, value)
                 message = msg_obj
+
+            # Wait for DDS endpoint matching before publishing (up to 1.5 s).
+            # Without this, messages published immediately after publisher creation
+            # are silently dropped because the subscriber hasn't matched yet.
+            rclpy_pub = getattr(
+                getattr(self._ros2_publisher, "publisher_info", None), "publisher", None
+            )
+            if rclpy_pub is not None:
+                deadline = loop.time() + 1.5
+                while loop.time() < deadline:
+                    count = await loop.run_in_executor(
+                        None, rclpy_pub.get_subscription_count
+                    )
+                    if count > 0:
+                        break
+                    await asyncio.sleep(0.05)
+
             await loop.run_in_executor(None, self._ros2_publisher.publish, message)
             return True
             

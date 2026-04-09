@@ -33,14 +33,30 @@ class CallbackAdapter:
         self._main_loop = main_loop
 
     def __call__(self, msg: Any):
-        """Sync wrapper that schedules the async callback on the main event loop."""
+        """Convert ROS2 msg to dict, then schedule async callback on the main loop."""
         try:
+            # Convert ROS2 message to a plain dict so callers don't receive
+            # un-serialisable ROS2 objects. Use get_fields_and_field_types()
+            # which exposes the public field names (not the _private slots).
+            if hasattr(msg, "get_fields_and_field_types"):
+                data = {
+                    field: getattr(msg, field)
+                    for field in msg.get_fields_and_field_types()
+                }
+            elif hasattr(msg, "__slots__"):
+                data = {
+                    slot.lstrip("_"): getattr(msg, slot)
+                    for slot in msg.__slots__
+                    if slot != "_check_fields"
+                }
+            else:
+                data = msg
             if asyncio.iscoroutinefunction(self.async_callback):
                 asyncio.run_coroutine_threadsafe(
-                    self.async_callback(msg), self._main_loop
+                    self.async_callback(data), self._main_loop
                 )
             else:
-                self.async_callback(msg)
+                self.async_callback(data)
         except Exception as e:
             logger.error(f"❌ Callback error: {e}")
 
@@ -93,6 +109,10 @@ class VyraSubscriberImpl(VyraSubscriber):
                 node=self.node,
                 subscriptionInfo=subscriber_info
             )
+            # Register the subscription on the ROS2 node (equivalent to
+            # create_publisher() for publishers — without this the node
+            # never receives messages).
+            self._ros2_subscriber.create_subscription()
             
             self._transport_handle = self._ros2_subscriber
             self._initialized = True

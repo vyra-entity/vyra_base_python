@@ -44,7 +44,6 @@ class _ROS2GoalHandleWrapper:
         """Return the goal request object (ROS2 attribute is `.request`)."""
         return self._handle.request
 
-    @property
     def is_cancel_requested(self) -> bool:
         """Return whether a cancel has been requested."""
         return self._handle.is_cancel_requested
@@ -66,12 +65,21 @@ class _ROS2GoalHandleWrapper:
 
     async def publish_feedback(self, feedback: Any) -> None:
         """Convert feedback dict to ROS2 Feedback message and publish (sync call)."""
+        import time
+        logger.debug("⚙️  publish_feedback: building msg")
         feedback_msg = self._action_type.Feedback()
         if isinstance(feedback, dict):
             for key, value in feedback.items():
                 if hasattr(feedback_msg, key):
                     setattr(feedback_msg, key, value)
+        t0 = time.monotonic()
+        logger.debug("⚙️  publish_feedback: calling handle.publish_feedback")
         self._handle.publish_feedback(feedback_msg)
+        elapsed = time.monotonic() - t0
+        if elapsed > 0.05:
+            logger.warning(f"⚠️  publish_feedback SLOW: {elapsed:.3f}s")
+        else:
+            logger.debug(f"⚙️  publish_feedback: done in {elapsed:.4f}s")
 
 
 class VyraActionServerImpl(VyraActionServer):
@@ -157,15 +165,22 @@ class VyraActionServerImpl(VyraActionServer):
 
             def execute_callback(goal_handle):
                 """Sync wrapper for execution_callback (called from ROS2 executor thread)."""
+                import threading
+                logger.debug(
+                    f"⚙️  execute_callback: START thread={threading.current_thread().name}"
+                )
                 # Wrap ROS2 ServerGoalHandle so the application sees the VYRA interface
                 wrapper = _ROS2GoalHandleWrapper(goal_handle, self.action_type)
                 try:
                     if self.execution_callback:
                         if asyncio.iscoroutinefunction(self.execution_callback):
+                            logger.debug("⚙️  execute_callback: submitting coro to asyncio loop")
                             future = asyncio.run_coroutine_threadsafe(
                                 self.execution_callback(wrapper), main_loop
                             )
-                            result = future.result()  # blocking wait — OK in ROS2 thread
+                            logger.debug("⚙️  execute_callback: waiting for coro result (timeout=30s)...")
+                            result = future.result(timeout=30.0)  # blocking wait with timeout
+                            logger.debug(f"⚙️  execute_callback: coro done, result={result}")
                         else:
                             result = self.execution_callback(wrapper)
 

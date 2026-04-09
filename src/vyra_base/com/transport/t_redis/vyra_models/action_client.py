@@ -82,36 +82,42 @@ class RedisActionClientImpl(VyraActionClient):
             goal_id on success, None on failure
         """
         try:
-            # Generate goal ID
+            # Generate goal ID on the client side so we can subscribe to updates
+            # BEFORE sending the goal (prevents race condition where the server
+            # completes execution and publishes the result notification before we
+            # have subscribed to the updates channel).
             goal_id = str(uuid.uuid4())
-            
+
+            if not self._redis:
+                raise InterfaceError("Redis client not initialized")
+
+            # Subscribe to updates channel FIRST (using our pre-generated goal_id)
+            await self._subscribe_to_updates(goal_id)
+
             # Create response future
             self._goal_response_future = asyncio.Future()
             response_channel = self._action_channel(f"response/{self._client_id}")
-            
+
             # Subscribe to this specific response (for goal acceptance)
-            if not self._redis:
-                raise InterfaceError("Redis client not initialized")
-            
             await self._redis.subscribe_channel(response_channel)
-            
+
             # Start listening for response
             async def wait_response(message, context):
                 if not self._redis:
                     raise InterfaceError("Redis client not initialized")
-            
+
                 try:
                     response = json.loads(message['data'])
                     if self._goal_response_future and not self._goal_response_future.done():
                         self._goal_response_future.set_result(response)
                 finally:
                     await self._redis.remove_listener_channels(response_channel)
-            
+
             await self._redis.create_pubsub_listener(
                 response_channel,
                 wait_response
             )
-            
+
             # Serialize goal
             # Convert action_type.Goal to dict if needed
             if self.action_type and hasattr(goal, '__dict__'):
@@ -127,38 +133,30 @@ class RedisActionClientImpl(VyraActionClient):
                 goal_data = goal
             else:
                 goal_data = {'goal': str(goal)}
-            
-            # Publish goal request
+
+            # Publish goal request (server will reuse our goal_id)
             goal_msg = json.dumps({
                 'goal_id': goal_id,
                 'goal': goal_data,
                 'response_channel': response_channel
             })
             await self._redis.publish_message(self._key_goal, goal_msg)
-            
+
             # Wait for acceptance
             try:
                 response = await asyncio.wait_for(self._goal_response_future, timeout=timeout)
-                
+
                 if response.get('accepted'):
-                    self._active_goal_id = response.get('goal_id', goal_id) 
-                    
-                    # Subscribe to updates
-                    if self._active_goal_id:
-                        await self._subscribe_to_updates(self._active_goal_id)
-                    else:
-                        logger.warning(
-                            f"No goal_id in response, cannot subscribe to updates: {response_channel}")
-                    
+                    self._active_goal_id = response.get('goal_id', goal_id)
                     return self._active_goal_id
                 else:
                     logger.warning(f"Goal rejected by server")
                     return None
-                    
+
             except asyncio.TimeoutError:
                 logger.error(f"❌ Goal acceptance timeout")
                 return None
-                
+
         except Exception as e:
             logger.error(f"❌ Send goal failed: {e}")
             return None
@@ -268,17 +266,28 @@ class RedisActionClientImpl(VyraActionClient):
             return False
     
     async def cleanup(self):
-        """Cleanup Redis resources."""
+        """Cleanup Redis resources.
+
+        Unsubscribes channels registered by this client but does NOT close the
+        underlying Redis connection because it is shared with other components
+        (action servers, publishers, etc.) managed by the provider.
+        """
         if self._listen_task:
             self._listen_task.cancel()
             try:
                 await self._listen_task
             except asyncio.CancelledError:
                 pass
-                
-        if self._redis:
-            await self._redis.close()
-            
+
+        # Unsubscribe only the channels this client registered, leaving the
+        # shared Redis connection open for other users.
+        if self._redis and self._active_goal_id:
+            updates_channel = self._action_channel(f"{self._active_goal_id}/updates")
+            try:
+                await self._redis.remove_listener_channels(updates_channel)
+            except Exception as e:
+                logger.debug(f"⚠️ Could not remove updates channel on cleanup: {e}")
+
         logger.info(f"🔄 RedisActionClient cleaned up: {self.name}")
     
     async def shutdown(self) -> None:

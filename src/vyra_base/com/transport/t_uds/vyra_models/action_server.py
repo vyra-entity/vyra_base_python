@@ -185,8 +185,10 @@ class VyraActionServerImpl(VyraActionServer):
                 # Set initial state
                 self._goal_states[goal_id] = GoalStatus.ACCEPTED
 
-                # Build feedback socket path (safe_name already contains the full module id prefix)
-                feedback_socket_path = self._socket_dir / f"{self._safe_name}_{goal_id}_feedback.sock"
+                # Build feedback socket path — use a short hash to stay within
+                # the 108-byte AF_UNIX path limit (full safe_name + UUID exceeds it)
+                goal_id_short = goal_id.replace('-', '')[:16]
+                feedback_socket_path = self._socket_dir / f"fb_{goal_id_short}.sock"
 
                 # Create feedback socket server so the client can connect after receiving the path
                 fb_server_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

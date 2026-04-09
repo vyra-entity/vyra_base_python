@@ -5,6 +5,7 @@ with TLS support and streaming capabilities for industrial applications
 """
 
 import json
+import inspect
 import os
 import ssl
 import asyncio

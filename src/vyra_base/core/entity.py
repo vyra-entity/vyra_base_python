@@ -248,7 +248,8 @@ class VyraEntity:
             await ros2_provider.initialize({
                 "node_name": node_name,
                 "namespace": self._node.get_namespace(),
-                "use_simulation_time": self.module_config.get("use_simulation_time", False)
+                "use_simulation_time": self.module_config.get("use_simulation_time", False),
+                "node": self._node,  # share entity's node so provider & spinner use the same node
             })
             providers.append(ros2_provider)
             logger.info("✅ Registered ROS2 protocol provider")

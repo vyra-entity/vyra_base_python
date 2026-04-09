@@ -98,9 +98,11 @@ class VyraActionClientImpl(VyraActionClient):
         """
         Send goal to action server (async).
 
-        Uses the same explicit spin_once pattern as the ROS2 service client
-        (vyra_models/client.py) so that DDS responses are not missed by the
-        background spinner's 1 ms wait-set window.
+        The application's background spinner (ros_spinner_runner) calls
+        rclpy.spin_once every ~6 ms and owns the executor — we MUST NOT call
+        rclpy.spin_once here too, because concurrent spin_once calls raise
+        'Executor is already spinning'. Instead we simply poll the rclpy
+        Futures with asyncio.sleep() and let the background spinner resolve them.
 
         Args:
             goal: Goal message
@@ -129,7 +131,7 @@ class VyraActionClientImpl(VyraActionClient):
                         setattr(goal_obj, key, value)
                 goal = goal_obj
 
-            # Wait for the action server to be discovered (blocking, run in executor)
+            # Wait for server discovery (does not spin — uses DDS discovery)
             server_ready = await loop.run_in_executor(
                 None,
                 lambda: self._ros2_action_client._action_info.client.wait_for_server(timeout_sec=5.0)
@@ -137,17 +139,11 @@ class VyraActionClientImpl(VyraActionClient):
             if not server_ready:
                 raise InterfaceError(f"Action server '{self.name}' not available")
 
-            # Send goal – returns rclpy Future immediately
+            # Send goal — returns rclpy Future immediately
             send_goal_future = self._ros2_action_client._action_info.client.send_goal_async(goal)
 
-            logger.debug(f"🎯 Goal sent for '{self.name}', waiting for acceptance (spin polling)...")
-
-            # Spin until goal accepted — mirrors the service client pattern in client.py.
-            # The background spinner uses timeout_sec=0.001 which is too short; 0.05 s
-            # gives the DDS wait-set enough time to detect the response.
-            import rclpy as _rclpy
+            logger.debug(f"🎯 send_goal_async issued for '{self.name}', polling for acceptance...")
             deadline = loop.time() + timeout
-            spin_count_goal = 0
             while not send_goal_future.done():
                 if loop.time() > deadline:
                     raise TimeoutError(
@@ -155,41 +151,24 @@ class VyraActionClientImpl(VyraActionClient):
                         timeout=timeout,
                         details={"action_name": self.name}
                     )
-                try:
-                    await loop.run_in_executor(
-                        None,
-                        lambda: _rclpy.spin_once(self.node, timeout_sec=0.05),
-                    )
-                    spin_count_goal += 1
-                    if spin_count_goal % 10 == 0:
-                        logger.debug(f"  send_goal spin {spin_count_goal}, done={send_goal_future.done()}")
-                except Exception:
-                    pass
-                await asyncio.sleep(0.001)
+                await asyncio.sleep(0.01)  # yield to background spinner
 
-            logger.debug(f"✅ Goal accepted for '{self.name}' after {spin_count_goal} spins")
             goal_handle = send_goal_future.result()
 
             if not goal_handle.accepted:
                 raise InterfaceError(f"Goal rejected by action server '{self.name}'")
 
-            # Goal accepted callback
             if self.goal_callback:
                 if asyncio.iscoroutinefunction(self.goal_callback):
                     await self.goal_callback(True)
                 else:
                     self.goal_callback(True)
 
-            # Give the background spinner a brief window to process the execute_callback
-            # before we request the result (so the server-side result is ready)
-            await asyncio.sleep(0.05)
-
             # Request the execution result
             result_future = goal_handle.get_result_async()
-            logger.debug(f"🎯 GetResult requested for '{self.name}', spinning for response...")
+            logger.debug(f"🎯 get_result_async issued for '{self.name}', polling for result...")
 
             deadline = loop.time() + timeout
-            spin_count_result = 0
             while not result_future.done():
                 if loop.time() > deadline:
                     raise TimeoutError(
@@ -197,29 +176,28 @@ class VyraActionClientImpl(VyraActionClient):
                         timeout=timeout,
                         details={"action_name": self.name}
                     )
-                try:
-                    await loop.run_in_executor(
-                        None,
-                        lambda: _rclpy.spin_once(self.node, timeout_sec=0.05),
-                    )
-                    spin_count_result += 1
-                    if spin_count_result % 5 == 0:
-                        logger.debug(f"  result_future spin {spin_count_result}, done={result_future.done()}")
-                except Exception:
-                    pass
-                await asyncio.sleep(0.001)
+                await asyncio.sleep(0.01)
 
-            logger.debug(f"✅ Result received for '{self.name}' after {spin_count_result} spins")
             wrapped_result = result_future.result()
+            logger.debug(f"✅ Result received for '{self.name}'")
+
+            # Convert ROS2 result message to dict for JSON serialization
+            ros2_result = wrapped_result.result
+            result_dict = {}
+            try:
+                for field_name in ros2_result.get_fields_and_field_types().keys():
+                    result_dict[field_name] = getattr(ros2_result, field_name)
+            except Exception:
+                result_dict = {"raw": str(ros2_result)}
 
             # Goal completed callback
             if self.direct_response_callback:
                 if asyncio.iscoroutinefunction(self.direct_response_callback):
-                    await self.direct_response_callback(wrapped_result.result)
+                    await self.direct_response_callback(result_dict)
                 else:
-                    self.direct_response_callback(wrapped_result.result)
+                    self.direct_response_callback(result_dict)
 
-            return wrapped_result.result
+            return result_dict
 
         except asyncio.TimeoutError:
             raise TimeoutError(
