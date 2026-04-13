@@ -166,19 +166,19 @@ class DbManipulator:
                     except Exception as e:
                         logger.error(f'Error in get_by_id: {e}')
                         raise e
-                    
-            result = await session.execute(stmt)
-            row = result.fetchone()
 
-            if not row:
-                return DBReturnValue(
-                    status=DBSTATUS.NOT_FOUND,
-                    value=row,
-                    details='No data found')
+                    result = await session.execute(stmt)
+                    row = result.fetchone()
 
-            return DBReturnValue(
-                value=row,
-                details='Data found').success_return()
+                    if not row:
+                        return DBReturnValue(
+                            status=DBSTATUS.NOT_FOUND,
+                            value=row,
+                            details='No data found')
+
+                    return DBReturnValue(
+                        value=row,
+                        details='Data found').success_return()
 
         finally:
             error_details = []

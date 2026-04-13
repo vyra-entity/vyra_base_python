@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
+## [0.1.8+build.145] - 2026-04-13
+
+### Build
+
+See changelog
+
+### Fixed
+
+- `DbManipulator.get_by_id`: moved `session.execute()` and `result.fetchone()` inside the
+  `async with session.begin():` block — previously these calls happened after the session was
+  already closed, causing SQLAlchemy to create orphaned connections that the garbage collector
+  could not safely return to the pool (manifested as "non-checked-in connection" ERROR messages
+  on every login attempt).
+
+
 ## [0.1.8+build.143] - 2026-04-02
 
 ### Build
