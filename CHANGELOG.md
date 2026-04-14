@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed — Protobuf duplicate symbol TypeError in InterfaceLoader (2026-04-14)
+
+- **`src/vyra_base/com/core/interface_loader.py` `load_protobuf_interface`** — Added `except TypeError` handler for the `importlib.import_module` call and a separate `except TypeError` for `spec.loader.exec_module`. When protobuf `AddSerializedFile` raises `TypeError: duplicate symbol ...`, this means the descriptors are already registered in the global pool (common when VBASE interfaces like `VBASEGetLogHistory` are shared across multiple modules in the same process). Previously only `ImportError` was caught, so the `TypeError` propagated up to `topic_builder.load_interface_type` which logged it as an ERROR on every call. Now: if the module is already in `sys.modules`, it is reused; otherwise the duplicate is silently skipped (Zenoh falls back to dict-based serialization). Also cleans up broken module skeletons from `sys.modules` when `exec_module` fails.
+
 
 ## [0.1.8+build.145] - 2026-04-13
 

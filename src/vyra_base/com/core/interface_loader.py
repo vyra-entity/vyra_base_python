@@ -238,7 +238,7 @@ class InterfaceLoader:
         # Build module name
         built_proto_name = f"{interface_name}_pb2"
         
-        # Try direct import first (if module already in sys.path)
+        # Try direct import first (if module already in sys.path or sys.modules)
         try:
             module = importlib.import_module(built_proto_name)
             self._protobuf_interface_cache[interface_name] = module
@@ -250,6 +250,28 @@ class InterfaceLoader:
                 f"searching interface paths..."
             )
             pass
+        except TypeError as exc:
+            if "duplicate symbol" in str(exc):
+                # The protobuf descriptors are already registered in the global pool,
+                # likely because a VBASE interface proto is shared across modules and
+                # was loaded earlier by another InterfaceLoader instance.
+                # Reuse whatever is already in sys.modules (may be a successfully
+                # loaded instance from the first import).
+                existing = sys.modules.get(built_proto_name)
+                if existing is not None:
+                    self._protobuf_interface_cache[interface_name] = existing
+                    logger.debug(
+                        f"Protobuf '{built_proto_name}' descriptors already in pool; "
+                        f"reusing sys.modules entry."
+                    )
+                    return existing
+                logger.debug(
+                    f"Protobuf '{built_proto_name}' descriptors already registered in pool "
+                    f"(duplicate symbol); skipping load. "
+                    f"Zenoh will fall back to dict-based serialization."
+                )
+                return None
+            raise
         
         # Search in interface paths
         proto_paths: list[Path] = []
@@ -291,7 +313,25 @@ class InterfaceLoader:
                 
                 return module
             
+            except TypeError as type_err:
+                if "duplicate symbol" in str(type_err):
+                    # Descriptors already registered (VBASE proto shared across modules).
+                    # Remove the incomplete skeleton so future import_module tries succeed.
+                    sys.modules.pop(built_proto_name, None)
+                    logger.debug(
+                        f"Protobuf '{built_proto_name}' descriptors already in pool "
+                        f"(duplicate symbol from {module_file}); skipping."
+                    )
+                    continue
+                # Remove broken skeleton and report real type error
+                sys.modules.pop(built_proto_name, None)
+                logger.error(
+                    f"❌ Failed to load protobuf module from {module_file}: {type_err}",
+                    exc_info=True
+                )
             except Exception as e:
+                # Remove broken skeleton to avoid polluting sys.modules
+                sys.modules.pop(built_proto_name, None)
                 logger.error(
                     f"❌ Failed to load protobuf module from {module_file}: {e}",
                     exc_info=True
