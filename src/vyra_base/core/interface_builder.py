@@ -130,6 +130,7 @@ class InterfaceBuilder:
                     response_callback=response_cb,
                     protocols=[ProtocolType.ZENOH],
                     service_type=setting.interfacetypes,
+                    namespace=setting.namespace,
                 )
                 if result is not None:
                     logger.info(f"✅ Zenoh service created: {name}")
@@ -149,6 +150,7 @@ class InterfaceBuilder:
                     response_callback=response_cb,
                     protocols=[ProtocolType.REDIS],
                     service_type=setting.interfacetypes,
+                    namespace=setting.namespace,
                 )
                 if result is not None:
                     logger.info(f"✅ Redis service created: {name}")
@@ -168,6 +170,7 @@ class InterfaceBuilder:
                     response_callback=response_cb,
                     protocols=[ProtocolType.UDS],
                     service_type=setting.interfacetypes,
+                    namespace=setting.namespace,
                 )
                 if result is not None:
                     logger.info(f"✅ UDS service created: {name}")
