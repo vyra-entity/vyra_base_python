@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.1.8+build.146] - 2026-04-15
+
+### Build
+
+see below
+
+### Added — `vyra_base.auth` shared authentication package (2026-04-15)
+
+- New sub-package `vyra_base.auth` with `exceptions.py`, `models.py`, `base_auth_service.py`, `router_utils.py`, `__init__.py`.
+- `BaseAuthService(ABC)` provides all Redis-session logic shared across VYRA modules.
+- `make_auth_service_di()` factory returns `(set_auth_service, get_auth_service)` DI closures for FastAPI.
+- Added `fastapi ^0.100.0` and `pydantic ^2.0` to `[tool.poetry.dependencies]`.
+
 ### Fixed — Protobuf duplicate symbol TypeError in InterfaceLoader (2026-04-14)
 
 - **`src/vyra_base/com/core/interface_loader.py` `load_protobuf_interface`** — Added `except TypeError` handler for the `importlib.import_module` call and a separate `except TypeError` for `spec.loader.exec_module`. When protobuf `AddSerializedFile` raises `TypeError: duplicate symbol ...`, this means the descriptors are already registered in the global pool (common when VBASE interfaces like `VBASEGetLogHistory` are shared across multiple modules in the same process). Previously only `ImportError` was caught, so the `TypeError` propagated up to `topic_builder.load_interface_type` which logged it as an ERROR on every call. Now: if the module is already in `sys.modules`, it is reused; otherwise the duplicate is silently skipped (Zenoh falls back to dict-based serialization). Also cleans up broken module skeletons from `sys.modules` when `exec_module` fails.

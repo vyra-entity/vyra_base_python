@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vyra_base"
-version = "0.1.8+build.145"
+version = "0.1.8+build.146"
 description = "Base library for V.Y.R.A. modules written in Python"
 authors = ["Holger Schernewski"]
 license = "LICENSE"
@@ -45,6 +45,10 @@ wasmtime = {version = ">=22.0", optional = true}
 
 # Password hashing
 bcrypt = "^4.0.0"
+
+# Web framework (used by vyra_base.auth.router_utils for FastAPI DI utilities)
+fastapi = "^0.100.0"
+pydantic = "^2.0"
 
 [tool.poetry.extras]
 wasm = ["wasmtime"]
