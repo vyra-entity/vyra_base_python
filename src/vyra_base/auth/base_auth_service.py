@@ -285,3 +285,24 @@ class BaseAuthService(ABC):
         except Exception as exc:
             self._logger.error(f"Error creating user: {exc}", exc_info=True)
             return {"success": False, "message": f"Error: {exc}"}
+
+    async def delete_local_user(self, username: str) -> Dict[str, Any]:
+        """Delete a local user by username via InternalUserManager.
+
+        Args:
+            username: The username to delete.
+
+        Returns:
+            Dict with ``success`` bool and ``message`` string.
+        """
+        try:
+            user_manager = self._get_user_manager()
+            if not user_manager or not user_manager.internal_usermanager:
+                raise Exception("InternalUserManager not available")
+            deleted = await user_manager.internal_usermanager.delete_user_impl(username)
+            if deleted:
+                return {"success": True, "message": f"User '{username}' deleted"}
+            return {"success": False, "message": f"Failed to delete user '{username}' (may be last admin)"}
+        except Exception as exc:
+            self._logger.error(f"Error deleting user: {exc}", exc_info=True)
+            return {"success": False, "message": f"Error: {exc}"}
