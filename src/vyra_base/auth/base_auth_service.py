@@ -299,10 +299,10 @@ class BaseAuthService(ABC):
             user_manager = self._get_user_manager()
             if not user_manager or not user_manager.internal_usermanager:
                 raise Exception("InternalUserManager not available")
-            deleted = await user_manager.internal_usermanager.delete_user_impl(username)
+            deleted, reason = await user_manager.internal_usermanager.delete_user_impl(username)
             if deleted:
                 return {"success": True, "message": f"User '{username}' deleted"}
-            return {"success": False, "message": f"Failed to delete user '{username}' (may be last admin)"}
+            return {"success": False, "message": reason or f"Failed to delete user '{username}'"}
         except Exception as exc:
             self._logger.error(f"Error deleting user: {exc}", exc_info=True)
             return {"success": False, "message": f"Error: {exc}"}
