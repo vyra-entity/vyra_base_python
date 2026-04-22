@@ -492,8 +492,8 @@ class ModuleEntry(DCBase):
     :type uuid: UUID
     :param name: Name of the module
     :type name: str
-    :param template: Template identifier for the module
-    :type template: str
+    :param blueprints: Blueprint identifier(s) for the module
+    :type blueprints: str
     :param description: Description of the module
     :type description: str
     :param version: Version of the module (semantic versioning, e.g. '1.0.0')
@@ -501,14 +501,14 @@ class ModuleEntry(DCBase):
     """
     uuid: str
     name: str
-    template: str
+    blueprints: str
     description: str
     version: str
 
     def __repr__(self) -> str:
         return (
             f"ModuleEntry(uuid={self.uuid}, name={self.name}, "
-            f"template={self.template}, description={self.description}, "
+            f"blueprints={self.blueprints}, description={self.description}, "
             f"version={self.version})"
         )
     
@@ -522,7 +522,7 @@ class ModuleEntry(DCBase):
         return {
             'uuid': str(self.uuid),
             'name': self.name,
-            'template': self.template,
+            'blueprints': self.blueprints,
             'description': self.description,
             'version': self.version
         }
