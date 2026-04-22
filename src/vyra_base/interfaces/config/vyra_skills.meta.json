@@ -1,0 +1,280 @@
+[
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "read_all_skills",
+        "displayname": "Read All Skills",
+        "description": "Returns all skill instances registered on this module with their full configuration as a JSON-encoded array.",
+        "filetype": [
+            "VBASESkill.proto"
+        ],
+        "params": [],
+        "returns": [
+            {
+                "name": "all_skills_json",
+                "datatype": "string",
+                "displayname": "All Skills (JSON)",
+                "description": "JSON-encoded array of skill objects. Each object contains: id, skill_type, is_enabled, parameter_mapping, volatile_mapping, interface_mapping, local_defaults, displayname, description, tags, created_at, updated_at."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "get_skill",
+        "displayname": "Get Skill",
+        "description": "Returns the full configuration of a single skill instance by its unique ID.",
+        "filetype": [
+            "VBASESkill.proto"
+        ],
+        "params": [
+            {
+                "name": "id",
+                "datatype": "string",
+                "displayname": "Skill ID",
+                "description": "The unique identifier of the skill instance (e.g. 'motion_slow')."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether the skill was found."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            },
+            {
+                "name": "skill_json",
+                "datatype": "string",
+                "displayname": "Skill (JSON)",
+                "description": "JSON-encoded skill object, or empty string if not found."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "add_skill",
+        "displayname": "Add Skill",
+        "description": "Creates a new skill instance on this module. Fails if a skill with the given ID already exists.",
+        "filetype": [
+            "VBASESkill.proto"
+        ],
+        "params": [
+            {
+                "name": "id",
+                "datatype": "string",
+                "displayname": "Skill ID",
+                "description": "Unique name for this skill instance (e.g. 'motion_slow'). Must be unique within the module."
+            },
+            {
+                "name": "skill_type",
+                "datatype": "string",
+                "displayname": "Skill Type",
+                "description": "The skill type this instance belongs to (e.g. 'motion_control'). Must match a type defined in the blueprint."
+            },
+            {
+                "name": "parameter_mapping",
+                "datatype": "string",
+                "displayname": "Parameter Mapping (JSON)",
+                "description": "JSON object mapping skill parameter names to module parameter keys. Example: {\"max_speed\": \"drive.max_speed_mps\"}."
+            },
+            {
+                "name": "volatile_mapping",
+                "datatype": "string",
+                "displayname": "Volatile Mapping (JSON)",
+                "description": "JSON object mapping skill volatile names to module volatile keys. Example: {\"current_position\": \"robot.pos\"}."
+            },
+            {
+                "name": "interface_mapping",
+                "datatype": "string",
+                "displayname": "Interface Mapping (JSON)",
+                "description": "JSON object mapping skill interface names to module interface functionnames. Example: {\"move_to\": \"drive_move_to_position\"}."
+            },
+            {
+                "name": "local_defaults",
+                "datatype": "string",
+                "displayname": "Local Defaults (JSON)",
+                "description": "JSON object with instance-specific default value overrides. Applied when the skill is activated. Example: {\"drive.max_speed_mps\": 0.5}."
+            },
+            {
+                "name": "displayname",
+                "datatype": "string",
+                "displayname": "Display Name",
+                "description": "Optional human-readable display name for this skill instance."
+            },
+            {
+                "name": "description",
+                "datatype": "string",
+                "displayname": "Description",
+                "description": "Optional description of this skill instance."
+            },
+            {
+                "name": "tags",
+                "datatype": "string",
+                "displayname": "Tags (JSON)",
+                "description": "Optional JSON array of tag strings for filtering and grouping."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether the skill was created successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "update_skill",
+        "displayname": "Update Skill",
+        "description": "Updates an existing skill instance. Only provided fields are updated; unset fields remain unchanged.",
+        "filetype": [
+            "VBASESkill.proto"
+        ],
+        "params": [
+            {
+                "name": "id",
+                "datatype": "string",
+                "displayname": "Skill ID",
+                "description": "The unique identifier of the skill instance to update."
+            },
+            {
+                "name": "is_enabled",
+                "datatype": "bool",
+                "displayname": "Is Enabled",
+                "description": "Whether this skill instance is active."
+            },
+            {
+                "name": "parameter_mapping",
+                "datatype": "string",
+                "displayname": "Parameter Mapping (JSON)",
+                "description": "Updated parameter mapping as JSON object, or empty to leave unchanged."
+            },
+            {
+                "name": "volatile_mapping",
+                "datatype": "string",
+                "displayname": "Volatile Mapping (JSON)",
+                "description": "Updated volatile mapping as JSON object, or empty to leave unchanged."
+            },
+            {
+                "name": "interface_mapping",
+                "datatype": "string",
+                "displayname": "Interface Mapping (JSON)",
+                "description": "Updated interface mapping as JSON object, or empty to leave unchanged."
+            },
+            {
+                "name": "local_defaults",
+                "datatype": "string",
+                "displayname": "Local Defaults (JSON)",
+                "description": "Updated instance-specific defaults as JSON object, or empty to leave unchanged."
+            },
+            {
+                "name": "displayname",
+                "datatype": "string",
+                "displayname": "Display Name",
+                "description": "Updated display name, or empty to leave unchanged."
+            },
+            {
+                "name": "description",
+                "datatype": "string",
+                "displayname": "Description",
+                "description": "Updated description, or empty to leave unchanged."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether the skill was updated successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": true,
+            "published": false
+        }
+    },
+    {
+        "tags": [
+            "zenoh"
+        ],
+        "type": "service",
+        "functionname": "delete_skill",
+        "displayname": "Delete Skill",
+        "description": "Deletes an existing skill instance from this module by its unique ID.",
+        "filetype": [
+            "VBASESkill.proto"
+        ],
+        "params": [
+            {
+                "name": "id",
+                "datatype": "string",
+                "displayname": "Skill ID",
+                "description": "The unique identifier of the skill instance to delete."
+            }
+        ],
+        "returns": [
+            {
+                "name": "success",
+                "datatype": "bool",
+                "displayname": "Success",
+                "description": "Whether the skill was deleted successfully."
+            },
+            {
+                "name": "message",
+                "datatype": "string",
+                "displayname": "Message",
+                "description": "Human-readable status message."
+            }
+        ],
+        "access_level": 1,
+        "displaystyle": {
+            "visible": false,
+            "published": false
+        }
+    }
+]

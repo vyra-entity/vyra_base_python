@@ -66,3 +66,15 @@ VBASEHealthCheck.srv | - | internal
 VBASEHealthCheck.proto | - | internal
 VBASEReadAllParams.srv | - | internal
 VBASEReadAllParams.proto | - | internal
+
+# Skill Interfaces (vyra_skills.meta.json)
+VBASESkill.srv | read_all_skills | vyra_skills.meta.json
+VBASESkill.proto | read_all_skills | vyra_skills.meta.json
+VBASESkill.srv | get_skill | vyra_skills.meta.json
+VBASESkill.proto | get_skill | vyra_skills.meta.json
+VBASESkill.srv | add_skill | vyra_skills.meta.json
+VBASESkill.proto | add_skill | vyra_skills.meta.json
+VBASESkill.srv | update_skill | vyra_skills.meta.json
+VBASESkill.proto | update_skill | vyra_skills.meta.json
+VBASESkill.srv | delete_skill | vyra_skills.meta.json
+VBASESkill.proto | delete_skill | vyra_skills.meta.json

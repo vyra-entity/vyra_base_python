@@ -7,11 +7,12 @@ This directory contains the built-in interface definitions for the VYRA framewor
 ```
 interfaces/
 ├── config/         # Metadata JSON files (*.meta.json) for built-in interfaces
-│   ├── vyra_core.meta.json      # Core VYRA interfaces (get_interface_list, etc.)
-│   ├── vyra_com.meta.json       # Communication interfaces
+│   ├── vyra_core.meta.json      # Core VYRA interfaces (get_interface_list, parameters, volatiles, etc.)
+│   ├── vyra_com.meta.json       # Communication interfaces (feeds, events)
 │   ├── vyra_security.meta.json  # Security interfaces
 │   ├── vyra_state.meta.json     # State-machine interfaces
 │   ├── vyra_plugin.meta.json    # Plugin interfaces
+│   ├── vyra_skills.meta.json    # Skill interfaces (read_all_skills, add_skill, etc.)
 │   └── RESERVED.list            # Reserved function names (module override forbidden)
 ├── tools/
 │   └── generate_interfaces.py   # Interface file generator (consumed by modules)
@@ -267,6 +268,80 @@ await entity.subscribe_speaker("error_feed", on_error_feed)
     }
 ]
 ```
+
+## Skill Interfaces (`vyra_skills.meta.json`)
+
+The `vyra_skills.meta.json` file defines the built-in **Skill API** that every
+VYRA module exposes automatically. A **Skill** is a named set of mappings that
+links a logical skill type (defined in the blueprint) to concrete module resources
+(parameters, volatiles, interfaces) along with optional instance-specific defaults.
+
+### Skill Services
+
+| Function Name | Type | Description |
+|---------------|------|-------------|
+| `read_all_skills` | service | Returns all skill instances as JSON array |
+| `get_skill` | service | Returns a single skill instance by ID |
+| `add_skill` | service | Creates a new skill instance (fails if ID exists) |
+| `update_skill` | service | Partially updates an existing skill instance |
+| `delete_skill` | service | Deletes a skill instance by ID |
+
+### Skill Object Fields
+
+```json
+{
+    "id": "motion_slow",
+    "skill_type": "motion_control",
+    "is_enabled": true,
+    "parameter_mapping": {
+        "max_speed": "drive.max_speed_mps",
+        "acceleration": "drive.acceleration_ms2"
+    },
+    "volatile_mapping": {
+        "current_position": "robot.current_position"
+    },
+    "interface_mapping": {
+        "move_to": "drive_move_to_position",
+        "stop": "drive_emergency_stop"
+    },
+    "local_defaults": {
+        "drive.max_speed_mps": 0.3,
+        "drive.acceleration_ms2": 0.5
+    },
+    "displayname": "Motion — Slow",
+    "description": "Safe low-speed motion profile for confined spaces.",
+    "tags": ["motion", "safe"],
+    "created_at": "2026-04-22T10:00:00",
+    "updated_at": "2026-04-22T10:00:00"
+}
+```
+
+### Multiple Skill Instances per Type
+
+Multiple skill instances can share the same `skill_type` but have different
+`local_defaults`, allowing different operational profiles without duplicating
+parameter/interface mappings:
+
+```
+motion_slow   → skill_type: motion_control — max_speed: 0.3 m/s
+motion_normal → skill_type: motion_control — max_speed: 1.2 m/s
+motion_rough  → skill_type: motion_control — max_speed: 2.5 m/s
+```
+
+### Blueprint Verification
+
+The Module Manager queries `read_all_skills` during startup to verify that a
+module satisfies the `required_skills` of its declared blueprint. See the
+[Module Manager documentation](../../../../VOS2_WORKSPACE/modules/v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff/docs/)
+for details on the verification flow.
+
+### Automatic Distribution
+
+`vyra_skills.meta.json` ships with the `vyra_base` Python package and is
+automatically copied into every module's interface config directory by
+`setup_interfaces.py` during the module build. No manual configuration is required.
+
+---
 
 ## See Also
 

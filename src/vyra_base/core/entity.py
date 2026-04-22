@@ -63,6 +63,8 @@ from vyra_base.storage.storage import Storage
 from vyra_base.core.interface_builder import InterfaceBuilder
 from vyra_base.core.parameter import Parameter
 from vyra_base.core.volatile import Volatile
+from vyra_base.core.skill_manager import SkillManager
+from vyra_base.storage.tb_skill import Skill as DbSkill
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.security import SecurityManager, SecurityLevel
 from vyra_base.helper.logging_config import VyraLoggingConfig
@@ -938,7 +940,30 @@ class VyraEntity:
 
         self._init_volatiles(transient_base_types=transient_base_types)
 
+        await self._init_skills()
+
         logger.info("Storage access initialized.")
+
+    async def _init_skills(self) -> None:
+        """
+        Initialize the :class:`~vyra_base.core.skill_manager.SkillManager` for the entity.
+
+        Creates the ``skill`` table in the persistent database if it does not
+        yet exist and instantiates :attr:`skill_manager`.  Zenoh service callbacks
+        (``read_all_skills``, ``get_skill``, ``add_skill``, ``update_skill``,
+        ``delete_skill``) are registered automatically via
+        :meth:`VyraEntity.register_service_callbacks`.
+        """
+        logger.debug("Initializing skill manager for the entity.")
+
+        try:
+            await self.database_access.create_selected_table([DbSkill])
+        except Exception as exc:
+            logger.warning("⚠️ Could not ensure skill table: %s", exc)
+
+        self.skill_manager = SkillManager(database_access=self.database_access)
+        VyraEntity.register_service_callbacks(self.skill_manager)
+        logger.info("✅ SkillManager initialized")
 
     async def _activate_errorfeed_db_handler(self) -> None:
         """Create the ``error_logs`` table and activate the DB handler on the error feeder.

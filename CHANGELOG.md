@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added — Skill management layer
+
+- **`src/vyra_base/storage/tb_skill.py`** — New `Skill` SQLAlchemy 2.0 model that persists per-module skill definitions in the local SQLite database (columns: `id`, `skill_type`, `is_enabled`, `parameter_mapping`, `volatile_mapping`, `interface_mapping`, `local_defaults`, `displayname`, `description`, `tags`, `created_at`, `updated_at`).
+- **`src/vyra_base/core/skill_manager.py`** — New `SkillManager` class providing CRUD operations for skills plus five Zenoh remote-service endpoints: `read_all_skills`, `get_skill`, `add_skill`, `update_skill`, `delete_skill`. JSON string parsing is handled transparently for protobuf-transported mapping fields.
+- **`src/vyra_base/core/entity.py`** — `VyraEntity.setup_storage()` now calls `_init_skills()` automatically, which creates the `skill` table and registers `SkillManager` service callbacks on every entity.
+- **`tests/test_skill_manager.py`** — Unit-test suite (13 test classes, all CRUD + service paths, uses `AsyncMock`/`MagicMock`, no external dependencies).
+
 
 ## [0.1.8+build.146] - 2026-04-15
 

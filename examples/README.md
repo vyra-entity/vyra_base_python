@@ -20,6 +20,7 @@ Practical, runnable examples for `vyra_base`.
 | `12_security_levels/` | Security-level matrix, algorithm mapping and validation helpers |
 | `13_plugin/` | WASM plugin runtime (`WasmRuntime` / `StubRuntime`) |
 | `14_interfaces_config/` | Writing `*.meta.json` interface configuration files |
+| `15_skills/` | Skill instances: add/query/verify via SkillManager and Zenoh |
 | `security/` | Standalone security framework examples (no ROS2 / rclpy required) |
 
 ## Quick Start
@@ -59,4 +60,6 @@ python examples/13_plugin/01_basic_plugin.py
   or `StubRuntime` (pure Python fallback).
 - Interface config documentation in `14_interfaces_config/` is reference-only
   (no Python file needed — the JSON format is the artefact).
+- `15_skills/` shows both the Zenoh API and the internal `SkillManager` class.
+  The `SkillManager` is part of `vyra_base.core` (Phase 1 implementation).
 
