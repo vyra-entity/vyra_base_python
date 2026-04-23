@@ -17,6 +17,7 @@ Die VYRA Storage API bietet eine einheitliche Schnittstelle für Datenbankzugrif
 3. [Redis-Verbindung](./redis_connection.md)
 4. [Tabellen anlegen](./table_creation.md)
 5. [API-Referenz](./api_reference.md)
+6. [VYRA Base Blueprint](./vyra_base_blueprint.md)
 
 ## Schnellstart
 

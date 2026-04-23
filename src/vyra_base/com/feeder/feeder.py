@@ -21,7 +21,8 @@ if _ROS2_AVAILABLE:
         QoSReliabilityPolicy,
         QoSDurabilityPolicy,
     )
-    from vyra_base.com import InterfaceFactory, ProtocolType
+
+from vyra_base.com import InterfaceFactory
 
 from vyra_base.com.feeder.interfaces import IFeeder
 from vyra_base.com.handler.communication import CommunicationHandler

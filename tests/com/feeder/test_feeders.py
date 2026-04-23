@@ -5,10 +5,13 @@ Tests IFeeder, BaseFeeder, CustomBaseFeeder, FeederRegistry,
 FeederConfigResolver, StateFeeder, NewsFeeder, ErrorFeeder.
 """
 import asyncio
+import builtins
+import importlib
 import json
 import pytest
 import tempfile
 import os
+import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
@@ -170,6 +173,29 @@ class TestFeederRegistry:
             def get_feeder_name(self): return "Decorated"
 
         assert FeederRegistry.get("DecoratedFeed") is DecoratedFeeder
+
+
+def test_feeder_module_imports_interface_factory_without_ros2(monkeypatch):
+    """BaseFeeder must keep InterfaceFactory available when ROS2 is absent."""
+    module_name = "vyra_base.com.feeder.feeder"
+    original_import = builtins.__import__
+
+    def fake_import(name, globals=None, locals=None, fromlist=(), level=0):
+        if name == "rclpy" or name.startswith("rclpy."):
+            raise ImportError("simulated missing rclpy")
+        return original_import(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    sys.modules.pop(module_name, None)
+
+    feeder_module = importlib.import_module(module_name)
+
+    assert feeder_module._ROS2_AVAILABLE is False
+    assert hasattr(feeder_module, "InterfaceFactory")
+    assert feeder_module.InterfaceFactory is not None
+
+    sys.modules.pop(module_name, None)
+    importlib.import_module(module_name)
 
 
 # ---------------------------------------------------------------------------

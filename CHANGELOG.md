@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed — Feeder startup without ROS2 available
+
+- **`src/vyra_base/com/feeder/feeder.py`** — `InterfaceFactory` is now imported independently of ROS2 availability, so feeder startup can still create Zenoh/Redis publishers when `rclpy` is not installed.
+- **`tests/com/feeder/test_feeders.py`** — Added a regression test that re-imports the feeder module with simulated missing `rclpy` and verifies `InterfaceFactory` remains available.
+
 ### Added — Skill management layer
 
 - **`src/vyra_base/storage/tb_skill.py`** — New `Skill` SQLAlchemy 2.0 model that persists per-module skill definitions in the local SQLite database (columns: `id`, `skill_type`, `is_enabled`, `parameter_mapping`, `volatile_mapping`, `interface_mapping`, `local_defaults`, `displayname`, `description`, `tags`, `created_at`, `updated_at`).
