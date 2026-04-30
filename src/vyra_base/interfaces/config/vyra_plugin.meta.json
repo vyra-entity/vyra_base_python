@@ -30,6 +30,12 @@
                 "datatype": "object",
                 "displayname": "Payload",
                 "description": "Beliebige JSON-serialisierbare Nutzdaten des Events."
+            },
+            {
+                "name": "error",
+                "datatype": "object",
+                "displayname": "Error",
+                "description": "Beliebige JSON-serialisierbare Fehlermeldungen des Events."
             }
         ],
         "access_level": 1,
@@ -69,6 +75,12 @@
                 "datatype": "object",
                 "displayname": "Payload",
                 "description": "Beliebige JSON-serialisierbare Nutzdaten des Events."
+            },
+            {
+                "name": "error",
+                "datatype": "object",
+                "displayname": "Error",
+                "description": "Beliebige JSON-serialisierbare Fehlermeldungen des Events."
             }
         ],
         "access_level": 1,
@@ -120,13 +132,19 @@
                 "name": "success",
                 "datatype": "bool",
                 "displayname": "Success",
-                "description": "True or False wether the funktion call was successfull"
+                "description": "True or False whether the function call was successful"
             },
             {
                 "name": "data",
                 "datatype": "object",
                 "displayname": "Payload",
                 "description": "Any JSON-serializable response data."
+            },
+            {
+                "name": "error",
+                "datatype": "object",
+                "displayname": "Error",
+                "description": "Any JSON-serializable error messages related to the function call."
             }
         ],
         "access_level": 1,
