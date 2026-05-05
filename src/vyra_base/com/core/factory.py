@@ -552,13 +552,13 @@ class InterfaceFactory:
                 _original_call = client.call
                 async def _logged_call(request: Any, timeout: float = 5.0) -> Any:
                     logger.debug(
-                        "[TRANSPORT OUT] type=call  name='%s'  protocol=%s | request=%r  timeout=%r",
-                        _name, _proto, request, timeout,
+                        "[TRANSPORT OUT] type=call  name='%s'  protocol=%s | request=%r  timeout=%r | module_name=%s  module_id=%s",
+                        _name, _proto, request, timeout, kwargs.get("module_name"), kwargs.get("module_id")
                     )
                     result = await _original_call(request, timeout=timeout)
                     logger.debug(
-                        "[TRANSPORT IN]  type=call  name='%s'  protocol=%s | result=%r",
-                        _name, _proto, result,
+                        "[TRANSPORT IN]  type=call  name='%s'  protocol=%s | result=%r | module_name=%s  module_id=%s",
+                        _name, _proto, result, kwargs.get("module_name"), kwargs.get("module_id")
                     )
                     return result
                 client.call = _logged_call
