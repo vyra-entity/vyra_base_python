@@ -40,7 +40,7 @@
         ],
         "access_level": 1,
         "displaystyle": {
-            "visible": false,
+            "visible": true,
             "published": false
         }
     },
@@ -85,7 +85,7 @@
         ],
         "access_level": 1,
         "displaystyle": {
-            "visible": false,
+            "visible": true,
             "published": false
         }
     },
@@ -149,7 +149,7 @@
         ],
         "access_level": 1,
         "displaystyle": {
-            "visible": false,
+            "visible": true,
             "published": false
         }
     }

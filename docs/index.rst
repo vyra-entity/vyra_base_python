@@ -13,58 +13,36 @@ framework, and a WASM plugin runtime.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Getting Started
+   :caption: Quick Start
 
    installation
-   quickstart
+   guides/quickstart
+   guides/state-machine-quick-guide
 
 .. toctree::
    :maxdepth: 2
-   :caption: Core
+   :caption: Developer Guides
 
-   core
+   guides/interfaces-how-to
+   guides/logging-setup
 
 .. toctree::
    :maxdepth: 2
    :caption: State Machine
 
-   state
+   components/state-machine/state-machine_FULL
+   components/state-machine/state-machine_QUICK
 
 .. toctree::
    :maxdepth: 2
-   :caption: Communication
+   :caption: Components
 
-   com
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Data Storage
-
-   storage
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Helper
-
+   core
+   components/communication/README
+   components/storage/README
    helper
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Interface
-
+   components/security/README
    interfaces
-   interfaces_guide
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Security Framework
-
-   security
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Plugin Runtime
-
    plugin
 
 .. toctree::
