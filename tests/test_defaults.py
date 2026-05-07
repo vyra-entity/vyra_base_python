@@ -26,7 +26,6 @@ class TestStateEntry:
         test_time = datetime.now()
         
         state_entry = StateEntry(
-            _type=None,
             previous="initial",
             trigger="start",
             current="running",
@@ -47,7 +46,6 @@ class TestStateEntry:
         test_time = datetime.now()
         
         state_entry = StateEntry(
-            _type=None,
             trigger="start",
             current="running",
             module_id="test_123",
@@ -60,7 +58,6 @@ class TestStateEntry:
     def test_state_entry_representation(self):
         """Test StateEntry string representation"""
         state_entry = StateEntry(
-            _type=None,
             previous="initial",
             trigger="start", 
             current="running",
@@ -87,7 +84,6 @@ class TestStateEntry:
         
         for previous, trigger, current in transitions:
             state_entry = StateEntry(
-                _type=None,
                 previous=previous,
                 trigger=trigger,
                 current=current,
@@ -109,7 +105,6 @@ class TestNewsEntry:
         test_uuid = uuid4()
         
         news_entry = NewsEntry(
-            _type=None,
             level=NewsEntry.MESSAGE_LEVEL.INFO,
             message="Test news message",
             timestamp=test_time,
@@ -127,7 +122,7 @@ class TestNewsEntry:
 
     def test_news_entry_defaults(self):
         """Test NewsEntry with default values"""
-        news_entry = NewsEntry(_type=None)
+        news_entry = NewsEntry()
         
         assert news_entry.level == 2  # Default INFO level
         assert news_entry.message == ""
@@ -147,7 +142,6 @@ class TestNewsEntry:
         
         for level_enum, level_value in levels:
             news_entry = NewsEntry(
-                _type=None,
                 level=level_enum,
                 message=f"Test {level_enum.name} message"
             )
@@ -157,7 +151,6 @@ class TestNewsEntry:
     def test_news_entry_representation(self):
         """Test NewsEntry string representation"""
         news_entry = NewsEntry(
-            _type=None,
             level=NewsEntry.MESSAGE_LEVEL.WARNING,
             message="Test warning message"
         )
@@ -177,7 +170,6 @@ class TestErrorEntry:
         test_time = "2024-01-01T12:00:00"
         
         error_entry = ErrorEntry(
-            _type=None,
             level=ErrorEntry.ERROR_LEVEL.MAJOR_FAULT,
             code=0x00001001,
             uuid=test_uuid,
@@ -201,7 +193,7 @@ class TestErrorEntry:
 
     def test_error_entry_defaults(self):
         """Test ErrorEntry with default values"""
-        error_entry = ErrorEntry(_type=None)
+        error_entry = ErrorEntry()
         
         assert error_entry.level == 0  # MINOR_FAULT
         assert error_entry.code == 0x00000000
@@ -224,7 +216,6 @@ class TestErrorEntry:
         
         for level_enum, level_value in levels:
             error_entry = ErrorEntry(
-                _type=None,
                 level=level_enum,
                 description=f"Test {level_enum.name} error"
             )
@@ -233,7 +224,6 @@ class TestErrorEntry:
     def test_error_entry_representation(self):
         """Test ErrorEntry string representation"""
         error_entry = ErrorEntry(
-            _type=None,
             level=ErrorEntry.ERROR_LEVEL.CRITICAL_FAULT,
             code=0x00001234,
             description="Critical system failure",
@@ -256,14 +246,14 @@ class TestModuleEntry:
         module_entry = ModuleEntry(
             uuid="12345678-1234-1234-1234-123456789abc",
             name="test_module",
-            template="vyra_module_template", 
+            blueprints="vyra_module_template", 
             description="A test module for testing",
             version="1.0.0"
         )
         
         assert module_entry.uuid == "12345678-1234-1234-1234-123456789abc"
         assert module_entry.name == "test_module"
-        assert module_entry.template == "vyra_module_template"
+        assert module_entry.blueprints == "vyra_module_template"
         assert module_entry.description == "A test module for testing"
         assert module_entry.version == "1.0.0"
 
@@ -272,7 +262,7 @@ class TestModuleEntry:
         module_entry = ModuleEntry(
             uuid="12345678-1234-1234-1234-123456789abc",
             name="test_module",
-            template="vyra_module_template",
+            blueprints="vyra_module_template",
             description="A test module for testing", 
             version="1.2.3"
         )
@@ -282,7 +272,7 @@ class TestModuleEntry:
         assert isinstance(result, dict)
         assert result["uuid"] == "12345678-1234-1234-1234-123456789abc"
         assert result["name"] == "test_module"
-        assert result["template"] == "vyra_module_template"
+        assert result["blueprints"] == "vyra_module_template"
         assert result["description"] == "A test module for testing"
         assert result["version"] == "1.2.3"
 
@@ -303,7 +293,7 @@ class TestModuleEntry:
         module_entry = ModuleEntry(
             uuid=hex_uuid,
             name="test_module",
-            template="vyra_module_template",
+            blueprints="vyra_module_template",
             description="Test description",
             version="1.0.0"
         )
@@ -318,7 +308,7 @@ class TestModuleEntry:
         module_entry = ModuleEntry(
             uuid="12345678-1234-1234-1234-123456789abc",
             name="test_module",
-            template="vyra_module_template",
+            blueprints="vyra_module_template",
             description="A test module",
             version="2.1.0"
         )
@@ -327,7 +317,7 @@ class TestModuleEntry:
         assert "ModuleEntry" in repr_str
         assert "uuid=12345678-1234-1234-1234-123456789abc" in repr_str
         assert "name=test_module" in repr_str
-        assert "template=vyra_module_template" in repr_str
+        assert "blueprints=vyra_module_template" in repr_str
         assert "version=2.1.0" in repr_str
 
 

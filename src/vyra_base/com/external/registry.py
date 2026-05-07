@@ -300,11 +300,16 @@ class ExternalRegistry:
         
         # Basic health check
         healthy = connection.status == ProtocolStatus.CONNECTED
-        
-        # Try client-specific health check if available
-        if connection.client and hasattr(connection.client, 'is_connected'):
+
+        # Try client-specific health check if available.
+        # Use getattr inside try/except because properties can raise during access.
+        if connection.client:
             try:
-                healthy = connection.client.is_connected
+                client_health = getattr(connection.client, "is_connected")
+                healthy = client_health() if callable(client_health) else bool(client_health)
+            except AttributeError:
+                # Client has no dedicated health signal; keep status-derived health.
+                pass
             except Exception as e:
                 logger.error(f"Health check error for '{name}': {e}")
                 healthy = False

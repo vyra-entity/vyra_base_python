@@ -7,6 +7,8 @@ Tracks latency, call count, and errors per protocol.
 import logging
 import time
 import functools
+import asyncio
+import inspect
 from typing import Callable, Optional, Any
 from contextlib import contextmanager
 
@@ -378,7 +380,7 @@ def monitored_callable(
                         request_size = len(str(request).encode('utf-8'))
                         metrics.record_message_size(
                             protocol,
-                            InterfaceType.CALLABLE,
+                            InterfaceType.SERVER,
                             request_size,
                             'receive'
                         )
@@ -394,7 +396,7 @@ def monitored_callable(
                         response_size = len(str(result).encode('utf-8'))
                         metrics.record_message_size(
                             protocol,
-                            InterfaceType.CALLABLE,
+                            InterfaceType.SERVER,
                             response_size,
                             'send'
                         )
@@ -407,7 +409,7 @@ def monitored_callable(
                 success = False
                 metrics.record_error(
                     protocol,
-                    InterfaceType.CALLABLE,
+                    InterfaceType.SERVER,
                     type(e).__name__
                 )
                 raise
@@ -415,7 +417,7 @@ def monitored_callable(
                 duration = time.time() - start_time
                 metrics.record_call(
                     protocol,
-                    InterfaceType.CALLABLE,
+                    InterfaceType.SERVER,
                     interface_name,
                     duration,
                     success
@@ -446,7 +448,7 @@ def monitored_callable(
                 success = False
                 metrics.record_error(
                     protocol,
-                    InterfaceType.CALLABLE,
+                    InterfaceType.SERVER,
                     type(e).__name__
                 )
                 raise
@@ -454,14 +456,14 @@ def monitored_callable(
                 duration = time.time() - start_time
                 metrics.record_call(
                     protocol,
-                    InterfaceType.CALLABLE,
+                    InterfaceType.SERVER,
                     interface_name,
                     duration,
                     success
                 )
         
         # Return appropriate wrapper
-        if functools.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             return async_wrapper
         else:
             return sync_wrapper
@@ -507,7 +509,7 @@ def monitored_speaker(
                 success = False
                 metrics.record_error(
                     protocol,
-                    InterfaceType.SPEAKER,
+                    InterfaceType.PUBLISHER,
                     type(e).__name__
                 )
                 raise
@@ -515,7 +517,7 @@ def monitored_speaker(
                 duration = time.time() - start_time
                 metrics.record_call(
                     protocol,
-                    InterfaceType.SPEAKER,
+                    InterfaceType.PUBLISHER,
                     speaker_name,
                     duration,
                     success

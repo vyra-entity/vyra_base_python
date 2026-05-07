@@ -42,11 +42,11 @@ class TestTopicBuilder:
         topic = builder.build("get_modules")
         assert topic == "v2_modulemanager_abc123/get_modules"
     
-    def test_build_with_subaction(self):
-        """Test building topic with subaction."""
+    def test_build_with_subsection(self):
+        """Test building topic with subsection."""
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
-        topic = builder.build("set_config", subaction="theme")
+        topic = builder.build("set_config", subsection="theme")
         assert topic == "v2_modulemanager_abc123/set_config/theme"
     
     def test_build_with_interface_type(self):
@@ -57,18 +57,18 @@ class TestTopicBuilder:
         topic = builder.build("get_modules", interface_type=InterfaceType.SERVER)
         assert topic == "v2_modulemanager_abc123/get_modules"
     
-    def test_build_with_prefix(self):
-        """Test building with prefix."""
+    def test_build_with_namespace(self):
+        """Test building with namespace."""
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
-        topic = builder.build_with_prefix("state", "update")
+        topic = builder.build("update", namespace="state")
         assert topic == "v2_modulemanager_abc123/state/update"
     
-    def test_build_with_prefix_and_subaction(self):
-        """Test building with prefix and subaction."""
+    def test_build_with_namespace_and_subsection(self):
+        """Test building with namespace and subsection."""
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
-        topic = builder.build_with_prefix("data", "temperature", subaction="celsius")
+        topic = builder.build("temperature", namespace="data", subsection="celsius")
         assert topic == "v2_modulemanager_abc123/data/temperature/celsius"
     
     def test_invalid_function_name(self):
@@ -78,12 +78,12 @@ class TestTopicBuilder:
         with pytest.raises(ValueError, match="Invalid function_name"):
             builder.build("invalid-name!")
     
-    def test_invalid_subaction(self):
-        """Test that invalid subactions raise ValueError."""
+    def test_invalid_subsection(self):
+        """Test that invalid subsections raise ValueError."""
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
-        with pytest.raises(ValueError, match="Invalid subaction"):
-            builder.build("get_modules", subaction="invalid name!")
+        with pytest.raises(ValueError, match="Invalid subsection"):
+            builder.build("get_modules", subsection="invalid name!")
     
     def test_parse_simple(self):
         """Test parsing simple topic name."""
@@ -94,10 +94,10 @@ class TestTopicBuilder:
         assert components.module_name == "v2_modulemanager"
         assert components.module_id == "abc123"
         assert components.function_name == "get_modules"
-        assert components.subaction is None
+        assert components.subsection is None
     
-    def test_parse_with_subaction(self):
-        """Test parsing topic with subaction."""
+    def test_parse_with_subsection(self):
+        """Test parsing topic with subsection."""
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
         components = builder.parse("v2_modulemanager_abc123/set_config/theme")
@@ -105,7 +105,7 @@ class TestTopicBuilder:
         assert components.module_name == "v2_modulemanager"
         assert components.module_id == "abc123"
         assert components.function_name == "set_config"
-        assert components.subaction == "theme"
+        assert components.subsection == "theme"
     
     def test_parse_complex_module_name(self):
         """Test parsing with complex module name containing underscores."""
@@ -155,7 +155,7 @@ class TestTopicBuilder:
             module_name="v2_modulemanager",
             module_id="abc123",
             function_name="get_modules",
-            subaction="detail"
+            subsection="detail"
         )
         
         assert str(components) == "v2_modulemanager_abc123/get_modules/detail"
@@ -188,13 +188,13 @@ class TestFactoryFunctions:
         
         assert topic == "v2_modulemanager_abc123/get_modules"
     
-    def test_build_topic_with_subaction(self):
-        """Test convenience function with subaction."""
+    def test_build_topic_with_subsection(self):
+        """Test convenience function with subsection."""
         topic = build_topic(
             "v2_modulemanager",
             "abc123",
             "set_config",
-            subaction="theme"
+            subsection="theme"
         )
         
         assert topic == "v2_modulemanager_abc123/set_config/theme"
@@ -224,8 +224,8 @@ class TestRealWorldExamples:
         assert builder.build("install_module") == \
             "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff/install_module"
         
-        # With subactions
-        assert builder.build("get_module_info", subaction="details") == \
+        # With subsections
+        assert builder.build("get_module_info", subsection="details") == \
             "v2_modulemanager_733256b82d6b48a48bc52b5ec73ebfff/get_module_info/details"
     
     def test_dashboard_example(self):
@@ -236,9 +236,9 @@ class TestRealWorldExamples:
         )
         
         # Configuration topics
-        assert builder.build_with_prefix("config", "theme") == \
+        assert builder.build("theme", namespace="config") == \
             "v2_dashboard_aef036f639d3486a985b65ee25df8fec/config/theme"
-        assert builder.build_with_prefix("config", "language") == \
+        assert builder.build("language", namespace="config") == \
             "v2_dashboard_aef036f639d3486a985b65ee25df8fec/config/language"
     
     def test_sensor_example(self):
@@ -246,13 +246,13 @@ class TestRealWorldExamples:
         builder = TopicBuilder("sensor_node", "def456")
         
         # Sensor data topics
-        assert builder.build_with_prefix("data", "temperature") == \
+        assert builder.build("temperature", namespace="data") == \
             "sensor_node_def456/data/temperature"
-        assert builder.build_with_prefix("data", "pressure") == \
+        assert builder.build("pressure", namespace="data") == \
             "sensor_node_def456/data/pressure"
         
         # With units
-        assert builder.build_with_prefix("data", "temperature", subaction="celsius") == \
+        assert builder.build("temperature", namespace="data", subsection="celsius") == \
             "sensor_node_def456/data/temperature/celsius"
     
     def test_roundtrip(self):
@@ -260,7 +260,7 @@ class TestRealWorldExamples:
         builder = TopicBuilder("v2_modulemanager", "abc123")
         
         # Build topic
-        original = builder.build("get_modules", subaction="detailed")
+        original = builder.build("get_modules", subsection="detailed")
         
         # Parse it back
         components = builder.parse(original)

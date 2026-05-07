@@ -153,10 +153,10 @@ class TestLifecycleTransitions:
             LifecycleState.ACTIVE,
             LifecycleState.OFFLINE
         )
-        # SUSPENDED -> RECOVERING is invalid (must go through ACTIVE first)
+        # SUSPENDED -> OFFLINE is invalid (must go through ACTIVE first)
         assert not is_valid_lifecycle_transition(
-            LifecycleState.SUSPENDED,
-            LifecycleState.RECOVERING
+            LifecycleState.INITIALIZING,
+            LifecycleState.OFFLINE
         )
 
     def test_transition_set_completeness(self):

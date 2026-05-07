@@ -1,337 +1,168 @@
-"""
-Unit tests for External Protocol Providers.
+"""Tests for external communication clients and the external registry."""
 
-Tests gRPC, MQTT, REST, and WebSocket protocol implementations.
-"""
+from __future__ import annotations
+
+from types import SimpleNamespace
+
 import pytest
-from unittest.mock import Mock, AsyncMock, MagicMock, patch
-from vyra_base.com.core.types import ProtocolType
+
+from vyra_base.com.external.grpc import grpc_client
+from vyra_base.com.external.mqtt import mqtt_client
+from vyra_base.com.external.registry import (
+    ExternalRegistry,
+    ProtocolStatus,
+    get_global_registry,
+)
+from vyra_base.com.external.rest import rest_client
+from vyra_base.com.external.websocket import websocket_client
 
 
-class TestGrpcProvider:
-    """Test gRPC protocol provider."""
-    
-    @pytest.mark.asyncio
-    async def test_grpc_provider_availability_without_grpcio(self):
-        """Test that gRPC provider checks for grpcio package."""
-        with patch('importlib.import_module') as mock_import:
-            mock_import.side_effect = ImportError("No module named 'grpcio'")
-            
-            # Provider should handle missing grpcio gracefully
-            try:
-                from vyra_base.com.external.grpc_provider import GrpcProvider
-                provider = GrpcProvider()
-                available = provider.is_available
-                assert available is False
-            except ImportError:
-                # If provider doesn't exist yet, test passes
-                pytest.skip("GrpcProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_grpc_provider_with_grpcio(self):
-        """Test gRPC provider when grpcio is available."""
-        try:
-            from vyra_base.com.external.grpc_provider import GrpcProvider
-            
-            # Mock grpcio availability
-            with patch('importlib.import_module') as mock_import:
-                mock_grpc = MagicMock()
-                mock_import.return_value = mock_grpc
-                
-                provider = GrpcProvider()
-                assert provider.protocol == ProtocolType.GRPC
-        except ImportError:
-            pytest.skip("GrpcProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_grpc_create_server(self):
-        """Test creating gRPC callable."""
-        try:
-            from vyra_base.com.external.grpc_provider import GrpcProvider
-            
-            provider = GrpcProvider()
-            
-            async def test_callback(request):
-                return {"result": "ok"}
-            
-            # Should create callable even if grpcio not available (graceful degradation)
-            if provider.is_available:
-                callable = await provider.create_server(
-                    name="test_service",
-                    callback=test_callback
-                )
-                assert callable is not None
-        except ImportError:
-            pytest.skip("GrpcProvider not implemented yet")
+class TestExternalClientAvailabilityGuards:
+    """Verify deterministic dependency guards for optional external clients."""
+
+    def test_grpc_client_raises_when_grpc_unavailable(self, monkeypatch):
+        """GrpcClient should fail fast when grpc dependency is unavailable."""
+        monkeypatch.setattr(grpc_client, "GRPC_AVAILABLE", False)
+        with pytest.raises(ImportError, match="grpcio not installed"):
+            grpc_client.GrpcClient(target="localhost:50051")
+
+    def test_mqtt_client_raises_when_mqtt_unavailable(self, monkeypatch):
+        """MqttClient should fail fast when paho-mqtt dependency is unavailable."""
+        monkeypatch.setattr(mqtt_client, "MQTT_AVAILABLE", False)
+        with pytest.raises(ImportError, match="paho-mqtt not installed"):
+            mqtt_client.MqttClient(broker="localhost")
+
+    def test_rest_client_raises_when_httpx_unavailable(self, monkeypatch):
+        """RestClient should fail fast when httpx dependency is unavailable."""
+        monkeypatch.setattr(rest_client, "REST_AVAILABLE", False)
+        with pytest.raises(ImportError, match="httpx not installed"):
+            rest_client.RestClient(base_url="http://localhost")
+
+    def test_websocket_client_raises_when_websocket_unavailable(self, monkeypatch):
+        """WebSocketClient should fail fast when websockets dependency is unavailable."""
+        monkeypatch.setattr(websocket_client, "WEBSOCKET_AVAILABLE", False)
+        with pytest.raises(ImportError, match="websockets not installed"):
+            websocket_client.WebSocketClient(url="ws://localhost")
 
 
-class TestMqttProvider:
-    """Test MQTT protocol provider."""
-    
-    @pytest.mark.asyncio
-    async def test_mqtt_provider_availability_without_paho(self):
-        """Test that MQTT provider checks for paho-mqtt package."""
-        with patch('importlib.import_module') as mock_import:
-            mock_import.side_effect = ImportError("No module named 'paho'")
-            
-            try:
-                from vyra_base.com.external.mqtt_provider import MqttProvider
-                provider = MqttProvider()
-                available = provider.is_available
-                assert available is False
-            except ImportError:
-                pytest.skip("MqttProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_mqtt_provider_with_paho(self):
-        """Test MQTT provider when paho-mqtt is available."""
-        try:
-            from vyra_base.com.external.mqtt_provider import MqttProvider
-            
-            # Mock paho availability
-            with patch('importlib.import_module') as mock_import:
-                mock_paho = MagicMock()
-                mock_import.return_value = mock_paho
-                
-                provider = MqttProvider()
-                assert provider.protocol == ProtocolType.MQTT
-        except ImportError:
-            pytest.skip("MqttProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_mqtt_create_publisher(self):
-        """Test creating MQTT speaker (publisher)."""
-        try:
-            from vyra_base.com.external.mqtt_provider import MqttProvider
-            
-            provider = MqttProvider()
-            
-            if provider.is_available:
-                speaker = await provider.create_publisher(
-                    name="test_topic",
-                    broker_host="localhost",
-                    broker_port=1883
-                )
-                assert speaker is not None
-        except ImportError:
-            pytest.skip("MqttProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_mqtt_connection_settings(self):
-        """Test MQTT connection with custom settings."""
-        try:
-            from vyra_base.com.external.mqtt_provider import MqttProvider
-            
-            provider = MqttProvider()
-            
-            config = {
-                "broker_host": "mqtt.example.com",
-                "broker_port": 8883,
-                "use_tls": True,
-                "username": "user",
-                "password": "pass"
-            }
-            
-            if provider.is_available:
-                await provider.initialize(config)
-                assert provider.is_initialized
-        except ImportError:
-            pytest.skip("MqttProvider not implemented yet")
+class TestExternalRegistry:
+    """Test ExternalRegistry behavior without network dependencies."""
 
+    @pytest.mark.asyncio
+    async def test_register_get_and_filter_connections(self):
+        """Registered connections should be retrievable and filterable."""
+        registry = ExternalRegistry()
+        await registry.register("rest_api", "rest", "http://localhost:8000")
+        await registry.register("mqtt_broker", "mqtt", "localhost:1883")
 
-class TestRestProvider:
-    """Test REST/FastAPI protocol provider."""
-    
-    @pytest.mark.asyncio
-    async def test_rest_provider_availability(self):
-        """Test REST provider availability."""
-        try:
-            from vyra_base.com.external.rest_provider import RestProvider
-            
-            provider = RestProvider()
-            assert provider.protocol == ProtocolType.REST
-            
-            # REST should always be available (uses FastAPI from requirements)
-            assert provider.is_available is True
-        except ImportError:
-            pytest.skip("RestProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_rest_create_server(self):
-        """Test creating REST endpoint as callable."""
-        try:
-            from vyra_base.com.external.rest_provider import RestProvider
-            
-            provider = RestProvider()
-            
-            async def test_callback(request):
-                return {"result": "ok"}
-            
-            callable = await provider.create_server(
-                name="test_endpoint",
-                callback=test_callback,
-                method="POST",
-                path="/api/test"
-            )
-            
-            assert callable is not None
-        except ImportError:
-            pytest.skip("RestProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_rest_create_publisher(self):
-        """Test creating REST webhook as speaker."""
-        try:
-            from vyra_base.com.external.rest_provider import RestProvider
-            
-            provider = RestProvider()
-            
-            speaker = await provider.create_publisher(
-                name="test_webhook",
-                webhook_url="https://example.com/webhook"
-            )
-            
-            assert speaker is not None
-        except ImportError:
-            pytest.skip("RestProvider not implemented yet")
+        assert registry.has_connection("rest_api")
+        assert registry.get_connection("rest_api") is not None
+        assert registry.get_connection("rest_api").endpoint == "http://localhost:8000"
 
+        rest_connections = registry.list_connections(protocol_type="rest")
+        assert len(rest_connections) == 1
+        assert rest_connections[0].name == "rest_api"
 
-class TestWebSocketProvider:
-    """Test WebSocket protocol provider."""
-    
     @pytest.mark.asyncio
-    async def test_websocket_provider_availability(self):
-        """Test WebSocket provider availability."""
-        try:
-            from vyra_base.com.external.websocket_provider import WebSocketProvider
-            
-            provider = WebSocketProvider()
-            assert provider.protocol == ProtocolType.WEBSOCKET
-            
-            # WebSocket should be available (uses FastAPI WebSockets)
-            assert provider.is_available is True
-        except ImportError:
-            pytest.skip("WebSocketProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_websocket_create_server(self):
-        """Test creating WebSocket handler as callable."""
-        try:
-            from vyra_base.com.external.websocket_provider import WebSocketProvider
-            
-            provider = WebSocketProvider()
-            
-            async def test_callback(message):
-                return {"echo": message}
-            
-            callable = await provider.create_server(
-                name="test_ws_handler",
-                callback=test_callback,
-                path="/ws/test"
-            )
-            
-            assert callable is not None
-        except ImportError:
-            pytest.skip("WebSocketProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_websocket_create_publisher(self):
-        """Test creating WebSocket broadcaster as speaker."""
-        try:
-            from vyra_base.com.external.websocket_provider import WebSocketProvider
-            
-            provider = WebSocketProvider()
-            
-            speaker = await provider.create_publisher(
-                name="test_broadcast",
-                room="global"
-            )
-            
-            assert speaker is not None
-        except ImportError:
-            pytest.skip("WebSocketProvider not implemented yet")
-    
-    @pytest.mark.asyncio
-    async def test_websocket_connection_manager(self):
-        """Test WebSocket connection manager."""
-        try:
-            from vyra_base.com.external.websocket_provider import WebSocketProvider
-            
-            provider = WebSocketProvider()
-            await provider.initialize()
-            
-            # Provider should have connection manager
-            assert hasattr(provider, 'connection_manager') or hasattr(provider, 'connections')
-        except (ImportError, AttributeError):
-            pytest.skip("WebSocketProvider not fully implemented yet")
+    async def test_unregister_calls_async_close(self):
+        """Unregister should close async clients when available."""
+        registry = ExternalRegistry()
 
+        closed = {"value": False}
 
-class TestExternalProvidersIntegration:
-    """Integration tests for external protocol providers."""
-    
+        class AsyncClosableClient:
+            """Minimal async-closable test client."""
+
+            async def close(self):
+                """Track close invocation for assertions."""
+                closed["value"] = True
+
+        await registry.register(
+            "grpc_service",
+            "grpc",
+            "localhost:50051",
+            client=AsyncClosableClient(),
+        )
+
+        result = await registry.unregister("grpc_service")
+        assert result is True
+        assert closed["value"] is True
+        assert registry.get_connection("grpc_service") is None
+
     @pytest.mark.asyncio
-    async def test_all_external_providers_in_registry(self):
-        """Test that all external providers can be registered."""
-        from vyra_base.com.providers import ProviderRegistry
-        from vyra_base.com.core.types import ProtocolType
-        
-        registry = ProviderRegistry()
-        registry._providers.clear()
-        
-        external_protocols = [
-            ProtocolType.GRPC,
-            ProtocolType.MQTT,
-            ProtocolType.REST,
-            ProtocolType.WEBSOCKET
-        ]
-        
-        registered = []
-        
-        for protocol in external_protocols:
-            try:
-                # Try to import and register each provider
-                if protocol == ProtocolType.GRPC:
-                    from vyra_base.com.external.grpc_provider import GrpcProvider
-                    provider = GrpcProvider()
-                elif protocol == ProtocolType.MQTT:
-                    from vyra_base.com.external.mqtt_provider import MqttProvider
-                    provider = MqttProvider()
-                elif protocol == ProtocolType.REST:
-                    from vyra_base.com.external.rest_provider import RestProvider
-                    provider = RestProvider()
-                elif protocol == ProtocolType.WEBSOCKET:
-                    from vyra_base.com.external.websocket_provider import WebSocketProvider
-                    provider = WebSocketProvider()
-                
-                registry.register_provider(provider)
-                registered.append(protocol)
-            except ImportError:
-                pass  # Provider not implemented yet
-        
-        # At least some providers should be registrable
-        assert len(registered) >= 0  # Will pass even if no providers implemented yet
-    
+    async def test_health_check_not_found(self):
+        """Health check for unknown connection should return not_found payload."""
+        registry = ExternalRegistry()
+        result = await registry.health_check("missing")
+
+        assert result["name"] == "missing"
+        assert result["status"] == "not_found"
+        assert result["healthy"] is False
+
     @pytest.mark.asyncio
-    async def test_external_protocol_fallback(self):
-        """Test fallback between external protocols."""
-        from vyra_base.com.core.factory import InterfaceFactory
-        from vyra_base.com.providers import ProviderRegistry
-        
-        registry = ProviderRegistry()
-        registry._providers.clear()
-        
-        # Test that factory can handle unavailable external protocols gracefully
-        async def test_callback(request):
-            return {"result": "ok"}
-        
-        try:
-            # Should raise error if no providers available
-            with pytest.raises(Exception):
-                await InterfaceFactory.create_server(
-                    name="test",
-                    callback=test_callback,
-                    protocols=[ProtocolType.GRPC, ProtocolType.REST]
-                )
-        except Exception:
-            # Expected behavior when no providers registered
-            pass
+    async def test_health_check_uses_client_is_connected(self):
+        """Health check should prioritize client connection state when available."""
+        registry = ExternalRegistry()
+        client = SimpleNamespace(is_connected=True)
+        connection = await registry.register(
+            "ws_events",
+            "websocket",
+            "ws://localhost:8765",
+            client=client,
+        )
+        connection.update_status(ProtocolStatus.DISCONNECTED)
+
+        result = await registry.health_check("ws_events")
+        assert result["healthy"] is True
+        assert result["status"] == ProtocolStatus.DISCONNECTED.value
+
+    @pytest.mark.asyncio
+    async def test_health_check_handles_client_errors(self):
+        """Health checks should downgrade status to error when client inspection fails."""
+        registry = ExternalRegistry()
+
+        class BrokenClient:
+            """Client whose health probe always fails."""
+
+            @property
+            def is_connected(self):
+                """Raise runtime error to simulate probing failure."""
+                raise RuntimeError("probe failed")
+
+        connection = await registry.register(
+            "broken_rest",
+            "rest",
+            "http://localhost:9000",
+            client=BrokenClient(),
+        )
+        connection.update_status(ProtocolStatus.CONNECTED)
+
+        result = await registry.health_check("broken_rest")
+        assert result["healthy"] is False
+        assert result["status"] == ProtocolStatus.ERROR.value
+        assert connection.error_count == 1
+
+    @pytest.mark.asyncio
+    async def test_registry_statistics_counts_protocols_and_statuses(self):
+        """Statistics should report accurate counts by protocol and status."""
+        registry = ExternalRegistry()
+        conn_a = await registry.register("a", "grpc", "localhost:5001")
+        conn_b = await registry.register("b", "grpc", "localhost:5002")
+        conn_c = await registry.register("c", "mqtt", "localhost:1883")
+
+        conn_a.update_status(ProtocolStatus.CONNECTED)
+        conn_b.update_status(ProtocolStatus.ERROR, "boom")
+        conn_c.update_status(ProtocolStatus.CONNECTED)
+
+        stats = registry.get_statistics()
+        assert stats["total_connections"] == 3
+        assert stats["by_protocol"] == {"grpc": 2, "mqtt": 1}
+        assert stats["by_status"][ProtocolStatus.CONNECTED.value] == 2
+        assert stats["by_status"][ProtocolStatus.ERROR.value] == 1
+
+    def test_get_global_registry_returns_singleton(self):
+        """Global registry accessor should return the same singleton instance."""
+        registry_a = get_global_registry()
+        registry_b = get_global_registry()
+
+        assert registry_a is registry_b

@@ -3,8 +3,33 @@ Unit tests for decorators (@remote_service, @remote_publisher, @remote_actionSer
 """
 import pytest
 import asyncio
-from vyra_base.com.core.decorators import remote_service, remote_publisher, remote_actionServer
+from vyra_base.com.core.decorators import (
+    remote_service,
+    remote_publisher,
+    remote_actionServer,
+    remote_subscriber,
+    get_decorated_methods,
+    bind_decorated_callbacks,
+    ActionServerDecorator,
+)
+from vyra_base.com.core.callback_registry import CallbackRegistry
+from vyra_base.com.core.blueprints import (
+    ServiceBlueprint,
+    PublisherBlueprint,
+    SubscriberBlueprint,
+    ActionBlueprint,
+)
 from vyra_base.com.core.types import ProtocolType
+
+
+@pytest.fixture(autouse=True)
+def clear_registry():
+    """Save registry state before test, restore after to avoid cross-test pollution."""
+    saved = dict(CallbackRegistry._blueprints)
+    CallbackRegistry.clear()
+    yield
+    CallbackRegistry.clear()
+    CallbackRegistry._blueprints.update(saved)
 
 
 class TestRemoteCallableDecorator:
@@ -137,3 +162,253 @@ class TestRemoteJobDecorator:
         
         result = await process_data(MockSelf(), {'data': 'test'})
         assert result == {"processed": "test"}
+
+
+# ---------------------------------------------------------------------------
+# TestRemoteSubscriberDecorator (new)
+# ---------------------------------------------------------------------------
+
+class TestRemoteSubscriberDecorator:
+    def test_decorator_sets_metadata(self):
+        @remote_subscriber(name="sub_test")
+        async def on_msg(msg):
+            pass
+
+        assert hasattr(on_msg, "_vyra_remote_subscriber")
+        assert on_msg._vyra_subscriber_name == "sub_test"
+
+    def test_decorator_default_name(self):
+        @remote_subscriber()
+        async def on_message(msg):
+            pass
+
+        assert on_message._vyra_subscriber_name == "on_message"
+
+    def test_decorator_registers_blueprint(self):
+        @remote_subscriber(name="sub_reg")
+        async def on_msg(msg):
+            pass
+
+        bp = CallbackRegistry.get_blueprint("sub_reg")
+        assert isinstance(bp, SubscriberBlueprint)
+
+    def test_decorator_no_auto_register(self):
+        @remote_subscriber(name="sub_no_reg", auto_register=False)
+        async def on_msg(msg):
+            pass
+
+        assert CallbackRegistry.get_blueprint("sub_no_reg") is None
+
+    @pytest.mark.asyncio
+    async def test_async_subscriber_callable(self):
+        @remote_subscriber(name="sub_call")
+        async def on_msg(msg):
+            return {"got": msg}
+
+        result = await on_msg({"x": 1})
+        assert result == {"got": {"x": 1}}
+
+    @pytest.mark.asyncio
+    async def test_sync_subscriber_wrapped_async(self):
+        @remote_subscriber(name="sub_sync_call")
+        def on_msg(msg):
+            return {"sync": True}
+
+        result = await on_msg("hi")
+        assert result == {"sync": True}
+
+    def test_decorator_duplicate_logs_warning(self):
+        @remote_subscriber(name="sub_dup")
+        async def on1(msg):
+            pass
+
+        @remote_subscriber(name="sub_dup")
+        async def on2(msg):
+            pass
+
+
+# ---------------------------------------------------------------------------
+# TestActionServerDecoratorClass (new)
+# ---------------------------------------------------------------------------
+
+class TestActionServerDecoratorClass:
+    def test_action_server_on_goal_registers_blueprint(self):
+        @remote_actionServer.on_goal(name="act_dec2", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        bp = CallbackRegistry.get_blueprint("act_dec2")
+        assert isinstance(bp, ActionBlueprint)
+
+    def test_execute_decorator(self):
+        @remote_actionServer.on_goal(name="act_exec2", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        @remote_actionServer.execute(name="act_exec2", protocols=[ProtocolType.ZENOH])
+        async def execute(goal_handle):
+            return {}
+
+        assert execute._vyra_action_callback_type == "execute"
+        assert execute._vyra_action_name == "act_exec2"
+
+    def test_on_goal_decorator(self):
+        @remote_actionServer.on_goal(name="act_goal2", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        assert accept._vyra_action_callback_type == "on_goal"
+
+    def test_on_cancel_decorator(self):
+        @remote_actionServer.on_goal(name="act_cancel2", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        @remote_actionServer.on_cancel(name="act_cancel2")
+        async def cancel(goal_handle):
+            pass
+
+        assert cancel._vyra_action_callback_type == "on_cancel"
+
+    def test_no_auto_register_on_execute(self):
+        """execute with auto_register=False doesn't re-register blueprint."""
+        @remote_actionServer.on_goal(name="act_no_rereg", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        @remote_actionServer.execute(name="act_no_rereg")
+        async def execute(goal_handle):
+            return {}
+
+        assert execute._vyra_auto_register is False
+
+    def test_blueprint_stored_on_wrapper(self):
+        @remote_actionServer.on_goal(name="act_bp2", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        assert isinstance(accept._vyra_blueprint, ActionBlueprint)
+
+
+# ---------------------------------------------------------------------------
+# TestGetDecoratedMethods (new)
+# ---------------------------------------------------------------------------
+
+class TestGetDecoratedMethodsNew:
+    def test_empty_object(self):
+        class Plain:
+            pass
+
+        result = get_decorated_methods(Plain())
+        assert result == {"servers": [], "publishers": [], "subscribers": [], "actions": []}
+
+    def test_finds_service(self):
+        class Comp:
+            @remote_service(name="gdm_svc")
+            async def calculate(self, req, resp=None):
+                return {}
+
+        result = get_decorated_methods(Comp())
+        assert len(result["servers"]) == 1
+        assert result["servers"][0]["name"] == "gdm_svc"
+
+    def test_finds_subscriber(self):
+        class Comp:
+            @remote_subscriber(name="gdm_sub")
+            async def on_data(self, msg):
+                pass
+
+        result = get_decorated_methods(Comp())
+        assert len(result["subscribers"]) == 1
+
+    def test_finds_all_types(self):
+        class Comp:
+            @remote_service(name="all_svc")
+            async def svc(self, req, resp=None):
+                return {}
+
+            @remote_publisher(name="all_pub")
+            async def pub(self, msg):
+                pass
+
+            @remote_subscriber(name="all_sub")
+            async def sub(self, msg):
+                pass
+
+        result = get_decorated_methods(Comp())
+        assert len(result["servers"]) == 1
+        assert len(result["publishers"]) == 1
+        assert len(result["subscribers"]) == 1
+
+    def test_blueprint_in_result(self):
+        class Comp:
+            @remote_service(name="bp_in_result")
+            async def svc(self, req, resp=None):
+                return {}
+
+        result = get_decorated_methods(Comp())
+        assert isinstance(result["servers"][0]["blueprint"], ServiceBlueprint)
+
+
+# ---------------------------------------------------------------------------
+# TestBindDecoratedCallbacks (new)
+# ---------------------------------------------------------------------------
+
+class TestBindDecoratedCallbacksNew:
+    def test_bind_service(self):
+        class Comp:
+            @remote_service(name="bdc_svc")
+            async def svc(self, req, resp=None):
+                return {}
+
+        results = bind_decorated_callbacks(Comp())
+        assert results.get("bdc_svc") is True
+
+    def test_bind_subscriber(self):
+        class Comp:
+            @remote_subscriber(name="bdc_sub")
+            async def on_msg(self, msg):
+                pass
+
+        results = bind_decorated_callbacks(Comp())
+        assert results.get("bdc_sub") is True
+
+    def test_bind_publisher(self):
+        class Comp:
+            @remote_publisher(name="bdc_pub")
+            async def pub(self, msg):
+                pass
+
+        results = bind_decorated_callbacks(Comp())
+        assert results.get("bdc_pub") is True
+
+    def test_force_rebind(self):
+        class Comp:
+            @remote_service(name="bdc_rebind")
+            async def svc(self, req, resp=None):
+                return {}
+
+        comp = Comp()
+        bind_decorated_callbacks(comp)
+        results = bind_decorated_callbacks(comp, force_rebind=True)
+        assert results.get("bdc_rebind") is True
+
+    def test_empty_component_returns_empty_dict(self):
+        class Empty:
+            pass
+
+        results = bind_decorated_callbacks(Empty())
+        assert results == {}
+
+    def test_bind_action(self):
+        @remote_actionServer.on_goal(name="bdc_action2", protocols=[ProtocolType.ZENOH])
+        async def accept(goal):
+            return True
+
+        class Comp:
+            @remote_actionServer.execute(name="bdc_action2")
+            async def execute(self, goal_handle):
+                return {}
+
+        results = bind_decorated_callbacks(Comp())
+        assert any("bdc_action2" in k for k in results)

@@ -116,7 +116,7 @@ class TestProviderRegistry:
         
         registry.register_provider(mock_provider)
         
-        assert ProtocolType.REDIS in registry.list_registered()
+        assert (ProtocolType.REDIS, None) in registry.list_registered()
     
     def test_get_provider(self):
         """Test getting a registered provider."""
@@ -209,12 +209,12 @@ class TestProviderRegistry:
         mock_provider = MockProvider()
         
         registry.register_provider(mock_provider)
-        assert ProtocolType.REDIS in registry.list_registered()
+        assert (ProtocolType.REDIS, None) in registry.list_registered()
         
         # Test unregister functionality
         result = registry.unregister_provider(ProtocolType.REDIS)
         assert result is True
-        assert ProtocolType.REDIS not in registry.list_registered()
+        assert (ProtocolType.REDIS, None) not in registry.list_registered()
     
     def test_get_all_providers(self):
         """Test getting all registered providers."""
@@ -282,8 +282,8 @@ class TestProviderRegistry:
         all_protocols = registry.list_registered()
         
         assert len(all_protocols) == 2
-        assert ProtocolType.ROS2 in all_protocols
-        assert ProtocolType.REDIS in all_protocols
+        assert (ProtocolType.ROS2, None) in all_protocols
+        assert (ProtocolType.REDIS, None) in all_protocols
     
     def test_register_replaces_existing_provider(self):
         """Test that registering replaces existing provider with force=True."""
@@ -364,7 +364,7 @@ class TestProviderRegistry:
         protocols = registry.list_registered()
         
         assert len(protocols) == 3
-        assert ProtocolType.ROS2 in protocols
-        assert ProtocolType.REDIS in protocols
-        assert ProtocolType.MQTT in protocols
+        assert (ProtocolType.ROS2, None) in protocols
+        assert (ProtocolType.REDIS, None) in protocols
+        assert (ProtocolType.MQTT, None) in protocols
 

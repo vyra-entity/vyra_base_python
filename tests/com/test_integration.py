@@ -82,10 +82,10 @@ class TestProviderRegistry:
         """Clear registry before each test."""
         registry = ProviderRegistry()
         registry._providers.clear()
-        registry._available_protocols.clear()
+        registry._available_keys.clear()
         yield
         registry._providers.clear()
-        registry._available_protocols.clear()
+        registry._available_keys.clear()
     
     def test_registry_is_singleton(self):
         """Test that registry is a singleton."""
@@ -185,10 +185,10 @@ class TestInterfaceFactory:
         """Clear registry before each test."""
         registry = ProviderRegistry()
         registry._providers.clear()
-        registry._available_protocols.clear()
+        registry._available_keys.clear()
         yield
         registry._providers.clear()
-        registry._available_protocols.clear()
+        registry._available_keys.clear()
     
     def test_factory_has_fallback_chains(self):
         """Test factory defines fallback chains."""
@@ -251,7 +251,8 @@ class TestInterfaceFactory:
         )
         
         assert result is not None
-        assert result.metadata.protocol == ProtocolType.REDIS
+        # result is a Mock from MockProvider; verify it was created via REDIS fallback
+        assert result._protocol == ProtocolType.REDIS
     
     @pytest.mark.asyncio
     async def test_create_publisher_with_available_protocol(self):
@@ -390,3 +391,138 @@ class TestAbstractProtocolProvider:
         assert callable_obj is not None
         assert speaker is not None
         assert job is not None
+
+
+# ============================================================================
+# Extended InterfaceFactory Tests — subscriber, client, action_client
+# ============================================================================
+
+class TestInterfaceFactoryExtended:
+    """Additional tests for subscriber, client, action_client factory methods."""
+
+    @pytest.fixture(autouse=True)
+    def clear_registry(self):
+        """Clear registry before each test."""
+        registry = ProviderRegistry()
+        registry._providers.clear()
+        registry._available_keys.clear()
+        yield
+        registry._providers.clear()
+        registry._available_keys.clear()
+
+    @pytest.mark.asyncio
+    async def test_create_subscriber(self):
+        """Test creating a subscriber with an available protocol."""
+        registry = ProviderRegistry()
+        provider = MockProvider(ProtocolType.REDIS, available=True)
+        await provider.initialize()
+        registry.register_provider(provider)
+
+        async def on_message(msg):
+            pass
+
+        result = await InterfaceFactory.create_subscriber(
+            "test_topic",
+            subscriber_callback=on_message,
+            protocols=[ProtocolType.REDIS]
+        )
+
+        assert result is not None
+
+    @pytest.mark.asyncio
+    async def test_create_subscriber_no_provider_raises(self):
+        """Test that creating subscriber without provider raises."""
+        with pytest.raises(Exception):
+            await InterfaceFactory.create_subscriber(
+                "test_topic",
+                protocols=[ProtocolType.GRPC]
+            )
+
+    @pytest.mark.asyncio
+    async def test_create_client(self):
+        """Test creating a client with an available protocol."""
+        registry = ProviderRegistry()
+        provider = MockProvider(ProtocolType.REDIS, available=True)
+        await provider.initialize()
+        registry.register_provider(provider)
+
+        result = await InterfaceFactory.create_client(
+            "test_service",
+            protocols=[ProtocolType.REDIS]
+        )
+
+        assert result is not None
+
+    @pytest.mark.asyncio
+    async def test_create_client_no_provider_raises(self):
+        """Test that creating client without provider raises."""
+        with pytest.raises(Exception):
+            await InterfaceFactory.create_client(
+                "test_service",
+                protocols=[ProtocolType.GRPC]
+            )
+
+    @pytest.mark.asyncio
+    async def test_create_action_client(self):
+        """Test creating an action client with an available protocol."""
+        registry = ProviderRegistry()
+        provider = MockProvider(ProtocolType.REDIS, available=True)
+        await provider.initialize()
+        registry.register_provider(provider)
+
+        async def on_response(msg): pass
+        async def on_feedback(msg): pass
+        async def on_goal(msg): pass
+
+        result = await InterfaceFactory.create_action_client(
+            "test_action",
+            direct_response_callback=on_response,
+            feedback_callback=on_feedback,
+            goal_callback=on_goal,
+            protocols=[ProtocolType.REDIS]
+        )
+
+        assert result is not None
+
+    @pytest.mark.asyncio
+    async def test_create_action_client_no_provider_raises(self):
+        """Test that creating action client without provider raises."""
+        async def on_response(msg): pass
+        async def on_feedback(msg): pass
+        async def on_goal(msg): pass
+
+        with pytest.raises(Exception):
+            await InterfaceFactory.create_action_client(
+                "test_action",
+                direct_response_callback=on_response,
+                feedback_callback=on_feedback,
+                goal_callback=on_goal,
+                protocols=[ProtocolType.GRPC]
+            )
+
+    @pytest.mark.asyncio
+    async def test_fallback_for_publisher(self):
+        """Test publisher fallback chain."""
+        registry = ProviderRegistry()
+
+        provider1 = MockProvider(ProtocolType.ROS2, available=False)
+        await provider1.initialize()
+        provider2 = MockProvider(ProtocolType.REDIS, available=True)
+        await provider2.initialize()
+
+        registry.register_provider(provider1)
+        registry.register_provider(provider2)
+
+        result = await InterfaceFactory.create_publisher(
+            "test_topic",
+            protocols=[ProtocolType.ROS2, ProtocolType.REDIS]
+        )
+
+        assert result is not None
+        assert result._protocol == ProtocolType.REDIS
+
+    def test_factory_fallback_chains_are_lists(self):
+        """Test fallback chain attributes are lists."""
+        assert isinstance(InterfaceFactory.SERVER_FALLBACK, list)
+        assert isinstance(InterfaceFactory.PUBLISHER_FALLBACK, list)
+        assert isinstance(InterfaceFactory.ACTION_SERVER_FALLBACK, list)

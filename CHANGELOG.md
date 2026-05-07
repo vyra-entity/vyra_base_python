@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - test coverage expansion session (2026-05-09)
+
+- Added `tests/helper/__init__.py` to make helper tests discoverable as a package.
+- Added `tests/helper/test_file_reader.py` (29 tests) covering `FileReader` sync/async methods for json, markdown, env, toml, ini, yaml files.
+- Extended `tests/com/core/test_types.py` from 7 to 67 tests, adding coverage for `CallbackType`, `AccessLevel`, `ActionStatus`, `DisplayStyle`, `InterfaceMetadata`, `GoalHandle`, `VyraPublisher`, `VyraSubscriber`, `VyraServer`, `VyraClient`, `VyraActionServer`, `VyraActionClient`, `VyraTransportKwargs`.
+- Added `tests/com/feeder/test_tracking.py` (59 tests) covering `_severity_to_error_level`, `_to_serializable`, `build_message_signature`, `FeedDebouncer`, `FeedConditionRegistry`, and `resolve_entity_from_call`.
+- Fixed `autouse` registry fixture in `tests/com/core/test_callback_registry.py` and `tests/com/core/test_decorators.py` to save/restore `CallbackRegistry._blueprints` instead of just clearing, preventing cross-test pollution.
+- Total passing tests: **1149** (was 998 before this session), 0 failures, 46% coverage.
+
+### Changed - test coverage baseline and external tests hardening (2026-05-07)
+
+- Updated `pytest.ini` coverage scope from selected subpackages to full `vyra_base` package and raised baseline gate to `--cov-fail-under=70`.
+- Enabled explicit test markers in `pytest.ini` (`unit`, `integration`, `slow`, `redis`, `ros2`, `zenoh`) to keep strict marker runs deterministic.
+- Updated `run_tests.py` to use configurable coverage threshold via `VYRA_COV_FAIL_UNDER` (default `70`) for staged CI hardening.
+- Replaced outdated placeholder tests in `tests/com/external/test_external_providers.py` with deterministic tests for real modules (`grpc_client`, `mqtt_client`, `rest_client`, `websocket_client`) and `ExternalRegistry` behavior.
+- Added `tests/auth/test_auth_models_and_router_utils.py` to start coverage expansion for `vyra_base.auth` (models, token extraction, DI lifecycle, shared exception).
+- Hardened `ExternalRegistry.health_check()` in `src/vyra_base/com/external/registry.py` to safely handle `is_connected` properties that raise during access.
+
 ### Changed - external communication examples upgraded (2026-05-07)
 
 - Replaced `examples/04_external_communication/02_grpc/01_grpc_availability.py` with `01_grpc_client_skeleton.py`.

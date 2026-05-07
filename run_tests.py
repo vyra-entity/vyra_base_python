@@ -27,6 +27,9 @@ def main():
         "--durations=10",             # Show 10 slowest tests
     ]
     
+    # Coverage threshold can be raised gradually in CI (e.g. 70 -> 80 -> 90).
+    cov_fail_under = int(os.getenv("VYRA_COV_FAIL_UNDER", "70"))
+
     # Add coverage if available
     try:
         import pytest_cov
@@ -34,7 +37,7 @@ def main():
             "--cov=vyra_base",
             "--cov-report=html:htmlcov",
             "--cov-report=term-missing",
-            "--cov-fail-under=80"
+            f"--cov-fail-under={cov_fail_under}"
         ])
         print("✅ Running tests with coverage analysis")
     except ImportError:

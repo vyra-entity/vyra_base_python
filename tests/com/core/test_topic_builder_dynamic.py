@@ -100,7 +100,7 @@ class TestTopicBuilderDynamic:
             enable_interface_loading=False
         )
         
-        topic = builder.build_topic_name("set_config", subaction="theme")
+        topic = builder.build_topic_name("set_config", subsection="theme")
         
         assert topic == "v2_modulemanager_abc123/set_config/theme"
     
@@ -193,7 +193,7 @@ class TestTopicBuilderDynamic:
         
         topic, interface = builder.build_with_interface(
             "set_config",
-            subaction="theme",
+            subsection="theme",
             protocol="ros2"
         )
         

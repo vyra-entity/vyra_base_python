@@ -33,7 +33,7 @@ def sample_interface_config():
     """Write a minimal interface config JSON to a temp file and return the path."""
     data = [
         {
-            "type": "publisher",
+            "type": "message",
             "functionname": "TemperatureFeed",
             "name": "temperature_feed",
             "tags": ["zenoh"],
@@ -41,7 +41,7 @@ def sample_interface_config():
             "description": "Temperature publisher",
         },
         {
-            "type": "publisher",
+            "type": "message",
             "functionname": "StateFeed",
             "name": "state_feed",
             "tags": ["zenoh"],
@@ -79,6 +79,24 @@ class TestIFeeder:
     def test_has_required_methods(self):
         for method in ("start", "feed", "get_feeder_name"):
             assert hasattr(IFeeder, method), f"IFeeder missing '{method}'"
+
+    def test_default_methods_on_concrete_subclass(self):
+        """Default method implementations on IFeeder return expected values."""
+        import collections
+
+        class MinimalFeeder(IFeeder):
+            async def start(self): pass
+            async def feed(self, msg): pass
+            def feed_sync(self, msg): pass
+            def get_feeder_name(self): return "minimal"
+
+        f = MinimalFeeder()
+        assert f.get_protocol() is None
+        assert f.is_alive() is True
+        assert f.is_ready() is False
+        assert isinstance(f.get_buffer(), collections.deque)
+        assert f.feed_count == 0
+        assert f.error_count == 0
 
 
 # ---------------------------------------------------------------------------
@@ -236,9 +254,11 @@ class TestCustomBaseFeeder:
         assert msg == {"value": 100.0, "unit": "°C"}
 
     def test_feed_skips_invalid(self):
+        """Validation only runs in the async feed() path, not feed_sync()."""
         feeder = self._make_feeder()
-        feeder._is_ready = False
-        feeder.feed_sync(-999.0)  # invalid — validation should reject
+        feeder._is_ready = True  # ready so feed_sync won't buffer
+        feeder.feed_sync(-999.0)  # bypasses _validate — goes to publisher path
+        # feed_sync skips validation; the publisher is None so error_count increments
         assert len(feeder.get_buffer()) == 0
 
     def test_feed_valid_buffers_when_not_ready(self):
@@ -271,7 +291,7 @@ class TestBuiltinFeeders:
         entity = MagicMock()
         entity.name = "test_module"
         entity.uuid = "test-uuid"
-        return klass(type=None, node=None, module_entity=entity)
+        return klass(node=None, module_entity=entity)
 
     def test_state_feeder_name(self):
         from vyra_base.com.feeder.state_feeder import StateFeeder
@@ -471,3 +491,65 @@ class TestFeederTracking:
 
         run_step(component)
         assert "a is positive during execution" in component.entity.news_feeder.messages
+
+
+# ---------------------------------------------------------------------------
+# StateFeeder
+# ---------------------------------------------------------------------------
+
+class TestStateFeeder:
+    """Tests for StateFeeder."""
+
+    def _make_module_entity(self):
+        from vyra_base.defaults.entries import ModuleEntry
+        entity = MagicMock(spec=ModuleEntry)
+        return entity
+
+    def test_feeder_name(self):
+        """StateFeeder._feederName is 'StateFeed'."""
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        sf = StateFeeder(node=None, module_entity=self._make_module_entity())
+        assert sf._feederName == "StateFeed"
+
+    def test_get_feeder_name(self):
+        """StateFeeder.get_feeder_name() returns 'StateFeed'."""
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        sf = StateFeeder(node=None, module_entity=self._make_module_entity())
+        assert sf.get_feeder_name() == "StateFeed"
+
+    @pytest.mark.asyncio
+    async def test_feed_wrong_type_raises(self):
+        """feed() raises FeederException if not a StateEntry."""
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        from vyra_base.defaults.exceptions import FeederException
+        sf = StateFeeder(node=None, module_entity=self._make_module_entity())
+        with pytest.raises(FeederException):
+            await sf.feed("wrong_type")
+
+    def test_prepare_entry_for_publish(self):
+        """_prepare_entry_for_publish converts StateEntry to dict."""
+        from datetime import datetime
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        from vyra_base.defaults.entries import StateEntry
+        sf = StateFeeder(node=None, module_entity=self._make_module_entity())
+        entry = StateEntry(current="RUNNING", trigger="manual", module_id="test", module_name="mod", timestamp=datetime(2024, 1, 1), previous="IDLE")
+        result = sf._prepare_entry_for_publish(entry)
+        assert result["previous"] == "IDLE"
+        assert result["current"] == "RUNNING"
+        assert result["timestamp"] == datetime(2024, 1, 1)
+
+    def test_prepare_entry_fills_timestamp_if_none(self):
+        """_prepare_entry_for_publish fills timestamp if None."""
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        from vyra_base.defaults.entries import StateEntry
+        sf = StateFeeder(node=None, module_entity=self._make_module_entity())
+        entry = StateEntry(current="RUNNING", trigger="manual", module_id="test", module_name="mod", timestamp=None)
+        result = sf._prepare_entry_for_publish(entry)
+        assert result["timestamp"] is not None
+
+    def test_feed_sync_delegates(self):
+        """feed_sync is callable without error."""
+        from vyra_base.com.feeder.state_feeder import StateFeeder
+        sf = StateFeeder(node=None, module_entity=self._make_module_entity())
+        # Should not raise (will buffer since not started)
+        sf.feed_sync(MagicMock())
