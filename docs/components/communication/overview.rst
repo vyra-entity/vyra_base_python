@@ -201,8 +201,8 @@ External Layer
 
 ---
 
-Industrial Layer
-----------------
+External Extensions
+-------------------
 
 .. list-table::
    :header-rows: 1
@@ -213,11 +213,11 @@ Industrial Layer
      - Key Classes
      - Notes
    * - **Modbus**
-     - ``industrial.modbus``
+     - ``external.modbus``
      - TCP + RTU sub-modules
      - Requires ``pymodbus``
    * - **OPC UA**
-     - ``industrial.opcua``
+     - ``external.opcua``
      - ``OpcuaClient``, ``OpcuaServer``
      - Requires ``asyncua``
 
@@ -326,7 +326,7 @@ All exceptions live in ``vyra_base.com.core.exceptions``.
 Further Reading
 ---------------
 
-* :doc:`../com` — Transport, External, Industrial — full module reference
+* :doc:`../com` — Transport and External — full module reference
 * :doc:`core/factory` — InterfaceFactory API
 * :doc:`core/decorators` — Decorator API
 * :doc:`core/types` — Type system

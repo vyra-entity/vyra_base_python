@@ -518,7 +518,7 @@ Common Issues
 Resources
 ---------
 
-- **Examples**: ``/examples/security/``
+- **Examples**: ``/examples/11_security/``
 - **Full Guide**: :doc:`overview`
 - **API Docs**: :doc:`api`
 - **Integration**: ``docs/security/INTEGRATION_GUIDE.md``

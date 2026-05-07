@@ -1,0 +1,81 @@
+[
+  {
+    "tags": ["zenoh"],
+    "type": "service",
+    "functionname": "read_status",
+    "displayname": "Read Status",
+    "description": "Returns module status information.",
+    "filetype": ["MyModuleReadStatus.proto"],
+    "params": [],
+    "returns": [
+      {
+        "name": "ok",
+        "datatype": "bool",
+        "displayname": "OK",
+        "description": "Current module health status."
+      }
+    ],
+    "access_level": 1,
+    "displaystyle": {
+      "visible": true,
+      "published": true,
+      "category": "Diagnostics",
+      "order": 10
+    }
+  },
+  {
+    "tags": ["zenoh"],
+    "type": "message",
+    "functionname": "status_stream",
+    "displayname": "Status Stream",
+    "description": "Publishes runtime status events.",
+    "filetype": ["MyModuleStatusStream.proto"],
+    "params": [
+      {
+        "name": "state",
+        "datatype": "string",
+        "displayname": "State",
+        "description": "Current state value."
+      }
+    ],
+    "returns": [],
+    "access_level": 1,
+    "displaystyle": {
+      "visible": true,
+      "published": true,
+      "category": "Telemetry",
+      "order": 20
+    }
+  },
+  {
+    "tags": ["zenoh"],
+    "type": "action",
+    "functionname": "move_axis",
+    "displayname": "Move Axis",
+    "description": "Move axis to a target position.",
+    "filetype": ["MyModuleMoveAxis.proto"],
+    "params": [
+      {
+        "name": "distance",
+        "datatype": "float",
+        "displayname": "Distance",
+        "description": "Move distance in mm."
+      }
+    ],
+    "returns": [
+      {
+        "name": "success",
+        "datatype": "bool",
+        "displayname": "Success",
+        "description": "Whether the action finished successfully."
+      }
+    ],
+    "access_level": 2,
+    "displaystyle": {
+      "visible": true,
+      "published": true,
+      "category": "Motion",
+      "order": 30
+    }
+  }
+]

@@ -6,6 +6,5 @@ Dies ist die Dokumentationsübersicht für das vyra_base.com-Paket. Die Unterord
 - external/
 - feeder/
 - handler/
-- industrial/
 - providers/
 - transport/

@@ -293,7 +293,7 @@ python3 secure_client.py
 
 - **Full Docs**: `docs/security/SECURITY_FRAMEWORK.md`
 - **Integration**: `docs/security/INTEGRATION_GUIDE.md`
-- **Examples**: `examples/security/`
+- **Examples**: `examples/11_security/`
 - **API**: `docs/security/api.rst`
 
 ---

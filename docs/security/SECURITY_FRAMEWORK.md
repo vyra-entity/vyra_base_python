@@ -906,7 +906,7 @@ except SecurityError as e:
 - [ROS2 Security Guide](../ROS2_SECURITY_GUIDE.md)
 - [SROS2 Integration](../SROS2_INTEGRATION.md)
 - [API Documentation](../api/security.html)
-- [Examples](../../examples/security/)
+- [Examples](../../examples/11_security/)
 
 ---
 

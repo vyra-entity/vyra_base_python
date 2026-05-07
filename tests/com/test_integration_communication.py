@@ -115,13 +115,13 @@ class TestTransportIntegration:
 
 
 @pytest.mark.integration
-class TestIndustrialProtocols:
-    """Integration tests for industrial protocols."""
+class TestExternalIndustrialProtocols:
+    """Integration tests for external Modbus/OPC UA protocols."""
     
     @pytest.mark.asyncio
     async def test_modbus_tcp_connection(self):
         """Test Modbus TCP client lifecycle."""
-        from vyra_base.com.industrial.modbus.tcp import ModbusTCPClient
+        from vyra_base.com.external.modbus.tcp import ModbusTCPClient
         
         try:
             client = ModbusTCPClient(
@@ -150,7 +150,7 @@ class TestIndustrialProtocols:
     @pytest.mark.asyncio
     async def test_opcua_client_connection(self):
         """Test OPC UA client lifecycle."""
-        from vyra_base.com.industrial.opcua.opcua_client import OpcuaClient
+        from vyra_base.com.external.opcua.opcua_client import OpcuaClient
         
         try:
             client = OpcuaClient(

@@ -358,14 +358,14 @@ services:
 
 ## Complete Example
 
-See `/examples/security/` for full working examples:
+See `/examples/11_security/` for full working examples:
 - `secure_server_node.py` - Server implementation
 - `secure_client_node.py` - Client implementation
 
 ## Next Steps
 
 1. Read full documentation: [SECURITY_FRAMEWORK.md](SECURITY_FRAMEWORK.md)
-2. Review examples: `/examples/security/`
+2. Review examples: `/examples/11_security/`
 3. Test integration with your module
 4. Consider Level 5 for critical operations
 

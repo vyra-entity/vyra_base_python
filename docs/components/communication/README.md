@@ -14,10 +14,7 @@ All communication handlers: ROS2, Zenoh, Redis, UDS, Database, Logging.
 Transport protocols: Redis, ROS2, UDS, Zenoh.
 
 ### External (`external_overview.rst`)
-External protocols: gRPC, MQTT, REST, WebSocket, Shared Memory, TCP, UDP.
-
-### Industrial (`industrial_overview.rst`)
-Industrial protocols: Modbus (TCP/RTU), OPC-UA.
+External protocols: gRPC, MQTT, REST, WebSocket, Shared Memory, TCP, UDP, Modbus, OPC-UA.
 
 ### Feeder (`feeder_overview.rst`)
 Canonical source: `src/vyra_base/com/feeder/README.md`

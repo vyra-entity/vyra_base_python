@@ -2,7 +2,7 @@ Security Framework Examples
 ===========================
 
 Runnable security examples are maintained in the repository root under
-``examples/security/`` and ``examples/12_security_levels/``.
+``examples/11_security/``.
 
 Why this layout?
 ----------------
@@ -21,16 +21,16 @@ Example Index
    * - File
      - Description
      - Runtime
-   * - ``examples/security/secure_server_node.py``
+   * - ``examples/11_security/secure_server_node.py``
      - Secure server with RequestAccess handling and session cleanup
      - ROS2
-   * - ``examples/security/secure_client_node.py``
+   * - ``examples/11_security/secure_client_node.py``
      - Secure client authentication and secure communication setup
      - ROS2
-   * - ``examples/security/access_level_example.py``
+   * - ``examples/11_security/access_level_example.py``
      - Access-level design pattern with ``@security_required``
      - Reference
-   * - ``examples/12_security_levels/security_level_matrix.py``
+   * - ``examples/11_security/security_level_matrix.py``
      - Security-level matrix and algorithm mapping helpers
      - Pure Python
 
@@ -40,11 +40,11 @@ Quick Run
 .. code-block:: bash
 
    cd /path/to/vyra_base_python
-   python examples/12_security_levels/security_level_matrix.py
+  python examples/11_security/security_level_matrix.py
 
    # ROS2 examples
-   python examples/security/secure_server_node.py
-   python examples/security/secure_client_node.py
+  python examples/11_security/secure_server_node.py
+  python examples/11_security/secure_client_node.py
 
 Validation Checklist
 --------------------

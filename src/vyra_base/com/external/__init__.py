@@ -7,6 +7,8 @@ Communication protocols for external system integration:
 - MQTT: IoT Messaging
 - REST: HTTP APIs
 - WebSocket: Real-time bidirectional communication
+- Modbus: Industrial client protocols (TCP/RTU)
+- OPC UA: Industrial client/server communication
 - Registry: Central management and monitoring for all external protocols
 
 All protocols optional with graceful degradation.
@@ -131,6 +133,32 @@ except ImportError as e:
     UDP_AVAILABLE = False
     logger.debug(f"⚠️  UDP unavailable: {e}")
 
+try:
+    from vyra_base.com.external.modbus import (
+        ModbusBaseClient,
+        ModbusTCPClient,
+        ModbusRTUClient,
+        MODBUS_AVAILABLE,
+    )
+except ImportError as e:
+    ModbusBaseClient = None
+    ModbusTCPClient = None
+    ModbusRTUClient = None
+    MODBUS_AVAILABLE = False
+    logger.debug(f"⚠️  Modbus unavailable: {e}")
+
+try:
+    from vyra_base.com.external.opcua import (
+        OpcuaClient,
+        OpcuaServer,
+        OPCUA_AVAILABLE,
+    )
+except ImportError as e:
+    OpcuaClient = None
+    OpcuaServer = None
+    OPCUA_AVAILABLE = False
+    logger.debug(f"⚠️  OPC UA unavailable: {e}")
+
 __all__ = [
     # Core exceptions
     "ProtocolUnavailableError",
@@ -177,4 +205,13 @@ __all__ = [
     "AsyncUdpClient",
     "AsyncUdpServer",
     "UDP_AVAILABLE",
+    # Modbus
+    "ModbusBaseClient",
+    "ModbusTCPClient",
+    "ModbusRTUClient",
+    "MODBUS_AVAILABLE",
+    # OPC UA
+    "OpcuaClient",
+    "OpcuaServer",
+    "OPCUA_AVAILABLE",
 ]

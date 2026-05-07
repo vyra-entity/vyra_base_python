@@ -9,10 +9,7 @@ Transport Layer  (in-process / low-latency)
     ROS2  · Zenoh  · Redis  · UDS
 
 External Layer   (out-of-process / cross-service)
-    gRPC  · MQTT  · REST  · WebSocket  · Shared Memory
-
-Industrial Layer
-    Modbus  · OPC UA
+    gRPC  · MQTT  · REST  · WebSocket  · Shared Memory  · Modbus  · OPC UA
 
 Public API
 ----------
@@ -174,7 +171,7 @@ except ImportError:
     UDSProvider = None
 
 # ============================================================================
-# External Layer — gRPC, MQTT, REST, WebSocket, Shared Memory (all optional)
+# External Layer — gRPC, MQTT, REST, WebSocket, Shared Memory, Modbus, OPC UA (all optional)
 # ============================================================================
 
 try:
@@ -208,6 +205,18 @@ except ImportError:
     SharedMemorySegment = None
     SharedMemorySerializer = None
     SharedMemoryDiscovery = None
+
+try:
+    from vyra_base.com.external.modbus import ModbusTCPClient, ModbusRTUClient
+except ImportError:
+    ModbusTCPClient = None
+    ModbusRTUClient = None
+
+try:
+    from vyra_base.com.external.opcua import OpcuaClient, OpcuaServer
+except ImportError:
+    OpcuaClient = None
+    OpcuaServer = None
 
 # ============================================================================
 # Public API declaration
@@ -336,4 +345,8 @@ __all__ = [
     "SharedMemorySegment",
     "SharedMemorySerializer",
     "SharedMemoryDiscovery",
+    "ModbusTCPClient",
+    "ModbusRTUClient",
+    "OpcuaClient",
+    "OpcuaServer",
 ]

@@ -4,7 +4,7 @@ Communication (com)
 The ``com`` module is the multi-protocol communication layer of the VYRA framework.
 It provides a unified API for **Transport** (Zenoh, ROS2, Redis, UDS),
 **External** (gRPC, MQTT, REST, WebSocket, Shared Memory), and
-**Industrial** (Modbus, OPC UA) protocols with automatic protocol selection and fallback.
+**External Extensions** (Modbus, OPC UA) protocols with automatic protocol selection and fallback.
 
 .. tip::
 
@@ -39,14 +39,9 @@ It provides a unified API for **Transport** (Zenoh, ROS2, Redis, UDS),
    com/external/rest
    com/external/websocket
    com/external/shared_memory
+  com/external/modbus
+  com/external/opcua
    com/external/registry
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Industrial Protocols
-
-   com/industrial/modbus
-   com/industrial/opcua
 
 .. toctree::
    :maxdepth: 2
@@ -84,15 +79,14 @@ Architecture
     │   Decorators · Blueprints · Factory · Types · Exceptions    │
     └────┬──────────────────┬─────────────────┬───────────────────┘
          │                  │                 │
-    ┌────▼────┐     ┌────────▼────┐    ┌──────▼──────────┐
-    │Transport│     │  External   │    │   Industrial    │
-    ├─────────┤     ├─────────────┤    ├─────────────────┤
-    │ Zenoh   │     │ gRPC        │    │ Modbus          │
-    │ ROS2    │     │ MQTT        │    │ OPC UA          │
-    │ Redis   │     │ REST        │    └─────────────────┘
-    │ UDS     │     │ WebSocket   │
-    └─────────┘     │ Shared Mem  │
-                    └─────────────┘
+    ┌────▼────┐     ┌──────────────────────▼─────────────────────┐
+    │Transport│     │                  External                   │
+    ├─────────┤     ├─────────────────────────────────────────────┤
+    │ Zenoh   │     │ gRPC · MQTT · REST · WebSocket · Shared Mem│
+    │ ROS2    │     │ Modbus · OPC UA                             │
+    │ Redis   │     └─────────────────────────────────────────────┘
+    │ UDS     │
+    └─────────┘
 
 **Protocol fallback (automatic):** ``Zenoh → ROS2 → Redis → UDS``
 

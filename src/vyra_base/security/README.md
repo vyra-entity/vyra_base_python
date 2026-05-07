@@ -122,7 +122,7 @@ Module A (Client)                    Module B (Server)
 - **[Security Framework Guide](../../../../docs/security/SECURITY_FRAMEWORK.md)**
 - **[Integration Guide](../../../../docs/security/INTEGRATION_GUIDE.md)**
 - **[API Reference](../../../../docs/security/api.rst)**
-- **[Examples](../../../../examples/security/)**
+- **[Examples](../../../../examples/11_security/)**
 
 ---
 
@@ -483,7 +483,7 @@ Proprietary - Variobotic GmbH
 ## Support
 
 - Documentation: [docs/security/](docs/security/)
-- Examples: [examples/security/](examples/security/)
+- Examples: [examples/11_security/](examples/11_security/)
 - API Reference: Build Sphinx docs with `make html`
 
 ## Version

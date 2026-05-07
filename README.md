@@ -1,4 +1,4 @@
-# vyra_base_python — VYRA Core Library
+# Python — VYRA Core Library
 
 [![Documentation](https://img.shields.io/badge/docs-sphinx-blue)](https://vyra-entity.github.io/vyra_base_python/)
 [![Python Version](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org/downloads/)
@@ -252,15 +252,14 @@ src/vyra_base/
 │   │   └── t_uds/              # Unix Domain Sockets
 │   ├── external/               # External protocols
 │   │   ├── grpc/               # gRPC client/server
+│   │   ├── modbus/             # Modbus TCP/RTU
 │   │   ├── mqtt/               # MQTT client
+│   │   ├── opcua/              # OPC UA client/server
 │   │   ├── rest/               # REST client
 │   │   ├── tcp/                # TCP client/server
 │   │   ├── udp/                # UDP client/server
 │   │   ├── websocket/          # WebSocket client
 │   │   └── shared_memory/      # Shared memory IPC
-│   ├── industrial/             # Industrial protocols
-│   │   ├── modbus/             # Modbus TCP/RTU
-│   │   └── opcua/              # OPC UA client/server
 │   ├── feeder/                 # Multi-protocol data publishers
 │   ├── handler/                # Protocol-specific feeder handlers
 │   ├── converter/              # Protobuf and message converters

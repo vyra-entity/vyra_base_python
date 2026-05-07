@@ -9,7 +9,7 @@ from typing import Any, Callable, Union
 from uuid import UUID
 
 try:
-    from rclpy.qos import QoSProfile
+    from rclpy.qos import QoSProfile  # type: ignore[import]
 except ImportError:  # ROS2 not installed (e.g. dashboard-only containers)
     pass
 from vyra_base.helper.error_handler import ErrorTraceback
@@ -396,58 +396,6 @@ class NewsEntry(dict):
         WARNING = 4
 
 
-@dataclass(slots=True)
-class PullRequestEntry(DCBase):
-    """
-    Contains the pull request entry.
-
-    Stores the pull request details.
-
-    :param uuid: Unique identifier for the pull request
-    :type uuid: str
-    :param ack_by_user: User who acknowledged the pull request
-    :type ack_by_user: str
-    :param ack_on_date: Date when the pull request was acknowledged
-    :type ack_on_date: str
-    :param request_structure: Structure of the request
-    :type request_structure: str
-    :param request_on_date: Date when the request was made
-    :type request_on_date: str
-    :param request_description: Description of the request
-    :type request_description: str
-    :param response: Response to the request
-    :type response: str
-    :param request_action: Action requested in the pull request
-    :type request_action: str
-    :param request_action_args: Arguments for the requested action
-    :type request_action_args: list
-    :param module_id: Unique identifier for the module associated with the pull request
-    :type module_id: str
-    :param color: Color code for visual representation in GUI
-    :type color: int
-    """
-    uuid: str
-    ack_by_user: str
-    ack_on_date: str
-    request_structure: str
-    request_on_date: str
-    request_description: str
-    response: str
-    request_action: str
-    request_action_args: list
-    module_id: str
-    color: int
-
-    def __repr__(self) -> str:
-        return (
-            f"PullRequestEntry(uuid={self.uuid}, ack_by_user={self.ack_by_user}, "
-            f"ack_on_date={self.ack_on_date}, request_structure={self.request_structure}, "
-            f"request_on_date={self.request_on_date}, request_description={self.request_description}, "
-            f"response={self.response}, request_action={self.request_action}, "
-            f"request_action_args={self.request_action_args}, module_id={self.module_id}, "
-            f"color={self.color})"
-        )
-
 @dataclass(repr=True, slots=True)
 class StateEntry(DCBase):
     """
@@ -540,11 +488,3 @@ class ModuleEntry(DCBase):
         :rtype: UUID
         """
         return uuid.UUID(hex=self.uuid)
-
-
-@dataclass(slots=True)
-class AvailableModuleEntry(DCBase):
-    """
-    Not used in the current implementation.
-    """
-    pass

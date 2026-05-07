@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - external communication examples upgraded (2026-05-07)
+
+- Replaced `examples/04_external_communication/02_grpc/01_grpc_availability.py` with `01_grpc_client_skeleton.py`.
+- Replaced `examples/04_external_communication/03_mqtt/01_mqtt_availability.py` with `01_mqtt_client_skeleton.py`.
+- Added optional runtime demo toggles (`RUN_GRPC_DEMO`, `RUN_MQTT_DEMO`) while keeping safe availability-first behavior.
+- Updated `examples/04_external_communication/README.md` coverage map and quick-start commands to match the new skeleton files.
+
+### Changed - examples/com external alignment (2026-05-07)
+
+- Merged `examples/15_security_framework` into `examples/11_security` and removed the standalone folder.
+- Closed the numbering gap after removed `04_*` by renumbering example folders:
+  - `05_external_tcp_udp` -> `04_external_communication`
+  - `06_decorator_blueprints` -> `05_decorator_blueprints`
+  - `07_helper` -> `06_helper`
+  - `08_format_logging` -> `07_format_logging`
+  - `09_parameter_volatile` -> `08_parameter_volatile`
+  - `10_statemachine` -> `09_statemachine`
+  - `11_defaults_entries` -> `10_defaults_entries`
+  - `12_security` -> `11_security`
+  - `13_plugin` -> `12_plugin`
+  - `14_skills` -> `13_skills`
+- Expanded `examples/04_external_communication` with subfolders to cover all current external protocols (`tcp_udp`, `grpc`, `mqtt`, `rest`, `websocket`, `shared_memory`, `modbus`, `opcua`, `registry`).
+- Refactored communication package layout: moved Modbus and OPC UA from `src/vyra_base/com/industrial/*` to `src/vyra_base/com/external/*` and removed `src/vyra_base/com/industrial`.
+- Updated imports, integration tests, and active documentation references from `vyra_base.com.industrial.*` to `vyra_base.com.external.*`.
+
+### Changed - defaults audit and examples restructuring (2026-05-07)
+
+- Audited `src/vyra_base/defaults` for real in-library references and documented the mapping in `src/vyra_base/defaults/change-file.md`.
+- Commented out unused defaults structures:
+  - `constants.py`: `RequiredVersion`, `FeederConstants`, `LoggerConstants`, `TimeoutConstants`, `MessageLengthConstants`, `CyclicRefreshConstants`
+  - `entries.py`: `PullRequestEntry`, `AvailableModuleEntry`
+  - `info.py`: `AuthorInfo`
+- Updated `src/vyra_base/defaults/__init__.py` exports to remove commented-out structures and keep only active exports.
+- Reorganized `examples/` with chronological numbering and new grouping:
+  - Added `01_interfaces` split into `implementation/` and `configuration/`
+  - Moved interface config docs/examples from old `14_interfaces_config` into `01_interfaces/configuration`
+  - Added JSON examples under `01_interfaces/configuration/json_examples/`
+  - Added complete callback decoration plus `set_interfaces(...)` usage example
+  - Renamed and expanded `10_state_callbacks` -> `10_statemachine`
+  - Renamed `12_security_levels` -> `12_security`
+  - Added new examples: `08_format_logging` and `09_parameter_volatile`
+  - Consolidated old service/pubsub/action folders and merged transport-focused samples into `04_transport`
+  - Updated all affected example README files including `examples/README.md`
+
 ### Fixed — Plugin interfaces now appear in get_interface_list
 
 - Updated `src/vyra_base/interfaces/config/vyra_plugin.meta.json` so plugin interfaces (`logic_event`, `ui_event`, `ui_function_call`) are flagged as visible.
