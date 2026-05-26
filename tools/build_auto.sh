@@ -186,17 +186,17 @@ else
     echo "  ⚠️  Warning: VOS2_WORKSPACE/modules directory not found"
 fi
 
-# Copy to vyra_base_image
-VYRA_BASE_IMAGE_DIR="../../VOS2_WORKSPACE/vyra_base_image"
+# Copy to vyra_image_python
+VYRA_BASE_IMAGE_DIR="../../VOS2_WORKSPACE/vyra_image_python"
 if [ -d "$VYRA_BASE_IMAGE_DIR" ]; then
     # Clean old wheels
     rm -rf "$VYRA_BASE_IMAGE_DIR"/vyra_base-*.whl 2>/dev/null || true
 
     # Copy new wheel
     cp "$WHEEL_FILE" "$VYRA_BASE_IMAGE_DIR/"
-    echo "  ✅ Copied to vyra_base_image"
+    echo "  ✅ Copied to vyra_image_python"
 else
-    echo "  ⚠️  Warning: vyra_base_image directory not found"
+    echo "  ⚠️  Warning: vyra_image_python directory not found"
 fi
 
 # Copy to test_daemon
