@@ -61,7 +61,7 @@ class Parameter(Base):
         JSON(), nullable=False, default={})
     type: Mapped[TypeEnum] = mapped_column(
         SQLEnum(TypeEnum, values_callable=lambda enum: [e.value for e in enum]),
-        nullable=False, unique=True)
+        nullable=False)
     visible: Mapped[bool] = mapped_column(
         nullable=False, default=True)
     editable: Mapped[bool] = mapped_column(
