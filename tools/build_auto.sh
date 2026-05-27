@@ -140,48 +140,48 @@ echo ""
 # ========================================
 echo "Step 6: Copying wheel to module directories..."
 
-# Copy to vyra_module_template
-if [ -d "../vyra_module_template/wheels" ]; then
-    # Clean old wheels
-    rm -rf ../vyra_module_template/wheels/vyra_base-*.whl 2>/dev/null || true
-    
-    # Copy new wheel
-    cp "$WHEEL_FILE" ../vyra_module_template/wheels/
-    echo "  ✅ Copied to vyra_module_template/wheels"
+# Copy to vyra_module_template_python
+PYTHON_TEMPLATE_WHEELS="../vyra_module_template_python/{{ module_name }}/wheels"
+if [ -d "$PYTHON_TEMPLATE_WHEELS" ]; then
+    rm -rf "$PYTHON_TEMPLATE_WHEELS"/vyra_base-*.whl 2>/dev/null || true
+    cp "$WHEEL_FILE" "$PYTHON_TEMPLATE_WHEELS/"
+    echo "  ✅ Copied to vyra_module_template_python/{{ module_name }}/wheels"
 else
-    echo "  ⚠️  Warning: ../vyra_module_template/wheels not found"
+    echo "  ⚠️  Warning: $PYTHON_TEMPLATE_WHEELS not found"
 fi
 
-# Copy to all modules in VOS2_WORKSPACE/modules/
+# Copy to all Python modules in VOS2_WORKSPACE/modules/
+# Rust modules (VYRA_RUST=true in .env) are skipped — they use lib/ not wheels/
 VOS2_MODULES_DIR="../../VOS2_WORKSPACE/modules"
 if [ -d "$VOS2_MODULES_DIR" ]; then
-    echo "  Searching for modules in $VOS2_MODULES_DIR..."
-    MODULE_COUNT=0
-    
-    # Iterate through all directories in modules/
+    echo "  Searching for Python modules in $VOS2_MODULES_DIR..."
+    PYTHON_MODULE_COUNT=0
+    RUST_SKIP_COUNT=0
+
     for MODULE_DIR in "$VOS2_MODULES_DIR"/*/; do
-        if [ -d "$MODULE_DIR" ]; then
-            MODULE_NAME=$(basename "$MODULE_DIR")
-            WHEELS_DIR="${MODULE_DIR}wheels"
-            
-            # Check if wheels directory exists
-            if [ -d "$WHEELS_DIR" ]; then
-                # Clean old wheels
-                rm -rf "$WHEELS_DIR"/vyra_base-*.whl 2>/dev/null || true
-                
-                # Copy new wheel
-                cp "$WHEEL_FILE" "$WHEELS_DIR/"
-                echo "  ✅ Copied to $MODULE_NAME/wheels"
-                MODULE_COUNT=$((MODULE_COUNT + 1))
-            fi
+        if [ ! -d "$MODULE_DIR" ]; then
+            continue
+        fi
+        MODULE_NAME=$(basename "$MODULE_DIR")
+        WHEELS_DIR="${MODULE_DIR}wheels"
+        ENV_FILE="${MODULE_DIR}.env"
+
+        # Skip Rust modules
+        if [ -f "$ENV_FILE" ] && grep -q '^VYRA_RUST=true' "$ENV_FILE"; then
+            RUST_SKIP_COUNT=$((RUST_SKIP_COUNT + 1))
+            continue
+        fi
+
+        if [ -d "$WHEELS_DIR" ]; then
+            rm -rf "$WHEELS_DIR"/vyra_base-*.whl 2>/dev/null || true
+            cp "$WHEEL_FILE" "$WHEELS_DIR/"
+            echo "  ✅ [Python] Copied to $MODULE_NAME/wheels"
+            PYTHON_MODULE_COUNT=$((PYTHON_MODULE_COUNT + 1))
         fi
     done
-    
-    if [ $MODULE_COUNT -eq 0 ]; then
-        echo "  ⚠️  Warning: No modules with wheels directory found"
-    else
-        echo "  ✅ Copied to $MODULE_COUNT module(s)"
-    fi
+
+    echo "  Python modules updated: $PYTHON_MODULE_COUNT"
+    echo "  Rust modules skipped:   $RUST_SKIP_COUNT"
 else
     echo "  ⚠️  Warning: VOS2_WORKSPACE/modules directory not found"
 fi

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (2026-05-27)
+- `tools/build_auto.sh`: Template path updated from `vyra_module_template` to `vyra_module_template_python/{{ module_name }}`
+- `tools/build_auto.sh`: Module copy step now detects `VYRA_RUST=true` in `.env` and skips Rust modules (wheels are for Python only)
+
 ### Added - test coverage expansion session (2026-05-09)
 
 - Added `tests/helper/__init__.py` to make helper tests discoverable as a package.
