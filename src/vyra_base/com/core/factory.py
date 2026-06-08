@@ -376,7 +376,7 @@ class InterfaceFactory:
                             **kwargs
                         }
                     }
-                    logger.info(f"✅ Subscriber '{name}' registered as pending with {protocol.value}")
+                    logger.info(f"🕒 Subscriber '{name}' registered as pending with {protocol.value}")
                     return None  # Return None for pending interface
                 
                 subscriber = await provider.create_subscriber(
@@ -459,7 +459,7 @@ class InterfaceFactory:
                             **kwargs
                         }
                     }
-                    logger.info(f"✅ Server '{name}' registered as pending with {protocol.value}")
+                    logger.info(f"🕒 Server '{name}' registered as pending with {protocol.value}")
                     return None  # Return None for pending interface
                 
                 server = await provider.create_server(
@@ -645,7 +645,7 @@ class InterfaceFactory:
                             **kwargs
                         }
                     }
-                    logger.info(f"✅ Action server '{name}' registered as pending with {protocol.value}")
+                    logger.info(f"🕒 Action server '{name}' registered as pending with {protocol.value}")
                     return None  # Return None for pending interface
 
                 action_server = await provider.create_action_server(
@@ -758,7 +758,7 @@ class InterfaceFactory:
                             **kwargs
                         }
                     }
-                    logger.info(f"✅ Action client '{name}' registered as pending with {protocol.value}")
+                    logger.info(f"🕒 Action client '{name}' registered as pending with {protocol.value}")
                     return None  # Return None for pending interface
                 
                 action_client = await provider.create_action_client(
