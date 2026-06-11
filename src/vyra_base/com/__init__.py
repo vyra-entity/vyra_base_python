@@ -20,11 +20,11 @@ Decorators (use on component methods):
     @remote_actionServer  — expose a method group as an action server (goal/feedback/result)
 
 Factory:
-    InterfaceFactory      — create server/client/publisher/subscriber/action objects
+    TransportProviderFactory      — create server/client/publisher/subscriber/action objects
 
 Example::
 
-    from vyra_base.com import remote_service, remote_publisher, InterfaceFactory, ProtocolType
+    from vyra_base.com import remote_service, remote_publisher, TransportProviderFactory, ProtocolType
 
     class MyComponent:
         @remote_service(name="ping", protocols=[ProtocolType.ZENOH])
@@ -66,7 +66,7 @@ from vyra_base.com.core import (
     IGoalHandle,
     GoalHandle,
     # Factory
-    InterfaceFactory,
+    TransportProviderFactory,
     # Decorators
     remote_service,
     remote_publisher,
@@ -94,12 +94,27 @@ from vyra_base.com.core.topic_builder import (
     parse_topic,
 )
 
-# Interface path registry & loader
+# Interface path registry & loader (legacy — kept for backward compatibility)
 from vyra_base.com.core import (
     InterfacePathRegistry,
     get_interface_registry,
     InterfaceLoader,
 )
+
+# New interface architecture
+from vyra_base.com.endpoint import (
+    InterfaceEndpoint,
+    InterfaceType as EndpointInterfaceType,
+    EndpointState,
+    EndpointRegistry,
+    ServiceEndpoint,
+    PublisherEndpoint,
+    SubscriberEndpoint,
+    ActionEndpoint,
+)
+from vyra_base.com.manifest import ManifestResolver, get_manifest_resolver
+from vyra_base.com.schema import SchemaResolver, SchemaType, Ros2Resolver, ProtoResolver
+from vyra_base.com.orchestrator import EndpointOrchestrator
 
 # Provider Registry
 from vyra_base.com.providers import (
@@ -260,7 +275,7 @@ __all__ = [
     # ------------------------------------------------------------------
     # Factory
     # ------------------------------------------------------------------
-    "InterfaceFactory",
+    "TransportProviderFactory",
     # ------------------------------------------------------------------
     # Decorators
     # ------------------------------------------------------------------
@@ -294,11 +309,29 @@ __all__ = [
     "build_topic",
     "parse_topic",
     # ------------------------------------------------------------------
-    # Interface Loading
+    # Interface Loading (legacy)
     # ------------------------------------------------------------------
     "InterfacePathRegistry",
     "get_interface_registry",
     "InterfaceLoader",
+    # ------------------------------------------------------------------
+    # New Interface Architecture
+    # ------------------------------------------------------------------
+    "InterfaceEndpoint",
+    "EndpointInterfaceType",
+    "EndpointState",
+    "EndpointRegistry",
+    "ServiceEndpoint",
+    "PublisherEndpoint",
+    "SubscriberEndpoint",
+    "ActionEndpoint",
+    "ManifestResolver",
+    "get_manifest_resolver",
+    "SchemaResolver",
+    "SchemaType",
+    "Ros2Resolver",
+    "ProtoResolver",
+    "EndpointOrchestrator",
     # ------------------------------------------------------------------
     # Feeders
     # ------------------------------------------------------------------

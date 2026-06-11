@@ -11,11 +11,17 @@ import re
 from typing import Any, Optional, Union, TYPE_CHECKING
 
 # NEW: Import from new multi-protocol architecture
-from vyra_base.com import InterfaceFactory, remote_service, ProtocolType
+from vyra_base.com import TransportProviderFactory, remote_service, ProtocolType
 from vyra_base.com.core.decorators import get_decorated_methods
 from vyra_base.com.core.blueprints import ActionBlueprint, ServiceBlueprint
 from vyra_base.com.core.callback_registry import CallbackRegistry
 from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
+
+# New interface architecture
+from vyra_base.com.endpoint import EndpointRegistry
+from vyra_base.com.manifest import ManifestResolver
+from vyra_base.com.schema import SchemaResolver
+from vyra_base.com.orchestrator import EndpointOrchestrator
 from vyra_base.com.providers.provider_registry import ProviderRegistry
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
@@ -173,6 +179,12 @@ class VyraEntity:
         self.module_entry: ModuleEntry = module_entry
         self.module_config: dict[str, Any] = module_config
 
+        # New interface architecture infrastructure
+        self.endpoint_registry: EndpointRegistry = EndpointRegistry()
+        self.manifest_resolver: ManifestResolver = ManifestResolver.get_instance()
+        self.schema_resolver: SchemaResolver = SchemaResolver()
+        self._orchestrator: Optional[EndpointOrchestrator] = None
+
         # Create ROS2 node only if ROS2 is available
         if self._ros2_available and VyraNode and NodeSettings:
             node_settings = NodeSettings(
@@ -234,7 +246,7 @@ class VyraEntity:
         Register the transport protocol providers based on availability.
 
         This method registers the appropriate protocol providers (ROS2, Zenoh, Redis, etc.)
-        with the InterfaceFactory to enable communication for the entity.
+        with the TransportProviderFactory to enable communication for the entity.
         """
         providers = []
         
@@ -322,16 +334,16 @@ class VyraEntity:
                 logger.info("✅ Registered UDS protocol provider (limited mode)")
         
         # Register all available providers
-        InterfaceFactory.register_provider(providers)
+        TransportProviderFactory.register_provider(providers)
 
     def _unregister_transport_providers(self) -> None:
         """
         Unregister all transport protocol providers.
 
-        This method removes all registered protocol providers from the InterfaceFactory.
+        This method removes all registered protocol providers from the TransportProviderFactory.
         """
         for protocol in self.registered_protocols:
-            InterfaceFactory.unregister_provider(protocol)
+            TransportProviderFactory.unregister_provider(protocol)
             logger.info(f"✅ Unregistered {protocol.value} protocol provider")
     
     def set_interface_paths(self, interface_paths: list[str | Path]) -> None:
@@ -411,6 +423,60 @@ class VyraEntity:
                             logger.debug(
                                 f"✓ Made {count} package(s) discoverable from: {install_dir}"
                             )
+
+    def add_manifest_paths(self, paths: list[str | Path]) -> None:
+        """
+        Register interface manifest directories with the ManifestResolver.
+
+        Paths are deduplicated and validated. Adding a path that is already
+        registered is a silent no-op.  Triggers the EndpointOrchestrator on
+        the next event-loop tick so newly discovered ``*.meta.json`` files
+        are loaded and matched to waiting endpoints.
+
+        Replaces ``set_interface_paths()`` in the new architecture.
+
+        Args:
+            paths: Base directories that contain a ``config/*.meta.json``
+                   sub-tree (and optionally ``srv/_gen/``, ``msg/_gen/``, …).
+        """
+        self.manifest_resolver.add_manifest_paths(paths)
+        # Also keep the legacy InterfacePathRegistry in sync
+        registry = InterfacePathRegistry.get_instance()
+        valid = [str(Path(p).resolve()) for p in paths if Path(p).resolve().is_dir()]
+        if valid:
+            try:
+                registry.set_interface_paths([str(p) for p in valid])
+            except ValueError:
+                pass
+        logger.info(
+            "add_manifest_paths: %d path(s) forwarded to ManifestResolver.", len(paths)
+        )
+
+    def add_schema_paths(self, paths: list[str | Path]) -> None:
+        """
+        Register additional directories for schema resolution (protos, srv/_gen, …).
+
+        These paths supplement those already known to the SchemaResolver via
+        the ManifestResolver singleton.
+
+        Args:
+            paths: Directories that contain ``msg/_gen``, ``srv/_gen``, or
+                   ``action/_gen`` subdirectories with ``*_pb2.py`` files.
+        """
+        for raw in paths:
+            path = Path(raw).resolve()
+            if not path.is_dir():
+                logger.warning(
+                    "add_schema_paths: path does not exist or is not a "
+                    "directory: %s",
+                    path,
+                )
+                continue
+            if path not in self.schema_resolver.interface_paths:
+                self.schema_resolver.interface_paths.append(path)
+                logger.info("add_schema_paths: added %s.", path)
+        if self._orchestrator is not None:
+            self._orchestrator.notify_schema_change()
 
     def _init_logger(self, log_config: Optional[dict[str, Any]]) -> None:
         """
@@ -742,6 +808,15 @@ class VyraEntity:
             # Step 2: Initialize transport providers
             await self._register_transport_provider(self.registered_protocols)
 
+            # Step 2b: Start the EndpointOrchestrator
+            self._orchestrator = EndpointOrchestrator(
+                endpoint_registry=self.endpoint_registry,
+                manifest_resolver=self.manifest_resolver,
+                schema_resolver=self.schema_resolver,
+                factory=TransportProviderFactory,
+            )
+            await self._orchestrator.start()
+
             # Step 3: Initialize resources (storages would be initialized here)
             await self.state_feeder.start()
             await self.news_feeder.start()
@@ -805,7 +880,10 @@ class VyraEntity:
             self.state_machine.shutdown(reason="graceful_shutdown")
             
             # Step 2: Clean up resources
-            # This is where cleanup would happen (close connections, save state, etc.)
+            if self._orchestrator is not None:
+                await self._orchestrator.stop()
+                self._orchestrator = None
+
             self._unregister_transport_providers()
             
             # Step 3: Complete shutdown
