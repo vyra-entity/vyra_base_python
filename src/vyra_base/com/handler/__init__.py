@@ -8,10 +8,10 @@ Handler hierarchy
 
     IFeederHandler  (interfaces.py)  — ABC: dispatch() + get_protocol() + logging.Handler
         └── CommunicationHandler  (communication.py)  — concrete base
-                ├── ROS2Handler    (ros2.py)      — ROS2 CAL publisher (via InterfaceFactory)
-                ├── ZenohHandler   (zenoh.py)     — Zenoh CAL publisher (via InterfaceFactory)
-                ├── RedisHandler   (redis.py)     — Redis CAL publisher (via InterfaceFactory)
-                ├── UDSHandler     (uds.py)       — UDS CAL publisher (via InterfaceFactory)
+                ├── ROS2Handler    (ros2.py)      — ROS2 CAL publisher (via TransportProviderFactory)
+                ├── ZenohHandler   (zenoh.py)     — Zenoh CAL publisher (via TransportProviderFactory)
+                ├── RedisHandler   (redis.py)     — Redis CAL publisher (via TransportProviderFactory)
+                ├── UDSHandler     (uds.py)       — UDS CAL publisher (via TransportProviderFactory)
                 └── DBCommunicationHandler (database.py) — async DB persistence
 
 Use :class:`~vyra_base.com.handler.factory.HandlerFactory` to create handlers

@@ -25,7 +25,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from vyra_base.com import InterfaceFactory, ProtocolType
+from vyra_base.com import TransportProviderFactory, ProtocolType
 from vyra_base.com.providers.provider_registry import ProviderRegistry
 from vyra_base.defaults.entries import (
     FunctionConfigEntry,
@@ -111,7 +111,7 @@ class InterfaceBuilder:
         # ROS2
         if ros2_available and cls.wants_ros2(tags) and cls.has_ros2_type(setting.interfacetypes):
             try:
-                await InterfaceFactory.create_server(
+                await TransportProviderFactory.create_server(
                     name=name,
                     response_callback=response_cb,
                     protocols=[ProtocolType.ROS2],
@@ -125,7 +125,7 @@ class InterfaceBuilder:
         # Zenoh
         if registry.is_available(ProtocolType.ZENOH) and cls.wants_zenoh(tags):
             try:
-                result = await InterfaceFactory.create_server(
+                result = await TransportProviderFactory.create_server(
                     name=name,
                     response_callback=response_cb,
                     protocols=[ProtocolType.ZENOH],
@@ -145,7 +145,7 @@ class InterfaceBuilder:
         # Redis
         if registry.is_available(ProtocolType.REDIS) and cls.wants_redis(tags):
             try:
-                result = await InterfaceFactory.create_server(
+                result = await TransportProviderFactory.create_server(
                     name=name,
                     response_callback=response_cb,
                     protocols=[ProtocolType.REDIS],
@@ -165,7 +165,7 @@ class InterfaceBuilder:
         # UDS
         if registry.is_available(ProtocolType.UDS) and cls.wants_uds(tags):
             try:
-                result = await InterfaceFactory.create_server(
+                result = await TransportProviderFactory.create_server(
                     name=name,
                     response_callback=response_cb,
                     protocols=[ProtocolType.UDS],
@@ -229,7 +229,7 @@ class InterfaceBuilder:
         # ROS2
         if ros2_available and cls.wants_ros2(tags) and cls.has_ros2_type(setting.interfacetypes):
             try:
-                await InterfaceFactory.create_action_server(
+                await TransportProviderFactory.create_action_server(
                     name=name,
                     handle_goal_request=on_goal,
                     handle_cancel_request=on_cancel,
@@ -246,7 +246,7 @@ class InterfaceBuilder:
         # Zenoh
         if registry.is_available(ProtocolType.ZENOH) and cls.wants_zenoh(tags):
             try:
-                result = await InterfaceFactory.create_action_server(
+                result = await TransportProviderFactory.create_action_server(
                     name=name,
                     handle_goal_request=on_goal,
                     handle_cancel_request=on_cancel,
@@ -268,7 +268,7 @@ class InterfaceBuilder:
         # Redis
         if registry.is_available(ProtocolType.REDIS) and cls.wants_redis(tags):
             try:
-                result = await InterfaceFactory.create_action_server(
+                result = await TransportProviderFactory.create_action_server(
                     name=name,
                     handle_goal_request=on_goal,
                     handle_cancel_request=on_cancel,
@@ -290,7 +290,7 @@ class InterfaceBuilder:
         # UDS
         if registry.is_available(ProtocolType.UDS) and cls.wants_uds(tags):
             try:
-                result = await InterfaceFactory.create_action_server(
+                result = await TransportProviderFactory.create_action_server(
                     name=name,
                     handle_goal_request=on_goal,
                     handle_cancel_request=on_cancel,
@@ -340,7 +340,7 @@ class InterfaceBuilder:
         # ROS2
         if ros2_available and cls.wants_ros2(tags) and cls.has_ros2_type(setting.interfacetypes):
             try:
-                await InterfaceFactory.create_publisher(
+                await TransportProviderFactory.create_publisher(
                     name=name,
                     protocols=[ProtocolType.ROS2],
                     message_type=setting.interfacetypes,
@@ -385,7 +385,7 @@ class InterfaceBuilder:
 
         if registry.is_available(ProtocolType.ZENOH):
             try:
-                result = await InterfaceFactory.create_server(
+                result = await TransportProviderFactory.create_server(
                     name=name,
                     response_callback=response_cb,
                     protocols=[ProtocolType.ZENOH],

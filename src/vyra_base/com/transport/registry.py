@@ -23,7 +23,7 @@ from vyra_base.com.core.types import (
 logger = logging.getLogger(__name__)
 
 
-class InterfaceRegistry:
+class TransportProviderRegistry:
     """
     Central registry for all communication interfaces.
     
@@ -31,7 +31,7 @@ class InterfaceRegistry:
     It provides thread-safe registration, lookup, and lifecycle management.
     """
     
-    _instance: Optional['InterfaceRegistry'] = None
+    _instance: Optional['TransportProviderRegistry'] = None
     _lock = RLock()
     
     def __new__(cls):
@@ -339,7 +339,7 @@ class InterfaceRegistry:
 
 
 # Global singleton instance
-interface_registry = InterfaceRegistry()
+interface_registry = TransportProviderRegistry()
 
 # Legacy compatibility functions (will be deprecated)
 def add_publisher(publisher_obj: VyraPublisher) -> None:

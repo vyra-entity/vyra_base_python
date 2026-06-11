@@ -1,5 +1,16 @@
 """
-Callback Registry - Late Binding Management
+.. deprecated::
+    This module is superseded by :mod:`vyra_base.com.endpoint`.
+
+    ``CallbackRegistry`` is replaced by ``EndpointRegistry`` in ``com/endpoint.py``.
+    Use ``entity.endpoint_registry.bind_callback()`` / ``bind_manifest()`` directly.
+
+    This file is kept for backward compatibility with transport providers that
+    have not yet been migrated.  Do **not** add new code here.
+
+----
+
+Callback Registry - Late Binding Management (DEPRECATED)
 
 Manages the lifecycle of handler blueprints and their callback bindings.
 Provides thread-safe global registry with per-module namespacing.

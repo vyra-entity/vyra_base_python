@@ -1,5 +1,20 @@
 """
-Communication Handler Blueprints
+.. deprecated::
+    This module is superseded by :mod:`vyra_base.com.endpoint`.
+
+    Migration map
+    -------------
+    * ``ServiceBlueprint``   → ``ServiceEndpoint``   in ``com/endpoint.py``
+    * ``ActionBlueprint``    → ``ActionEndpoint``     in ``com/endpoint.py``
+    * ``PublisherBlueprint`` → ``PublisherEndpoint``  in ``com/endpoint.py``
+    * ``CallbackRegistry``   → ``EndpointRegistry``  in ``com/endpoint.py``
+
+    This file is kept for backward compatibility with transport providers and
+    feeder classes that have not yet been migrated.  Do **not** add new code here.
+
+----
+
+Communication Handler Blueprints (DEPRECATED)
 
 Blueprints represent interface definitions that can be registered before their
 implementations are available. This enables two-phase initialization:

@@ -2,7 +2,7 @@
 Zenoh transport handler for VYRA feeders.
 
 Publishers are created via
-:func:`~vyra_base.com.core.factory.InterfaceFactory.create_publisher` using
+:func:`~vyra_base.com.core.factory.TransportProviderFactory.create_publisher` using
 :attr:`~vyra_base.com.core.types.ProtocolType.ZENOH`.  This keeps the
 Zenoh session management inside the CAL layer (``t_zenoh`` provider) and
 decoupled from the handler.
@@ -26,7 +26,7 @@ class ZenohHandler(CommunicationHandler):
 
     The internal ``VyraPublisher`` is created externally (by
     :class:`~vyra_base.com.handler.factory.HandlerFactory`) using
-    :func:`~vyra_base.com.core.factory.InterfaceFactory.create_publisher`
+    :func:`~vyra_base.com.core.factory.TransportProviderFactory.create_publisher`
     with ``protocols=[ProtocolType.ZENOH]``.  This handler only wraps the
     publisher to bridge the feeder / logging interface.
 

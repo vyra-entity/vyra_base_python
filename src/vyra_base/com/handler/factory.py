@@ -8,7 +8,7 @@ Transport handlers (ROS2, Zenoh, Redis, UDS)
 ---------------------------------------------
 Their internal :class:`~vyra_base.com.core.types.VyraPublisher` is **always**
 created through
-:func:`~vyra_base.com.core.factory.InterfaceFactory.create_publisher`,
+:func:`~vyra_base.com.core.factory.TransportProviderFactory.create_publisher`,
 keeping the CAL transport layer fully encapsulated.  The handler itself is
 only responsible for bridging the feeder / logging interface to that
 publisher.
@@ -47,7 +47,7 @@ class HandlerFactory:
     instances for a given :class:`~vyra_base.com.core.types.ProtocolType`.
 
     All transport handlers use
-    :func:`~vyra_base.com.core.factory.InterfaceFactory.create_publisher`
+    :func:`~vyra_base.com.core.factory.TransportProviderFactory.create_publisher`
     to obtain their ``VyraPublisher`` — the factory does not touch provider
     internals directly.
     """
@@ -71,7 +71,7 @@ class HandlerFactory:
         .. code-block:: text
 
             HandlerFactory.create(ProtocolType.ZENOH, ...)
-              └─► InterfaceFactory.create_publisher(protocols=[ZENOH], ...)
+              └─► TransportProviderFactory.create_publisher(protocols=[ZENOH], ...)
                     └─► ZenohProvider.create_publisher(...)   ← t_zenoh/provider.py
                           └─► ZenohPublisherImpl(...)         ← t_zenoh/vyra_models/
               └─► ZenohHandler(initiator, publisher, message_type)
@@ -83,7 +83,7 @@ class HandlerFactory:
             log messages).
         :type initiator: str
         :param feeder_name: Topic / service name forwarded to
-            ``InterfaceFactory.create_publisher``.
+            ``TransportProviderFactory.create_publisher``.
         :type feeder_name: str
         :param message_type: Message type for the publisher (e.g.
             ROS2 msg class, protobuf class, or ``None`` for dict-based
@@ -97,7 +97,7 @@ class HandlerFactory:
             ``ProtocolType.DATABASE`` / DB handlers).
         :type database: Any, optional
         :param extra_kwargs: Extra keyword arguments forwarded to
-            ``InterfaceFactory.create_publisher``.
+            ``TransportProviderFactory.create_publisher``.
         :type extra_kwargs: dict, optional
         :return: A fully initialised handler instance ready to be added
             to a feeder.
@@ -105,14 +105,14 @@ class HandlerFactory:
         :raises ValueError: If an unsupported *protocol* is given.
         :raises RuntimeError: If the publisher cannot be created.
         """
-        from vyra_base.com.core.factory import InterfaceFactory
+        from vyra_base.com.core.factory import TransportProviderFactory
         from vyra_base.com.core.types import ProtocolType
 
         extra_kwargs = extra_kwargs or {}
         protocol_str = str(protocol.value) if hasattr(protocol, "value") else str(protocol)
 
         # ----------------------------------------------------------------
-        # Transport handlers — publisher via InterfaceFactory
+        # Transport handlers — publisher via TransportProviderFactory
         # ----------------------------------------------------------------
         if protocol_str in (ProtocolType.ROS2.value, ProtocolType.ZENOH.value,
                             ProtocolType.REDIS.value, ProtocolType.UDS.value):
@@ -129,7 +129,7 @@ class HandlerFactory:
                     pub_kwargs["qos_profile"] = qos_profile
 
             try:
-                publisher = await InterfaceFactory.create_publisher(**pub_kwargs)
+                publisher = await TransportProviderFactory.create_publisher(**pub_kwargs)
             except Exception as exc:
                 raise RuntimeError(
                     f"HandlerFactory: could not create publisher for "

@@ -10,7 +10,7 @@ except ImportError:
 from vyra_base.com.core.types import VyraPublisher
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.com.transport.t_redis import RedisClient, REDIS_TYPE
-from vyra_base.com import InterfaceFactory, ProtocolType, remote_service
+from vyra_base.com import TransportProviderFactory, ProtocolType, remote_service
 
 import logging
 logger = logging.getLogger(__name__)
@@ -352,7 +352,7 @@ class Volatile:
         topic_name = ros2_topic_name if ros2_topic_name is not None else volatile_key
 
         # Step 3: Create ROS2 publisher for this volatile type
-        publisher: VyraPublisher = await InterfaceFactory.create_publisher(
+        publisher: VyraPublisher = await TransportProviderFactory.create_publisher(
             name=topic_name,
             protocols=[ProtocolType.ROS2],
             message_type=mapped_type,

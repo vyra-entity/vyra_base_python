@@ -9,7 +9,7 @@ muss eine konkrete Implementierung bereitstellen.
 WASM-Plugins können ausschließlich über diese Funktionen mit dem Host interagieren
 (kein direktes Filesystem, kein direktes Network-Access aus dem WASM-Kontext).
 
-Kommunikation läuft ausschließlich über die InterfaceFactory (create_publisher,
+Kommunikation läuft ausschließlich über die TransportProviderFactory (create_publisher,
 create_subscriber, create_server, create_client) — kein direkter Zenoh-Zugriff.
 Der PluginFacade sitzt oberhalb und prüft Berechtigungen aus metadata.json.
 
@@ -22,7 +22,7 @@ Klassen:
 Für ein Modul das Plugins hostet::
 
     from vyra_base.plugin.host_functions import BaseHostFunctions
-    from vyra_base.com.core.factory import InterfaceFactory
+    from vyra_base.com.core.factory import TransportProviderFactory
 
     class MyModuleHostFunctions(BaseHostFunctions):
         def __init__(self, plugin_event_publisher):
@@ -37,19 +37,19 @@ Für ein Modul das Plugins hostet::
             })
 
         async def create_publisher(self, name, module_name, module_id=None, **kwargs):
-            return await InterfaceFactory.create_publisher(name, module_id=module_id,
+            return await TransportProviderFactory.create_publisher(name, module_id=module_id,
                                                            module_name=module_name, **kwargs)
 
         async def create_subscriber(self, name, callback, module_name, module_id=None, **kwargs):
-            return await InterfaceFactory.create_subscriber(name, subscriber_callback=callback,
+            return await TransportProviderFactory.create_subscriber(name, subscriber_callback=callback,
                                                             module_id=module_id,
                                                             module_name=module_name, **kwargs)
 
         async def create_server(self, name, callback, **kwargs):
-            return await InterfaceFactory.create_server(name, response_callback=callback, **kwargs)
+            return await TransportProviderFactory.create_server(name, response_callback=callback, **kwargs)
 
         async def create_client(self, name, module_name, module_id=None, **kwargs):
-            return await InterfaceFactory.create_client(name, module_id=module_id,
+            return await TransportProviderFactory.create_client(name, module_id=module_id,
                                                         module_name=module_name, **kwargs)
 """
 
@@ -70,7 +70,7 @@ class HostFunctions(Protocol):
     Jede Methode entspricht einer Funktion, die in die WASM-Sandbox exportiert wird.
     Implementierungen müssen alle Methoden bereitstellen.
 
-    Kommunikation erfolgt über InterfaceFactory-Methoden (kein direkter Zenoh-Zugriff).
+    Kommunikation erfolgt über TransportProviderFactory-Methoden (kein direkter Zenoh-Zugriff).
     Der PluginFacade prüft Berechtigungen vor Delegierung an BaseHostFunctions.
     """
 
@@ -91,7 +91,7 @@ class HostFunctions(Protocol):
         **kwargs: Any,
     ) -> Any:
         """
-        Erstellt einen Publisher über InterfaceFactory.
+        Erstellt einen Publisher über TransportProviderFactory.
 
         :param name:        Interface-Name
         :param module_name: Ziel-Modulname
@@ -108,7 +108,7 @@ class HostFunctions(Protocol):
         **kwargs: Any,
     ) -> Any:
         """
-        Erstellt einen Subscriber über InterfaceFactory.
+        Erstellt einen Subscriber über TransportProviderFactory.
 
         :param name:        Interface-Name
         :param callback:    Async-Callback für eingehende Nachrichten
@@ -124,7 +124,7 @@ class HostFunctions(Protocol):
         **kwargs: Any,
     ) -> Any:
         """
-        Erstellt einen Service-Server über InterfaceFactory.
+        Erstellt einen Service-Server über TransportProviderFactory.
 
         :param name:     Service-Name
         :param callback: Async-Callback für eingehende Requests
@@ -139,7 +139,7 @@ class HostFunctions(Protocol):
         **kwargs: Any,
     ) -> Any:
         """
-        Erstellt einen Service-Client über InterfaceFactory.
+        Erstellt einen Service-Client über TransportProviderFactory.
 
         :param name:        Service-Name
         :param module_name: Ziel-Modulname
@@ -190,7 +190,7 @@ class BaseHostFunctions(ABC):
     `notify_ui`, `create_publisher`, `create_subscriber`, `create_server`,
     `create_client` müssen von der Unterklasse implementiert werden.
 
-    Kommunikation läuft ausschließlich über die InterfaceFactory — kein direkter
+    Kommunikation läuft ausschließlich über die TransportProviderFactory — kein direkter
     Zenoh-Zugriff. Der PluginFacade (vyra_base.plugin.plugin_facade) sitzt
     oberhalb und prüft Berechtigungen aus metadata.json vor jeder Operation.
 
@@ -211,20 +211,20 @@ class BaseHostFunctions(ABC):
                 await self._pub.publish({"event_name": event_name, "data": data})
 
             async def create_publisher(self, name, module_name, module_id=None, **kw):
-                return await InterfaceFactory.create_publisher(
+                return await TransportProviderFactory.create_publisher(
                     name, module_id=module_id, module_name=module_name, **kw)
 
             async def create_subscriber(self, name, callback, module_name, module_id=None, **kw):
-                return await InterfaceFactory.create_subscriber(
+                return await TransportProviderFactory.create_subscriber(
                     name, subscriber_callback=callback,
                     module_id=module_id, module_name=module_name, **kw)
 
             async def create_server(self, name, callback, **kw):
-                return await InterfaceFactory.create_server(
+                return await TransportProviderFactory.create_server(
                     name, response_callback=callback, **kw)
 
             async def create_client(self, name, module_name, module_id=None, **kw):
-                return await InterfaceFactory.create_client(
+                return await TransportProviderFactory.create_client(
                     name, module_id=module_id, module_name=module_name, **kw)
     """
 
@@ -246,7 +246,7 @@ class BaseHostFunctions(ABC):
         module_id: Optional[str] = None,
         **kwargs: Any,
     ) -> Any:
-        """Erstellt einen Publisher via InterfaceFactory."""
+        """Erstellt einen Publisher via TransportProviderFactory."""
         ...
 
     @abstractmethod
@@ -258,7 +258,7 @@ class BaseHostFunctions(ABC):
         module_id: Optional[str] = None,
         **kwargs: Any,
     ) -> Any:
-        """Erstellt einen Subscriber via InterfaceFactory."""
+        """Erstellt einen Subscriber via TransportProviderFactory."""
         ...
 
     @abstractmethod
@@ -268,7 +268,7 @@ class BaseHostFunctions(ABC):
         callback: Callable,
         **kwargs: Any,
     ) -> Any:
-        """Erstellt einen Service-Server via InterfaceFactory."""
+        """Erstellt einen Service-Server via TransportProviderFactory."""
         ...
 
     @abstractmethod
@@ -279,7 +279,7 @@ class BaseHostFunctions(ABC):
         module_id: Optional[str] = None,
         **kwargs: Any,
     ) -> Any:
-        """Erstellt einen Service-Client via InterfaceFactory.
+        """Erstellt einen Service-Client via TransportProviderFactory.
 
         :param name:        Service-Name
         :param module_name: Ziel-Modulname

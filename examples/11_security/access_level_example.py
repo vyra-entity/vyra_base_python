@@ -134,8 +134,8 @@ async def build_base():
     )
     
     # Security manager is now available
-    if entity.security_manager:
-        print(f"✅ Security enabled: Max Level {entity.security_manager.max_security_level}")
+    if entity.security:
+        print(f"✅ Security enabled: Max Level {entity.security.max_security_level}")
     
     return entity
 
@@ -160,8 +160,8 @@ class Application(OperationalStateMachine):
         self.entity = entity
         
         # Log security status
-        if entity.security_manager:
-            logger.info(f"Security enabled: Max level {entity.security_manager.max_security_level}")
+        if entity.security:
+            logger.info(f"Security enabled: Max level {entity.security.max_security_level}")
         else:
             logger.warning("Security disabled - all services are public")
     

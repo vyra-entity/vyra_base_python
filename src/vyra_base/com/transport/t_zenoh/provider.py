@@ -533,7 +533,7 @@ class ZenohProvider(AbstractProtocolProvider):
         direct_response: Optional[Callable] = None,
         feedback_callback: Optional[Callable] = None,
         goal_response_callback: Optional[Callable] = None,
-        # Factory-style aliases (InterfaceFactory.create_action_client uses these names)
+        # Factory-style aliases (TransportProviderFactory.create_action_client uses these names)
         direct_response_callback: Optional[Callable] = None,
         goal_callback: Optional[Callable] = None,
         **kwargs

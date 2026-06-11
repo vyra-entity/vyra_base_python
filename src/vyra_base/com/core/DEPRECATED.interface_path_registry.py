@@ -1,5 +1,17 @@
 """
-Interface Path Registry for Dynamic Interface Loading
+.. deprecated::
+    This module is superseded by :mod:`vyra_base.com.manifest`.
+
+    ``InterfacePathRegistry`` → ``ManifestResolver`` in ``com/manifest.py``.
+    Use ``ManifestResolver.get_instance().add_manifest_paths([...])`` instead.
+    ``get_interface_registry()`` → ``ManifestResolver.get_instance()``.
+
+    This file is kept for backward compatibility with feeder classes and
+    ``entity.py`` that have not yet been fully migrated.  Do **not** add new code here.
+
+----
+
+Interface Path Registry for Dynamic Interface Loading (DEPRECATED)
 
 Singleton registry that stores interface base paths for module-wide access.
 Enables dynamic discovery of ROS2 interfaces (.srv/.msg/.action) and 

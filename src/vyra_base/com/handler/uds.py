@@ -2,7 +2,7 @@
 Unix Domain Socket (UDS) transport handler for VYRA feeders.
 
 Publishers are created via
-:func:`~vyra_base.com.core.factory.InterfaceFactory.create_publisher` using
+:func:`~vyra_base.com.core.factory.TransportProviderFactory.create_publisher` using
 :attr:`~vyra_base.com.core.types.ProtocolType.UDS`.
 
 UDS is ideal for high-throughput, low-latency intra-host communication

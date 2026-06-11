@@ -6,7 +6,7 @@ from typing import Any, Optional
 from sqlalchemy import event
 from sqlalchemy import inspect
 
-from vyra_base.com import InterfaceFactory, ProtocolType, remote_service
+from vyra_base.com import TransportProviderFactory, ProtocolType, remote_service
 from vyra_base.helper.error_handler import ErrorTraceback
 from vyra_base.storage.db_access import DBSTATUS, DbAccess
 from vyra_base.storage.db_manipulator import DBReturnValue, DbManipulator
@@ -83,7 +83,7 @@ class Parameter:
     async def _init_publisher(self) -> None:
         """Initialize the parameter update publisher lazily."""
         if self.update_parameter_publisher is None:
-            self.update_parameter_publisher = await InterfaceFactory.create_publisher(
+            self.update_parameter_publisher = await TransportProviderFactory.create_publisher(
                 name=self.update_param_event_ident,
                 protocols=[ProtocolType.ZENOH],
                 node=self._node,

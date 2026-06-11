@@ -1,5 +1,17 @@
 """
-Dynamic Interface Loader for ROS2 and Protocol Buffer Interfaces
+.. deprecated::
+    This module is superseded by :mod:`vyra_base.com.schema`.
+
+    ``InterfaceLoader`` → ``SchemaResolver`` in ``com/schema.py``.
+    Subclasses: ``Ros2Resolver``, ``ProtoResolver``.
+    Unified entry-point: ``schema_resolver.load_interface(name, SchemaType.ROS2)``.
+
+    This file is kept for backward compatibility with feeder and topic_builder
+    classes that have not yet been migrated.  Do **not** add new code here.
+
+----
+
+Dynamic Interface Loader for ROS2 and Protocol Buffer Interfaces (DEPRECATED)
 
 Loads interface type classes at runtime from string names, supporting:
 - ROS2 Interfaces: .srv (services), .msg (messages), .action (actions)

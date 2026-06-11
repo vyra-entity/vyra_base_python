@@ -76,12 +76,12 @@ from vyra_base.com.core import (
     bind_decorated_callbacks,
     # Deprecated aliases (kept for backwards compatibility)
     # Blueprint Infrastructure
-    HandlerBlueprint,
-    ServiceBlueprint,
-    PublisherBlueprint,
-    SubscriberBlueprint,
-    ActionBlueprint,
-    CallbackRegistry,
+    # HandlerBlueprint,
+    # ServiceBlueprint,
+    # PublisherBlueprint,
+    # SubscriberBlueprint,
+    # ActionBlueprint,
+    # CallbackRegistry,
 )
 
 # Topic Builder for naming conventions
@@ -95,11 +95,11 @@ from vyra_base.com.core.topic_builder import (
 )
 
 # Interface path registry & loader (legacy — kept for backward compatibility)
-from vyra_base.com.core import (
-    InterfacePathRegistry,
-    get_interface_registry,
-    InterfaceLoader,
-)
+# from vyra_base.com.core import (
+#     InterfacePathRegistry,
+#     get_interface_registry,
+#     InterfaceLoader,
+# )
 
 # New interface architecture
 from vyra_base.com.endpoint import (
@@ -288,12 +288,12 @@ __all__ = [
     # ------------------------------------------------------------------
     # Blueprint Infrastructure
     # ------------------------------------------------------------------
-    "HandlerBlueprint",
-    "ServiceBlueprint",
-    "PublisherBlueprint",
-    "SubscriberBlueprint",
-    "ActionBlueprint",
-    "CallbackRegistry",
+    # "HandlerBlueprint",
+    # "ServiceBlueprint",
+    # "PublisherBlueprint",
+    # "SubscriberBlueprint",
+    # "ActionBlueprint",
+    # "CallbackRegistry",
     # ------------------------------------------------------------------
     # Provider Registry
     # ------------------------------------------------------------------
@@ -311,9 +311,9 @@ __all__ = [
     # ------------------------------------------------------------------
     # Interface Loading (legacy)
     # ------------------------------------------------------------------
-    "InterfacePathRegistry",
-    "get_interface_registry",
-    "InterfaceLoader",
+    # "InterfacePathRegistry",
+    # "get_interface_registry",
+    # "InterfaceLoader",
     # ------------------------------------------------------------------
     # New Interface Architecture
     # ------------------------------------------------------------------

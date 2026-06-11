@@ -42,7 +42,7 @@ from vyra_base.com.core.types import (
     GoalHandle,
 )
 
-from vyra_base.com.core.factory import InterfaceFactory
+from vyra_base.com.core.factory import TransportProviderFactory
 
 from vyra_base.com.core.blueprints import (
     HandlerBlueprint,
@@ -149,7 +149,7 @@ __all__ = [
     "IActionHandler",
     "IGoalHandle",
     # Factory
-    "InterfaceFactory",
+    "TransportProviderFactory",
     # Decorators
     "remote_service",
     "remote_publisher",

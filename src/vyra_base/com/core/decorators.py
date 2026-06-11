@@ -195,7 +195,7 @@ def remote_publisher(
         ...         await self.publish_status({"state": "running"})
         
     Note:
-        - Publisher creation happens via InterfaceFactory during binding
+        - Publisher creation happens via TransportProviderFactory during binding
         - The decorated method is replaced with actual publishing logic
     """
     def decorator(func: Callable) -> Callable:
@@ -234,11 +234,11 @@ def remote_publisher(
             if not hasattr(self_obj, publisher_attr):
                 logger.warning(
                     f"⚠️  Publisher '{blueprint_name}' not initialized. "
-                    f"This should be created via InterfaceFactory during binding."
+                    f"This should be created via TransportProviderFactory during binding."
                 )
                 # Lazy creation as fallback (not ideal, but prevents crashes)
-                from vyra_base.com.core.factory import InterfaceFactory
-                publisher = await InterfaceFactory.create_publisher(
+                from vyra_base.com.core.factory import TransportProviderFactory
+                publisher = await TransportProviderFactory.create_publisher(
                     name=blueprint_name,
                     protocols=protocols or [],
                     **kwargs

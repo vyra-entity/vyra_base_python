@@ -46,7 +46,7 @@ class VyraActionClientImpl(VyraActionClient):
         **kwargs
     ):
         # Pop factory-style aliases from kwargs to avoid duplicate-argument errors
-        # when InterfaceFactory passes direct_response_callback / goal_callback.
+        # when TransportProviderFactory passes direct_response_callback / goal_callback.
         direct_response = direct_response or kwargs.pop("direct_response_callback", None)
         goal_response_callback = goal_response_callback or kwargs.pop("goal_callback", None)
 
@@ -91,7 +91,6 @@ class VyraActionClientImpl(VyraActionClient):
         Returns:
             goal_id on success, None on failure
             
-        TODO:
         1. Serialize goal
         2. Query to ``self._key_goal`` (built via _action_channel)
         3. Parse response for goal_id

@@ -4,7 +4,7 @@ Abstract interfaces for VYRA feeder handlers.
 This module defines the ``IFeederHandler`` abstract base class that all
 communication handlers must implement.  Transport handlers (ROS2, Zenoh,
 Redis, UDS) create their internal publisher via
-:func:`~vyra_base.com.core.factory.InterfaceFactory.create_publisher`,
+:func:`~vyra_base.com.core.factory.TransportProviderFactory.create_publisher`,
 keeping the CAL layer fully decoupled from handler logic.
 
 Design decisions

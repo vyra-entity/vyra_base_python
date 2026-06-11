@@ -22,7 +22,7 @@ if _ROS2_AVAILABLE:
         QoSDurabilityPolicy,
     )
 
-from vyra_base.com import InterfaceFactory
+from vyra_base.com import TransportProviderFactory
 
 from vyra_base.com.feeder.interfaces import IFeeder
 from vyra_base.com.handler.communication import CommunicationHandler
@@ -234,7 +234,7 @@ class BaseFeeder(IFeeder):
         1. ``FeederConfigResolver.resolve(feeder_name, interface_paths)`` —
            reads the module's JSON config, maps ``tags`` to a protocol.
         2. If no config found (or ``interface_paths`` empty): fall back to
-           ``InterfaceFactory.create_publisher`` with the default chain
+           ``TransportProviderFactory.create_publisher`` with the default chain
            ``[ZENOH, ROS2, REDIS, UDS]``.
 
         :raises FeederException: If no protocol is available at all.
@@ -286,7 +286,7 @@ class BaseFeeder(IFeeder):
                 if self._qos:
                     pub_kwargs["qos_profile"] = self._qos
 
-            self._publisher = await InterfaceFactory.create_publisher(**pub_kwargs)
+            self._publisher = await TransportProviderFactory.create_publisher(**pub_kwargs)
 
             if self._resolved_protocol is None and hasattr(self._publisher, 'protocol'):
                 self._resolved_protocol = getattr(self._publisher.protocol, 'value',
@@ -311,7 +311,7 @@ class BaseFeeder(IFeeder):
                 if self._ros2_available and self._node:
                     fallback_kwargs["node"] = self._node
                     fallback_kwargs["qos_profile"] = self._qos
-                self._publisher = await InterfaceFactory.create_publisher(
+                self._publisher = await TransportProviderFactory.create_publisher(
                     **fallback_kwargs
                 )
             except Exception as exc_fallback:

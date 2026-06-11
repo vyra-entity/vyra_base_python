@@ -212,7 +212,7 @@ class VyraEntity:
 
         self._init_security_manager(module_config)
 
-        VyraEntity.register_service_callbacks(self)
+        self.bind_endpoint_callbacks(self)
 
         self.news_feeder.feed_sync("...V.Y.R.A. entity initialized")
 
@@ -598,7 +598,7 @@ class VyraEntity:
             storage_access_transient=self.redis_access
         )
 
-        VyraEntity.register_service_callbacks(self.param_manager)
+        self.bind_endpoint_callbacks(self.param_manager)
 
         await self.param_manager.load_defaults()
 
@@ -623,7 +623,7 @@ class VyraEntity:
             transient_base_types=transient_base_types
         )
 
-        VyraEntity.register_service_callbacks(self.volatile)
+        self.bind_endpoint_callbacks(self.volatile)
 
     def _init_state_machine(self, state_entry: StateEntry) -> UnifiedStateMachine:
         """
@@ -945,7 +945,7 @@ class VyraEntity:
             f"{SecurityLevel.get_name(max_level)}"
         )
         
-        self.security_manager = SecurityManager(
+        self.security = SecurityManager(
             max_security_level=max_level,
             session_duration_seconds=session_duration,
             ca_key_path=ca_key_path,
@@ -953,7 +953,7 @@ class VyraEntity:
             module_passwords=module_passwords
         )
 
-        VyraEntity.register_service_callbacks(self.security_manager)
+        self.bind_endpoint_callbacks(self.security)
 
     async def setup_storage(
             self, config: dict[str, Any], 
@@ -1040,7 +1040,7 @@ class VyraEntity:
             logger.warning("⚠️ Could not ensure skill table: %s", exc)
 
         self.skill_manager = SkillManager(database_access=self.database_access)
-        VyraEntity.register_service_callbacks(self.skill_manager)
+        self.bind_endpoint_callbacks(self.skill_manager)
         logger.info("✅ SkillManager initialized")
 
     async def _activate_errorfeed_db_handler(self) -> None:
@@ -1081,234 +1081,247 @@ class VyraEntity:
             ERROR_LOG_MAX_ROWS,
         )
 
-    async def set_interfaces(
-            self,
-            settings: list[FunctionConfigEntry]) -> None:
-        """
-        Add communication interfaces to this module.
+    # async def set_interfaces(
+    #         self,
+    #         settings: list[FunctionConfigEntry]) -> None:
+    #     """
+    #     .. deprecated::
+    #         Transport activation is now handled automatically by
+    #         :class:`~vyra_base.com.orchestrator.EndpointOrchestrator`.
 
-        Protocol selection is driven by :class:`~vyra_base.defaults.entries.FunctionConfigTags`:
+    #         Migration path:
+    #           1. Call ``entity.add_manifest_paths([interfaces_path])`` — loads ``*.meta.json``.
+    #           2. Call ``entity.bind_endpoint_callbacks(component)`` for each component.
+    #           3. The orchestrator wires the transport once definition + schema + callbacks align.
 
-        - **empty tags** → register on every available / applicable protocol.
-        - **non-empty tags** → register *only* on the explicitly listed protocols.
+    #         This method is preserved for backward compatibility during the transition period.
+    #         It will be removed in a future release.
+    #     """
+    #     import warnings
+    #     warnings.warn(
+    #         "set_interfaces() is deprecated. The EndpointOrchestrator handles transport "
+    #         "activation automatically. Use add_manifest_paths() + bind_endpoint_callbacks().",
+    #         DeprecationWarning,
+    #         stacklevel=2,
+    #     )
 
-        Dispatch is fully delegated to :class:`~vyra_base.core.interface_builder.InterfaceBuilder`
-        so this method stays lean and serves solely as orchestration glue.
+    #     # ── Original implementation kept as reference (no longer active) ────────
+    #     # _registry = ProviderRegistry()
+    #     _registry = ProviderRegistry()  # still needed for the body below
 
-        :param settings: List of :class:`~vyra_base.defaults.entries.FunctionConfigEntry`.
-        """
+    #     for setting in settings:
+    #         # ── Dedup / late-bind upgrade ─────────────────────────────────────
+    #         existing = next(
+    #             (i for i in self._interface_list if i.functionname == setting.functionname),
+    #             None,
+    #         )
+    #         if existing is not None:
+    #             new_cb = setting.callbacks if isinstance(setting.callbacks, dict) else None
+    #             old_cb = existing.callbacks if isinstance(existing.callbacks, dict) else None
+    #             if new_cb and not old_cb:
+    #                 logger.info(
+    #                     f"📋 Upgrading pending interface '{setting.functionname}' with callback"
+    #                 )
+    #                 existing.callbacks = new_cb
+    #                 await InterfaceBuilder.upgrade_service(setting, new_cb, _registry)
+    #             else:
+    #                 logger.warning(
+    #                     f"Interface '{setting.functionname}' already registered. Skipping."
+    #                 )
+    #             continue
 
-        _registry = ProviderRegistry()
+    #         self._interface_list.append(setting)
 
-        for setting in settings:
-            # ── Dedup / late-bind upgrade ─────────────────────────────────────
-            existing = next(
-                (i for i in self._interface_list if i.functionname == setting.functionname),
-                None,
-            )
-            if existing is not None:
-                new_cb = setting.callbacks if isinstance(setting.callbacks, dict) else None
-                old_cb = existing.callbacks if isinstance(existing.callbacks, dict) else None
-                if new_cb and not old_cb:
-                    logger.info(
-                        f"📋 Upgrading pending interface '{setting.functionname}' with callback"
-                    )
-                    existing.callbacks = new_cb
-                    await InterfaceBuilder.upgrade_service(setting, new_cb, _registry)
-                else:
-                    logger.warning(
-                        f"Interface '{setting.functionname}' already registered. Skipping."
-                    )
-                continue
+    #         # ── Resolve callbacks ─────────────────────────────────────────────
+    #         callbacks: dict | None = (
+    #             setting.callbacks if isinstance(setting.callbacks, dict) else None
+    #         )
+    #         if not callbacks:
+    #             blueprint = CallbackRegistry.get_blueprint(setting.functionname)
+    #             if blueprint and blueprint.is_bound():
+    #                 callbacks = {"response": blueprint.callback}
+    #                 logger.debug(
+    #                     f"📋 Using CallbackRegistry blueprint for '{setting.functionname}'"
+    #                 )
 
-            self._interface_list.append(setting)
+    #         # ── Dispatch by interface type ────────────────────────────────────
+    #         t = setting.type
 
-            # ── Resolve callbacks ─────────────────────────────────────────────
-            callbacks: dict | None = (
-                setting.callbacks if isinstance(setting.callbacks, dict) else None
-            )
-            if not callbacks:
-                blueprint = CallbackRegistry.get_blueprint(setting.functionname)
-                if blueprint and blueprint.is_bound():
-                    callbacks = {"response": blueprint.callback}
-                    logger.debug(
-                        f"📋 Using CallbackRegistry blueprint for '{setting.functionname}'"
-                    )
+    #         if t == FunctionConfigBaseTypes.service.value:
+    #             logger.info(f"Creating service: {setting.functionname}")
+    #             await InterfaceBuilder.create_service(
+    #                 setting, callbacks, self._node, self._ros2_available, _registry
+    #             )
 
-            # ── Dispatch by interface type ────────────────────────────────────
-            t = setting.type
+    #         elif t == FunctionConfigBaseTypes.action.value:
+    #             logger.info(f"Creating actionServer: {setting.functionname}")
+    #             await InterfaceBuilder.create_action(
+    #                 setting, callbacks, self._node, self._ros2_available, _registry
+    #             )
 
-            if t == FunctionConfigBaseTypes.service.value:
-                logger.info(f"Creating service: {setting.functionname}")
-                await InterfaceBuilder.create_service(
-                    setting, callbacks, self._node, self._ros2_available, _registry
-                )
+    #         elif t == FunctionConfigBaseTypes.message.value:
+    #             logger.info(f"Creating publisher: {setting.functionname}")
+    #             await InterfaceBuilder.create_publisher(
+    #                 setting, self._node, self._ros2_available
+    #             )
 
-            elif t == FunctionConfigBaseTypes.action.value:
-                logger.info(f"Creating actionServer: {setting.functionname}")
-                await InterfaceBuilder.create_action(
-                    setting, callbacks, self._node, self._ros2_available, _registry
-                )
+    #         else:
+    #             msg = (
+    #                 f"Unsupported interface type: '{setting.type}'. "
+    #                 "Supported: service, action, message."
+    #             )
+    #             logger.error(msg)
+    #             raise ValueError(msg)
 
-            elif t == FunctionConfigBaseTypes.message.value:
-                logger.info(f"Creating publisher: {setting.functionname}")
-                await InterfaceBuilder.create_publisher(
-                    setting, self._node, self._ros2_available
-                )
+    # def bind_interface_callbacks(
+    #         self, 
+    #         component: Any,
+    #         settings: Optional[list[FunctionConfigEntry]] = None) -> dict[str, bool]:
+    #     """
+    #     .. deprecated::
+    #         Use :meth:`bind_endpoint_callbacks` instead.  Callbacks are now registered
+    #         directly with :attr:`endpoint_registry` via ``bind_callback()``.
 
-            else:
-                msg = (
-                    f"Unsupported interface type: '{setting.type}'. "
-                    "Supported: service, action, message."
-                )
-                logger.error(msg)
-                raise ValueError(msg)
-
-    def bind_interface_callbacks(
-            self, 
-            component: Any,
-            settings: Optional[list[FunctionConfigEntry]] = None) -> dict[str, bool]:
-        """
-        Bind decorated callbacks from a component to interface settings.
+    #     Bind decorated callbacks from a component to interface settings.
         
-        This method discovers decorated methods (e.g., @remote_actionServer.on_goal/on_cancel/execute)
-        from a component and binds them to the corresponding FunctionConfigEntry objects.
+    #     This method discovers decorated methods (e.g., @remote_actionServer.on_goal/on_cancel/execute)
+    #     from a component and binds them to the corresponding FunctionConfigEntry objects.
         
-        For ActionServers with multi-callback pattern, callbacks are stored in:
-        - setting.metadata['callbacks']['on_goal']
-        - setting.metadata['callbacks']['on_cancel']
-        - setting.metadata['callbacks']['execute']
+    #     For ActionServers with multi-callback pattern, callbacks are stored in:
+    #     - setting.metadata['callbacks']['on_goal']
+    #     - setting.metadata['callbacks']['on_cancel']
+    #     - setting.metadata['callbacks']['execute']
         
-        Args:
-            component: Component instance with decorated methods
-            settings: Optional list of FunctionConfigEntry to update. 
-                     If None, uses self._interface_list
+    #     Args:
+    #         component: Component instance with decorated methods
+    #         settings: Optional list of FunctionConfigEntry to update. 
+    #                  If None, uses self._interface_list
                      
-        Returns:
-            dict[str, bool]: Mapping of interface names to binding success status
+    #     Returns:
+    #         dict[str, bool]: Mapping of interface names to binding success status
             
-        Example:
-            >>> class MyComponent:
-            ...     @remote_actionServer.on_goal(name="process")
-            ...     async def accept_goal(self, goal_request): return True
-            ...     
-            ...     @remote_actionServer.on_cancel(name="process")
-            ...     async def cancel(self, goal_handle): return True
-            ...     
-            ...     @remote_actionServer.execute(name="process")
-            ...     async def execute(self, goal_handle): return {"done": True}
-            >>> 
-            >>> component = MyComponent()
-            >>> entity.bind_interface_callbacks(component)
-            {'process/on_goal': True, 'process/on_cancel': True, 'process/execute': True}
-        """
-        if settings is None:
-            settings = self._interface_list
+    #     Example:
+    #         >>> class MyComponent:
+    #         ...     @remote_actionServer.on_goal(name="process")
+    #         ...     async def accept_goal(self, goal_request): return True
+    #         ...     
+    #         ...     @remote_actionServer.on_cancel(name="process")
+    #         ...     async def cancel(self, goal_handle): return True
+    #         ...     
+    #         ...     @remote_actionServer.execute(name="process")
+    #         ...     async def execute(self, goal_handle): return {"done": True}
+    #         >>> 
+    #         >>> component = MyComponent()
+    #         >>> entity.bind_interface_callbacks(component)
+    #         {'process/on_goal': True, 'process/on_cancel': True, 'process/execute': True}
+    #     """
+    #     if settings is None:
+    #         settings = self._interface_list
         
-        # Discover decorated methods
-        decorated = get_decorated_methods(component)
-        results = {}
+    #     # Discover decorated methods
+    #     decorated = get_decorated_methods(component)
+    #     results = {}
         
-        # Process ActionServer callbacks (multi-callback pattern)
-        action_callbacks = {}  # {action_name: {callback_type: method}}
+    #     # Process ActionServer callbacks (multi-callback pattern)
+    #     action_callbacks = {}  # {action_name: {callback_type: method}}
         
-        for action_item in decorated['actions']:
-            action_name = action_item['name']
-            callback_type = action_item.get('callback_type', 'execute')
-            method = action_item['method']
+    #     for action_item in decorated['actions']:
+    #         action_name = action_item['name']
+    #         callback_type = action_item.get('callback_type', 'execute')
+    #         method = action_item['method']
             
-            if action_name not in action_callbacks:
-                action_callbacks[action_name] = {}
+    #         if action_name not in action_callbacks:
+    #             action_callbacks[action_name] = {}
             
-            action_callbacks[action_name][callback_type] = method
-            logger.debug(
-                f"Discovered ActionServer callback: {action_name}/{callback_type}"
-            )
+    #         action_callbacks[action_name][callback_type] = method
+    #         logger.debug(
+    #             f"Discovered ActionServer callback: {action_name}/{callback_type}"
+    #         )
         
-        # Bind ActionServer callbacks to settings
-        for action_name, callbacks in action_callbacks.items():
-            # Find corresponding FunctionConfigEntry
-            matching_settings = [
-                s for s in settings 
-                if s.functionname == action_name and 
-                   s.type == FunctionConfigBaseTypes.action.value
-            ]
+    #     # Bind ActionServer callbacks to settings
+    #     for action_name, callbacks in action_callbacks.items():
+    #         # Find corresponding FunctionConfigEntry
+    #         matching_settings = [
+    #             s for s in settings 
+    #             if s.functionname == action_name and 
+    #                s.type == FunctionConfigBaseTypes.action.value
+    #         ]
             
-            if not matching_settings:
-                logger.warning(
-                    f"⚠️  No FunctionConfigEntry found for ActionServer '{action_name}'. "
-                    f"Callbacks will not be bound."
-                )
-                for callback_type in callbacks:
-                    results[f"{action_name}/{callback_type}"] = False
-                continue
+    #         if not matching_settings:
+    #             logger.warning(
+    #                 f"⚠️  No FunctionConfigEntry found for ActionServer '{action_name}'. "
+    #                 f"Callbacks will not be bound."
+    #             )
+    #             for callback_type in callbacks:
+    #                 results[f"{action_name}/{callback_type}"] = False
+    #             continue
             
-            setting = matching_settings[0]
+    #         setting = matching_settings[0]
             
-            if setting.callbacks is None:
-                logger.warning(
-                    f"⚠️  FunctionConfigEntry for '{action_name}' has no callbacks dict. Initializing empty callbacks dict."
-                )
-                setting.callbacks = {}
+    #         if setting.callbacks is None:
+    #             logger.warning(
+    #                 f"⚠️  FunctionConfigEntry for '{action_name}' has no callbacks dict. Initializing empty callbacks dict."
+    #             )
+    #             setting.callbacks = {}
             
-            # Bind each callback
-            for callback_type, method in callbacks.items():
-                setting.callbacks[callback_type] = method
-                results[f"{action_name}/{callback_type}"] = True
-                logger.debug(
-                    f"✅ Bound ActionServer callback: {action_name}/{callback_type}"
-                )
+    #         # Bind each callback
+    #         for callback_type, method in callbacks.items():
+    #             setting.callbacks[callback_type] = method
+    #             results[f"{action_name}/{callback_type}"] = True
+    #             logger.debug(
+    #                 f"✅ Bound ActionServer callback: {action_name}/{callback_type}"
+    #             )
             
-            # Verify all required callbacks are present
-            required = ['on_goal', 'on_cancel', 'execute']
-            missing = [cb for cb in required if cb not in setting.callbacks]
+    #         # Verify all required callbacks are present
+    #         required = ['on_goal', 'on_cancel', 'execute']
+    #         missing = [cb for cb in required if cb not in setting.callbacks]
             
-            if missing:
-                logger.warning(
-                    f"⚠️  ActionServer '{action_name}' missing callbacks: {missing}. "
-                    "Will use default implementations (accept all)."
-                )
+    #         if missing:
+    #             logger.warning(
+    #                 f"⚠️  ActionServer '{action_name}' missing callbacks: {missing}. "
+    #                 "Will use default implementations (accept all)."
+    #             )
         
-        # Process Service callbacks (single callback pattern)
-        for service_item in decorated['servers']:
-            service_name = service_item['name']
-            method = service_item['method']
+    #     # Process Service callbacks (single callback pattern)
+    #     for service_item in decorated['servers']:
+    #         service_name = service_item['name']
+    #         method = service_item['method']
             
-            matching_settings = [
-                s for s in settings 
-                if s.functionname == service_name and 
-                   s.type == FunctionConfigBaseTypes.service.value
-            ]
+    #         matching_settings = [
+    #             s for s in settings 
+    #             if s.functionname == service_name and 
+    #                s.type == FunctionConfigBaseTypes.service.value
+    #         ]
             
-            if matching_settings:
-                setting = matching_settings[0]
-                if setting.callbacks is None:
-                    setting.callbacks = {}
-                setting.callbacks['response'] = method
-                results[service_name] = True
-                logger.debug(f"✅ Bound service callback: {service_name}")
-                # Blueprint strategy: also bind to CallbackRegistry blueprint
-                blueprint = getattr(method, '_vyra_blueprint', None)
-                if isinstance(blueprint, ServiceBlueprint) and not blueprint.is_bound():
-                    try:
-                        blueprint.bind_callback(method)
-                        logger.debug(f"📋 Blueprint '{service_name}' callback bound in CallbackRegistry")
-                    except RuntimeError:
-                        pass  # Already bound (e.g. duplicate call)
-            else:
-                results[service_name] = False
-                logger.warning(
-                    f"⚠️  No FunctionConfigEntry found for service '{service_name}'"
-                )
+    #         if matching_settings:
+    #             setting = matching_settings[0]
+    #             if setting.callbacks is None:
+    #                 setting.callbacks = {}
+    #             setting.callbacks['response'] = method
+    #             results[service_name] = True
+    #             logger.debug(f"✅ Bound service callback: {service_name}")
+    #             # Blueprint strategy: also bind to CallbackRegistry blueprint
+    #             blueprint = getattr(method, '_vyra_blueprint', None)
+    #             if isinstance(blueprint, ServiceBlueprint) and not blueprint.is_bound():
+    #                 try:
+    #                     blueprint.bind_callback(method)
+    #                     logger.debug(f"📋 Blueprint '{service_name}' callback bound in CallbackRegistry")
+    #                 except RuntimeError:
+    #                     pass  # Already bound (e.g. duplicate call)
+    #         else:
+    #             results[service_name] = False
+    #             logger.warning(
+    #                 f"⚠️  No FunctionConfigEntry found for service '{service_name}'"
+    #             )
         
-        # Summary
-        total = len(results)
-        success = sum(results.values())
-        logger.info(
-            f"📊 Interface callback binding complete: {success}/{total} successful"
-        )
+    #     # Summary
+    #     total = len(results)
+    #     success = sum(results.values())
+    #     logger.info(
+    #         f"📊 Interface callback binding complete: {success}/{total} successful"
+    #     )
         
-        return results
+    #     return results
 
     def register_storage(self, storage: Storage) -> None:
         """
@@ -1621,62 +1634,116 @@ class VyraEntity:
         response.success = True
         return None
 
-    @staticmethod
-    def register_service_callbacks(callback_parent: object):
+    def bind_endpoint_callbacks(self, component: object) -> None:
         """
-        Registers all remote services defined in the callback_parent. 
-        
-        Remote services must be decorated with ``@remote_service``.
+        Discover all ``@remote_service`` / ``@remote_actionServer`` decorated
+        methods on *component* and register them with the :attr:`endpoint_registry`.
 
-        Example::
+        Called automatically inside each ``_init_*`` method so that every
+        entity sub-system (params, volatile, skills, security, …) registers
+        its callbacks as soon as it is constructed — without requiring a
+        separate binding pass in the module bootstrap.
 
-            from vyra_base.com import remote_service
+        If a matching endpoint definition has already been loaded by the
+        :class:`~vyra_base.com.manifest.ManifestResolver` the callback is
+        bound immediately; otherwise a dangling stub is created and the
+        :class:`~vyra_base.com.orchestrator.EndpointOrchestrator` will
+        complete the wiring once the manifest arrives.
 
-            class MyParentClass:
-                @remote_service()
-                async def my_remote_function(self, request: Any, response: Any):
-                    pass
-
-            instance_my_parent = MyParentClass()
-
-        To register the remote service in this example, the instance_my_parent
-        object must be passed to this function:
-        
-        - ``register_services_callbacks(instance_my_parent)``
-
-        Inside your MyParentClass in a method you can call the same function and
-        set the callback_parent to self to register the services of the
-        instance itself:
-        
-        - ``register_services_callbacks(self)``
-
-        This function will iterate over all attributes of the instance and
-        register those marked as remote service with the DataSpace.
-
-        .. warning::
-           This function will only register the callbacks. Run 
-           ``entity.set_interfaces(your_config)`` afterwards to load the interfaces 
-           in vyra.
-
-        :param callback_parent: The class or instance containing the remote services.
-        :type callback_parent: Type[object]
-        :raises TypeError: If callback_parent is not an instance of object.
-        :raises ValueError: If callback_parent does not have any remote services.
-        :raises RuntimeError: If the service registration fails.
-        :returns: None
-        :rtype: None
+        :param component: Any object whose methods may be decorated with
+                          VYRA communication decorators.
         """
-        for attr_name in dir(callback_parent):
-            attr = getattr(callback_parent, attr_name)
-            rc_active = getattr(attr, "_remote_service", False)
+        from vyra_base.com.core.decorators import get_decorated_methods
 
-            if callable(attr) and rc_active:
-                # Interface automatically registered via @remote_service decorator
-                logger.debug(
-                    f"Remote service <{attr.__name__}> registered via decorator")
+        decorated = get_decorated_methods(component)
+        for method_info in decorated:
+            for interface_type in method_info:
+                if interface_type not in ["service", "publisher", "subscriber", "action"]:
+                    continue
+                
+                fn_name = (
+                    method_info[interface_type].get("name")
+                    or getattr(method_info[interface_type].get("method"), "__name__", None)
+                )
+                method = method_info[interface_type].get("method") or method_info[interface_type]
+                cb_type = method_info[interface_type].get("callback_type", "default")
 
-                # Set on the underlying function object
-                if hasattr(attr, "__func__"):
-                    setattr(attr.__func__, "_remote_service", False)
-                else:
-                    setattr(attr, "_remote_service", False)
+                if fn_name and callable(method):
+                    try:
+                        self.endpoint_registry.bind_callback(fn_name, method, cb_type)
+                    except Exception as exc:
+                        logger.debug(
+                            "_bind_endpoint_callbacks: could not bind '%s' on %s: %s",
+                            fn_name,
+                            type(component).__name__,
+                            exc,
+                        )
+
+    # ------------------------------------------------------------------
+    # Deprecated — superseded by _bind_endpoint_callbacks.
+    # Kept commented-out for reference; do not call from new code.
+    # ------------------------------------------------------------------
+    # @staticmethod
+    # def register_service_callbacks(callback_parent: object):
+    #     """
+    #     .. deprecated::
+    #         Use :meth:`bind_endpoint_callbacks` instead.  This static method
+    #         scanned for the ``_remote_service`` flag which is no longer set by
+    #         the current ``@remote_service`` decorator implementation.
+
+    #     Registers all remote services defined in the callback_parent. 
+        
+    #     Remote services must be decorated with ``@remote_service``.
+
+    #     Example::
+
+    #         from vyra_base.com import remote_service
+
+    #         class MyParentClass:
+    #             @remote_service()
+    #             async def my_remote_function(self, request: Any, response: Any):
+    #                 pass
+
+    #         instance_my_parent = MyParentClass()
+
+    #     To register the remote service in this example, the instance_my_parent
+    #     object must be passed to this function:
+        
+    #     - ``register_services_callbacks(instance_my_parent)``
+
+    #     Inside your MyParentClass in a method you can call the same function and
+    #     set the callback_parent to self to register the services of the
+    #     instance itself:
+        
+    #     - ``register_services_callbacks(self)``
+
+    #     This function will iterate over all attributes of the instance and
+    #     register those marked as remote service with the DataSpace.
+
+    #     .. warning::
+    #        This function will only register the callbacks. Run 
+    #        ``entity.set_interfaces(your_config)`` afterwards to load the interfaces 
+    #        in vyra.
+
+    #     :param callback_parent: The class or instance containing the remote services.
+    #     :type callback_parent: Type[object]
+    #     :raises TypeError: If callback_parent is not an instance of object.
+    #     :raises ValueError: If callback_parent does not have any remote services.
+    #     :raises RuntimeError: If the service registration fails.
+    #     :returns: None
+    #     :rtype: None
+    #     """
+    #     for attr_name in dir(callback_parent):
+    #         attr = getattr(callback_parent, attr_name)
+    #         rc_active = getattr(attr, "_remote_service", False)
+
+    #         if callable(attr) and rc_active:
+    #             # Interface automatically registered via @remote_service decorator
+    #             logger.debug(
+    #                 f"Remote service <{attr.__name__}> registered via decorator")
+
+    #             # Set on the underlying function object
+    #             if hasattr(attr, "__func__"):
+    #                 setattr(attr.__func__, "_remote_service", False)
+    #             else:
+    #                 setattr(attr, "_remote_service", False)
