@@ -394,14 +394,8 @@ class VyraEntity:
             )
         
         # Update global registry
-        registry = InterfacePathRegistry.get_instance()
-        registry.set_interface_paths([str(p) for p in validated_paths])
-        
-        logger.info(
-            f"✅ Interface paths configured: {len(validated_paths)} path(s)"
-        )
-        for idx, path in enumerate(validated_paths, 1):
-            logger.info(f"  [{idx}] {path}")
+        registry = ManifestResolver.get_instance()
+        registry.add_manifest_paths([str(p) for p in validated_paths])
         
         # Optionally update environment for ROS2 discovery
         from vyra_base.helper.ros2_env_helper import ensure_workspace_discoverable
@@ -436,11 +430,11 @@ class VyraEntity:
         """
         self.manifest_resolver.add_manifest_paths(paths)
         # Also keep the legacy InterfacePathRegistry in sync
-        registry = InterfacePathRegistry.get_instance()
+        registry = ManifestResolver.get_instance()
         valid = [str(Path(p).resolve()) for p in paths if Path(p).resolve().is_dir()]
         if valid:
             try:
-                registry.set_interface_paths([str(p) for p in valid])
+                registry.add_manifest_paths([str(p) for p in valid])
             except ValueError:
                 pass
         logger.info(
