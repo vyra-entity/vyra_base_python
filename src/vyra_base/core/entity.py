@@ -12,17 +12,12 @@ from typing import Any, Optional, Union, TYPE_CHECKING
 
 # NEW: Import from new multi-protocol architecture
 from vyra_base.com import TransportProviderFactory, remote_service, ProtocolType
-from vyra_base.com.core.decorators import get_decorated_methods
-from vyra_base.com.core.blueprints import ActionBlueprint, ServiceBlueprint
-from vyra_base.com.core.callback_registry import CallbackRegistry
-from vyra_base.com.core.interface_path_registry import InterfacePathRegistry
 
 # New interface architecture
 from vyra_base.com.endpoint import EndpointRegistry
 from vyra_base.com.manifest import ManifestResolver
 from vyra_base.com.schema import SchemaResolver
 from vyra_base.com.orchestrator import EndpointOrchestrator
-from vyra_base.com.providers.provider_registry import ProviderRegistry
 from vyra_base.com.feeder.error_feeder import ErrorFeeder
 from vyra_base.com.feeder.news_feeder import NewsFeeder
 from vyra_base.com.feeder.state_feeder import StateFeeder
@@ -451,6 +446,8 @@ class VyraEntity:
         logger.info(
             "add_manifest_paths: %d path(s) forwarded to ManifestResolver.", len(paths)
         )
+        if self._orchestrator is not None:
+            self._orchestrator.notify_manifest_change()
 
     def add_schema_paths(self, paths: list[str | Path]) -> None:
         """
@@ -1656,24 +1653,30 @@ class VyraEntity:
         from vyra_base.com.core.decorators import get_decorated_methods
 
         decorated = get_decorated_methods(component)
-        for method_info in decorated:
-            for interface_type in method_info:
-                if interface_type not in ["service", "publisher", "subscriber", "action"]:
-                    continue
-                
-                fn_name = (
-                    method_info[interface_type].get("name")
-                    or getattr(method_info[interface_type].get("method"), "__name__", None)
+        slot_defaults = {
+            "servers": "default",
+            "publishers": "default",
+            "subscribers": "default",
+            "actions": "execute",
+        }
+
+        for group, default_slot in slot_defaults.items():
+            for item in decorated.get(group, []):
+                fn_name = item.get("name") or getattr(
+                    item.get("method"), "__name__", None
                 )
-                method = method_info[interface_type].get("method") or method_info[interface_type]
-                cb_type = method_info[interface_type].get("callback_type", "default")
+                method = item.get("method")
+                cb_type = item.get("callback_type", default_slot)
 
                 if fn_name and callable(method):
                     try:
-                        self.endpoint_registry.bind_callback(fn_name, method, cb_type)
+                        self.endpoint_registry.bind_callback(
+                            fn_name, method, cb_type
+                        )
                     except Exception as exc:
                         logger.debug(
-                            "_bind_endpoint_callbacks: could not bind '%s' on %s: %s",
+                            "bind_endpoint_callbacks: could not bind '%s' "
+                            "on %s: %s",
                             fn_name,
                             type(component).__name__,
                             exc,

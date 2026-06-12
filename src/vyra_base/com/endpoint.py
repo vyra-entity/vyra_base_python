@@ -275,7 +275,9 @@ class PublisherEndpoint(InterfaceEndpoint):
         return {"default": None}
 
     def required_callback_slots(self) -> Set[str]:
-        return {"default"}
+        # Publishers are activated without a callback — the transport only
+        # needs the resolved schema and manifest definition.
+        return set()
 
     def _validate_callback(self, callback: Callable, callback_type: str) -> None:
         sig = inspect.signature(callback)
@@ -521,6 +523,9 @@ class EndpointRegistry:
         ``functionname`` in manifest_data, the manifest is merged into that
         stub so that the previously registered callback is preserved.
 
+        Idempotent: if the endpoint already carries the same manifest data,
+        returns True without emitting a change event.
+
         Returns True on success.
         """
         with self._lock:
@@ -536,10 +541,18 @@ class EndpointRegistry:
                 existing_key = next(
                     (k for k, v in self._endpoints.items() if v is ep), key
                 )
-                if existing_key != key:
+                rekey_needed = existing_key != key
+                if not _manifest_bind_would_change(
+                    ep, function_name, manifest_data, rekey_needed=rekey_needed
+                ):
+                    logger.debug(
+                        "bind_manifest: '%s' already bound — skipped.", key
+                    )
+                    return True
+
+                if rekey_needed:
                     self._endpoints[key] = ep
-                    if existing_key != key:
-                        self._endpoints.pop(existing_key, None)
+                    self._endpoints.pop(existing_key, None)
                     logger.info(
                         "bind_manifest: merged manifest into dangling endpoint "
                         "'%s' (previously keyed as '%s').",
@@ -721,6 +734,26 @@ class EndpointRegistry:
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
+def _manifest_bind_would_change(
+    ep: InterfaceEndpoint,
+    function_name: str,
+    manifest_data: Dict[str, Any],
+    *,
+    rekey_needed: bool,
+) -> bool:
+    """Return True when ``bind_manifest`` must mutate state or notify."""
+    if rekey_needed:
+        return True
+    if ep._manifest_key != function_name:
+        return True
+    merged = {**ep.metadata, **manifest_data}
+    if merged != ep.metadata:
+        return True
+    if not ep.protocols and manifest_data.get("tags"):
+        return True
+    return False
+
 
 def _tags_to_protocols(tags: List[str]) -> List[ProtocolType]:
     """Convert metadata tag strings to ProtocolType list."""

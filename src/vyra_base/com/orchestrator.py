@@ -266,7 +266,9 @@ class EndpointOrchestrator:
             return
 
         for fn_name, meta in all_meta.items():
-            # bind_manifest handles dedup + dangling-endpoint merge internally
+            ep = self._registry.get_endpoint(fn_name)
+            if ep is not None and ep._manifest_key is not None:
+                continue
             self._registry.bind_manifest(fn_name, meta)
 
     async def _sync_schema_to_endpoints(self) -> None:
